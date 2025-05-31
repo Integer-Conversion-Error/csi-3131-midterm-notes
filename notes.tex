@@ -1,0 +1,181 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{ragged2e} % For better justification in p-columns
+\usepackage{hyperref} % For clickable ToC and links
+\usepackage{parskip} % For compact paragraphs
+\linespread{0.9} % For more compact line spacing
+
+\geometry{a4paper, margin=0.2in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Operating Systems Notes},
+    pdfpagemode=FullScreen,
+}
+
+\title{Operating Systems Notes}
+\author{} % Author intentionally left blank
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{Chapter 1 – Foundations of Operating Systems}
+\subsection*{1 Purpose and Core Responsibilities}
+\begin{itemize}
+    \item \textbf{Intermediary:} OS sits between user \& applications and hardware, hiding details while exposing services.
+    \item \textbf{Goals:}
+    \begin{itemize}
+        \item Run programs conveniently (consistent UI).
+        \item Run programs efficiently (performance, safe sharing).
+        \item Manage hardware resources (CPU, memory, I/O, storage).
+    \end{itemize}
+\end{itemize}
+
+\subsection*{2 Abstraction Layers (high $\rightarrow$ low)}
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{User} – GUI, CLI, touch, voice.
+    \item \textbf{Application programs} – browsers, compilers, games.
+    \item \textbf{Operating system} – kernel, system programs, middleware.
+    \item \textbf{Computer hardware} – CPU, memory, devices.
+\end{enumerate}
+
+\subsection*{3 User View vs. System View}
+\begin{itemize}
+    \item \textbf{User view:} Focus on ease of use; resource details hidden.
+    \item \textbf{System view:}
+    \begin{itemize}
+        \item \textbf{Resource allocator} – arbitrates CPU, memory, I/O, etc.
+        \item \textbf{Control program} – governs execution, manages devices.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{4 What Forms an Operating System?}
+\centering
+\begin{tabular}{>{\RaggedRight}p{0.28\textwidth} >{\RaggedRight}p{0.28\textwidth} >{\RaggedRight\arraybackslash}p{0.34\textwidth}}
+\toprule
+\textbf{Always} & \textbf{Usually} & \textbf{Optional / Varies} \\
+\midrule
+\textbf{Kernel} – always runs after boot. & \textbf{Device drivers}, loadable modules. & \textbf{Middleware} (graphics, DB), extra utilities. \\
+& \textbf{System programs} (shells, daemons). & \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip} % Add some space after the table
+
+\subsection*{5 Why Study Operating Systems?}
+\begin{itemize}
+    \item All code runs on an OS; knowing its policies \& APIs yields safer, faster, portable software.
+    \item OS concepts (processes, memory, I/O, security) recur in servers, clouds, IoT.
+\end{itemize}
+
+\subsection*{6 Glossary Highlights (1.1)}
+\begin{itemize}
+    \item \textbf{Operating system, kernel, system program, middleware, resource allocator, control program, ease of use, resource utilization}
+\end{itemize}
+
+\section*{1.2 Computer-System Organization}
+\subsection*{1 System-Level Hardware Layout}
+\begin{itemize}
+    \item Shared \textbf{system bus} connects CPU cores, main memory, device controllers.
+    \item \textbf{Device controller:} logic per device class (disk, GPU, USB) with registers \& buffer.
+    \item \textbf{Device driver:} kernel API shielding hardware details.
+    \item \textbf{Parallelism:} CPU \& controllers run concurrently; \textbf{memory controller} arbitrates.
+\end{itemize}
+
+\subsection*{2 Interrupts – Hardware-Driven Events}
+\subsubsection*{2.1 Lifecycle}
+\begin{enumerate}[label=\arabic*.]
+    \item Controller raises signal on \textbf{interrupt-request line}.
+    \item CPU catches signal, saves state, jumps to handler via \textbf{interrupt vector}.
+    \item Handler services device, restores state, executes \texttt{return\_from\_interrupt}.
+\end{enumerate}
+
+\subsubsection*{2.2 Efficiency Features}
+\begin{itemize}
+    \item \textbf{O(1) dispatch} via vector table.
+    \item \textbf{Nonmaskable} vs. \textbf{maskable} lines (maskable can be disabled).
+    \item \textbf{Priority \& interrupt chaining:} high-priority pre-empts low; vector entry may head list of handlers.
+\end{itemize}
+
+\subsubsection*{2.3 End-to-End I/O Timeline}
+\texttt{User code $\rightarrow$ I/O request $\rightarrow$ controller/DMA busy $\rightarrow$ finish $\rightarrow$ interrupt $\rightarrow$ handler $\rightarrow$ resume user code}
+
+\subsection*{3 Storage Structure}
+\subsubsection*{3.1 Memory Hierarchy}
+\centering
+\begin{tabular}{lllll}
+\toprule
+\textbf{Layer} & \textbf{Volatile?} & \textbf{Size} & \textbf{Access} & \textbf{Notes} \\
+\midrule
+Registers & Yes & bytes & sub-ns & in CPU \\
+Cache & Yes & KB–MB & ns & SRAM \\
+Main memory & Yes & GBs & $\sim$10 ns & DRAM \\
+NVM/SSD & No & 10 GB–TB & $\mu$s & electrical \\
+HDD & No & 100 GB–TB & ms & mechanical \\
+Optical/tape & No & TB–PB & s–min & archival \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
+
+\subsubsection*{3.2 Key Units \& Terms}
+\begin{itemize}
+    \item \textbf{Bit $\rightarrow$ byte (8 bits) $\rightarrow$ word} (CPU width).
+    \item \textbf{KiB / MiB / GiB / TiB / PiB} = powers of 1024.
+    \item \textbf{Volatile} memory loses data on power-off; \textbf{non-volatile storage (NVS)} persists.
+    \item \textbf{Firmware / EEPROM} stores bootstrap program.
+\end{itemize}
+
+\subsubsection*{3.3 Why Secondary Storage?}
+\begin{itemize}
+    \item Main memory is finite and volatile; programs \& data live on slower persistent media until loaded.
+\end{itemize}
+
+\subsection*{4 I/O Structure}
+\subsubsection*{4.1 Direct Memory Access (DMA)}
+\begin{itemize}
+    \item Driver configures DMA engine; controller moves block without CPU, raises one interrupt on completion.
+\end{itemize}
+
+\subsubsection*{4.2 Bus vs. Switched Fabrics}
+\begin{itemize}
+    \item \textbf{Shared bus:} one transfer at a time; common on PCs.
+    \item \textbf{Switch fabric:} concurrent links; used in servers \& SoCs.
+\end{itemize}
+
+\subsubsection*{4.3 Full I/O Cycle}
+\begin{enumerate}[label=\arabic*.]
+    \item Driver starts I/O.
+    \item Controller activates device/DMA.
+    \item CPU handles other tasks, checks interrupts.
+    \item Device finishes, raises interrupt.
+    \item Handler validates data, wakes waiting process.
+\end{enumerate}
+
+\subsection*{5 Glossary Highlights (1.2)}
+\centering
+\begin{tabular}{>{\RaggedRight}p{0.35\textwidth} >{\RaggedRight\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Bus} & Shared path linking CPU, memory, controllers. \\
+\textbf{Device driver} & Kernel interface to a controller. \\
+\textbf{Interrupt / vector / request line} & Hardware signal and its dispatch mechanism. \\
+\textbf{Maskable / nonmaskable interrupt} & Can or cannot be disabled. \\
+\textbf{DMA} & Controller-driven block transfer to/from memory. \\
+\textbf{Volatile / non-volatile memory} & Data lost or retained on power loss. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
+
+\end{document}
