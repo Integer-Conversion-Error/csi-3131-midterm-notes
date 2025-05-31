@@ -1278,4 +1278,181 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
+\newpage
+\section*{1.11 Free and open-source operating systems}
+\addcontentsline{toc}{section}{1.11 Free and open-source operating systems}
+\begin{itemize}
+    \item Study of OS made easier by free software and open-source releases.
+    \item Both available in source-code format (not compiled binary).
+    \item \textbf{Free software} (\textit{free/libre software}):
+    \begin{itemize}
+        \item Source code available.
+        \item Licensed for no-cost use, redistribution, and modification.
+    \end{itemize}
+    \item \textbf{Open-source software}:
+    \begin{itemize}
+        \item Source code available.
+        \item Does not necessarily offer free licensing.
+    \end{itemize}
+    \item All free software is open source, but some open-source software is not "free."
+    \item \textbf{GNU/Linux:} Most famous open-source OS; some distributions are free, others open source only.
+    \item \textbf{Microsoft Windows:} Closed-source, proprietary software (Microsoft owns, restricts use, protects source code).
+    \item \textbf{Apple macOS:} Hybrid approach (open-source \textbf{Darwin} kernel, proprietary closed-source components).
+    \item Starting with source code allows programmers to produce executable binary code.
+    \item Examining source code is an excellent learning tool: students can modify, compile, and run changes.
+    \item \textbf{Benefits of open-source operating systems:}
+    \begin{itemize}
+        \item Community of programmers contribute (write, debug, analyze, support, suggest changes).
+        \item Arguably more secure (many eyes viewing the code).
+        \item Bugs found and fixed faster due to number of users/viewers.
+        \item Commercial companies (e.g., Red Hat) benefit from open-sourcing code (revenue from support contracts, hardware sales).
+    \end{itemize}
+\end{itemize}
+
+\subsection*{1 History}
+\addcontentsline{toc}{subsection}{1 History}
+\begin{itemize}
+    \item Early computing (1950s): software generally came with source code (e.g., MIT's Tech Model Railroad Club, Homebrew user groups, DECUS).
+    \item 1970: Digital's OS distributed as source code with no restrictions/copyright.
+    \item Computer/software companies later sought to limit software use to authorized computers/paying customers.
+    \item Releasing only binary files (not source code) helped protect code/ideas from competitors.
+    \item By 1980: proprietary software was the usual case.
+\end{itemize}
+
+\subsection*{2 Free operating systems}
+\addcontentsline{toc}{subsection}{2 Free operating systems}
+\begin{itemize}
+    \item To counter proprietary trend, \textbf{Richard Stallman} (1984) started developing \textbf{GNU} ("GNU's Not Unix!"): a free, UNIX-compatible OS.
+    \item "Free" refers to freedom of use, not price.
+    \item Free-software movement holds users are entitled to four freedoms:
+    \begin{enumerate}
+        \item To freely run the program.
+        \item To study and change the source code.
+        \item To give or sell copies.
+        \item To give or sell copies with or without changes.
+    \end{enumerate}
+    \item 1985: Stallman published the \textbf{GNU Manifesto} (argues all software should be free).
+    \item Formed the \textbf{Free Software Foundation (FSF)} to encourage free software use/development.
+    \item FSF uses "copyleft" (Stallman invention): licensing that gives anyone possessing a copy the four essential freedoms, with condition that redistribution must preserve these freedoms.
+    \item \textbf{GNU General Public License (GPL):} Common license for free software; requires source code distribution with binaries, and all copies (including modified) released under same GPL.
+    \item Creative Commons "Attribution Sharealike" license is also a copyleft license.
+\end{itemize}
+
+\subsection*{3 GNU/Linux}
+\addcontentsline{toc}{subsection}{3 GNU/Linux}
+\begin{itemize}
+    \item By 1991: GNU OS nearly complete (compilers, editors, utilities, libraries, games), but kernel not ready.
+    \item 1991: \textbf{Linus Torvalds} (Finland) released a rudimentary UNIX-like kernel using GNU compilers/tools, invited worldwide contributions.
+    \item Internet enabled rapid growth of "Linux" (weekly updates, thousands of programmers).
+    \item 1991: Linux not free (noncommercial redistribution only).
+    \item 1992: Torvalds rereleased Linux under the GPL, making it free software (and "open source").
+    \item \textbf{GNU/Linux:} Full OS (kernel properly called Linux, but includes GNU tools).
+    \item Spawned hundreds of unique \textbf{distributions} (custom builds): Red Hat, SUSE, Fedora, Debian, Slackware, Ubuntu.
+    \item Distributions vary in function, utility, installed applications, hardware support, user interface, and purpose.
+    \item Example: Red Hat Enterprise Linux geared for large commercial use.
+    \item Example: \textbf{PCLinuxOS} is a \textbf{Live CD} (or \textbf{LiveDVD}) -- OS that can be booted/run from CD-ROM/DVD without installation on boot disk.
+    \item Running Linux on a Windows (or other) system using virtualization:
+    \begin{enumerate}
+        \item Download/install free \textbf{Virtualbox VMM} tool (\url{https://www.virtualbox.org/}).
+        \item Install OS from scratch (CD image) or use pre-built images (\url{http://virtualboxes.org/images/}).
+        \item Boot the virtual machine within Virtualbox.
+    \end{enumerate}
+    \item Alternative: free program \textbf{Qemu} (\url{http://wiki.qemu.org/Download/}), includes \texttt{qemu-img} for converting Virtualbox images.
+    \item This text provides a virtual machine image of GNU/Linux running Ubuntu release (includes source code, dev tools).
+\end{itemize}
+
+\subsection*{4 BSD UNIX}
+\addcontentsline{toc}{subsection}{4 BSD UNIX}
+\begin{itemize}
+    \item Longer, more complicated history than Linux.
+    \item Started 1978 as derivative of AT\&T's UNIX.
+    \item Releases from University of California at Berkeley (UCB) came in source/binary form, but not open source (AT\&T license required).
+    \item Development slowed by AT\&T lawsuit.
+    \item 1994: Fully functional, open-source \textbf{4.4BSD-lite} released.
+    \item Many distributions: \textbf{FreeBSD}, \textbf{NetBSD}, \textbf{OpenBSD}, \textbf{DragonflyBSD}.
+    \item To explore FreeBSD source code: download VM image (Virtualbox), source in \texttt{/usr/src/}, kernel in \texttt{/usr/src/sys}, VM code in \texttt{/usr/src/sys/vm}.
+    \item View source code online: \url{https://svnweb.freebsd.org}.
+    \item Source code contained/controlled by a \textbf{version control system} (e.g., "subversion" \url{https://subversion.apache.org/source-code}).
+    \begin{itemize}
+        \item Allows user to "pull" entire source code tree and "push" changes back to repository.
+        \item Provides history of each file and conflict resolution.
+    \end{itemize}
+    \item Another version control system: \textbf{git} (\url{http://www.git-scm.com}), used for GNU/Linux and other programs.
+    \item \textbf{Darwin:} Core kernel component of macOS, based on BSD UNIX, open-sourced (\url{http://www.opensource.apple.com/}).
+    \begin{itemize}
+        \item Every macOS release has open-source components posted there.
+        \item Package containing kernel begins with "xnu."
+        \item Apple provides developer tools, documentation, support (\url{http://developer.apple.com}).
+    \end{itemize}
+\end{itemize}
+
+\subsection*{5 The study of operating systems}
+\addcontentsline{toc}{subsection}{5 The study of operating systems}
+\begin{itemize}
+    \item Never been easier/more interesting to study OS.
+    \item Open-source movement: many OS available in source and binary (Linux, BSD UNIX, Solaris, part of macOS).
+    \item Availability of source code allows studying OS from the inside out (examining code vs. documentation/behavior).
+    \item OS no longer commercially viable have been open-sourced (study how systems operated with fewer CPU, memory, storage resources).
+    \item Rise of \textbf{virtualization} (mainstream, often free) makes it possible to run many OS on top of one core system.
+    \begin{itemize}
+        \item Example: VMware (\url{http://www.vmware.com}) provides free "player" for Windows; hundreds of free "virtual appliances" can run.
+        \item Example: Virtualbox (\url{http://www.virtualbox.com}) provides free, open-source VMM on many OS.
+        \item Students can try hundreds of OS without dedicated hardware.
+    \end{itemize}
+    \item Simulators of specific hardware also available (run OS on "native" hardware within modern computer/OS).
+    \begin{itemize}
+        \item Example: DECSYSTEM-20 simulator on macOS can boot TOPS-20, load source tapes, modify/compile new TOPS-20 kernel.
+    \end{itemize}
+    \item Open-source OS make it easier to move from student to OS developer (create new OS distribution).
+    \item Access to source code limited only by interest, time, and disk space.
+\end{itemize}
+
+\subsection*{6 Solaris}
+\addcontentsline{toc}{subsection}{6 Solaris}
+\begin{itemize}
+    \item Commercial UNIX-based OS of Sun Microsystems.
+    \item Originally Sun's \textbf{SunOS} based on BSD UNIX.
+    \item 1991: Sun moved to AT\&T's System V UNIX as its base.
+    \item 2005: Sun open-sourced most Solaris code as the \textbf{OpenSolaris} project.
+    \item 2010: Oracle's purchase of Sun left project state unclear.
+    \item \textbf{Project Illumos:} Groups interested in OpenSolaris expanded features; basis for several products (\url{http://wiki.illumos.org}).
+\end{itemize}
+
+\subsection*{7 Open-source systems as learning tools}
+\addcontentsline{toc}{subsection}{7 Open-source systems as learning tools}
+\begin{itemize}
+    \item Free-software movement drives legions of programmers to create thousands of open-source projects (including OS).
+    \item Portals: \url{http://freshmeat.net/}, \url{http://distrowatch.com/}.
+    \item Students use source code as a learning tool: modify/test programs, help find/fix bugs, explore mature systems (OS, compilers, tools, UIs).
+    \item Availability of source code for historic projects (e.g., Multics) helps understanding and building knowledge for new projects.
+    \item Diversity of open-source OS (e.g., GNU/Linux, BSD UNIX) with different goals, utility, licensing, purpose.
+    \item Cross-pollination occurs (e.g., major OpenSolaris components ported to BSD UNIX), allowing rapid improvements.
+    \item Advantages of free software and open sourcing likely to increase number/quality of open-source projects and their adoption.
+\end{itemize}
+
+\subsection*{8 Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Free operating system} & An operating system released under a license that makes its source code available and allows no-cost use, redistribution, and modification. \\
+\textbf{Open-source operating system} & An operating system or other program available in source-code format rather than as compiled binary code. \\
+\textbf{Closed-source} & An operating system or other program available only in compiled binary code format. \\
+\textbf{Reverse engineering} & The procedure of converting a compiled binary file into a human-readable format. \\
+\textbf{GNU General Public License (GPL)} & A license agreement that codifies copylefting (allowing and requiring open sourcing of the associated programs); a common license under which free software is released. \\
+\textbf{GNU/Linux (aka Linux)} & An open-source operating system composed of components contributed by the GNU foundation and Linus Torvalds, as well as many others. \\
+\textbf{Distribution} & A release of a version of an operating system. \\
+\textbf{LiveCD} & An operating system that can be booted and run from a CD-ROM (or more generally from any media) without being installed on a system's boot disk(s). \\
+\textbf{LiveDVD} & An operating system that can be booted and run from a DVD (or more generally from any media) without being installed on a system's boot disk(s). \\
+\textbf{UnixBSD} & A UNIX derivative based on work done at the University of California at Berkeley (UCB). \\
+\textbf{Version control system} & Software that manages software distributions by allowing contributors to "push" changes into a repository and "pull" a version of the software source-code tree to a system (e.g., for compilation). \\
+\textbf{Git} & A version control system used for GNU/Linux and other programs. \\
+\textbf{Solaris} & A UNIX derivative that is the main operating system of Sun Microsystems (now owned by Oracle Corporation). There is an active open source version called Illumos. \\
+\textbf{SunOS} & The predecessor of Solaris by Sun Microsystems Inc. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
 \end{document}
