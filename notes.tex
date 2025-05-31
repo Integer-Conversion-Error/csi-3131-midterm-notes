@@ -6,10 +6,11 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \usepackage{array}
-\usepackage{ragged2e} % For better justification in p-columns
+%\usepackage{ragged2el} % For better justification in p-columns (Package not found, using \raggedright instead)
+\usepackage[table]{xcolor} % For alternating row colors in tables
 \usepackage{hyperref} % For clickable ToC and links
 \usepackage{parskip} % For compact paragraphs
-\linespread{0.9} % For more compact line spacing
+% \linespread{0.8} % For more compact line spacing -- Moved after first page for clarity
 
 \geometry{a4paper, margin=0.2in}
 
@@ -27,12 +28,15 @@
 \date{\today}
 
 \begin{document}
+\linespread{1.0}\selectfont % Ensure normal linespread for title and ToC
 \maketitle
 \tableofcontents
 \newpage
-
-\section*{Chapter 1 – Foundations of Operating Systems}
+\linespread{0.8}\selectfont % Apply compact spacing for the rest of the document
+\section*{1.1 Introduction to Operating Systems}
+\addcontentsline{toc}{section}{1.1 Introduction to Operating Systems}
 \subsection*{1 Purpose and Core Responsibilities}
+\addcontentsline{toc}{subsection}{1 Purpose and Core Responsibilities}
 \begin{itemize}
     \item \textbf{Intermediary:} OS sits between user \& applications and hardware, hiding details while exposing services.
     \item \textbf{Goals:}
@@ -44,14 +48,24 @@
 \end{itemize}
 
 \subsection*{2 Abstraction Layers (high $\rightarrow$ low)}
+\addcontentsline{toc}{subsection}{\texorpdfstring{2 Abstraction Layers (high $\rightarrow$ low)}{2 Abstraction Layers (high -> low)}}
 \begin{enumerate}[label=\arabic*.]
     \item \textbf{User} – GUI, CLI, touch, voice.
     \item \textbf{Application programs} – browsers, compilers, games.
     \item \textbf{Operating system} – kernel, system programs, middleware.
     \item \textbf{Computer hardware} – CPU, memory, devices.
 \end{enumerate}
+\subsection*{3 User and Kernel Mode Transition}
+\addcontentsline{toc}{subsection}{3 User and Kernel Mode Transition}
+Hardware mode bit switches CPU from \emph{user} to \emph{kernel} on a
+system call (trap) or interrupt; return-from-trap restores user mode.
 
-\subsection*{3 User View vs. System View}
+\subsection*{4 User View vs. System View}
+\addcontentsline{toc}{subsection}{4 User View vs. System View}
+% >>> NEW: why fast memory matters
+\textit{A von Neumann CPU follows a fetch–decode–execute loop, issuing a
+stream of memory addresses that the OS must service quickly and safely.}
+
 \begin{itemize}
     \item \textbf{User view:} Focus on ease of use; resource details hidden.
     \item \textbf{System view:}
@@ -61,9 +75,11 @@
     \end{itemize}
 \end{itemize}
 
-\subsection*{4 What Forms an Operating System?}
+\subsection*{5 What Forms an Operating System?}
+\addcontentsline{toc}{subsection}{5 What Forms an Operating System?}
+\rowcolors{2}{gray!10}{white}
 \centering
-\begin{tabular}{>{\RaggedRight}p{0.28\textwidth} >{\RaggedRight}p{0.28\textwidth} >{\RaggedRight\arraybackslash}p{0.34\textwidth}}
+\begin{tabular}{>{\raggedright}p{0.28\textwidth} >{\raggedright}p{0.28\textwidth} >{\raggedright\arraybackslash}p{0.34\textwidth}}
 \toprule
 \textbf{Always} & \textbf{Usually} & \textbf{Optional / Varies} \\
 \midrule
@@ -72,20 +88,55 @@
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip} % Add some space after the table
+% >>> NEW: tiny OSs that live in firmware
+\begin{itemize}
+    \item \textbf{Firmware OSs:} microcode, BIOS/UEFI, and many device
+    controllers contain their own minimal operating systems that run
+    continuously beneath the main kernel.
+\end{itemize}
 
-\subsection*{5 Why Study Operating Systems?}
+\subsection*{6 Why Study Operating Systems?}
+\addcontentsline{toc}{subsection}{6 Why Study Operating Systems?}
 \begin{itemize}
     \item All code runs on an OS; knowing its policies \& APIs yields safer, faster, portable software.
-    \item OS concepts (processes, memory, I/O, security) recur in servers, clouds, IoT.
+
+% >>> NEW: computing environments
+\item \textbf{OS flavours:} desktop (Windows, macOS), server (Linux, Windows Server),  
+      mobile (Android, iOS), and embedded/real-time systems each emphasise different goals.
+
+% >>> NEW: real code you can read
+\item \textbf{Open-source examples:} Linux, FreeBSD, and Minix show how textbook
+      concepts map to production kernels.
+
+\item OS concepts (processes, memory, I/O, security) recur in servers, clouds, IoT.
+
 \end{itemize}
 
-\subsection*{6 Glossary Highlights (1.1)}
-\begin{itemize}
-    \item \textbf{Operating system, kernel, system program, middleware, resource allocator, control program, ease of use, resource utilization}
-\end{itemize}
+\subsection*{7 Glossary Highlights (1.1)}
+\addcontentsline{toc}{subsection}{7 Glossary Highlights (1.1)}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Operating system} & Intermediary between user/applications and hardware; hides details, exposes services; runs programs conveniently and efficiently; manages hardware resources. \\
+\textbf{Kernel} & Always runs after boot; provides services. \\
+\textbf{System program} & Loaded at boot time, becomes system daemon; provides services outside the kernel. \\
+\textbf{Middleware} & Optional/varies; graphics, DB, extra utilities. \\
+\textbf{Resource allocator} & Part of OS (system view); arbitrates CPU, memory, I/O, etc. \\
+\textbf{Control program} & Part of OS (system view); governs execution, manages devices. \\
+\textbf{Ease of use} & User view goal; focus on convenience, resource details hidden. \\
+\textbf{Resource utilization} & System view goal; focus on efficiency, performance, safe sharing. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
 
+\newpage
 \section*{1.2 Computer-System Organization}
+\addcontentsline{toc}{section}{1.2 Computer-System Organization}
 \subsection*{1 System-Level Hardware Layout}
+\addcontentsline{toc}{subsection}{1 System-Level Hardware Layout}
 \begin{itemize}
     \item Shared \textbf{system bus} connects CPU cores, main memory, device controllers.
     \item \textbf{Device controller:} logic per device class (disk, GPU, USB) with registers \& buffer.
@@ -94,6 +145,7 @@
 \end{itemize}
 
 \subsection*{2 Interrupts – Hardware-Driven Events}
+\addcontentsline{toc}{subsection}{2 Interrupts – Hardware-Driven Events}
 \subsubsection*{2.1 Lifecycle}
 \begin{enumerate}[label=\arabic*.]
     \item Controller raises signal on \textbf{interrupt-request line}.
@@ -112,7 +164,9 @@
 \texttt{User code $\rightarrow$ I/O request $\rightarrow$ controller/DMA busy $\rightarrow$ finish $\rightarrow$ interrupt $\rightarrow$ handler $\rightarrow$ resume user code}
 
 \subsection*{3 Storage Structure}
+\addcontentsline{toc}{subsection}{3 Storage Structure}
 \subsubsection*{3.1 Memory Hierarchy}
+\rowcolors{2}{gray!10}{white}
 \centering
 \begin{tabular}{lllll}
 \toprule
@@ -133,7 +187,14 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item \textbf{Bit $\rightarrow$ byte (8 bits) $\rightarrow$ word} (CPU width).
     \item \textbf{KiB / MiB / GiB / TiB / PiB} = powers of 1024.
     \item \textbf{Volatile} memory loses data on power-off; \textbf{non-volatile storage (NVS)} persists.
+    % >>> NEW: distinguish mechanical vs electrical NVS
+    \item NVS divides into \emph{mechanical} media (HDD, optical, tape) and
+      \emph{electrical} non-volatile memory (NVM: SSD, flash).
+
     \item \textbf{Firmware / EEPROM} stores bootstrap program.
+    \item \textbf{Interrupt masking:} the kernel may briefly disable maskable
+      interrupts while executing critical sections to maintain data coherence.
+
 \end{itemize}
 
 \subsubsection*{3.3 Why Secondary Storage?}
@@ -142,6 +203,7 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \end{itemize}
 
 \subsection*{4 I/O Structure}
+\addcontentsline{toc}{subsection}{4 I/O Structure}
 \subsubsection*{4.1 Direct Memory Access (DMA)}
 \begin{itemize}
     \item Driver configures DMA engine; controller moves block without CPU, raises one interrupt on completion.
@@ -163,8 +225,10 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \end{enumerate}
 
 \subsection*{5 Glossary Highlights (1.2)}
+\addcontentsline{toc}{subsection}{5 Glossary Highlights (1.2)}
+\rowcolors{2}{gray!10}{white}
 \centering
-\begin{tabular}{>{\RaggedRight}p{0.35\textwidth} >{\RaggedRight\arraybackslash}p{0.55\textwidth}}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
@@ -175,6 +239,366 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \textbf{DMA} & Controller-driven block transfer to/from memory. \\
 \textbf{Volatile / non-volatile memory} & Data lost or retained on power loss. \\
 \bottomrule
+\end{tabular}
+\vspace{\baselineskip}
+
+\newpage
+\section*{1.3 Computer-system architecture}
+\addcontentsline{toc}{section}{1.3 Computer-system architecture}
+\begin{itemize}
+    \item Computer systems are organized based on the number of general-purpose processors.
+\end{itemize}
+
+\subsection*{1 Single-processor systems}
+\addcontentsline{toc}{subsection}{1 Single-processor systems}
+\begin{itemize}
+    \item \textbf{Definition:} One general-purpose CPU with a single processing core.
+    \item Historically common, but few contemporary systems fit this definition.
+    \item \textbf{CPU Core:} Executes instructions, contains registers for local data.
+    \item Main CPU core executes general-purpose instruction sets (including processes).
+    \item May include \textbf{special-purpose processors} (e.g., disk, keyboard, graphics controllers).
+    \begin{itemize}
+        \item Run limited instruction sets; do not run processes.
+        \item Can be OS-managed (OS sends tasks, monitors status).
+        \item Example: Disk-controller microprocessor handles disk queue/scheduling, reducing main CPU overhead.
+        \item Example: Keyboard microprocessor converts keystrokes to codes for CPU.
+        \item Can be low-level hardware components, operating autonomously without OS communication.
+    \end{itemize}
+    \item Use of special-purpose microprocessors does not classify a system as multiprocessor.
+\end{itemize}
+
+\subsection*{2 Multiprocessor systems}
+\addcontentsline{toc}{subsection}{2 Multiprocessor systems}
+\begin{itemize}
+    \item Dominant in modern computing (mobile devices to servers).
+    \item Traditionally: Two or more processors, each with a single-core CPU.
+    \item Share computer bus, sometimes clock, memory, and peripheral devices.
+    \item \textbf{Primary advantage:} Increased throughput (more work in less time).
+    \item Speed-up ratio with $N$ processors is less than $N$ due to overhead and contention for shared resources.
+    \item \textbf{Symmetric Multiprocessing (SMP):}
+    \begin{itemize}
+        \item Each peer CPU processor performs all tasks (OS functions, user processes).
+        \item Each CPU has its own registers and private/local cache.
+        \item All processors share physical memory via the system bus.
+        \item \textit{Figure 1.3.1: Symmetric multiprocessing architecture. Diagram shows main memory connected to two processors, each with its own CPU containing registers and cache.}
+        \item Benefit: $N$ processes can run simultaneously on $N$ CPUs without significant performance degradation.
+        \item Inefficiencies from idle/overloaded CPUs are mitigated by sharing data structures.
+        \item Allows dynamic sharing of processes and resources (e.g., memory) among processors, reducing workload variance.
+        \item Requires careful design (e.g., CPU Scheduling, Synchronization Tools).
+    \end{itemize}
+    \item \textbf{Multicore systems:}
+    \begin{itemize}
+        \item Modern evolution: Multiple computing cores reside on a single chip.
+        \item More efficient than multiple single-core chips due to faster on-chip communication.
+        \item Uses significantly less power than multiple single-core chips (critical for mobile/laptops).
+        \item Example: Dual-core design (Figure 1.3.2)
+        \begin{itemize}
+            \item Each core has its own register set and L1 cache.
+            \item Shared L2 cache is local to the chip.
+            \item Combines local (smaller, faster) and shared (higher-level) caches.
+        \item \textit{Figure 1.3.2: A dual-core design with two cores on the same chip. Diagram shows main memory connected to L2 cache of processor. Processor has two CPU cores, each core has its own registers and L1 cache and shares L2 cache of processor.}
+        \item An $N$-core processor appears as $N$ standard CPUs to the OS.
+        \item Demands efficient use of processing cores from OS/application designers (Threads \& Concurrency).
+        \item Supported by virtually all modern OS (Windows, macOS, Linux, Android, iOS).
+    \end{itemize}
+\end{itemize} % This closes the \begin{itemize} for "Multicore systems"
+\end{itemize} % This closes the main \begin{itemize} for "Multiprocessor systems"
+
+\subsubsection*{Definitions of computer system components}
+\begin{itemize}
+    \item \textbf{CPU:} Hardware that executes instructions.
+    \item \textbf{Processor:} A physical chip containing one or more CPUs.
+    \item \textbf{Core:} Basic computation unit of the CPU.
+    \item \textbf{Multicore:} Multiple computing cores on the same CPU.
+    \item \textbf{Multiprocessor:} Multiple processors within the same CPU chip or system.
+\end{itemize}
+\begin{itemize}
+    \item General term \textit{CPU} refers to a single computational unit.
+    \item \textit{Core} and \textit{multicore} refer specifically to one or more cores on a CPU.
+\end{itemize}
+
+\subsubsection*{Non-Uniform Memory Access (NUMA)}
+\begin{itemize}
+    \item An alternative to scaling multiprocessor systems when bus contention becomes a bottleneck.
+    \item Each CPU (or group of CPUs) has its own \textbf{local memory} accessed via a small, fast local bus.
+    \item CPUs are connected by a \textbf{shared system interconnect}; all CPUs share one physical address space.
+    \item \textit{Figure 1.3.3: NUMA multiprocessing architecture. Diagram shows NUMA architecture which includes four interconnected CPUs, each attached with its own local memory.}
+    \item \textbf{Advantage:} Fast local memory access with no contention over the system interconnect.
+    \item \textbf{Result:} NUMA systems scale more effectively with additional processors.
+    \item \textbf{Potential drawback:} Increased latency for remote memory access across the system interconnect (e.g., $CPU0$ accessing $CPU3$'s local memory is slower).
+    \item OS minimizes NUMA penalty through careful CPU scheduling and memory management.
+    \item Increasingly popular on servers and high-performance computing systems due to scalability.
+\end{itemize}
+
+\subsubsection*{Blade servers}
+\begin{itemize}
+    \item Multiple processor boards, I/O boards, and networking boards placed in the same chassis.
+    \item Differ from traditional multiprocessor systems: each blade-processor board boots independently and runs its own OS.
+    \item Can consist of multiple independent multiprocessor systems.
+\end{itemize}
+
+\subsection*{3 Clustered systems}
+\addcontentsline{toc}{subsection}{3 Clustered systems}
+\begin{itemize}
+    \item Another type of multiprocessor system, gathering multiple CPUs.
+    \item Composed of two or more individual systems (\textbf{nodes}) joined together; each node is typically a multicore system.
+    \item Considered \textbf{loosely coupled}.
+    \item Definition: Clustered computers share storage and are closely linked via LAN or faster interconnect (e.g., InfiniBand).
+    \item \textbf{Primary use:} Provide \textbf{high-availability service} (service continues even if one or more systems fail).
+    \begin{itemize}
+        \item Achieved by adding redundancy.
+        \item Cluster software runs on nodes; each node monitors others.
+        \item If a monitored machine fails, the monitoring machine takes ownership of its storage and restarts applications.
+        \item Users/clients experience only a brief interruption.
+    \end{itemize}
+    \item High availability increases reliability.
+    \item \textbf{Graceful degradation:} System's ability to continue providing service proportional to surviving hardware.
+    \item \textbf{Fault-tolerant systems:} Can suffer a single component failure and continue operation (requires detection, diagnosis, correction).
+    \item \textbf{Clustering structures:}
+    \begin{itemize}
+        \item \textbf{Asymmetric clustering:} One machine in \textbf{hot-standby mode} (monitors active server); if active fails, hot-standby becomes active.
+        \item \textbf{Symmetric clustering:} Two or more hosts run applications and monitor each other; more efficient as it uses all hardware, but requires multiple applications.
+    \end{itemize}
+    \item \textbf{PC motherboard example:}
+    \begin{itemize}
+        \item A fully functioning computer once slots are populated (processor socket, DRAM sockets, PCIe bus slots, I/O connectors).
+        \item Lowest-cost general-purpose CPUs have multiple cores.
+        \item Some motherboards have multiple processor sockets (for NUMA systems).
+        \item \textit{Image shows a computer processor with arrows pointing to: DRAM slots, processor socket, PCI bus slots, and various I/O and power connectors.}
+    \end{itemize}
+    \item \textbf{High-Performance Computing (HPC) environments:}
+    \begin{itemize}
+        \item Clusters provide significantly greater computational power than single-processor/SMP systems.
+        \item Run applications concurrently on all computers in the cluster.
+        \item Requires applications to be specifically written for clusters (e.g., \textbf{parallelization}).
+        \item \textbf{Parallelization:} Divides a program into separate components that run in parallel on individual cores/computers.
+        \item Results from nodes are combined into a final solution.
+    \end{itemize}
+    \item \textbf{Other cluster forms:}
+    \begin{itemize}
+        \item \textbf{Parallel clusters:} Multiple hosts access the same data on shared storage.
+        \item Often requires special software/application releases (e.g., Oracle Real Application Cluster).
+        \item Uses \textbf{distributed lock manager (DLM)} for access control and locking.
+        \item Clustering over Wide-Area Network (WAN).
+    \end{itemize}
+    \item Cluster technology is rapidly evolving (supporting thousands of systems, separated by miles).
+    \item Enabled by \textbf{Storage-Area Networks (SANs)}: allow many systems to attach to a pool of storage.
+    \item If applications/data are on the SAN, cluster software can assign the application to any host attached to the SAN.
+    \item \textit{Figure 1.3.4: General structure of a clustered system. Diagram shows structure of clustered system in which storage-area network is connected with set of interconnected computers.}
+\end{itemize}
+
+\subsection*{4 Section glossary}
+\addcontentsline{toc}{subsection}{4 Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Core} & Within a CPU, the component that executes instructions. \\
+\textbf{Multiprocessor systems} & Systems with two or more hardware processors (CPU cores) in close communication, sharing the computer bus and sometimes the clock, memory, and peripheral devices. \\
+\textbf{Symmetric multiprocessing (SMP)} & Multiprocessing where each processor performs all tasks, including OS tasks and user processes. \\
+\textbf{Multicore} & Multiple processing cores within the same CPU chip or within a single system. \\
+\textbf{Multiprocessor} & Multiple processors within the same CPU chip or within a single system. \\
+\textbf{Shared system interconnect} & A bus connecting CPUs to memory such that all CPUs can access all system memory; basis for NUMA systems. \\
+\textbf{Non-Uniform Memory Access (NUMA)} & Architecture where memory access time varies based on which core the thread is running on (e.g., core interlink slower than direct DIMM access). \\
+\textbf{Blade server} & Computer with multiple processor, I/O, and networking boards in same chassis; each board boots independently and runs its own OS. \\
+\textbf{Clustered system} & Gathers multiple CPUs; composed of two or more individual systems (nodes) joined together. \\
+\textbf{High-availability} & Service continues even if one or more systems in the cluster fail. \\
+\textbf{Graceful degradation} & System's ability to continue providing service proportional to surviving hardware. \\
+\textbf{Fault-tolerant system} & System that can suffer a single component failure and still continue operation. \\
+\textbf{Asymmetric clustering} & One machine in hot-standby mode monitors active server; takes over if active fails. \\
+\textbf{Hot-standby mode} & Computer in cluster monitors active server, becomes active if it fails. \\
+\textbf{Symmetric clustering} & Two or more hosts run applications and monitor each other. \\
+\textbf{High-Performance Computing (HPC)} & Computing facility for large number of resources used by software designed for parallel operation. \\
+\textbf{Parallelization} & Dividing a program into separate components that run in parallel on individual cores/computers. \\
+\textbf{Distributed lock manager (DLM)} & Function used by clustered system for access control and locking to prevent conflicting operations. \\
+\textbf{Storage-Area Network (SAN)} & Local-area storage network allowing multiple computers to connect to one or more storage devices. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
+
+\newpage
+\section*{1.4 Operating-system operations}
+\addcontentsline{toc}{section}{1.4 Operating-system operations}
+\begin{itemize}
+    \item Provides the environment within which programs are executed.
+    \item Internally, OS vary greatly, but share commonalities.
+\end{itemize}
+
+\subsection*{1 Initial Program and Kernel Loading}
+\addcontentsline{toc}{subsection}{1 Initial Program and Kernel Loading}
+\begin{itemize}
+    \item Computer needs an initial program to run when powered up or rebooted.
+    \item This \textbf{bootstrap program} is typically simple and stored in \textbf{firmware}.
+    \item Initializes all system aspects: CPU registers, device controllers, memory contents.
+    \item Must locate and load the \textbf{operating-system kernel} into memory.
+    \item Once kernel is loaded and executing, it provides services.
+    \item Some services are provided by \textbf{system programs} loaded at boot time, becoming \textbf{system daemons}.
+    \item Example: On Linux, \texttt{systemd} starts many other daemons.
+    \item After booting, the system waits for events (e.g., interrupts or traps).
+\end{itemize}
+
+\subsubsection*{Hadoop}
+\begin{itemize}
+    \item Open-source software framework for distributed processing of \textbf{big data} in clustered systems.
+    \item Designed to scale from a single system to thousands of computing nodes.
+    \item Assigns tasks to nodes, manages communication for parallel computations, and coalesces results.
+    \item Detects and manages node failures, providing efficient and reliable distributed computing.
+    \item Organized around three components:
+    \begin{enumerate}
+        \item A distributed file system for managing data and files across nodes.
+        \item The \textbf{YARN} ("Yet Another Resource Negotiator") framework for resource management and task scheduling.
+        \item The \textbf{MapReduce} system for parallel data processing across nodes.
+    \end{enumerate}
+    \item Primarily runs on Linux systems.
+    \item Applications can be written in PHP, Perl, Python, and Java (popular due to Java libraries for MapReduce).
+\end{itemize}
+
+\subsection*{2 Interrupts and Traps}
+\addcontentsline{toc}{subsection}{2 Interrupts and Traps}
+\begin{itemize}
+    \item Events are almost always signaled by the occurrence of an \textbf{interrupt}.
+    \item A \textbf{trap} (or an \textbf{exception}) is a software-generated interrupt.
+    \begin{itemize}
+        \item Caused by an error (e.g., division by zero, invalid memory access).
+        \item Caused by a specific request from a user program for an operating-system service, by executing a \textbf{system call}.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{3 Multiprogramming and Multitasking}
+\addcontentsline{toc}{subsection}{3 Multiprogramming and Multitasking}
+\begin{itemize}
+    \item Important aspects of OS: ability to run multiple programs.
+    \item Single program cannot keep CPU or I/O devices busy at all times.
+\item \textbf{Multiprogramming:}
+    \begin{itemize}
+        \item Increases CPU utilization and user satisfaction.
+        \item OS keeps several \textbf{processes} (programs in execution) in memory simultaneously.
+        \item When a process waits for a task (e.g., I/O), OS switches to another process.
+        \item CPU is never idle as long as at least one process needs to execute.
+        \item \textit{Figure 1.4.1: Memory layout for a multiprogramming system. Diagram shows vertical column representing memory which contains layers of operating system, process 1, process 2, process 3, and process 4.}
+    \end{itemize}
+\item \textbf{Multitasking:}
+    \begin{itemize}
+        \item Logical extension of multiprogramming.
+        \item CPU switches frequently among processes, providing fast \textbf{response time}.
+        \item Handles slow interactive I/O (e.g., user typing speed).
+        \item Requires:
+        \begin{itemize}
+            \item Memory management (\textit{Main Memory}, \textit{Virtual Memory} chapters).
+            \item \textbf{CPU scheduling} (choosing which process runs next).
+            \item Protection mechanisms to limit processes' ability to affect one another.
+            \item \textbf{Virtual memory}: allows execution of processes not completely in memory; enables running programs larger than physical memory; abstracts main memory into a large, uniform array of storage, separating \textbf{logical memory} from physical memory.
+            \item File system (\textit{File-System Interface}, \textit{File-System Implementation}, \textit{File-System Internals} chapters).
+            \item Storage management (\textit{Mass-Storage Structure} chapter).
+            \item Resource protection (\textit{Protection} chapter).
+            \item Process synchronization and communication (\textit{Synchronization Tools}, \textit{Synchronization Examples} chapters).
+            \item Deadlock prevention (\textit{Deadlocks} chapter).
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{4 Dual-mode and Multimode Operation}
+\addcontentsline{toc}{subsection}{4 Dual-mode and Multimode Operation}
+\begin{itemize}
+    \item Ensures incorrect/malicious programs cannot cause other programs or the OS to execute incorrectly.
+    \item Distinguishes between execution of operating-system code and user-defined code.
+    \item Hardware support provides differentiation among various modes of execution.
+\item At least two separate modes of operation:
+    \begin{itemize}
+        \item \textbf{User mode}: System executing on behalf of a user application.
+        \item \textbf{Kernel mode} (also called \textbf{supervisor mode}, \textbf{system mode}, or \textbf{privileged mode}): System executing on behalf of the operating system.
+    \end{itemize}
+    \item A \textbf{mode bit} is added to hardware to indicate current mode: kernel (0) or user (1).
+    \item \textit{Figure 1.4.2: Transition from user to kernel mode. Diagram shows events such as user process executing, calling system call and return from system call in user mode whereas trapping mode bit 0, execute system call, and returning mode bit 1 in kernel mode.}
+    \item At system boot time, hardware starts in kernel mode.
+    \item OS is loaded and starts user applications in user mode.
+    \item Whenever a trap or interrupt occurs, hardware switches from user mode to kernel mode (mode bit to 0).
+    \item OS always gains control in kernel mode.
+    \item System always switches to user mode (mode bit to 1) before passing control to a user program.
+    \item \textit{Figure 1.4.3: Windows Performance Monitor tool. Image shows a graph which utilizes an x-axis with time and y-axis with percentages of system usage. It shows in green the user mode which is higher than the red line which is in kernel mode.}
+    \item Dual mode provides protection for OS from errant users and users from one another.
+    \item \textbf{Privileged instructions}: Machine instructions that may cause harm, executable only in kernel mode.
+    \begin{itemize}
+        \item Attempt to execute in user mode $\rightarrow$ hardware treats as illegal and traps to OS.
+        \item Examples: switch to kernel mode, I/O control, timer management, interrupt management.
+    \end{itemize}
+    \item Modes can be extended beyond two:
+    \begin{itemize}
+        \item Intel processors: four separate \textbf{protection rings} (ring 0 kernel, ring 3 user).
+        \item ARM v8 systems: seven modes.
+        \item CPUs supporting virtualization: separate mode for \textbf{Virtual Machine Manager (VMM)}.
+    \end{itemize}
+    \item Life cycle of instruction execution: OS (kernel mode) $\rightarrow$ user application (user mode) $\rightarrow$ back to OS via interrupt, trap, or system call.
+    \item Most contemporary OS (Microsoft Windows, Unix, Linux) use dual-mode for protection.
+\end{itemize}
+
+\subsubsection*{System Calls}
+\begin{itemize}
+    \item Provide means for a user program to ask the OS to perform tasks reserved for the OS.
+    \item Invoked via a trap to a specific location in the interrupt vector.
+    \item Can be executed by a generic `trap` instruction or a specific `syscall` instruction.
+    \item Treated by hardware as a software interrupt.
+    \item Control passes to a service routine in the OS, and mode bit is set to kernel mode.
+    \item Kernel examines interrupting instruction, determines system call, verifies parameters, executes request, and returns control.
+\end{itemize}
+
+\subsubsection*{Program Errors}
+\begin{itemize}
+    \item Hardware protection detects errors that violate modes (e.g., illegal instruction, accessing memory not in user's address space).
+    \item Hardware traps to the OS.
+    \item OS terminates the program abnormally, provides an error message, and may dump program memory to a file for examination/correction.
+\end{itemize}
+
+\subsection*{5 Timer}
+\addcontentsline{toc}{subsection}{5 Timer}
+\begin{itemize}
+    \item Ensures OS maintains control over the CPU.
+    \item Prevents user programs from getting stuck in infinite loops or failing to return control to the OS.
+    \item Can be set to interrupt the computer after a specified period (fixed or variable).
+    \item Variable timer implemented by a fixed-rate clock and a counter.
+    \begin{itemize}
+        \item OS sets the counter.
+        \item Every clock tick, counter is decremented.
+        \item When counter reaches 0, an interrupt occurs.
+    \end{itemize}
+    \item OS ensures timer is set before turning control to user.
+    \item If timer interrupts, control transfers automatically to OS (may treat as fatal error or give more time).
+    \item Instructions that modify the content of the timer are privileged.
+\end{itemize}
+
+\subsubsection*{Linux timers}
+\begin{itemize}
+    \item Kernel configuration parameter \textbf{HZ} specifies frequency of timer interrupts (e.g., 250 HZ = 250 interrupts/sec).
+    \item Related kernel variable \textbf{jiffies} represents number of timer interrupts since system boot.
+\end{itemize}
+
+\subsection*{6 Section glossary}
+\addcontentsline{toc}{subsection}{6 Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Big data} & Extremely large sets of data; distributed systems are well suited to working with big data. \\
+\textbf{MapReduce} & Google-created big data programming model and implementation for parallel processing across nodes in a distributed cluster. \\
+\textbf{System daemon} & Service provided outside the kernel by system programs loaded at boot time and running continuously. \\
+\textbf{Trap} & Software interrupt caused by an error or a specific request from a user program for an operating-system service. \\
+\textbf{Exception} & Software-generated interrupt caused by an error or a specific request from a user program for an operating-system service. \\
+\textbf{System call} & Software-triggered interrupt allowing a process to request a kernel service. \\
+\textbf{Multiprogramming} & Technique that increases CPU utilization by organizing jobs so that the CPU always has a job to execute. \\
+\textbf{Process} & A program loaded into memory and executing. \\
+\textbf{Multitasking} & Concurrent performance of multiple jobs; CPU switches frequently among them for fast response time. \\
+\textbf{Response time} & Amount of time it takes the system to respond to user action. \\
+\textbf{CPU scheduling} & Process by which the system chooses which job will run next if several jobs are ready to run. \\
+\textbf{Virtual memory} & Technique that allows execution of a process not completely in memory; also, separation of computer memory address space from physical into logical. \\
+\textbf{Logical memory} & Memory as viewed by the user; usually a large uniform array, not matching physical memory in virtual memory systems. \\
+\textbf{User mode} & CPU mode for executing user processes in which some instructions are limited or not allowed. \\
+\textbf{Kernel mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
+\textbf{Supervisor mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
+\textbf{System mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
 \end{tabular}
 \vspace{\baselineskip}
 
