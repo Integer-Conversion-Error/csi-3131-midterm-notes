@@ -38,7 +38,11 @@
 \subsection*{1 Purpose and Core Responsibilities}
 \addcontentsline{toc}{subsection}{1 Purpose and Core Responsibilities}
 \begin{itemize}
-    \item \textbf{Intermediary:} OS sits between user \& applications and hardware, hiding details while exposing services.
+    \item \textbf{Intermediary:} OS sits between user/applications and hardware.
+    \begin{itemize}
+        \item Hides hardware details.
+        \item Exposes services.
+    \end{itemize}
     \item \textbf{Goals:}
     \begin{itemize}
         \item Run programs conveniently (consistent UI).
@@ -57,20 +61,21 @@
 \end{enumerate}
 \subsection*{3 User and Kernel Mode Transition}
 \addcontentsline{toc}{subsection}{3 User and Kernel Mode Transition}
-Hardware mode bit switches CPU from \emph{user} to \emph{kernel} on a
-system call (trap) or interrupt; return-from-trap restores user mode.
+\begin{itemize}
+    \item Hardware mode bit switches CPU from \emph{user} to \emph{kernel} on system call (trap) or interrupt.
+    \item Return-from-trap restores user mode.
+\end{itemize}
 
 \subsection*{4 User View vs. System View}
 \addcontentsline{toc}{subsection}{4 User View vs. System View}
 % >>> NEW: why fast memory matters
-\textit{A von Neumann CPU follows a fetch–decode–execute loop, issuing a
-stream of memory addresses that the OS must service quickly and safely.}
+\textit{A von Neumann CPU follows a fetch–decode–execute loop, issuing memory addresses the OS must service quickly and safely.}
 
 \begin{itemize}
     \item \textbf{User view:} Focus on ease of use; resource details hidden.
     \item \textbf{System view:}
     \begin{itemize}
-        \item \textbf{Resource allocator} – arbitrates CPU, memory, I/O, etc.
+        \item \textbf{Resource allocator} – arbitrates CPU, memory, I/O.
         \item \textbf{Control program} – governs execution, manages devices.
     \end{itemize}
 \end{itemize}
@@ -90,26 +95,24 @@ stream of memory addresses that the OS must service quickly and safely.}
 \vspace{\baselineskip} % Add some space after the table
 % >>> NEW: tiny OSs that live in firmware
 \begin{itemize}
-    \item \textbf{Firmware OSs:} microcode, BIOS/UEFI, and many device
-    controllers contain their own minimal operating systems that run
-    continuously beneath the main kernel.
+    \item \textbf{Firmware OSs:} microcode, BIOS/UEFI, and many device controllers contain minimal OS.
+    \item Run continuously beneath the main kernel.
 \end{itemize}
 
 \subsection*{6 Why Study Operating Systems?}
 \addcontentsline{toc}{subsection}{6 Why Study Operating Systems?}
 \begin{itemize}
-    \item All code runs on an OS; knowing its policies \& APIs yields safer, faster, portable software.
-
-% >>> NEW: computing environments
-\item \textbf{OS flavours:} desktop (Windows, macOS), server (Linux, Windows Server),  
-      mobile (Android, iOS), and embedded/real-time systems each emphasise different goals.
-
-% >>> NEW: real code you can read
-\item \textbf{Open-source examples:} Linux, FreeBSD, and Minix show how textbook
-      concepts map to production kernels.
-
-\item OS concepts (processes, memory, I/O, security) recur in servers, clouds, IoT.
-
+    \item All code runs on an OS.
+    \item Knowing OS policies \& APIs yields safer, faster, portable software.
+    \item \textbf{OS flavours:}
+    \begin{itemize}
+        \item Desktop (Windows, macOS).
+        \item Server (Linux, Windows Server).
+        \item Mobile (Android, iOS).
+        \item Embedded/real-time systems (emphasize different goals).
+    \end{itemize}
+    \item \textbf{Open-source examples:} Linux, FreeBSD, Minix show how textbook concepts map to production kernels.
+    \item OS concepts (processes, memory, I/O, security) recur in servers, clouds, IoT.
 \end{itemize}
 
 \subsection*{7 Glossary Highlights (1.1)}
@@ -120,11 +123,11 @@ stream of memory addresses that the OS must service quickly and safely.}
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Operating system} & Intermediary between user/applications and hardware; hides details, exposes services; runs programs conveniently and efficiently; manages hardware resources. \\
+\textbf{Operating system} & Intermediary between user/applications and hardware; hides details, exposes services; runs programs conveniently/efficiently; manages hardware resources. \\
 \textbf{Kernel} & Always runs after boot; provides services. \\
-\textbf{System program} & Loaded at boot time, becomes system daemon; provides services outside the kernel. \\
+\textbf{System program} & Loaded at boot, becomes system daemon; provides services outside kernel. \\
 \textbf{Middleware} & Optional/varies; graphics, DB, extra utilities. \\
-\textbf{Resource allocator} & Part of OS (system view); arbitrates CPU, memory, I/O, etc. \\
+\textbf{Resource allocator} & Part of OS (system view); arbitrates CPU, memory, I/O. \\
 \textbf{Control program} & Part of OS (system view); governs execution, manages devices. \\
 \textbf{Ease of use} & User view goal; focus on convenience, resource details hidden. \\
 \textbf{Resource utilization} & System view goal; focus on efficiency, performance, safe sharing. \\
@@ -138,10 +141,16 @@ stream of memory addresses that the OS must service quickly and safely.}
 \subsection*{1 System-Level Hardware Layout}
 \addcontentsline{toc}{subsection}{1 System-Level Hardware Layout}
 \begin{itemize}
-    \item Shared \textbf{system bus} connects CPU cores, main memory, device controllers.
-    \item \textbf{Device controller:} logic per device class (disk, GPU, USB) with registers \& buffer.
-    \item \textbf{Device driver:} kernel API shielding hardware details.
-    \item \textbf{Parallelism:} CPU \& controllers run concurrently; \textbf{memory controller} arbitrates.
+    \item Shared \textbf{system bus} connects:
+    \begin{itemize}
+        \item CPU cores.
+        \item Main memory.
+        \item Device controllers.
+    \end{itemize}
+    \item \textbf{Device controller:} Logic per device class (disk, GPU, USB) with registers \& buffer.
+    \item \textbf{Device driver:} Kernel API shielding hardware details.
+    \item \textbf{Parallelism:} CPU \& controllers run concurrently.
+    \item \textbf{Memory controller:} Arbitrates memory access.
 \end{itemize}
 
 \subsection*{2 Interrupts – Hardware-Driven Events}
@@ -157,7 +166,7 @@ stream of memory addresses that the OS must service quickly and safely.}
 \begin{itemize}
     \item \textbf{O(1) dispatch} via vector table.
     \item \textbf{Nonmaskable} vs. \textbf{maskable} lines (maskable can be disabled).
-    \item \textbf{Priority \& interrupt chaining:} high-priority pre-empts low; vector entry may head list of handlers.
+    \item \textbf{Priority \& interrupt chaining:} High-priority pre-empts low; vector entry may head list of handlers.
 \end{itemize}
 
 \subsubsection*{2.3 End-to-End I/O Timeline}
@@ -186,33 +195,36 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item \textbf{Bit $\rightarrow$ byte (8 bits) $\rightarrow$ word} (CPU width).
     \item \textbf{KiB / MiB / GiB / TiB / PiB} = powers of 1024.
-    \item \textbf{Volatile} memory loses data on power-off; \textbf{non-volatile storage (NVS)} persists.
-    % >>> NEW: distinguish mechanical vs electrical NVS
-    \item NVS divides into \emph{mechanical} media (HDD, optical, tape) and
-      \emph{electrical} non-volatile memory (NVM: SSD, flash).
-
+    \item \textbf{Volatile} memory loses data on power-off.
+    \item \textbf{Non-volatile storage (NVS)} persists data.
+    \item NVS divides into:
+    \begin{itemize}
+        \item \emph{Mechanical} media (HDD, optical, tape).
+        \item \emph{Electrical} non-volatile memory (NVM: SSD, flash).
+    \end{itemize}
     \item \textbf{Firmware / EEPROM} stores bootstrap program.
-    \item \textbf{Interrupt masking:} the kernel may briefly disable maskable
-      interrupts while executing critical sections to maintain data coherence.
-
+    \item \textbf{Interrupt masking:} Kernel may briefly disable maskable interrupts for data coherence in critical sections.
 \end{itemize}
 
 \subsubsection*{3.3 Why Secondary Storage?}
 \begin{itemize}
-    \item Main memory is finite and volatile; programs \& data live on slower persistent media until loaded.
+    \item Main memory is finite and volatile.
+    \item Programs \& data live on slower persistent media until loaded.
 \end{itemize}
 
 \subsection*{4 I/O Structure}
 \addcontentsline{toc}{subsection}{4 I/O Structure}
 \subsubsection*{4.1 Direct Memory Access (DMA)}
 \begin{itemize}
-    \item Driver configures DMA engine; controller moves block without CPU, raises one interrupt on completion.
+    \item Driver configures DMA engine.
+    \item Controller moves block without CPU.
+    \item Raises one interrupt on completion.
 \end{itemize}
 
 \subsubsection*{4.2 Bus vs. Switched Fabrics}
 \begin{itemize}
-    \item \textbf{Shared bus:} one transfer at a time; common on PCs.
-    \item \textbf{Switch fabric:} concurrent links; used in servers \& SoCs.
+    \item \textbf{Shared bus:} One transfer at a time; common on PCs.
+    \item \textbf{Switch fabric:} Concurrent links; used in servers \& SoCs.
 \end{itemize}
 
 \subsubsection*{4.3 Full I/O Cycle}
@@ -242,259 +254,259 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \end{tabular}
 \vspace{\baselineskip}
 
-\newpage
-\section*{1.3 Computer-system architecture}
-\addcontentsline{toc}{section}{1.3 Computer-system architecture}
-\begin{itemize}
-    \item Computer systems are organized based on the number of general-purpose processors.
-\end{itemize}
-
-\subsection*{1 Single-processor systems}
-\addcontentsline{toc}{subsection}{1 Single-processor systems}
-\begin{itemize}
-    \item \textbf{Definition:} One general-purpose CPU with a single processing core.
-    \item Historically common, but few contemporary systems fit this definition.
-    \item \textbf{CPU Core:} Executes instructions, contains registers for local data.
-    \item Main CPU core executes general-purpose instruction sets (including processes).
-    \item May include \textbf{special-purpose processors} (e.g., disk, keyboard, graphics controllers).
-    \begin{itemize}
-        \item Run limited instruction sets; do not run processes.
-        \item Can be OS-managed (OS sends tasks, monitors status).
-        \item Example: Disk-controller microprocessor handles disk queue/scheduling, reducing main CPU overhead.
-        \item Example: Keyboard microprocessor converts keystrokes to codes for CPU.
-        \item Can be low-level hardware components, operating autonomously without OS communication.
-    \end{itemize}
-    \item Use of special-purpose microprocessors does not classify a system as multiprocessor.
-\end{itemize}
-
-\subsection*{2 Multiprocessor systems}
-\addcontentsline{toc}{subsection}{2 Multiprocessor systems}
-\begin{itemize}
-    \item Dominant in modern computing (mobile devices to servers).
-    \item Traditionally: Two or more processors, each with a single-core CPU.
-    \item Share computer bus, sometimes clock, memory, and peripheral devices.
-    \item \textbf{Primary advantage:} Increased throughput (more work in less time).
-    \item Speed-up ratio with $N$ processors is less than $N$ due to overhead and contention for shared resources.
-    \item \textbf{Symmetric Multiprocessing (SMP):}
-    \begin{itemize}
-        \item Each peer CPU processor performs all tasks (OS functions, user processes).
-        \item Each CPU has its own registers and private/local cache.
-        \item All processors share physical memory via the system bus.
-        \item \textit{Figure 1.3.1: Symmetric multiprocessing architecture. Diagram shows main memory connected to two processors, each with its own CPU containing registers and cache.}
-        \item Benefit: $N$ processes can run simultaneously on $N$ CPUs without significant performance degradation.
-        \item Inefficiencies from idle/overloaded CPUs are mitigated by sharing data structures.
-        \item Allows dynamic sharing of processes and resources (e.g., memory) among processors, reducing workload variance.
-        \item Requires careful design (e.g., CPU Scheduling, Synchronization Tools).
-    \end{itemize}
-    \item \textbf{Multicore systems:}
-    \begin{itemize}
-        \item Modern evolution: Multiple computing cores reside on a single chip.
-        \item More efficient than multiple single-core chips due to faster on-chip communication.
-        \item Uses significantly less power than multiple single-core chips (critical for mobile/laptops).
-        \item Example: Dual-core design (Figure 1.3.2)
-        \begin{itemize}
-            \item Each core has its own register set and L1 cache.
-            \item Shared L2 cache is local to the chip.
-            \item Combines local (smaller, faster) and shared (higher-level) caches.
-        \item \textit{Figure 1.3.2: A dual-core design with two cores on the same chip. Diagram shows main memory connected to L2 cache of processor. Processor has two CPU cores, each core has its own registers and L1 cache and shares L2 cache of processor.}
-        \item An $N$-core processor appears as $N$ standard CPUs to the OS.
-        \item Demands efficient use of processing cores from OS/application designers (Threads \& Concurrency).
-        \item Supported by virtually all modern OS (Windows, macOS, Linux, Android, iOS).
-    \end{itemize}
-\end{itemize} % This closes the \begin{itemize} for "Multicore systems"
-\end{itemize} % This closes the main \begin{itemize} for "Multiprocessor systems"
-
-\subsubsection*{Definitions of computer system components}
-\begin{itemize}
-    \item \textbf{CPU:} Hardware that executes instructions.
-    \item \textbf{Processor:} A physical chip containing one or more CPUs.
-    \item \textbf{Core:} Basic computation unit of the CPU.
-    \item \textbf{Multicore:} Multiple computing cores on the same CPU.
-    \item \textbf{Multiprocessor:} Multiple processors within the same CPU chip or system.
-\end{itemize}
-\begin{itemize}
-    \item General term \textit{CPU} refers to a single computational unit.
-    \item \textit{Core} and \textit{multicore} refer specifically to one or more cores on a CPU.
-\end{itemize}
-
-\subsubsection*{Non-Uniform Memory Access (NUMA)}
-\begin{itemize}
-    \item An alternative to scaling multiprocessor systems when bus contention becomes a bottleneck.
-    \item Each CPU (or group of CPUs) has its own \textbf{local memory} accessed via a small, fast local bus.
-    \item CPUs are connected by a \textbf{shared system interconnect}; all CPUs share one physical address space.
-    \item \textit{Figure 1.3.3: NUMA multiprocessing architecture. Diagram shows NUMA architecture which includes four interconnected CPUs, each attached with its own local memory.}
-    \item \textbf{Advantage:} Fast local memory access with no contention over the system interconnect.
-    \item \textbf{Result:} NUMA systems scale more effectively with additional processors.
-    \item \textbf{Potential drawback:} Increased latency for remote memory access across the system interconnect (e.g., $CPU0$ accessing $CPU3$'s local memory is slower).
-    \item OS minimizes NUMA penalty through careful CPU scheduling and memory management.
-    \item Increasingly popular on servers and high-performance computing systems due to scalability.
-\end{itemize}
-
-\subsubsection*{Blade servers}
-\begin{itemize}
-    \item Multiple processor boards, I/O boards, and networking boards placed in the same chassis.
-    \item Differ from traditional multiprocessor systems: each blade-processor board boots independently and runs its own OS.
-    \item Can consist of multiple independent multiprocessor systems.
-\end{itemize}
-
-\subsection*{3 Clustered systems}
-\addcontentsline{toc}{subsection}{3 Clustered systems}
-\begin{itemize}
-    \item Another type of multiprocessor system, gathering multiple CPUs.
-    \item Composed of two or more individual systems (\textbf{nodes}) joined together; each node is typically a multicore system.
-    \item Considered \textbf{loosely coupled}.
-    \item Definition: Clustered computers share storage and are closely linked via LAN or faster interconnect (e.g., InfiniBand).
-    \item \textbf{Primary use:} Provide \textbf{high-availability service} (service continues even if one or more systems fail).
-    \begin{itemize}
-        \item Achieved by adding redundancy.
-        \item Cluster software runs on nodes; each node monitors others.
-        \item If a monitored machine fails, the monitoring machine takes ownership of its storage and restarts applications.
-        \item Users/clients experience only a brief interruption.
-    \end{itemize}
-    \item High availability increases reliability.
-    \item \textbf{Graceful degradation:} System's ability to continue providing service proportional to surviving hardware.
-    \item \textbf{Fault-tolerant systems:} Can suffer a single component failure and continue operation (requires detection, diagnosis, correction).
-    \item \textbf{Clustering structures:}
-    \begin{itemize}
-        \item \textbf{Asymmetric clustering:} One machine in \textbf{hot-standby mode} (monitors active server); if active fails, hot-standby becomes active.
-        \item \textbf{Symmetric clustering:} Two or more hosts run applications and monitor each other; more efficient as it uses all hardware, but requires multiple applications.
-    \end{itemize}
-    \item \textbf{PC motherboard example:}
-    \begin{itemize}
-        \item A fully functioning computer once slots are populated (processor socket, DRAM sockets, PCIe bus slots, I/O connectors).
-        \item Lowest-cost general-purpose CPUs have multiple cores.
-        \item Some motherboards have multiple processor sockets (for NUMA systems).
-        \item \textit{Image shows a computer processor with arrows pointing to: DRAM slots, processor socket, PCI bus slots, and various I/O and power connectors.}
-    \end{itemize}
-    \item \textbf{High-Performance Computing (HPC) environments:}
-    \begin{itemize}
-        \item Clusters provide significantly greater computational power than single-processor/SMP systems.
-        \item Run applications concurrently on all computers in the cluster.
-        \item Requires applications to be specifically written for clusters (e.g., \textbf{parallelization}).
-        \item \textbf{Parallelization:} Divides a program into separate components that run in parallel on individual cores/computers.
-        \item Results from nodes are combined into a final solution.
-    \end{itemize}
-    \item \textbf{Other cluster forms:}
-    \begin{itemize}
-        \item \textbf{Parallel clusters:} Multiple hosts access the same data on shared storage.
-        \item Often requires special software/application releases (e.g., Oracle Real Application Cluster).
-        \item Uses \textbf{distributed lock manager (DLM)} for access control and locking.
-        \item Clustering over Wide-Area Network (WAN).
-    \end{itemize}
-    \item Cluster technology is rapidly evolving (supporting thousands of systems, separated by miles).
-    \item Enabled by \textbf{Storage-Area Networks (SANs)}: allow many systems to attach to a pool of storage.
-    \item If applications/data are on the SAN, cluster software can assign the application to any host attached to the SAN.
-    \item \textit{Figure 1.3.4: General structure of a clustered system. Diagram shows structure of clustered system in which storage-area network is connected with set of interconnected computers.}
-\end{itemize}
-
-\subsection*{4 Section glossary}
-\addcontentsline{toc}{subsection}{Section glossary}
-\rowcolors{2}{gray!10}{white}
-\centering
-\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
-\toprule
-\textbf{Term} & \textbf{Definition} \\
-\midrule
-\textbf{Core} & Within a CPU, the component that executes instructions. \\
-\textbf{Multiprocessor systems} & Systems with two or more hardware processors (CPU cores) in close communication, sharing the computer bus and sometimes the clock, memory, and peripheral devices. \\
-\textbf{Symmetric multiprocessing (SMP)} & Multiprocessing where each processor performs all tasks, including OS tasks and user processes. \\
-\textbf{Multicore} & Multiple processing cores within the same CPU chip or within a single system. \\
-\textbf{Multiprocessor} & Multiple processors within the same CPU chip or within a single system. \\
-\textbf{Shared system interconnect} & A bus connecting CPUs to memory such that all CPUs can access all system memory; basis for NUMA systems. \\
-\textbf{Non-Uniform Memory Access (NUMA)} & Architecture where memory access time varies based on which core the thread is running on (e.g., core interlink slower than direct DIMM access). \\
-\textbf{Blade server} & Computer with multiple processor, I/O, and networking boards in same chassis; each board boots independently and runs its own OS. \\
-\textbf{Clustered system} & Gathers multiple CPUs; composed of two or more individual systems (nodes) joined together. \\
-\textbf{High-availability} & Service continues even if one or more systems in the cluster fail. \\
-\textbf{Graceful degradation} & System's ability to continue providing service proportional to surviving hardware. \\
-\textbf{Fault-tolerant system} & System that can suffer a single component failure and still continue operation. \\
-\textbf{Asymmetric clustering} & One machine in hot-standby mode monitors active server; takes over if active fails. \\
-\textbf{Hot-standby mode} & Computer in cluster monitors active server, becomes active if it fails. \\
-\textbf{Symmetric clustering} & Two or more hosts run applications and monitor each other. \\
-\textbf{High-Performance Computing (HPC)} & Computing facility for large number of resources used by software designed for parallel operation. \\
-\textbf{Parallelization} & Dividing a program into separate components that run in parallel on individual cores/computers. \\
-\textbf{Distributed lock manager (DLM)} & Function used by clustered system for access control and locking to prevent conflicting operations. \\
-\textbf{Storage-Area Network (SAN)} & Local-area storage network allowing multiple computers to connect to one or more storage devices. \\
-\bottomrule
-\end{tabular}
-\vspace{\baselineskip}
+% \newpage
+% \section*{1.3 Computer-system architecture}
+% \addcontentsline{toc}{section}{1.3 Computer-system architecture}
+% \begin{itemize}
+%     \item Computer systems organized by number of general-purpose processors.
+% \end{itemize}
+% 
+% \subsection*{1 Single-processor systems}
+% \addcontentsline{toc}{subsection}{1 Single-processor systems}
+% \begin{itemize}
+%     \item \textbf{Definition:} One general-purpose CPU with a single processing core.
+%     \item Historically common, but few contemporary systems fit this.
+%     \item \textbf{CPU Core:} Executes instructions, contains registers for local data.
+%     \item Main CPU core executes general-purpose instruction sets (including processes).
+%     \item May include \textbf{special-purpose processors} (e.g., disk, keyboard, graphics controllers).
+%     \begin{itemize}
+%         \item Run limited instruction sets; do not run processes.
+%         \item Can be OS-managed (OS sends tasks, monitors status).
+%         \item Example: Disk-controller microprocessor handles disk queue/scheduling, reducing main CPU overhead.
+%         \item Example: Keyboard microprocessor converts keystrokes to codes for CPU.
+%         \item Can be low-level hardware components, operating autonomously without OS communication.
+%     \end{itemize}
+%     \item Use of special-purpose microprocessors does not classify a system as multiprocessor.
+% \end{itemize}
+% 
+% \subsection*{2 Multiprocessor systems}
+% \addcontentsline{toc}{subsection}{2 Multiprocessor systems}
+% \begin{itemize}
+% %    \item Dominant in modern computing (mobile devices to servers).
+% %    \item Traditionally: Two or more processors, each with a single-core CPU.
+% %    \item Share computer bus, sometimes clock, memory, and peripheral devices.
+% %    \item \textbf{Primary advantage:} Increased throughput (more work in less time).
+% %    \item Speed-up ratio with $N$ processors is less than $N$ due to overhead and contention for shared resources.
+% %    \item \textbf{Symmetric Multiprocessing (SMP):}
+% %    \begin{itemize}
+% %        \item Each peer CPU processor performs all tasks (OS functions, user processes).
+% %        \item Each CPU has its own registers and private/local cache.
+% %        \item All processors share physical memory via the system bus.
+% %        \item \textit{Figure 1.3.1: Symmetric multiprocessing architecture. Diagram shows main memory connected to two processors, each with its own CPU containing registers and cache.}
+% %        \item Benefit: $N$ processes can run simultaneously on $N$ CPUs without significant performance degradation.
+% %        \item Inefficiencies from idle/overloaded CPUs mitigated by sharing data structures.
+% %        \item Allows dynamic sharing of processes and resources (e.g., memory) among processors, reducing workload variance.
+% %        \item Requires careful design (e.g., CPU Scheduling, Synchronization Tools).
+% %    \end{itemize}
+% %    \item \textbf{Multicore systems:}
+% %    \begin{itemize}
+% %        \item Modern evolution: Multiple computing cores on a single chip.
+% %        \item More efficient than multiple single-core chips due to faster on-chip communication.
+% %        \item Uses significantly less power than multiple single-core chips (critical for mobile/laptops).
+% %        \item Example: Dual-core design (Figure 1.3.2)
+% %        \begin{itemize}
+% %            \item Each core has its own register set and L1 cache.
+% %            \item Shared L2 cache is local to the chip.
+% %            \item Combines local (smaller, faster) and shared (higher-level) caches.
+% %        \end{itemize}
+% %        \item \textit{Figure 1.3.2: A dual-core design with two cores on the same chip. Diagram shows main memory connected to L2 cache of processor. Processor has two CPU cores, each core has its own registers and L1 cache and shares L2 cache of processor.}
+% %        \item An $N$-core processor appears as $N$ standard CPUs to the OS.
+% %        \item Demands efficient use of processing cores from OS/application designers (Threads \& Concurrency).
+% %        \item Supported by virtually all modern OS (Windows, macOS, Linux, Android, iOS).
+% %    \end{itemize}
+%     \item \% Content commented out for debugging
+% \end{itemize}
+% \subsubsection*{Definitions of computer system components}
+% \begin{itemize}
+%     \item \textbf{CPU:} Hardware that executes instructions.
+%     \item \textbf{Processor:} A physical chip containing one or more CPUs.
+%     \item \textbf{Core:} Basic computation unit of the CPU.
+%     \item \textbf{Multicore:} Multiple computing cores on the same CPU.
+%     \item \textbf{Multiprocessor:} Multiple processors within the same CPU chip or system.
+% \end{itemize}
+% \begin{itemize}
+%     \item General term \textit{CPU} refers to a single computational unit.
+%     \item \textit{Core} and \textit{multicore} refer specifically to one or more cores on a CPU.
+% \end{itemize}
+% 
+% \subsubsection*{Non-Uniform Memory Access (NUMA)}
+% \begin{itemize}
+%     \item Alternative to scaling multiprocessor systems when bus contention is a bottleneck.
+%     \item Each CPU (or group of CPUs) has its own \textbf{local memory} via a small, fast local bus.
+%     \item CPUs connected by a \textbf{shared system interconnect}; all CPUs share one physical address space.
+%     \item \textit{Figure 1.3.3: NUMA multiprocessing architecture. Diagram shows NUMA architecture which includes four interconnected CPUs, each attached with its own local memory.}
+%     \item \textbf{Advantage:} Fast local memory access with no contention over system interconnect.
+%     \item \textbf{Result:} NUMA systems scale more effectively with additional processors.
+%     \item \textbf{Potential drawback:} Increased latency for remote memory access across system interconnect (e.g., $CPU0$ accessing $CPU3$'s local memory is slower).
+%     \item OS minimizes NUMA penalty via careful CPU scheduling and memory management.
+%     \item Increasingly popular on servers and high-performance computing systems due to scalability.
+% \end{itemize}
+% 
+% \subsubsection*{Blade servers}
+% \begin{itemize}
+%     \item Multiple processor boards, I/O boards, and networking boards in same chassis.
+%     \item Differ from traditional multiprocessor systems: each blade-processor board boots independently and runs its own OS.
+%     \item Can consist of multiple independent multiprocessor systems.
+% \end{itemize}
+% 
+% \subsection*{3 Clustered systems}
+% \addcontentsline{toc}{subsection}{3 Clustered systems}
+% \begin{itemize}
+%     \item Another type of multiprocessor system, gathering multiple CPUs.
+%     \item Composed of two or more individual systems (\textbf{nodes}) joined together; each node typically a multicore system.
+%     \item Considered \textbf{loosely coupled}.
+%     \item Definition: Clustered computers share storage and are closely linked via LAN or faster interconnect (e.g., InfiniBand).
+%     \item \textbf{Primary use:} Provide \textbf{high-availability service} (service continues even if one or more systems fail).
+%     \begin{itemize}
+%         \item Achieved by adding redundancy.
+%         \item Cluster software runs on nodes; each node monitors others.
+%         \item If a monitored machine fails, monitoring machine takes ownership of its storage and restarts applications.
+%         \item Users/clients experience only a brief interruption.
+%     \end{itemize}
+%     \item High availability increases reliability.
+%     \item \textbf{Graceful degradation:} System's ability to continue providing service proportional to surviving hardware.
+%     \item \textbf{Fault-tolerant systems:} Can suffer a single component failure and continue operation (requires detection, diagnosis, correction).
+%     \item \textbf{Clustering structures:}
+%     \begin{itemize}
+%         \item \textbf{Asymmetric clustering:} One machine in \textbf{hot-standby mode} (monitors active server); if active fails, hot-standby becomes active.
+%         \item \textbf{Symmetric clustering:} Two or more hosts run applications and monitor each other; more efficient as it uses all hardware, but requires multiple applications.
+%     \end{itemize}
+%     \item \textbf{PC motherboard example:}
+%     \begin{itemize}
+%         \item Fully functioning computer once slots populated (processor socket, DRAM sockets, PCIe bus slots, I/O connectors).
+%         \item Lowest-cost general-purpose CPUs have multiple cores.
+%         \item Some motherboards have multiple processor sockets (for NUMA systems).
+%         \item \textit{Image shows a computer processor with arrows pointing to: DRAM slots, processor socket, PCI bus slots, and various I/O and power connectors.}
+%     \end{itemize}
+%     \item \textbf{High-Performance Computing (HPC) environments:}
+%     \begin{itemize}
+%         \item Clusters provide significantly greater computational power than single-processor/SMP systems.
+%         \item Run applications concurrently on all computers in the cluster.
+%         \item Requires applications specifically written for clusters (e.g., \textbf{parallelization}).
+%         \item \textbf{Parallelization:} Divides a program into separate components that run in parallel on individual cores/computers.
+%         \item Results from nodes combined into a final solution.
+%     \end{itemize}
+%     \item \textbf{Other cluster forms:}
+%     \begin{itemize}
+%         \item \textbf{Parallel clusters:} Multiple hosts access same data on shared storage.
+%         \item Often requires special software/application releases (e.g., Oracle Real Application Cluster).
+%         \item Uses \textbf{distributed lock manager (DLM)} for access control and locking.
+%         \item Clustering over Wide-Area Network (WAN).
+%     \end{itemize}
+%     \item Cluster technology rapidly evolving (supporting thousands of systems, separated by miles).
+%     \item Enabled by \textbf{Storage-Area Networks (SANs)}: allow many systems to attach to a pool of storage.
+%     \item If applications/data on SAN, cluster software can assign application to any host attached to SAN.
+%     \item \textit{Figure 1.3.4: General structure of a clustered system. Diagram shows structure of clustered system in which storage-area network is connected with set of interconnected computers.}
+% \end{itemize}
+% 
+% \subsection*{4 Section glossary}
+% \addcontentsline{toc}{subsection}{Section glossary}
+% \rowcolors{2}{gray!10}{white}
+% \centering
+% \begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+% \toprule
+% \textbf{Term} & \textbf{Definition} \\
+% \midrule
+% \textbf{Core} & Within a CPU, the component that executes instructions. \\
+% \textbf{Multiprocessor systems} & Systems with two or more hardware processors (CPU cores) in close communication, sharing the computer bus and sometimes the clock, memory, and peripheral devices. \\
+% \textbf{Symmetric multiprocessing (SMP)} & Multiprocessing where each processor performs all tasks, including OS tasks and user processes. \\
+% \textbf{Multicore} & Multiple processing cores within the same CPU chip or within a single system. \\
+% \textbf{Multiprocessor} & Multiple processors within the same CPU chip or within a single system. \\
+% \textbf{Shared system interconnect} & A bus connecting CPUs to memory such that all CPUs can access all system memory; basis for NUMA systems. \\
+% \textbf{Non-Uniform Memory Access (NUMA)} & Architecture where memory access time varies based on which core the thread is running on (e.g., core interlink slower than direct DIMM access). \\
+% \textbf{Blade server} & Computer with multiple processor, I/O, and networking boards in same chassis; each board boots independently and runs its own OS. \\
+% \textbf{Clustered system} & Gathers multiple CPUs; composed of two or more individual systems (nodes) joined together. \\
+% \textbf{High-availability} & Service continues even if one or more systems in the cluster fail. \\
+% \textbf{Graceful degradation} & System's ability to continue providing service proportional to surviving hardware. \\
+% \textbf{Fault-tolerant system} & System that can suffer a single component failure and still continue operation. \\
+% \textbf{Asymmetric clustering} & One machine in hot-standby mode monitors active server; takes over if active fails. \\
+% \textbf{Hot-standby mode} & Computer in cluster monitors active server, becomes active if it fails. \\
+% \textbf{Symmetric clustering} & Two or more hosts run applications and monitor each other. \\
+% \textbf{High-Performance Computing (HPC)} & Computing facility for large number of resources used by software designed for parallel operation. \\
+% \textbf{Parallelization} & Dividing a program into separate components that run in parallel on individual cores/computers. \\
+% \textbf{Distributed lock manager (DLM)} & Function used by clustered system for access control and locking to prevent conflicting operations. \\
+% \textbf{Storage-Area Network (SAN)} & Local-area storage network allowing multiple computers to connect to one or more storage devices. \\
+% \bottomrule
+% \end{tabular}
+% \vspace{\baselineskip}
 
 \newpage
 \section*{1.4 Operating-system operations}
 \addcontentsline{toc}{section}{1.4 Operating-system operations}
 \begin{itemize}
-    \item Provides the environment within which programs are executed.
-    \item Internally, OS vary greatly, but share commonalities.
+    \item OS provides environment for program execution.
+    \item Internal OS variations exist, but commonalities are shared.
 \end{itemize}
 
 \subsection*{1 Initial Program and Kernel Loading}
 \addcontentsline{toc}{subsection}{1 Initial Program and Kernel Loading}
 \begin{itemize}
-    \item Computer needs an initial program to run when powered up or rebooted.
-    \item This \textbf{bootstrap program} is typically simple and stored in \textbf{firmware}.
-    \item Initializes all system aspects: CPU registers, device controllers, memory contents.
-    \item Must locate and load the \textbf{operating-system kernel} into memory.
-    \item Once kernel is loaded and executing, it provides services.
-    \item Some services are provided by \textbf{system programs} loaded at boot time, becoming \textbf{system daemons}.
-    \item Example: On Linux, \texttt{systemd} starts many other daemons.
-    \item After booting, the system waits for events (e.g., interrupts or traps).
+    \item Computer needs initial program on power-up/reboot.
+    \item \textbf{Bootstrap program:} Simple, stored in \textbf{firmware}.
+    \item Initializes system: CPU registers, device controllers, memory.
+    \item Locates and loads \textbf{operating-system kernel} into memory.
+    \item Kernel provides services once loaded and executing.
+    \item Some services by \textbf{system programs} loaded at boot, becoming \textbf{system daemons}.
+    \item Example: On Linux, \texttt{systemd} starts other daemons.
+    \item After booting, system waits for events (e.g., interrupts or traps).
 \end{itemize}
 
 \subsubsection*{Hadoop}
 \begin{itemize}
-    \item Open-source software framework for distributed processing of \textbf{big data} in clustered systems.
-    \item Designed to scale from a single system to thousands of computing nodes.
-    \item Assigns tasks to nodes, manages communication for parallel computations, and coalesces results.
-    \item Detects and manages node failures, providing efficient and reliable distributed computing.
+    \item Open-source software framework for distributed \textbf{big data} processing in clustered systems.
+    \item Scales from single system to thousands of nodes.
+    \item Assigns tasks, manages parallel communication, coalesces results.
+    \item Detects/manages node failures; provides efficient, reliable distributed computing.
     \item Organized around three components:
     \begin{enumerate}
-        \item A distributed file system for managing data and files across nodes.
-        \item The \textbf{YARN} ("Yet Another Resource Negotiator") framework for resource management and task scheduling.
-        \item The \textbf{MapReduce} system for parallel data processing across nodes.
+        \item Distributed file system (manages data/files across nodes).
+        \item \textbf{YARN} ("Yet Another Resource Negotiator") framework (resource management, task scheduling).
+        \item \textbf{MapReduce} system (parallel data processing across nodes).
     \end{enumerate}
-    \item Primarily runs on Linux systems.
-    \item Applications can be written in PHP, Perl, Python, and Java (popular due to Java libraries for MapReduce).
+    \item Primarily runs on Linux.
+    \item Applications in PHP, Perl, Python, Java (Java popular due to MapReduce libraries).
 \end{itemize}
 
 \subsection*{2 Interrupts and Traps}
 \addcontentsline{toc}{subsection}{2 Interrupts and Traps}
 \begin{itemize}
-    \item Events are almost always signaled by the occurrence of an \textbf{interrupt}.
-    \item A \textbf{trap} (or an \textbf{exception}) is a software-generated interrupt.
+    \item Events almost always signaled by an \textbf{interrupt}.
+    \item \textbf{Trap} (or \textbf{exception}): Software-generated interrupt.
     \begin{itemize}
-        \item Caused by an error (e.g., division by zero, invalid memory access).
-        \item Caused by a specific request from a user program for an operating-system service, by executing a \textbf{system call}.
+        \item Caused by error (e.g., division by zero, invalid memory access).
+        \item Caused by user program request for OS service via \textbf{system call}.
     \end{itemize}
 \end{itemize}
 
 \subsection*{3 Multiprogramming and Multitasking}
 \addcontentsline{toc}{subsection}{3 Multiprogramming and Multitasking}
 \begin{itemize}
-    \item Important aspects of OS: ability to run multiple programs.
-    \item Single program cannot keep CPU or I/O devices busy at all times.
-\item \textbf{Multiprogramming:}
+    \item OS ability to run multiple programs is important.
+    \item Single program cannot keep CPU/I/O devices busy always.
+    \item \textbf{Multiprogramming:}
     \begin{itemize}
         \item Increases CPU utilization and user satisfaction.
         \item OS keeps several \textbf{processes} (programs in execution) in memory simultaneously.
-        \item When a process waits for a task (e.g., I/O), OS switches to another process.
-        \item CPU is never idle as long as at least one process needs to execute.
+        \item When a process waits (e.g., I/O), OS switches to another.
+        \item CPU never idle if a process needs execution.
         \item \textit{Figure 1.4.1: Memory layout for a multiprogramming system. Diagram shows vertical column representing memory which contains layers of operating system, process 1, process 2, process 3, and process 4.}
     \end{itemize}
-\item \textbf{Multitasking:}
+    \item \textbf{Multitasking:}
     \begin{itemize}
         \item Logical extension of multiprogramming.
-        \item CPU switches frequently among processes, providing fast \textbf{response time}.
-        \item Handles slow interactive I/O (e.g., user typing speed).
+        \item CPU switches frequently among processes for fast \textbf{response time}.
+        \item Handles slow interactive I/O (e.g., user typing).
         \item Requires:
         \begin{itemize}
-            \item Memory management (\textit{Main Memory}, \textit{Virtual Memory} chapters).
-            \item \textbf{CPU scheduling} (choosing which process runs next).
-            \item Protection mechanisms to limit processes' ability to affect one another.
-            \item \textbf{Virtual memory}: allows execution of processes not completely in memory; enables running programs larger than physical memory; abstracts main memory into a large, uniform array of storage, separating \textbf{logical memory} from physical memory.
-            \item File system (\textit{File-System Interface}, \textit{File-System Implementation}, \textit{File-System Internals} chapters).
-            \item Storage management (\textit{Mass-Storage Structure} chapter).
-            \item Resource protection (\textit{Protection} chapter).
-            \item Process synchronization and communication (\textit{Synchronization Tools}, \textit{Synchronization Examples} chapters).
-            \item Deadlock prevention (\textit{Deadlocks} chapter).
+            \item Memory management (\textit{Main Memory}, \textit{Virtual Memory}).
+            \item \textbf{CPU scheduling} (choosing next process to run).
+            \item Protection mechanisms (limit process interference).
+            \item \textbf{Virtual memory}: Allows execution of processes not fully in memory; enables programs larger than physical memory; abstracts main memory into large, uniform storage, separating \textbf{logical memory} from physical.
+            \item File system (\textit{File-System Interface}, \textit{File-System Implementation}, \textit{File-System Internals}).
+            \item Storage management (\textit{Mass-Storage Structure}).
+            \item Resource protection (\textit{Protection}).
+            \item Process synchronization and communication (\textit{Synchronization Tools}, \textit{Synchronization Examples}).
+            \item Deadlock prevention (\textit{Deadlocks}).
         \end{itemize}
     \end{itemize}
 \end{itemize}
@@ -502,76 +514,76 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \subsection*{4 Dual-mode and Multimode Operation}
 \addcontentsline{toc}{subsection}{4 Dual-mode and Multimode Operation}
 \begin{itemize}
-    \item Ensures incorrect/malicious programs cannot cause other programs or the OS to execute incorrectly.
-    \item Distinguishes between execution of operating-system code and user-defined code.
-    \item Hardware support provides differentiation among various modes of execution.
-\item At least two separate modes of operation:
+    \item Ensures incorrect/malicious programs don't harm others or OS.
+    \item Distinguishes OS code execution from user code.
+    \item Hardware supports differentiation among execution modes.
+    \item At least two separate modes:
     \begin{itemize}
-        \item \textbf{User mode}: System executing on behalf of a user application.
-        \item \textbf{Kernel mode} (also called \textbf{supervisor mode}, \textbf{system mode}, or \textbf{privileged mode}): System executing on behalf of the operating system.
+        \item \textbf{User mode}: System executing for user application.
+        \item \textbf{Kernel mode} (also \textbf{supervisor mode}, \textbf{system mode}, or \textbf{privileged mode}): System executing for OS.
     \end{itemize}
-    \item A \textbf{mode bit} is added to hardware to indicate current mode: kernel (0) or user (1).
+    \item \textbf{Mode bit} added to hardware: kernel (0) or user (1).
     \item \textit{Figure 1.4.2: Transition from user to kernel mode. Diagram shows events such as user process executing, calling system call and return from system call in user mode whereas trapping mode bit 0, execute system call, and returning mode bit 1 in kernel mode.}
-    \item At system boot time, hardware starts in kernel mode.
-    \item OS is loaded and starts user applications in user mode.
-    \item Whenever a trap or interrupt occurs, hardware switches from user mode to kernel mode (mode bit to 0).
+    \item At boot, hardware starts in kernel mode.
+    \item OS loaded, starts user applications in user mode.
+    \item Trap or interrupt: hardware switches from user to kernel mode (mode bit to 0).
     \item OS always gains control in kernel mode.
-    \item System always switches to user mode (mode bit to 1) before passing control to a user program.
+    \item System switches to user mode (mode bit to 1) before passing control to user program.
     \item \textit{Figure 1.4.3: Windows Performance Monitor tool. Image shows a graph which utilizes an x-axis with time and y-axis with percentages of system usage. It shows in green the user mode which is higher than the red line which is in kernel mode.}
-    \item Dual mode provides protection for OS from errant users and users from one another.
-    \item \textbf{Privileged instructions}: Machine instructions that may cause harm, executable only in kernel mode.
+    \item Dual mode protects OS from errant users, and users from each other.
+    \item \textbf{Privileged instructions}: Harmful machine instructions, executable only in kernel mode.
     \begin{itemize}
-        \item Attempt to execute in user mode $\rightarrow$ hardware treats as illegal and traps to OS.
+        \item Attempt in user mode $\rightarrow$ hardware treats as illegal, traps to OS.
         \item Examples: switch to kernel mode, I/O control, timer management, interrupt management.
     \end{itemize}
-    \item Modes can be extended beyond two:
+    \item Modes can extend beyond two:
     \begin{itemize}
-        \item Intel processors: four separate \textbf{protection rings} (ring 0 kernel, ring 3 user).
+        \item Intel processors: four \textbf{protection rings} (ring 0 kernel, ring 3 user).
         \item ARM v8 systems: seven modes.
         \item CPUs supporting virtualization: separate mode for \textbf{Virtual Machine Manager (VMM)}.
     \end{itemize}
-    \item Life cycle of instruction execution: OS (kernel mode) $\rightarrow$ user application (user mode) $\rightarrow$ back to OS via interrupt, trap, or system call.
-    \item Most contemporary OS (Microsoft Windows, Unix, Linux) use dual-mode for protection.
+    \item Instruction execution lifecycle: OS (kernel) $\rightarrow$ user app (user) $\rightarrow$ back to OS via interrupt, trap, or system call.
+    \item Most contemporary OS (Windows, Unix, Linux) use dual-mode for protection.
 \end{itemize}
 
 \subsubsection*{System Calls}
 \begin{itemize}
-    \item Provide means for a user program to ask the OS to perform tasks reserved for the OS.
-    \item Invoked via a trap to a specific location in the interrupt vector.
-    \item Can be executed by a generic `trap` instruction or a specific `syscall` instruction.
-    \item Treated by hardware as a software interrupt.
-    \item Control passes to a service routine in the OS, and mode bit is set to kernel mode.
-    \item Kernel examines interrupting instruction, determines system call, verifies parameters, executes request, and returns control.
+    \item User program asks OS to perform reserved tasks.
+    \item Invoked via trap to specific interrupt vector location.
+    \item Can use generic `trap` or specific `syscall` instruction.
+    \item Hardware treats as software interrupt.
+    \item Control passes to OS service routine; mode bit set to kernel.
+    \item Kernel examines instruction, determines system call, verifies parameters, executes request, returns control.
 \end{itemize}
 
 \subsubsection*{Program Errors}
 \begin{itemize}
-    \item Hardware protection detects errors that violate modes (e.g., illegal instruction, accessing memory not in user's address space).
-    \item Hardware traps to the OS.
-    \item OS terminates the program abnormally, provides an error message, and may dump program memory to a file for examination/correction.
+    \item Hardware protection detects mode-violating errors (e.g., illegal instruction, invalid memory access).
+    \item Hardware traps to OS.
+    \item OS terminates program abnormally, provides error message, may dump memory for examination.
 \end{itemize}
 
 \subsection*{5 Timer}
 \addcontentsline{toc}{subsection}{5 Timer}
 \begin{itemize}
-    \item Ensures OS maintains control over the CPU.
-    \item Prevents user programs from getting stuck in infinite loops or failing to return control to the OS.
-    \item Can be set to interrupt the computer after a specified period (fixed or variable).
-    \item Variable timer implemented by a fixed-rate clock and a counter.
+    \item Ensures OS maintains CPU control.
+    \item Prevents user programs from infinite loops or failing to return control.
+    \item Can interrupt computer after specified period (fixed or variable).
+    \item Variable timer: fixed-rate clock and counter.
     \begin{itemize}
-        \item OS sets the counter.
-        \item Every clock tick, counter is decremented.
-        \item When counter reaches 0, an interrupt occurs.
+        \item OS sets counter.
+        \item Every clock tick, counter decremented.
+        \item Counter reaches 0, interrupt occurs.
     \end{itemize}
-    \item OS ensures timer is set before turning control to user.
+    \item OS ensures timer set before turning control to user.
     \item If timer interrupts, control transfers automatically to OS (may treat as fatal error or give more time).
-    \item Instructions that modify the content of the timer are privileged.
+    \item Instructions modifying timer content are privileged.
 \end{itemize}
 
 \subsubsection*{Linux timers}
 \begin{itemize}
-    \item Kernel configuration parameter \textbf{HZ} specifies frequency of timer interrupts (e.g., 250 HZ = 250 interrupts/sec).
-    \item Related kernel variable \textbf{jiffies} represents number of timer interrupts since system boot.
+    \item Kernel config parameter \textbf{HZ} specifies timer interrupt frequency (e.g., 250 HZ = 250 interrupts/sec).
+    \item Related kernel variable \textbf{jiffies} represents timer interrupts since boot.
 \end{itemize}
 
 \subsection*{6 Section glossary}
@@ -582,23 +594,23 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Big data} & Extremely large sets of data; distributed systems are well suited to working with big data. \\
-\textbf{MapReduce} & Google-created big data programming model and implementation for parallel processing across nodes in a distributed cluster. \\
-\textbf{System daemon} & Service provided outside the kernel by system programs loaded at boot time and running continuously. \\
-\textbf{Trap} & Software interrupt caused by an error or a specific request from a user program for an operating-system service. \\
-\textbf{Exception} & Software-generated interrupt caused by an error or a specific request from a user program for an operating-system service. \\
-\textbf{System call} & Software-triggered interrupt allowing a process to request a kernel service. \\
-\textbf{Multiprogramming} & Technique that increases CPU utilization by organizing jobs so that the CPU always has a job to execute. \\
-\textbf{Process} & A program loaded into memory and executing. \\
-\textbf{Multitasking} & Concurrent performance of multiple jobs; CPU switches frequently among them for fast response time. \\
-\textbf{Response time} & Amount of time it takes the system to respond to user action. \\
-\textbf{CPU scheduling} & Process by which the system chooses which job will run next if several jobs are ready to run. \\
-\textbf{Virtual memory} & Technique that allows execution of a process not completely in memory; also, separation of computer memory address space from physical into logical. \\
-\textbf{Logical memory} & Memory as viewed by the user; usually a large uniform array, not matching physical memory in virtual memory systems. \\
-\textbf{User mode} & CPU mode for executing user processes in which some instructions are limited or not allowed. \\
-\textbf{Kernel mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
-\textbf{Supervisor mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
-\textbf{System mode} & CPU mode in which all instructions are enabled; the kernel runs in this mode. \\
+\textbf{Big data} & Extremely large data sets; distributed systems suited for it. \\
+\textbf{MapReduce} & Google-created big data programming model for parallel processing across distributed cluster nodes. \\
+\textbf{System daemon} & Service outside kernel by system programs loaded at boot, running continuously. \\
+\textbf{Trap} & Software interrupt from error or user program request for OS service. \\
+\textbf{Exception} & Software-generated interrupt from error or user program request for OS service. \\
+\textbf{System call} & Software-triggered interrupt for process to request kernel service. \\
+\textbf{Multiprogramming} & Increases CPU utilization by organizing jobs so CPU always has one to execute. \\
+\textbf{Process} & Program loaded into memory and executing. \\
+\textbf{Multitasking} & Concurrent performance of multiple jobs; CPU switches frequently for fast response. \\
+\textbf{Response time} & Time for system to respond to user action. \\
+\textbf{CPU scheduling} & System chooses which ready job runs next. \\
+\textbf{Virtual memory} & Allows process execution not completely in memory; enables programs larger than physical memory; separates logical from physical memory. \\
+\textbf{Logical memory} & Memory as viewed by user; large uniform array, not matching physical memory in virtual memory systems. \\
+\textbf{User mode} & CPU mode for user processes; some instructions limited/disallowed. \\
+\textbf{Kernel mode} & CPU mode with all instructions enabled; kernel runs here. \\
+\textbf{Supervisor mode} & CPU mode with all instructions enabled; kernel runs here. \\
+\textbf{System mode} & CPU mode with all instructions enabled; kernel runs here. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -607,131 +619,141 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \section*{1.5 Resource management}
 \addcontentsline{toc}{section}{1.5 Resource management}
 \begin{itemize}
-    \item An operating system is a \textbf{resource manager}, managing CPU, memory space, file-storage space, and I/O devices.
+    \item OS is a \textbf{resource manager}, managing:
+    \begin{itemize}
+        \item CPU.
+        \item Memory space.
+        \item File-storage space.
+        \item I/O devices.
+    \end{itemize}
 \end{itemize}
 
 \subsection*{1 Process management}
 \addcontentsline{toc}{subsection}{1 Process management}
 \begin{itemize}
-    \item A program in execution is a \textbf{process} (e.g., compiler, word-processing program, social media app).
-    \item A process needs resources: CPU time, memory, files, and I/O devices, allocated during its execution.
-    \item Initialization data (input) may be passed to a process (e.g., URL for a web browser).
+    \item A program in execution is a \textbf{process} (e.g., compiler, word processor, social media app).
+    \item A process needs resources: CPU time, memory, files, I/O devices, allocated during execution.
+    \item Initialization data (input) may be passed to a process (e.g., URL for web browser).
     \item OS reclaims reusable resources when a process terminates.
-    \item A program is a \textit{passive} entity (like a file on disk), whereas a process is an \textit{active} entity.
-    \item A \textbf{single-threaded process} has one \textbf{program counter} specifying the next instruction. Execution is sequential.
-    \item A \textbf{multithreaded process} has multiple program counters. (Covered in \textit{Threads \& Concurrency}).
+    \item Program is a \textit{passive} entity (like a file on disk); process is an \textit{active} entity.
+    \item \textbf{Single-threaded process:} One \textbf{program counter} specifies next instruction; sequential execution.
+    \item \textbf{Multithreaded process:} Multiple program counters (\textit{Threads \& Concurrency}).
     \item A process is the unit of work in a system.
-    \item A system consists of operating-system processes (execute system code) and user processes (execute user code).
-    \item Processes can execute concurrently (multiplexing on a single CPU core) or in parallel (across multiple CPU cores).
-    \item The OS is responsible for:
+    \item System consists of OS processes (execute system code) and user processes (execute user code).
+    \item Processes can execute concurrently (multiplexing on single CPU core) or in parallel (across multiple CPU cores).
+    \item OS responsibilities:
     \begin{itemize}
-        \item Creating and deleting both user and system processes.
-        \item Scheduling processes and threads on the CPUs.
-        \item Suspending and resuming processes.
-        \item Providing mechanisms for process synchronization.
-        \item Providing mechanisms for process communication.
+        \item Create/delete user and system processes.
+        \item Schedule processes and threads on CPUs.
+        \item Suspend/resume processes.
+        \item Provide mechanisms for process synchronization.
+        \item Provide mechanisms for process communication.
     \end{itemize}
-    \item (Process management techniques discussed in chapters \textit{Processes} through \textit{Synchronization Examples}).
+    \item (Process management techniques in \textit{Processes} through \textit{Synchronization Examples}).
 \end{itemize}
 
 \subsection*{2 Memory management}
 \addcontentsline{toc}{subsection}{2 Memory management}
 \begin{itemize}
-    \item Main memory is central to modern computer operation: a large array of bytes, each with an address.
-    \item It's a repository of quickly accessible data shared by the CPU and I/O devices.
-    \item CPU reads instructions and data from main memory (von Neumann architecture).
-    \item Main memory is generally the only large storage CPU accesses directly. Data from disk must be transferred to main memory.
-    \item For a program to execute, it must be mapped to absolute addresses and loaded into memory.
-    \item To improve CPU utilization and system responsiveness, general-purpose computers keep several programs in memory.
-    \item Memory-management schemes vary; effectiveness depends on the situation and \textit{hardware design}.
-    \item The OS is responsible for:
+    \item Main memory central to modern computer operation: large array of bytes, each with an address.
+    \item Repository of quickly accessible data shared by CPU and I/O devices.
+    \item CPU reads instructions/data from main memory (von Neumann architecture).
+    \item Main memory generally only large storage CPU accesses directly; disk data transferred here.
+    \item For execution, program mapped to absolute addresses and loaded into memory.
+    \item To improve CPU utilization/system responsiveness, general-purpose computers keep several programs in memory.
+    \item Memory-management schemes vary; effectiveness depends on situation and \textit{hardware design}.
+    \item OS responsibilities:
     \begin{itemize}
-        \item Keeping track of which parts of memory are currently being used and by which process.
-        \item Allocating and deallocating memory space as needed.
-        \item Deciding which processes (or parts of processes) and data to move into and out of memory.
+        \item Track memory usage (which parts, by which process).
+        \item Allocate/deallocate memory space.
+        \item Decide which processes/data to move into/out of memory.
     \end{itemize}
-    \item (Memory-management techniques discussed in chapters \textit{Main Memory} and \textit{Virtual Memory}).
+    \item (Memory-management techniques in \textit{Main Memory} and \textit{Virtual Memory}).
 \end{itemize}
 
 \subsection*{3 File-system management}
 \addcontentsline{toc}{subsection}{3 File-system management}
 \begin{itemize}
-    \item OS provides a uniform, logical view of information storage.
-    \item OS abstracts from physical properties of storage devices to define a logical storage unit: the \textbf{file}.
-    \item OS maps files onto physical media and accesses them via storage devices.
+    \item OS provides uniform, logical view of information storage.
+    \item OS abstracts physical storage properties to define logical storage unit: the \textbf{file}.
+    \item OS maps files onto physical media, accesses via storage devices.
     \item Computers store information on various physical media (secondary, tertiary).
     \item A \textbf{file} is a collection of related information defined by its creator (e.g., programs, data).
     \item Files can be free-form (text files) or rigidly formatted (fixed fields, e.g., mp3).
-    \item OS implements the file concept by managing mass storage media and their control devices.
-    \item Files are normally organized into directories.
+    \item OS implements file concept by managing mass storage media and control devices.
+    \item Files normally organized into directories.
     \item Access control may be needed for multiple users (read, write, append).
-    \item The OS is responsible for:
+    \item OS responsibilities:
     \begin{itemize}
-        \item Creating and deleting files.
-        \item Creating and deleting directories to organize files.
-        \item Supporting primitives for manipulating files and directories.
-        \item Mapping files onto mass storage.
-        \item Backing up files on stable (nonvolatile) storage media.
+        \item Create/delete files.
+        \item Create/delete directories to organize files.
+        \item Support primitives for manipulating files/directories.
+        \item Map files onto mass storage.
+        \item Back up files on stable (nonvolatile) storage media.
     \end{itemize}
-    \item (File-management techniques discussed in chapters \textit{File-System Interface}, \textit{File-System Implementation}, and \textit{File-System Internals}).
+    \item (File-management techniques in \textit{File-System Interface}, \textit{File-System Implementation}, \textit{File-System Internals}).
 \end{itemize}
 
 \subsection*{4 Mass-storage management}
 \addcontentsline{toc}{subsection}{4 Mass-storage management}
 \begin{itemize}
     \item Computer systems use secondary storage (HDDs, NVM devices) to back up main memory.
-    \item Most programs are stored on these devices until loaded into memory.
-    \item Proper management of secondary storage is crucial.
-    \item The OS is responsible for secondary storage management:
+    \item Most programs stored on these devices until loaded into memory.
+    \item Proper secondary storage management is crucial.
+    \item OS responsibilities for secondary storage management:
     \begin{itemize}
-        \item Mounting and unmounting.
+        \item Mounting/unmounting.
         \item Free-space management.
         \item Storage allocation.
         \item Disk scheduling.
         \item Partitioning.
         \item Protection.
     \end{itemize}
-    \item Tertiary storage (slower, lower cost, higher capacity) is used for backups, seldom-used data, archival.
+    \item Tertiary storage (slower, lower cost, higher capacity) for backups, seldom-used data, archival.
     \begin{itemize}
         \item Examples: magnetic tape, CD, DVD, Blu-ray.
         \item OS may manage mounting/unmounting, device allocation, data migration.
     \end{itemize}
-    \item (Techniques discussed in chapter \textit{Mass-Storage Structure}).
+    \item (Techniques in \textit{Mass-Storage Structure}).
 \end{itemize}
 
 \subsection*{5 Cache management}
 \addcontentsline{toc}{subsection}{5 Cache management}
 \begin{itemize}
-    \item \textbf{Caching} is an important principle: information is copied from a storage system (e.g., main memory) to a faster temporary storage system (the \textbf{cache}).
-    \item When information is needed, check cache first. If not present, use source and copy to cache.
-    \item Internal programmable registers act as a high-speed cache for main memory.
-    \item Hardware-only caches (e.g., instruction cache, data caches) are outside OS control.
-    \item \textbf{Cache management} is important due to limited cache size; careful selection of size and replacement policy increases performance.
+    \item \textbf{Caching} principle: information copied from slower storage (e.g., main memory) to faster temporary storage (\textbf{cache}).
+    \item When info needed, check cache first. If not present, use source and copy to cache.
+    \item Internal programmable registers act as high-speed cache for main memory.
+    \item Hardware-only caches (e.g., instruction cache, data caches) outside OS control.
+    \item \textbf{Cache management} important due to limited cache size; careful selection of size/replacement policy increases performance.
     \item \textit{Figure 1.5.1: Characteristics of various types of storage. Table lists level, typical size, implementation technology, access time, bandwidth, managed by, and backed by for various types of storage such as registers, cache, main memory, solid-state disk, and magnetic disk.}
-    \item Information movement between storage levels can be explicit (OS-controlled, e.g., disk to memory) or implicit (hardware function, e.g., cache to CPU).
+    \item Information movement between storage levels:
+    \begin{itemize}
+        \item Explicit (OS-controlled, e.g., disk to memory).
+        \item Implicit (hardware function, e.g., cache to CPU).
+    \end{itemize}
     \item Data coherency:
     \begin{itemize}
-        \item The same data may appear in different levels of the storage hierarchy (e.g., integer A on disk, main memory, cache, internal register).
+        \item Same data may appear in different storage hierarchy levels (e.g., integer A on disk, main memory, cache, internal register).
         \item \textit{Figure 1.5.2: Migration of integer A from disk to register. Block diagram shows migration of integer A from magnetic disk to hardware register through main memory and cache.}
-        \item In a multitasking environment, processes must access the most recently updated value.
-        \item In a multiprocessor environment, an update to a value in one cache must be reflected in all other caches where it resides. This is \textbf{cache coherency} (usually a hardware issue).
-        \item In a distributed environment, replicas of the same file on different computers must be kept consistent. (Discussed in \textit{Networks and Distributed Systems}).
+        \item Multitasking: processes must access most recently updated value.
+        \item Multiprocessor: update to value in one cache reflected in all other caches (\textbf{cache coherency}, usually hardware issue).
+        \item Distributed: replicas of same file on different computers kept consistent (\textit{Networks and Distributed Systems}).
     \end{itemize}
-    \item (Replacement algorithms for software-controlled caches discussed in chapter \textit{Virtual Memory}).
+    \item (Replacement algorithms for software-controlled caches in \textit{Virtual Memory}).
 \end{itemize}
 
 \subsection*{6 I/O system management}
 \addcontentsline{toc}{subsection}{6 I/O system management}
 \begin{itemize}
-    \item OS hides peculiarities of specific hardware devices from the user.
-    \item The \textbf{I/O subsystem} consists of:
+    \item OS hides peculiarities of specific hardware devices from user.
+    \item \textbf{I/O subsystem} consists of:
     \begin{itemize}
-        \item A memory-management component (buffering, caching, spooling).
-        \item A general device-driver interface.
+        \item Memory-management component (buffering, caching, spooling).
+        \item General device-driver interface.
         \item Drivers for specific hardware devices.
     \end{itemize}
-    \item Only the device driver knows the peculiarities of its specific device.
-    \item (Discussed in chapter \textit{I/O Systems}).
+    \item Only device driver knows its specific device's peculiarities.
+    \item (Discussed in \textit{I/O Systems}).
 \end{itemize}
 
 \subsection*{7 Section glossary}
@@ -742,13 +764,13 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Resource manager} & The role of an operating system in managing the computer's resources. \\
-\textbf{Program counter} & A CPU register indicating the main memory location of the next instruction to load and execute. \\
-\textbf{File} & The smallest logical storage unit; a collection of related information defined by its creator. \\
-\textbf{Caching} & The use of temporary data storage areas to improve performance. \\
-\textbf{Cache management} & The management of a cache's contents. \\
-\textbf{Cache coherency} & The coordination of the contents of caches such that an update to a value stored in one cache is immediately reflected in all other caches that hold that value. \\
-\textbf{I/O subsystem} & The I/O devices and the part of the kernel that manages I/O. \\
+\textbf{Resource manager} & OS role in managing computer resources. \\
+\textbf{Program counter} & CPU register indicating main memory location of next instruction to load/execute. \\
+\textbf{File} & Smallest logical storage unit; collection of related info defined by creator. \\
+\textbf{Caching} & Use of temporary data storage areas to improve performance. \\
+\textbf{Cache management} & Management of a cache's contents. \\
+\textbf{Cache coherency} & Coordination of cache contents so update in one cache reflects immediately in others holding that value. \\
+\textbf{I/O subsystem} & I/O devices and kernel part managing I/O. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -757,53 +779,58 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \section*{1.6 Security and protection}
 \addcontentsline{toc}{section}{1.6 Security and protection}
 \begin{itemize}
-    \item In multi-user, multi-process systems, access to data must be regulated.
-    \item Mechanisms ensure processes operate only on authorized resources (files, memory segments, CPU, etc.).
-    \item Examples: memory-addressing hardware (process within its address space), timer (CPU relinquishing control), device-control registers (not user accessible).
+    \item In multi-user, multi-process systems, data access must be regulated.
+    \item Mechanisms ensure processes operate only on authorized resources (files, memory segments, CPU).
+    \item Examples:
+    \begin{itemize}
+        \item Memory-addressing hardware (process within its address space).
+        \item Timer (CPU relinquishing control).
+        \item Device-control registers (not user accessible).
+    \end{itemize}
 \end{itemize}
 
 \subsection*{1 Protection}
 \addcontentsline{toc}{subsection}{1 Protection}
 \begin{itemize}
-    \item \textbf{Definition:} Any mechanism for controlling the access of processes or users to the resources defined by a computer system.
-    \item Must provide means to specify and enforce controls.
-    \item Improves \textbf{reliability} by detecting latent errors at component subsystem interfaces.
+    \item \textbf{Definition:} Mechanism controlling access of processes/users to system resources.
+    \item Specifies and enforces controls.
+    \item Improves \textbf{reliability} by detecting latent errors at subsystem interfaces.
     \item Prevents contamination of healthy subsystems by malfunctioning ones.
-    \item An unprotected resource cannot defend against unauthorized or incompetent use.
-    \item Distinguishes between authorized and unauthorized usage (discussed further in chapter \textit{Protection}).
+    \item Unprotected resources cannot defend against unauthorized/incompetent use.
+    \item Distinguishes authorized from unauthorized usage (\textit{Protection} chapter).
 \end{itemize}
 
 \subsection*{2 Security}
 \addcontentsline{toc}{subsection}{2 Security}
 \begin{itemize}
-    \item \textbf{Definition:} The defense of a system from external and internal attacks.
-    \item Attacks include: viruses, worms, \textbf{denial-of-service} (DoS) attacks, identity theft, and theft of service.
-    \item Prevention can be an operating-system function, policy, or require additional software.
-    \item Operating-system security features are a fast-growing area of research and implementation due to rising incidents (discussed further in chapter \textit{Security}).
+    \item \textbf{Definition:} Defense of a system from external and internal attacks.
+    \item Attacks include: viruses, worms, \textbf{denial-of-service} (DoS) attacks, identity theft, theft of service.
+    \item Prevention can be OS function, policy, or require additional software.
+    \item OS security features are a fast-growing area due to rising incidents (\textit{Security} chapter).
 \end{itemize}
 
 \subsection*{3 User and Group Identification}
 \addcontentsline{toc}{subsection}{3 User and Group Identification}
 \begin{itemize}
     \item Systems must distinguish among all users.
-    \item Most operating systems maintain a list of user names and associated \textbf{user identifiers} (\textbf{user IDs} or \textbf{UIDs}).
+    \item Most OS maintain list of user names and associated \textbf{user identifiers} (\textbf{user IDs} or \textbf{UIDs}).
     \item In Windows, this is a \textbf{security ID} (\textbf{SID}).
-    \item These numerical IDs are unique per user.
-    \item Upon login, authentication determines the user ID, which is then associated with all of the user's processes and threads.
-    \item For readability, user IDs are translated back to user names.
-    \item To distinguish among sets of users (e.g., file owner vs. a group of readers), systems define a \textbf{group name} and the set of users belonging to that group.
-    \item Group functionality is implemented as a system-wide list of group names and \textbf{group identifiers}.
-    \item A user can belong to one or more groups, depending on OS design.
-    \item Group IDs are also included in every associated process and thread.
+    \item Numerical IDs are unique per user.
+    \item Upon login, authentication determines user ID, associated with all user's processes/threads.
+    \item For readability, user IDs translated back to user names.
+    \item To distinguish among sets of users (e.g., file owner vs. group of readers), systems define \textbf{group name} and its users.
+    \item Group functionality implemented as system-wide list of group names and \textbf{group identifiers}.
+    \item User can belong to one or more groups, depending on OS design.
+    \item Group IDs included in every associated process and thread.
 \end{itemize}
 
 \subsection*{4 Privilege Escalation}
 \addcontentsline{toc}{subsection}{4 Privilege Escalation}
 \begin{itemize}
-    \item Users sometimes need to \textbf{escalate privileges} to gain extra permissions for an activity (e.g., access to a restricted device).
-    \item Operating systems provide various methods for this.
-    \item On UNIX, the \textbf{setuid} attribute on a program causes it to run with the user ID of the file's owner, rather than the current user's ID.
-    \item The process runs with this \textbf{effective UID} until it turns off the extra privileges or terminates.
+    \item Users sometimes need to \textbf{escalate privileges} for extra permissions (e.g., restricted device access).
+    \item OS provides various methods.
+    \item On UNIX, \textbf{setuid} attribute on program runs it with file owner's user ID, not current user's.
+    \item Process runs with this \textbf{effective UID} until privileges turned off or terminates.
 \end{itemize}
 
 \subsection*{5 Section glossary}
@@ -814,14 +841,14 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Protection} & Any mechanism for controlling the access of processes or users to the resources defined by a computer system. \\
-\textbf{Security} & The defense of a system from external and internal attacks (e.g., viruses, DoS, identity theft). \\
-\textbf{User identifier (user ID) (UID)} & A unique numerical user identifier. \\
-\textbf{Security ID (SID)} & In Windows, a value used to uniquely identify a user or group for security purposes. \\
-\textbf{Group identifier} & Similar to a user identifier, but used to identify a group of users to determine access rights. \\
-\textbf{Escalate privileges} & To gain extra permissions for an activity, as when a user needs access to a restricted device. \\
-\textbf{Setuid} & A UNIX attribute on a program that causes it to run with the user ID of the file's owner. \\
-\textbf{Effective UID} & The UID the process is currently using, which can be different from the login UID due to privilege escalation. \\
+\textbf{Protection} & Mechanism controlling access of processes/users to system resources. \\
+\textbf{Security} & Defense of system from external/internal attacks (e.g., viruses, DoS, identity theft). \\
+\textbf{User identifier (user ID) (UID)} & Unique numerical user identifier. \\
+\textbf{Security ID (SID)} & Windows value to uniquely identify user/group for security. \\
+\textbf{Group identifier} & Identifies group of users for access rights. \\
+\textbf{Escalate privileges} & Gain extra permissions for an activity (e.g., restricted device access). \\
+\textbf{Setuid} & UNIX attribute: program runs with file owner's user ID. \\
+\textbf{Effective UID} & Current UID process uses; can differ from login UID due to privilege escalation. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -830,10 +857,10 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \section*{1.7 Virtualization}
 \addcontentsline{toc}{section}{1.7 Virtualization}
 \begin{itemize}
-    \item \textbf{Definition:} Technology that abstracts a single computer's hardware (CPU, memory, disk, network) into several execution environments.
-    \item Creates the illusion that each environment runs on its own private computer.
-    \item Environments can be different OS (e.g., Windows, UNIX) running concurrently and interacting.
-    \item User can switch among virtual machines (VMs) like switching among processes in a single OS.
+    \item \textbf{Definition:} Technology abstracting a single computer's hardware (CPU, memory, disk, network) into multiple execution environments.
+    \item Creates illusion each environment runs on its own private computer.
+    \item Environments can be different OS (e.g., Windows, UNIX) running concurrently.
+    \item User can switch among virtual machines (VMs) like switching among processes.
     \item Allows OS to run as applications within other OS.
     \item Industry is vast and growing due to its utility.
 \end{itemize}
@@ -844,16 +871,16 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item Simulates computer hardware in software.
     \item Used when \textbf{source CPU type} differs from \textbf{target CPU type}.
-    \item \textbf{Example:} Apple's "Rosetta 2" allowed Intel x86 applications to run on ARM-based Apple Silicon.
-    \item \textbf{Drawback:} Heavy performance cost; every machine-level instruction translated, often resulting in multiple target instructions.
+    \item \textbf{Example:} Apple's "Rosetta 2" allowed Intel x86 apps on ARM-based Apple Silicon.
+    \item \textbf{Drawback:} Heavy performance cost; every machine instruction translated, often to multiple target instructions.
     \item Emulated code runs much slower than native code.
 \end{itemize}
 
 \subsubsection*{Virtualization}
 \begin{itemize}
-    \item An OS natively compiled for a specific CPU architecture runs within another OS also native to that CPU.
+    \item OS natively compiled for a specific CPU architecture runs within another OS also native to that CPU.
     \item \textbf{Origin:} First used on IBM mainframes for multiple users to run tasks concurrently on a single-user system.
-    \item \textbf{VMware's innovation:} Created virtualization technology as an application running on Windows for Intel x86 CPUs.
+    \item \textbf{VMware's innovation:} Created virtualization technology as an application on Windows for Intel x86 CPUs.
     \begin{itemize}
         \item Ran guest copies of Windows or other native x86 OS.
         \item Windows acted as the \textbf{host operating system}.
@@ -892,12 +919,12 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Virtualization} & A technology for abstracting the hardware of a single computer into several different execution environments, creating the illusion that each environment runs on its own private computer. \\
-\textbf{Virtual machine (VM)} & The abstraction of hardware allowing a virtual computer to execute on a physical computer; multiple VMs can run on a single physical machine, each with a different OS. \\
-\textbf{Emulation} & A methodology to enable a process to run when the compiled program's original (source) CPU type differs from the target CPU type. \\
-\textbf{Guest} & In virtualization, an operating system running in a virtual environment rather than natively on the computer hardware. \\
-\textbf{Host} & In virtualization, the location of the virtual machine manager, which runs guest operating systems; generally, a computer. \\
-\textbf{Virtual machine manager (VMM)} & The computer function that manages the virtual machine; also called a \textbf{hypervisor}. \\
+\textbf{Virtualization} & Technology abstracting single computer hardware into multiple execution environments; creates illusion each environment runs on private computer. \\
+\textbf{Virtual machine (VM)} & Hardware abstraction allowing virtual computer to execute on physical computer; multiple VMs can run on single physical machine, each with different OS. \\
+\textbf{Emulation} & Methodology enabling process to run when compiled program's source CPU type differs from target CPU type. \\
+\textbf{Guest} & In virtualization, OS running in virtual environment rather than natively on hardware. \\
+\textbf{Host} & In virtualization, VMM location running guest OS; generally, a computer. \\
+\textbf{Virtual machine manager (VMM)} & Computer function managing VM; also \textbf{hypervisor}. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -906,24 +933,28 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \addcontentsline{toc}{section}{1.8 Distributed systems}
 \begin{itemize}
     \item Collection of physically separate, possibly heterogeneous computer systems networked together.
-    \item Provides users access to various resources maintained by the system.
+    \item Provides users access to various system resources.
     \item Increases computation speed, functionality, data availability, and reliability.
-    \item OS may generalize network access as file access (details in device driver) or require specific network function invocation.
+    \item OS may generalize network access as file access (via device driver) or require specific network function invocation.
     \item Protocols greatly affect utility and popularity.
 \end{itemize}
 
 \subsection*{1 Networks}
 \addcontentsline{toc}{subsection}{1 Networks}
 \begin{itemize}
-    \item \textbf{Definition:} A communication path between two or more systems.
+    \item \textbf{Definition:} Communication path between two or more systems.
     \item Distributed systems depend on networking.
     \item Vary by protocols, distances between nodes, and transport media.
-    \item \textbf{TCP/IP:} Most common network protocol, fundamental architecture of the Internet.
+    \item \textbf{TCP/IP:} Most common network protocol, fundamental Internet architecture.
     \begin{itemize}
         \item Supported by most general-purpose OS.
         \item Some systems use proprietary protocols.
     \end{itemize}
-    \item OS requires a network protocol to have an interface device (e.g., network adapter) with a device driver and software for data handling.
+    \item OS requires network protocol to have:
+    \begin{itemize}
+        \item Interface device (e.g., network adapter) with device driver.
+        \item Software for data handling.
+    \end{itemize}
 \end{itemize}
 
 \subsubsection*{Network Characterization by Distance}
@@ -949,14 +980,14 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item Some OS extend beyond basic network connectivity.
     \item \textbf{Network operating system:}
     \begin{itemize}
-        \item Provides features like file sharing across the network.
-        \item Includes a communication scheme for processes on different computers to exchange messages.
+        \item Provides features like file sharing across network.
+        \item Includes communication scheme for processes on different computers to exchange messages.
         \item Computer runs autonomously but is aware of and communicates with other networked computers.
     \end{itemize}
     \item \textbf{Distributed operating system:}
     \begin{itemize}
         \item Provides a less autonomous environment.
-        \item Computers communicate closely enough to create the illusion of a single OS controlling the network.
+        \item Computers communicate closely enough to create illusion of single OS controlling network.
     \end{itemize}
 \end{itemize}
 
@@ -968,13 +999,13 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Network} & A communication path between two or more systems. \\
-\textbf{Transmission Control Protocol/Internet Protocol (TCP/IP)} & The most common network protocol; provides the fundamental architecture of the Internet. \\
-\textbf{Local-area network (LAN)} & A network that connects computers within a room, a building, or a campus. \\
-\textbf{Metropolitan-area network (MAN)} & A network linking buildings within a city. \\
-\textbf{Personal-area network (PAN)} & A network linking devices within several feet of each other (e.g., on a person). \\
-\textbf{Wide-area network (WAN)} & A network which usually links buildings, cities, or countries. \\
-\textbf{Network operating system} & A type of operating system that provides features such as file sharing across a network, along with a communication scheme that allows different processes on different computers to exchange messages. \\
+\textbf{Network} & Communication path between two or more systems. \\
+\textbf{Transmission Control Protocol/Internet Protocol (TCP/IP)} & Most common network protocol; fundamental Internet architecture. \\
+\textbf{Local-area network (LAN)} & Network connecting computers within a room, building, or campus. \\
+\textbf{Metropolitan-area network (MAN)} & Network linking buildings within a city. \\
+\textbf{Personal-area network (PAN)} & Network linking devices within several feet (e.g., on a person). \\
+\textbf{Wide-area network (WAN)} & Network linking buildings, cities, or countries. \\
+\textbf{Network operating system} & OS providing features like network file sharing and inter-process communication; computer runs autonomously but communicates with others. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -982,24 +1013,23 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \section*{1.9 Kernel data structures}
 \addcontentsline{toc}{section}{1.9 Kernel data structures}
 \begin{itemize}
-    \item Fundamental data structures are used extensively in operating systems.
+    \item Fundamental data structures used extensively in operating systems.
 \end{itemize}
 
 \subsection*{1 Lists, stacks, and queues}
 \addcontentsline{toc}{subsection}{1 Lists, stacks, and queues}
 \begin{itemize}
-    \item \textbf{Array:} Simple data structure where each element can be accessed directly (e.g., main memory).
-    \item \textbf{List:} Collection of data values as a sequence; items must be accessed in a particular order.
+    \item \textbf{Array:} Simple data structure; each element accessed directly (e.g., main memory).
+    \item \textbf{List:} Collection of data values as a sequence; items accessed in particular order.
     \begin{itemize}
-        \item Implemented commonly as a \textbf{linked list}, where items are linked.
+        \item Commonly implemented as a \textbf{linked list}, where items are linked.
         \item \textbf{Singly linked list:} Each item points to its successor.
         \item \textit{Figure 1.9.1: Singly linked list. Diagram shows a sequence of data sets where each data set points to its immediate successor, and the last data set points to null.}
-        \item \textbf{Doubly linked list:} A given item can refer to its predecessor or successor.
+        \item \textbf{Doubly linked list:} Item can refer to its predecessor or successor.
         \item \textit{Figure 1.9.2: Doubly linked list. Diagram shows a sequence of data sets where each data set points to its immediate successor and predecessor.}
-        \item \textbf{Circularly linked list:} The last element refers to the first element, not null.
-        \item \textit{Figure 1.9.3: Circularly linked list. Diagram shows a sequence of data sets where each data set points to its immediate successor, and the last data set points to the first data set instead of null.}
-        \item Accommodate varying item sizes; allow easy insertion/deletion.
-        \item \textbf{Disadvantage:} Retrieving a specified item is $O(N)$ in worst case (linear performance).
+        \item \textbf{Circularly linked list:} Last element refers to the first, not null.
+        \item Accommodates varying item sizes; allows easy insertion/deletion.
+        \item \textbf{Disadvantage:} Retrieving specified item is $O(N)$ in worst case (linear performance).
         \item Used directly by kernel algorithms or for constructing other structures.
     \end{itemize}
     \item \textbf{Stack:} Sequentially ordered data structure using \textbf{Last In, First Out (LIFO)} principle.
@@ -1037,9 +1067,9 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item Numeric value used as index into a table (array) for quick data retrieval.
     \item Retrieval can be $O(1)$ (constant time), much faster than $O(N)$ for lists.
     \item Used extensively in OS due to performance.
-    \item \textbf{Hash collision:} Two unique inputs result in the same output value (same table location).
+    \item \textbf{Hash collision:} Two unique inputs result in same output value (same table location).
     \begin{itemize}
-        \item Handled by having a linked list at the table location for all items with the same hash value.
+        \item Handled by having a linked list at the table location for all items with same hash value.
         \item More collisions reduce efficiency.
     \end{itemize}
     \item \textbf{Hash map:} Associates (maps) [key:value] pairs using a hash function.
@@ -1053,11 +1083,11 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \subsection*{4 Bitmaps}
 \addcontentsline{toc}{subsection}{4 Bitmaps}
 \begin{itemize}
-    \item String of $N$ binary digits representing the status of $N$ items.
+    \item String of $N$ binary digits representing status of $N$ items.
     \item \textbf{Example:} 0 = resource available, 1 = resource unavailable.
     \item Value of $i^{th}$ position associated with $i^{th}$ resource.
     \item \textbf{Example bitmap:} `0 0 1 0 1 1 1 0 1` (resources 2, 4, 5, 6, 8 unavailable; 0, 1, 3, 7 available).
-    \item \textbf{Space efficiency:} Significant power; using a single bit vs. eight-bit Boolean value saves space.
+    \item \textbf{Space efficiency:} Significant power; using single bit vs. eight-bit Boolean value saves space.
     \item Commonly used to represent availability of large number of resources (e.g., disk blocks).
 \end{itemize}
 
@@ -1078,19 +1108,19 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{List} & A data structure that presents a collection of data values as a sequence. \\
-\textbf{Linked list} & A data structure in which items are linked to one another. \\
-\textbf{Stack} & A sequentially ordered data structure that uses the last-in, first-out (LIFO) principle for adding and removing items. \\
-\textbf{Queue} & A sequentially ordered data structure that uses the first-in, first-out (FIFO) principle. \\
-\textbf{Tree} & A data structure that can be used to represent data hierarchically; data values are linked through parent-child relationships. \\
-\textbf{General tree} & A tree data structure in which a parent may have unlimited children. \\
-\textbf{Binary tree} & A tree data structure in which a parent may have at most two children. \\
-\textbf{Binary search tree} & A type of binary tree data structure that requires an ordering between the parent's two children (left child $\le$ right child). \\
-\textbf{Balanced binary search tree} & A tree containing $N$ items that has, at most, $\lg N$ levels, ensuring worst-case performance of $O(\lg N)$. \\
-\textbf{Red-black tree} & A tree containing $N$ items and having at most $\lg N$ levels, thus ensuring worst-case performance of $O(\lg N)$. \\
-\textbf{Hash function} & A function that takes data as its input, performs a numeric operation on the data, and returns a numeric value. \\
-\textbf{Hash map} & A data structure that maps [key:value] pairs using a hash function. \\
-\textbf{Bitmap} & A string of $N$ binary digits that can be used to represent the status of $N$ items. \\
+\textbf{List} & Data structure presenting data values as a sequence. \\
+\textbf{Linked list} & Data structure where items are linked. \\
+\textbf{Stack} & LIFO sequentially ordered data structure. \\
+\textbf{Queue} & FIFO sequentially ordered data structure. \\
+\textbf{Tree} & Data structure representing data hierarchically via parent-child relationships. \\
+\textbf{General tree} & Tree where parent may have unlimited children. \\
+\textbf{Binary tree} & Tree where parent has at most two children. \\
+\textbf{Binary search tree} & Binary tree with ordering: \textit{left\_child} $\le$ \textit{right\_child}. \\
+\textbf{Balanced binary search tree} & Tree with $N$ items, at most $\lg N$ levels, ensuring $O(\lg N)$ worst-case performance. \\
+\textbf{Red-black tree} & Tree with $N$ items, at most $\lg N$ levels, ensuring $O(\lg N)$ worst-case performance. \\
+\textbf{Hash function} & Function taking data input, performing numeric operation, returning numeric value. \\
+\textbf{Hash map} & Data structure mapping [key:value] pairs using a hash function. \\
+\textbf{Bitmap} & String of $N$ binary digits representing status of $N$ items. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -1098,35 +1128,41 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \section*{1.10 Computing environments}
 \addcontentsline{toc}{section}{1.10 Computing environments}
 \begin{itemize}
-    \item Operating systems are used in a variety of computing environments.
+    \item Operating systems used in various computing environments.
 \end{itemize}
 
 \subsection*{1 Traditional computing}
 \addcontentsline{toc}{subsection}{1 Traditional computing}
 \begin{itemize}
-    \item Lines between traditional computing environments have blurred.
-    \item \textbf{Typical office environment} evolved from PCs on a network with file/print servers to:
+    \item Lines between traditional computing environments blurred.
+    \item \textbf{Typical office environment} evolved:
     \begin{itemize}
-        \item \textbf{Web technologies} and increasing \textbf{WAN bandwidth} stretching boundaries.
-        \item Companies use \textbf{portals} for web accessibility to internal servers.
-        \item \textbf{Network computers} (or \textbf{thin clients}) used for security/easier maintenance.
+        \item From PCs on network with file/print servers.
+        \item To \textbf{web technologies} and increasing \textbf{WAN bandwidth} stretching boundaries.
+        \item Companies use \textbf{portals} for web access to internal servers.
+        \item \textbf{Network computers} (or \textbf{thin clients}) for security/easier maintenance.
         \item Mobile computers synchronize with PCs for portable use.
         \item Mobile devices connect to wireless/cellular networks for web portals.
     \end{itemize}
-    \item \textbf{Home computing} evolved from single PCs with slow modems to:
+    \item \textbf{Home computing} evolved:
     \begin{itemize}
-        \item Inexpensive fast data connections.
+        \item From single PCs with slow modems.
+        \item To inexpensive fast data connections.
         \item Home computers serving web pages and running networks (printers, client PCs, servers).
         \item Use of \textbf{firewalls} to protect networks from security breaches.
     \end{itemize}
-    \item Historically, systems were either \textbf{batch} (processed jobs in bulk with predetermined input) or \textbf{interactive} (waited for user input).
+    \item Historically, systems were either:
+    \begin{itemize}
+        \item \textbf{Batch} (processed jobs in bulk with predetermined input).
+        \item \textbf{Interactive} (waited for user input).
+    \end{itemize}
     \item \textbf{Time-sharing systems:}
     \begin{itemize}
         \item Multiple users shared time on systems to optimize resource use.
-        \item Used a timer and scheduling algorithms to cycle processes rapidly through the CPU.
+        \item Used timer and scheduling algorithms to cycle processes rapidly through CPU.
         \item Rare today as traditional time-sharing systems.
         \item Same scheduling technique used on desktops, laptops, servers, mobile computers.
-        \item Processes often owned by a single user (or user and OS).
+        \item Processes often owned by single user (or user and OS).
         \item User and system processes managed to get a slice of computer time (e.g., multiple windows, web browser processes).
     \end{itemize}
 \end{itemize}
@@ -1139,20 +1175,20 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item \textbf{Functionality evolution:}
     \begin{itemize}
         \item Historically: sacrificed screen size, memory, functionality for mobile access (email, web browsing).
-        \item Today: rich features, comparable to laptops, offering unique/impractical functionality for desktops.
+        \item Today: rich features, comparable to laptops; unique/impractical functionality for desktops.
         \item Used for music, video, digital books, photos, HD video editing.
     \end{itemize}
     \item \textbf{Unique features leveraged by applications:}
     \begin{itemize}
         \item \textbf{GPS chips:} Determine precise location for navigation apps.
         \item \textbf{Accelerometers and gyroscopes:} Detect orientation, tilting, shaking (e.g., in games).
-        \item \textbf{Augmented-reality applications:} Overlay information on a display of the current environment.
+        \item \textbf{Augmented-reality applications:} Overlay info on display of current environment.
     \end{itemize}
     \item \textbf{Connectivity:} Typically use \textbf{IEEE 802.11 wireless} or \textbf{cellular data networks}.
     \item \textbf{Limitations compared to PCs:}
     \begin{itemize}
         \item More limited memory capacity and processing speed (e.g., 256 GB storage vs. 8 TB on desktop).
-        \item Smaller, slower processors with fewer cores due to power consumption concerns.
+        \item Smaller, slower processors with fewer cores due to power consumption.
     \end{itemize}
     \item \textbf{Dominant mobile operating systems:}
     \begin{itemize}
@@ -1169,8 +1205,8 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item \textit{Figure 1.10.1: General structure of a client-server system. Diagram shows server connected through network to client desktop, client laptop, and client smartphone.}
     \item \textbf{Server system categories:}
     \begin{itemize}
-        \item \textbf{Compute-server system:} Client sends request to perform an action (e.g., read data); server executes and sends results (e.g., database server).
-        \item \textbf{File-server system:} Provides a file-system interface for clients to create, update, read, delete files (e.g., web server delivering files).
+        \item \textbf{Compute-server system:} Client sends request for action (e.g., read data); server executes and sends results (e.g., database server).
+        \item \textbf{File-server system:} Provides file-system interface for clients to create, update, read, delete files (e.g., web server delivering files).
     \end{itemize}
 \end{itemize}
 
@@ -1178,20 +1214,20 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \addcontentsline{toc}{subsection}{4 Peer-to-peer computing}
 \begin{itemize}
     \item \textbf{Definition:} Distributed system model where clients and servers are not distinguished; all nodes are \textbf{peers}.
-    \item Each node can act as either a client (requesting service) or a server (providing service).
-    \item \textbf{Advantage:} Services can be provided by several distributed nodes, avoiding server bottlenecks of client-server systems.
+    \item Each node can act as either client (requesting service) or server (providing service).
+    \item \textbf{Advantage:} Services provided by several distributed nodes, avoiding server bottlenecks.
     \item \textbf{Node participation:} Must first join the network of peers.
     \item \textbf{Service discovery methods:}
     \begin{itemize}
-        \item \textbf{Centralized lookup service:} Node registers service; clients contact lookup service to find providers. Communication then occurs directly between client and provider (e.g., Napster).
+        \item \textbf{Centralized lookup service:} Node registers service; clients contact lookup service to find providers. Communication then direct. (e.g., Napster).
         \item \textbf{No centralized lookup service:} Client broadcasts request to all nodes; providers respond directly. Requires a \textbf{discovery protocol} (e.g., Gnutella).
         \item \textit{Figure 1.10.2: Peer-to-peer system with no centralized service. Image shows a client broadcasting a request to other nodes, and a service provider node responding directly to the client.}
     \end{itemize}
     \item \textbf{Examples:}
     \begin{itemize}
-        \item \textbf{Napster} (late 1990s): Centralized server indexed files, actual exchange was peer-to-peer. Shut down due to copyright infringement.
+        \item \textbf{Napster} (late 1990s): Centralized server indexed files, actual exchange was peer-to-peer. Shut down due to copyright.
         \item \textbf{Gnutella:} Decentralized, clients broadcasted requests.
-        \item \textbf{Skype:} Hybrid approach with centralized login server but decentralized peer communication for VoIP calls and messages.
+        \item \textbf{Skype:} Hybrid approach with centralized login server but decentralized peer communication for VoIP calls/messages.
     \end{itemize}
 \end{itemize}
 
@@ -1199,9 +1235,9 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \addcontentsline{toc}{subsection}{5 Cloud computing}
 \begin{itemize}
     \item \textbf{Definition:} Delivers computing, storage, and applications as a service across a network.
-    \item Logical extension of \textbf{virtualization}, using it as a base.
-    \item \textbf{Example:} \textbf{Amazon Elastic Compute Cloud (EC2)} with thousands of servers, millions of VMs, petabytes of storage. Users pay for resources used.
-    \textbf{Types of cloud computing:} (not discrete, often combined)
+    \item Logical extension of \textbf{virtualization}, using it as base.
+    \item \textbf{Example:} \textbf{Amazon Elastic Compute Cloud (EC2)} with thousands of servers, millions of VMs, petabytes of storage. Users pay for resources.
+    \item \textbf{Types of cloud computing:} (not discrete, often combined)
     \begin{itemize}
         \item \textbf{Public cloud:} Available via Internet to anyone willing to pay.
         \item \textbf{Private cloud:} Run by a company for its own use.
@@ -1224,7 +1260,7 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item \textbf{Embedded computers:} Most prevalent form of computers (car engines, robots, optical drives, microwaves).
     \item Tend to have very specific tasks.
-    \item Systems are usually primitive; OS provides limited features, often little/no user interface.
+    \item Systems usually primitive; OS provides limited features, often little/no user interface.
     \item Focus on monitoring and managing hardware devices.
     \item \textbf{Variations:}
     \begin{itemize}
@@ -1235,11 +1271,11 @@ Optical/tape & No & TB–PB & s–min & archival \\
     \item Expanding use: computerized houses controlling heating, lighting, alarms, appliances; potential for smart refrigerators.
     \item \textbf{Real-time operating systems (RTOS):}
     \begin{itemize}
-        \item Used when rigid time requirements are placed on processor operation or data flow.
+        \item Used when rigid time requirements on processor operation or data flow.
         \item Often used as control devices in dedicated applications (e.g., scientific experiments, medical imaging, industrial control, weapon systems, fuel-injection).
         \item Have well-defined, fixed time constraints.
-        \item Processing \textit{must} be done within defined constraints, or the system fails (e.g., robot arm halting after smashing).
-        \item Functions correctly only if it returns the correct result within its time constraints.
+        \item Processing \textit{must} be done within defined constraints, or system fails (e.g., robot arm halting after smashing).
+        \item Functions correctly only if it returns correct result within time constraints.
         \item Contrasts with traditional systems where quick response is desirable but not mandatory.
     \end{itemize}
 \end{itemize}
@@ -1252,29 +1288,29 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Portals} & Gateways between requestors and services running on provider computers. \\
-\textbf{Network computer} & A limited computer that understands only web-based computing. \\
-\textbf{Thin client} & A limited computer (terminal) used for web-based computing. \\
-\textbf{Wireless network} & A communication network composed of radio signals rather than physical wires. \\
-\textbf{Firewall} & A computer, appliance, process, or network router that sits between trusted and untrusted systems or devices; protects a network from security breaches by managing and blocking certain types of communications. \\
-\textbf{Mobile computing} & A mode of computing involving small portable devices like smartphones and tablet computers. \\
-\textbf{Apple iOS} & The mobile operating system created by Apple Inc. \\
-\textbf{Google Android} & The mobile operating system created by Google Inc. \\
-\textbf{Server system} & A system providing services to other computers (e.g., a web server). \\
-\textbf{Client system} & A computer that uses services from other computers (such as a web client). \\
-\textbf{Client-server model} & A mode of computing in which a server provides services to one or more clients. \\
-\textbf{Compute-server system} & A server that provides an interface to which a client can send a request for an action (e.g., read data); server executes and sends results to client. \\
-\textbf{File-server system} & A server that provides a file-system interface where clients can create, update, read, and delete files (e.g., a web server that delivers files to clients running web browsers). \\
-\textbf{Cloud computing} & A type of computing that delivers computing, storage, and even applications "as a service" across a network. \\
-\textbf{Amazon Elastic Compute Cloud (EC2)} & An instance of cloud computing implemented by Amazon. \\
-\textbf{Public cloud} & Cloud computing available via the Internet to anyone willing to pay for the services offered. \\
-\textbf{Private cloud} & Cloud computing run by a company for that company's own use. \\
-\textbf{Hybrid cloud} & A type of cloud computing that includes both public and private cloud components. \\
-\textbf{Software as a Service (SaaS)} & A type of computing in which one or more applications (such as word processors or spreadsheets) are available as a service via the Internet. \\
-\textbf{Platform as a Service (PaaS)} & A software stack ready for application use via the Internet (e.g., a database server). \\
-\textbf{Infrastructure as a Service (IaaS)} & A type of computing in which servers or storage are available over the Internet (e.g., storage available for making backup copies of production data). \\
-\textbf{ASIC} & An application-specific integrated circuit (hardware chip) that performs its tasks without an operating system. \\
-\textbf{Real-time operating systems (RTOS)} & Systems used when rigid time requirements have been placed on the operation of a processor or the flow of data; often used as control devices in dedicated applications. \\
+\textbf{Portals} & Gateways between requestors and services on provider computers. \\
+\textbf{Network computer} & Limited computer understanding only web-based computing. \\
+\textbf{Thin client} & Limited computer (terminal) for web-based computing. \\
+\textbf{Wireless network} & Communication network of radio signals. \\
+\textbf{Firewall} & Computer/appliance/process/router protecting network from security breaches by managing/blocking communications. \\
+\textbf{Mobile computing} & Computing on handheld smartphones/tablets. \\
+\textbf{Apple iOS} & Mobile OS by Apple Inc. \\
+\textbf{Google Android} & Mobile OS by Google Inc. \\
+\textbf{Server system} & System providing services to other computers. \\
+\textbf{Client system} & Computer using services from other computers. \\
+\textbf{Client-server model} & Server provides services to one or more clients. \\
+\textbf{Compute-server system} & Server providing interface for client to request action; executes and sends results. \\
+\textbf{File-server system} & Server providing file-system interface for clients to manipulate files. \\
+\textbf{Cloud computing} & Delivers computing, storage, applications as a service across network. \\
+\textbf{Amazon Elastic Compute Cloud (EC2)} & Amazon's cloud computing instance. \\
+\textbf{Public cloud} & Cloud computing available via Internet to anyone willing to pay. \\
+\textbf{Private cloud} & Cloud computing run by a company for its own use. \\
+\textbf{Hybrid cloud} & Includes both public and private components. \\
+\textbf{Software as a Service (SaaS)} & Applications (e.g., word processors) available as service via Internet. \\
+\textbf{Platform as a Service (PaaS)} & Software stack ready for application use via Internet (e.g., database server). \\
+\textbf{Infrastructure as a Service (IaaS)} & Servers/storage available over Internet (e.g., backup storage). \\
+\textbf{ASIC} & Application-specific integrated circuit (hardware chip) performing tasks without OS. \\
+\textbf{Real-time operating systems (RTOS)} & Systems with rigid time requirements on processor operation/data flow; often control devices in dedicated applications. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
@@ -1314,9 +1350,9 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item Early computing (1950s): software generally came with source code (e.g., MIT's Tech Model Railroad Club, Homebrew user groups, DECUS).
     \item 1970: Digital's OS distributed as source code with no restrictions/copyright.
-    \item Computer/software companies later sought to limit software use to authorized computers/paying customers.
-    \item Releasing only binary files (not source code) helped protect code/ideas from competitors.
-    \item By 1980: proprietary software was the usual case.
+    \item Companies later limited software use to authorized/paying customers.
+    \item Releasing only binary files (not source code) protected code/ideas.
+    \item By 1980: proprietary software was usual case.
 \end{itemize}
 
 \subsection*{2 Free operating systems}
@@ -1324,17 +1360,17 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item To counter proprietary trend, \textbf{Richard Stallman} (1984) started developing \textbf{GNU} ("GNU's Not Unix!"): a free, UNIX-compatible OS.
     \item "Free" refers to freedom of use, not price.
-    \item Free-software movement holds users are entitled to four freedoms:
+    \item Free-software movement holds users entitled to four freedoms:
     \begin{enumerate}
         \item To freely run the program.
         \item To study and change the source code.
         \item To give or sell copies.
         \item To give or sell copies with or without changes.
     \end{enumerate}
-    \item 1985: Stallman published the \textbf{GNU Manifesto} (argues all software should be free).
-    \item Formed the \textbf{Free Software Foundation (FSF)} to encourage free software use/development.
-    \item FSF uses "copyleft" (Stallman invention): licensing that gives anyone possessing a copy the four essential freedoms, with condition that redistribution must preserve these freedoms.
-    \item \textbf{GNU General Public License (GPL):} Common license for free software; requires source code distribution with binaries, and all copies (including modified) released under same GPL.
+    \item 1985: Stallman published \textbf{GNU Manifesto} (argues all software should be free).
+    \item Formed \textbf{Free Software Foundation (FSF)} to encourage free software use/development.
+    \item FSF uses "copyleft" (Stallman invention): licensing giving four essential freedoms, conditioned on preserving them in redistribution.
+    \item \textbf{GNU General Public License (GPL):} Common free software license; requires source code distribution with binaries, and all copies (modified) released under same GPL.
     \item Creative Commons "Attribution Sharealike" license is also a copyleft license.
 \end{itemize}
 
@@ -1342,23 +1378,23 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \addcontentsline{toc}{subsection}{3 GNU/Linux}
 \begin{itemize}
     \item By 1991: GNU OS nearly complete (compilers, editors, utilities, libraries, games), but kernel not ready.
-    \item 1991: \textbf{Linus Torvalds} (Finland) released a rudimentary UNIX-like kernel using GNU compilers/tools, invited worldwide contributions.
-    \item Internet enabled rapid growth of "Linux" (weekly updates, thousands of programmers).
+    \item 1991: \textbf{Linus Torvalds} (Finland) released rudimentary UNIX-like kernel using GNU compilers/tools, invited worldwide contributions.
+    \item Internet enabled rapid "Linux" growth (weekly updates, thousands of programmers).
     \item 1991: Linux not free (noncommercial redistribution only).
-    \item 1992: Torvalds rereleased Linux under the GPL, making it free software (and "open source").
-    \item \textbf{GNU/Linux:} Full OS (kernel properly called Linux, but includes GNU tools).
+    \item 1992: Torvalds rereleased Linux under GPL, making it free software (and "open source").
+    \item \textbf{GNU/Linux:} Full OS (kernel properly Linux, includes GNU tools).
     \item Spawned hundreds of unique \textbf{distributions} (custom builds): Red Hat, SUSE, Fedora, Debian, Slackware, Ubuntu.
     \item Distributions vary in function, utility, installed applications, hardware support, user interface, and purpose.
-    \item Example: Red Hat Enterprise Linux geared for large commercial use.
-    \item Example: \textbf{PCLinuxOS} is a \textbf{Live CD} (or \textbf{LiveDVD}) -- OS that can be booted/run from CD-ROM/DVD without installation on boot disk.
-    \item Running Linux on a Windows (or other) system using virtualization:
+    \item Example: Red Hat Enterprise Linux for large commercial use.
+    \item Example: \textbf{PCLinuxOS} is a \textbf{Live CD} (or \textbf{LiveDVD}) -- OS bootable/run from CD-ROM/DVD without installation.
+    \item Running Linux on Windows (or other) system using virtualization:
     \begin{enumerate}
         \item Download/install free \textbf{Virtualbox VMM} tool (\url{https://www.virtualbox.org/}).
         \item Install OS from scratch (CD image) or use pre-built images (\url{http://virtualboxes.org/images/}).
         \item Boot the virtual machine within Virtualbox.
     \end{enumerate}
     \item Alternative: free program \textbf{Qemu} (\url{http://wiki.qemu.org/Download/}), includes \texttt{qemu-img} for converting Virtualbox images.
-    \item This text provides a virtual machine image of GNU/Linux running Ubuntu release (includes source code, dev tools).
+    \item This text provides a virtual machine image of GNU/Linux running Ubuntu (includes source code, dev tools).
 \end{itemize}
 
 \subsection*{4 BSD UNIX}
@@ -1366,16 +1402,16 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item Longer, more complicated history than Linux.
     \item Started 1978 as derivative of AT\&T's UNIX.
-    \item Releases from University of California at Berkeley (UCB) came in source/binary form, but not open source (AT\&T license required).
+    \item UCB releases in source/binary form, but not open source (AT\&T license required).
     \item Development slowed by AT\&T lawsuit.
     \item 1994: Fully functional, open-source \textbf{4.4BSD-lite} released.
     \item Many distributions: \textbf{FreeBSD}, \textbf{NetBSD}, \textbf{OpenBSD}, \textbf{DragonflyBSD}.
     \item To explore FreeBSD source code: download VM image (Virtualbox), source in \texttt{/usr/src/}, kernel in \texttt{/usr/src/sys}, VM code in \texttt{/usr/src/sys/vm}.
     \item View source code online: \url{https://svnweb.freebsd.org}.
-    \item Source code contained/controlled by a \textbf{version control system} (e.g., "subversion" \url{https://subversion.apache.org/source-code}).
+    \item Source code controlled by a \textbf{version control system} (e.g., "subversion" \url{https://subversion.apache.org/source-code}).
     \begin{itemize}
-        \item Allows user to "pull" entire source code tree and "push" changes back to repository.
-        \item Provides history of each file and conflict resolution.
+        \item Allows user to "pull" entire source code tree and "push" changes.
+        \item Provides file history and conflict resolution.
     \end{itemize}
     \item Another version control system: \textbf{git} (\url{http://www.git-scm.com}), used for GNU/Linux and other programs.
     \item \textbf{Darwin:} Core kernel component of macOS, based on BSD UNIX, open-sourced (\url{http://www.opensource.apple.com/}).
@@ -1391,9 +1427,9 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \begin{itemize}
     \item Never been easier/more interesting to study OS.
     \item Open-source movement: many OS available in source and binary (Linux, BSD UNIX, Solaris, part of macOS).
-    \item Availability of source code allows studying OS from the inside out (examining code vs. documentation/behavior).
+    \item Source code allows studying OS from inside out (examining code vs. documentation/behavior).
     \item OS no longer commercially viable have been open-sourced (study how systems operated with fewer CPU, memory, storage resources).
-    \item Rise of \textbf{virtualization} (mainstream, often free) makes it possible to run many OS on top of one core system.
+    \item Rise of \textbf{virtualization} (mainstream, often free) allows running many OS on one core system.
     \begin{itemize}
         \item Example: VMware (\url{http://www.vmware.com}) provides free "player" for Windows; hundreds of free "virtual appliances" can run.
         \item Example: Virtualbox (\url{http://www.virtualbox.com}) provides free, open-source VMM on many OS.
@@ -1421,9 +1457,9 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \subsection*{7 Open-source systems as learning tools}
 \addcontentsline{toc}{subsection}{7 Open-source systems as learning tools}
 \begin{itemize}
-    \item Free-software movement drives legions of programmers to create thousands of open-source projects (including OS).
+    \item Free-software movement drives programmers to create thousands of open-source projects (including OS).
     \item Portals: \url{http://freshmeat.net/}, \url{http://distrowatch.com/}.
-    \item Students use source code as a learning tool: modify/test programs, help find/fix bugs, explore mature systems (OS, compilers, tools, UIs).
+    \item Students use source code as learning tool: modify/test programs, help find/fix bugs, explore mature systems (OS, compilers, tools, UIs).
     \item Availability of source code for historic projects (e.g., Multics) helps understanding and building knowledge for new projects.
     \item Diversity of open-source OS (e.g., GNU/Linux, BSD UNIX) with different goals, utility, licensing, purpose.
     \item Cross-pollination occurs (e.g., major OpenSolaris components ported to BSD UNIX), allowing rapid improvements.
@@ -1438,20 +1474,20 @@ Optical/tape & No & TB–PB & s–min & archival \\
 \toprule
 \textbf{Term} & \textbf{Definition} \\
 \midrule
-\textbf{Free operating system} & An operating system released under a license that makes its source code available and allows no-cost use, redistribution, and modification. \\
-\textbf{Open-source operating system} & An operating system or other program available in source-code format rather than as compiled binary code. \\
-\textbf{Closed-source} & An operating system or other program available only in compiled binary code format. \\
-\textbf{Reverse engineering} & The procedure of converting a compiled binary file into a human-readable format. \\
-\textbf{GNU General Public License (GPL)} & A license agreement that codifies copylefting (allowing and requiring open sourcing of the associated programs); a common license under which free software is released. \\
-\textbf{GNU/Linux (aka Linux)} & An open-source operating system composed of components contributed by the GNU foundation and Linus Torvalds, as well as many others. \\
-\textbf{Distribution} & A release of a version of an operating system. \\
-\textbf{LiveCD} & An operating system that can be booted and run from a CD-ROM (or more generally from any media) without being installed on a system's boot disk(s). \\
-\textbf{LiveDVD} & An operating system that can be booted and run from a DVD (or more generally from any media) without being installed on a system's boot disk(s). \\
-\textbf{UnixBSD} & A UNIX derivative based on work done at the University of California at Berkeley (UCB). \\
-\textbf{Version control system} & Software that manages software distributions by allowing contributors to "push" changes into a repository and "pull" a version of the software source-code tree to a system (e.g., for compilation). \\
-\textbf{Git} & A version control system used for GNU/Linux and other programs. \\
-\textbf{Solaris} & A UNIX derivative that is the main operating system of Sun Microsystems (now owned by Oracle Corporation). There is an active open source version called Illumos. \\
-\textbf{SunOS} & The predecessor of Solaris by Sun Microsystems Inc. \\
+\textbf{Free operating system} & OS released under license making source code available, allowing no-cost use, redistribution, modification. \\
+\textbf{Open-source operating system} & OS/program available in source-code format (not compiled binary). \\
+\textbf{Closed-source} & OS/program available only in compiled binary code format. \\
+\textbf{Reverse engineering} & Converting compiled binary file into human-readable format. \\
+\textbf{GNU General Public License (GPL)} & License codifying copylefting; common free software license. \\
+\textbf{GNU/Linux (aka Linux)} & Open-source OS: GNU foundation components + Linus Torvalds' kernel. \\
+\textbf{Distribution} & Release of an OS version. \\
+\textbf{LiveCD} & OS bootable/run from CD-ROM (or any media) without installation. \\
+\textbf{LiveDVD} & OS bootable/run from DVD (or any media) without installation. \\
+\textbf{UnixBSD} & UNIX derivative based on UCB work. \\
+\textbf{Version control system} & Software managing distributions; allows "pulling" source tree, "pushing" changes. \\
+\textbf{Git} & Version control system for GNU/Linux and other programs. \\
+\textbf{Solaris} & Commercial UNIX-based OS by Sun Microsystems (now Oracle); active open source version called Illumos. \\
+\textbf{SunOS} & Predecessor of Solaris by Sun Microsystems Inc. \\
 \bottomrule
 \end{tabular}
 \vspace{\baselineskip}
