@@ -1,0 +1,453 @@
+\phantomsection
+\section{Examples of IPC systems}\label{sec:3.7}
+
+In this section, we explore four different IPC systems. We first cover the POSIX API for shared memory and then discuss message passing in the Mach operating system. Next, we present Windows IPC, which interestingly uses shared memory as a mechanism for providing certain types of message passing. We conclude with pipes, one of the earliest IPC mechanisms on UNIX systems.
+
+<h3>POSIX shared memory</h3>
+Several IPC mechanisms are available for POSIX systems, including shared memory and message passing. Here, we explore the POSIX API for shared memory.
+
+POSIX shared memory is organized using memory-mapped files, which associate the region of shared memory with a file. A process must first create a shared-memory object using the \texttt{shm\_open()} system call, as follows:
+\begin{verbatim}
+fd = shm_open(name,  O_CREAT | O_RDWR, 0666);
+\end{verbatim}
+The first parameter specifies the name of the shared-memory object. Processes that wish to access this shared memory must refer to the object by this name. The subsequent parameters specify that the shared-memory object is to be created if it does not yet exist (\texttt{O\_CREAT}) and that the object is open for reading and writing (\texttt{O\_RDWR}). The last parameter establishes the file-access permissions of the shared-memory object. A successful call to \texttt{shm\_open()} returns an integer file descriptor for the shared-memory object.
+
+Once the object is established, the \texttt{ftruncate()} function is used to configure the size of the object in bytes. The call
+\begin{verbatim}
+ftruncate(fd, 4096);
+\end{verbatim}
+sets the size of the object to 4,096 bytes.
+
+Finally, the \texttt{mmap()} function establishes a memory-mapped file containing the shared-memory object. It also returns a pointer to the memory-mapped file that is used for accessing the shared-memory object.
+
+The programs shown in Figure \ref{fig:producer-posix-shm} and Figure \ref{fig:consumer-posix-shm} use the producer-consumer model in implementing shared memory. The producer establishes a shared-memory object and writes to shared memory, and the consumer reads from shared memory.
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
+ 
+#include <sys/mman.h>
+ 
+int main()
+{
+/* the size (in bytes) of shared memory object */
+const int SIZE = 4096;
+/* name of the shared memory object */
+const char *name = "OS";
+/* strings written to shared memory */
+const char *message_0 = "Hello";
+const char *message_1 = "World!";
+ 
+/* shared memory file descriptor */
+int fd;
+/* pointer to shared memory obect */
+char *ptr;
+ 
+   /* create the shared memory object */
+   fd = shm_open(name,O_CREAT | O_RDWR,0666);
+ 
+   /* configure the size of the shared memory object */
+   ftruncate(fd, SIZE);
+ 
+   /* memory map the shared memory object */
+   ptr = (char *)
+    mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+ 
+   /* write to the shared memory object */
+   sprintf(ptr,"%s",message_0);
+   ptr += strlen(message_0);
+   sprintf(ptr,"%s",message_1);
+   ptr += strlen(message_1);
+ 
+   return 0;
+}
+\end{verbatim}
+\caption{Producer process illustrating POSIX shared-memory API.}\label{fig:producer-posix-shm}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/shm.h>
+#include <sys/stat.h>
+ 
+#include <sys/mman.h>
+ 
+int main()
+{
+/* the size (in bytes) of shared memory object */
+const int SIZE = 4096;
+/* name of the shared memory object */
+const char *name = "OS";
+/* shared memory file descriptor */
+int fd;
+/* pointer to shared memory obect */
+char *ptr;
+ 
+   /* open the shared memory object */
+   fd = shm_open(name, O_RDONLY, 0666);
+ 
+   /* memory map the shared memory object */
+   ptr = (char *)
+    mmap(0, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+ 
+   /* read from the shared memory object */
+   printf("%s",(char *)ptr);
+ 
+   /* remove the shared memory object */
+   shm_unlink(name);
+ 
+   return 0;
+}
+\end{verbatim}
+\caption{Consumer process illustrating POSIX shared-memory API.}\label{fig:consumer-posix-shm}
+\end{figure}
+
+The producer, shown in Figure \ref{fig:producer-posix-shm}, creates a shared-memory object named \texttt{OS} and writes the infamous string \texttt{"Hello World!"} to shared memory. The program memory-maps a shared-memory object of the specified size and allows writing to the object. The flag \texttt{MAP\_SHARED} specifies that changes to the shared-memory object will be visible to all processes sharing the object. Notice that we write to the shared-memory object by calling the \texttt{sprintf()} function and writing the formatted string to the pointer \texttt{ptr}. After each write, we must increment the pointer by the number of bytes written.
+
+The consumer process, shown in Figure \ref{fig:consumer-posix-shm}, reads and outputs the contents of the shared memory. The consumer also invokes the \texttt{shm\_unlink()} function, which removes the shared-memory segment after the consumer has accessed it. We provide further exercises using the POSIX shared-memory API in the programming exercises at the end of this chapter. Additionally, we provide more detailed coverage of memory mapping in Section \hyperref[sec:13.5]{13.5}.
+
+<h3>Mach message passing</h3>
+As an example of message passing, we next consider the Mach operating system. Mach was especially designed for distributed systems, but was shown to be suitable for desktop and mobile systems as well, as evidenced by its inclusion in the MacOS and iOS operating systems, as discussed in the previous chapter Operating-System Structures.
+
+The Mach kernel supports the creation and destruction of multiple \textbf{tasks}, which are similar to processes but have multiple threads of control and fewer associated resources. Most communication in Mach---including all inter-task communication---is carried out by \textbf{messages}. Messages are sent to, and received from, mailboxes, which are called \textbf{ports} in Mach. Ports are finite in size and unidirectional; for two-way communication, a message is sent to one port, and a response is sent to a separate \textbf{reply} port. Each port may have multiple senders, but only one receiver. Mach uses \textbf{kernel abstractions} to represent resources such as tasks, threads, memory, and processors, while message passing provides an object-oriented approach for interacting with these system resources and services. Message passing may occur between any two ports on the same host or on separate hosts on a distributed system.
+
+Associated with each port is a collection of \textbf{port rights} that identify the capabilities necessary for a task to interact with the port. For example, for a task to receive a message from a port, it must have the capability \texttt{MACH\_PORT\_RIGHT\_RECEIVE} for that port. The task that creates a port is that port's owner, and the owner is the only task that is allowed to receive messages from that port. A port's owner may also manipulate the capabilities for a port. This is most commonly done in establishing a reply port. For example, assume that task $T1$ owns port $P1$, and it sends a message to port $P2$, which is owned by task $T2$. If $T1$ expects to receive a reply from $T2$, it must grant $T2$ the right \texttt{MACH\_PORT\_RIGHT\_SEND} for port $P1$. Ownership of port rights is at the task level, which means that all threads belonging to the same task share the same port rights. Thus, two threads belonging to the same task can easily communicate by exchanging messages through the per-thread port associated with each thread.
+
+When a task is created, two special ports---the \textbf{Task Self} port and the \textbf{Notify} port---are also created. The kernel has receive rights to the Task Self port, which allows a task to send messages to the kernel. The kernel can send notification of event occurrences to a task's Notify port (to which, of course, the task has receive rights).
+
+The \texttt{mach\_port\_allocate()} function call creates a new port and allocates space for its queue of messages. It also identifies the rights for the port. Each port right represents a \textbf{name} for that port, and a port can only be accessed via a right. Port names are simple integer values and behave much like UNIX file descriptors. The following example illustrates creating a port using this API:
+\begin{verbatim}
+mach_port_t port; // the name of the port right
+ 
+mach_port_allocate(
+        mach_task_self(), // a task referring to itself
+        MACH_PORT_RIGHT_RECEIVE, // the right for this port
+        &port); // the name of the port right
+\end{verbatim}
+Each task also has access to a \textbf{bootstrap port}, which allows a task to register a port it has created with a system-wide \textbf{bootstrap server}. Once a port has been registered with the bootstrap server, other tasks can look up the port in this registry and obtain rights for sending messages to the port.
+
+The queue associated with each port is finite in size and is initially empty. As messages are sent to the port, the messages are copied into the queue. All messages are delivered reliably and have the same priority. Mach guarantees that multiple messages from the same sender are queued in first-in, first-out (FIFO) order but does not guarantee an absolute ordering. For instance, messages from two senders may be queued in any order.
+
+Mach messages contain the following two fields:
+\begin{itemize}
+\item A fixed-size message header containing metadata about the message, including the size of the message as well as source and destination ports. Commonly, the sending thread expects a reply, so the port name of the source is passed on to the receiving task, which can use it as a "return address" in sending a reply.
+\item A variable-sized body containing data.
+\end{itemize}
+Messages may be either \textbf{simple} or \textbf{complex}. A simple message contains ordinary, unstructured user data that are not interpreted by the kernel. A complex message may contain pointers to memory locations containing data (known as "out-of-line" data) or may also be used for transferring port rights to another task. Out-of-line data pointers are especially useful when a message must pass large chunks of data. A simple message would require copying and packaging the data in the message; out-of-line data transmission requires only a pointer that refers to the memory location where the data are stored.
+
+The function \texttt{mach\_msg()} is the standard API for both sending and receiving messages. The value of one of the function's parameters---either \texttt{MACH\_SEND\_MSG} or \texttt{MACH\_RCV\_MSG}---indicates if it is a send or receive operation. We now illustrate how it is used when a client task sends a simple message to a server task. Assume there are two ports---\texttt{client} and \texttt{server}---associated with the client and server tasks, respectively. The code in Figure \ref{fig:mach-message-passing} shows the client task constructing a header and sending a message to the server, as well as the server task receiving the message sent from the client.
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include<mach/mach.h>
+ 
+struct message {
+  mach_msg_header_t header;
+  int data;
+};
+ 
+mach_port_t client;
+mach_port_t server;
+ 
+       /* Client Code */
+ 
+struct message message;
+ 
+// construct the header
+message.header.msgh_size = sizeof(message);
+message.header.msgh_remote_port = server;
+message.header.msgh_local_port = client;
+ 
+// send the message
+mach_msg(&message.header, // message header
+  MACH_SEND_MSG, // sending a message
+  sizeof(message), // size of message sent
+  0, // maximum size of received message - unnecessary
+  MACH_PORT_NULL, // name of receive port - unnecessary
+  MACH_MSG_TIMEOUT_NONE, // no time outs
+  MACH_PORT_NULL // no notify port
+);
+ 
+      /* Server Code */
+ 
+struct message message;
+ 
+// receive the message
+mach_msg(&message.header, // message header
+  MACH_RCV_MSG, // receiving a message
+  0,  // size of message sent
+  sizeof(message), // maximum size of received message
+  server, // name of receive port
+  MACH_MSG_TIMEOUT_NONE, // no time outs
+  MACH_PORT_NULL // no notify port
+);
+\end{verbatim}
+\caption{Example program illustrating message passing in Mach.}\label{fig:mach-message-passing}
+\end{figure}
+
+The \texttt{mach\_msg()} function call is invoked by user programs for performing message passing. \texttt{mach\_msg()} then invokes the function \texttt{mach\_msg\_trap()}, which is a system call to the Mach kernel. Within the kernel, \texttt{mach\_msg\_trap()} next calls the function \texttt{mach\_msg\_overwrite\_trap()}, which then handles the actual passing of the message.
+
+The send and receive operations themselves are flexible. For instance, when a message is sent to a port, its queue may be full. If the queue is not full, the message is copied to the queue, and the sending task continues. If the port's queue is full, the sender has several options (specified via parameters to \texttt{mach\_msg()}):
+\begin{enumerate}
+\item Wait indefinitely until there is room in the queue.
+\item Wait at most $n$ milliseconds.
+\item Do not wait at all but rather return immediately.
+\item Temporarily cache a message. Here, a message is given to the operating system to keep, even though the queue to which that message is being sent is full. When the message can be put in the queue, a notification message is sent back to the sender. Only one message to a full queue can be pending at any time for a given sending thread.
+\end{enumerate}
+The final option is meant for server tasks. After finishing a request, a server task may need to send a one-time reply to the task that requested the service, but it must also continue with other service requests, even if the reply port for a client is full.
+
+The major problem with message systems has generally been poor performance caused by copying of messages from the sender's port to the receiver's port. The Mach message system attempts to avoid copy operations by using virtual-memory-management techniques (Chapter Virtual Memory). Essentially, Mach maps the address space containing the sender's message into the receiver's address space. Therefore, the message itself is never actually copied, as both the sender and receiver access the same memory. This message-management technique provides a large performance boost but works only for intrasystem messages.
+
+<h3>Windows</h3>
+The Windows operating system is an example of modern design that employs modularity to increase functionality and decrease the time needed to implement new features. Windows provides support for multiple operating environments, or \textbf{subsystems}. Application programs communicate with these subsystems via a message-passing mechanism. Thus, application programs can be considered clients of a subsystem server.
+
+The message-passing facility in Windows is called the \textbf{advanced local procedure call} (\textit{ALPC}) facility. It is used for communication between two processes on the same machine. It is similar to the standard remote procedure call (RPC) mechanism that is widely used, but it is optimized for and specific to Windows. (Remote procedure calls are covered in detail in Section Remote procedure calls.) Like Mach, Windows uses a port object to establish and maintain a connection between two processes. Windows uses two types of ports: \textbf{connection ports} and \textbf{communication ports}.
+
+Server processes publish connection-port objects that are visible to all processes. When a client wants services from a subsystem, it opens a handle to the server's connection-port object and sends a connection request to that port. The server then creates a channel and returns a handle to the client. The channel consists of a pair of private communication ports: one for client-server messages, the other for server-client messages. Additionally, communication channels support a callback mechanism that allows the client and server to accept requests when they would normally be expecting a reply.
+
+When an ALPC channel is created, one of three message-passing techniques is chosen:
+\begin{enumerate}
+\item For small messages (up to 256 bytes), the port's message queue is used as intermediate storage, and the messages are copied from one process to the other.
+\item Larger messages must be passed through a \textbf{section object}, which is a region of shared memory associated with the channel.
+\item When the amount of data is too large to fit into a section object, an API is available that allows server processes to read and write directly into the address space of a client.
+\end{enumerate}
+The client has to decide when it sets up the channel whether it will need to send a large message. If the client determines that it does want to send large messages, it asks for a section object to be created. Similarly, if the server decides that replies will be large, it creates a section object. So that the section object can be used, a small message is sent that contains a pointer and size information about the section object. This method is more complicated than the first method listed above, but it avoids data copying. The structure of advanced local procedure calls in Windows is shown in Figure \ref{fig:windows-alpc}.
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.8\textwidth]{ch3/images/5de3e848-039a-4e19-b272-cb59f3a4bf02.png}
+\caption{Advanced local procedure calls in Windows.}\label{fig:windows-alpc}
+\end{figure}
+
+It is important to note that the ALPC facility in Windows is not part of the Windows API and hence is not visible to the application programmer. Rather, applications using the Windows API invoke standard remote procedure calls. When the RPC is being invoked on a process on the same system, the RPC is handled indirectly through an ALPC procedure call. Additionally, many kernel services use ALPC to communicate with client processes.
+
+<h3>Pipes</h3>
+A \textbf{pipe} acts as a conduit allowing two processes to communicate. Pipes were one of the first IPC mechanisms in early UNIX systems. They typically provide one of the simpler ways for processes to communicate with one another, although they also have some limitations. In implementing a pipe, four issues must be considered:
+\begin{enumerate}
+\item Does the pipe allow bidirectional communication, or is communication unidirectional?
+\item If two-way communication is allowed, is it half duplex (data can travel only one way at a time) or full duplex (data can travel in both directions at the same time)?
+\item Must a relationship (such as \textbf{parent-child}) exist between the communicating processes?
+\item Can the pipes communicate over a network, or must the communicating processes reside on the same machine?
+\end{enumerate}
+In the following sections, we explore two common types of pipes used on both UNIX and Windows systems: ordinary pipes and named pipes.
+
+<h4>Ordinary pipes</h4>
+Ordinary pipes allow two processes to communicate in standard producer-consumer fashion: the producer writes to one end of the pipe (the \textbf{write end}) and the consumer reads from the other end (the \textbf{read end}). As a result, ordinary pipes are unidirectional, allowing only one-way communication. If two-way communication is required, two pipes must be used, with each pipe sending data in a different direction. We next illustrate constructing ordinary pipes on both UNIX and Windows systems. In both program examples, one process writes the message \texttt{Greetings} to the pipe, while the other process reads this message from the pipe.
+
+On UNIX systems, ordinary pipes are constructed using the function
+\begin{verbatim}
+pipe(int fd[])
+\end{verbatim}
+This function creates a pipe that is accessed through the \texttt{int fd[]} file descriptors: \texttt{fd[0]} is the read end of the pipe, and \texttt{fd[1]} is the write end. UNIX treats a pipe as a special type of file. Thus, pipes can be accessed using ordinary \texttt{read()} and \texttt{write()} system calls.
+
+An ordinary pipe cannot be accessed from outside the process that created it. Typically, a parent process creates a pipe and uses it to communicate with a child process that it creates via \texttt{fork()}. Recall from Section Process creation that a child process inherits open files from its parent. Since a pipe is a special type of file, the child inherits the pipe from its parent process. Figure \ref{fig:unix-pipe-fds} illustrates the relationship of the file descriptors in the \texttt{fd} array to the parent and child processes. As this illustrates, any writes by the parent to its write end of the pipe---\texttt{fd[1]}---can be read by the child from its read end---\texttt{fd[0]}---of the pipe.
+
+\begin{figure}[h!]
+\centering
+% \includegraphics[width=0.8\textwidth]{ch3/images/83b38239-e8ea-4f40-9341-cf378fba40c2.png}
+\caption{File descriptors for an ordinary pipe.}\label{fig:unix-pipe-fds}
+\end{figure}
+
+In the UNIX program shown in Figure \ref{fig:unix-ordinary-pipe}, the parent process creates a pipe and then sends a \texttt{fork()} call creating the child process. What occurs after the \texttt{fork()} call depends on how the data are to flow through the pipe. In this instance, the parent writes to the pipe, and the child reads from it. It is important to notice that both the parent process and the child process initially close their unused ends of the pipe. Although the program shown in Figure \ref{fig:unix-ordinary-pipe} does not require this action, it is an important step to ensure that a process reading from the pipe can detect end-of-file (\texttt{read()} returns 0) when the writer has closed its end of the pipe.
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+ 
+#define BUFFER_SIZE 25
+#define READ_END 0
+#define WRITE_END 1
+ 
+int main(void)
+{
+  char write_msg[BUFFER_SIZE] = "Greetings";
+  char read_msg[BUFFER_SIZE];
+  int fd[2];
+  pid_t pid;
+
+   /* create the pipe */
+   if (pipe(fd) == -1) {
+     fprintf(stderr,"Pipe failed");
+     return 1;
+   }
+ 
+   /* fork a child process */
+   pid = fork();
+ 
+   if (pid < 0) { /* error occurred */
+     fprintf(stderr, "Fork Failed");
+     return 1;
+   }
+ 
+   if (pid > 0) { /* parent process */
+     /* close the unused end of the pipe */
+     close(fd[READ_END]);
+ 
+     /* write to the pipe */
+     write(fd[WRITE_END], write_msg, strlen(write_msg)+1);
+ 
+     /* close the write end of the pipe */
+     close(fd[WRITE_END]);
+   }
+   else { /* child process */
+     /* close the unused end of the pipe */
+     close(fd[WRITE_END]);
+ 
+     /* read from the pipe */
+     read(fd[READ_END], read_msg, BUFFER_SIZE);
+     printf("read %s",read_msg);
+ 
+     /* close the read end of the pipe */
+     close(fd[READ_END]);
+   }
+   return 0;
+}
+\end{verbatim}
+\caption{Ordinary pipe in UNIX.}\label{fig:unix-ordinary-pipe}
+\end{figure}
+
+Ordinary pipes on Windows systems are termed \textbf{anonymous pipes}, and they behave similarly to their UNIX counterparts: they are unidirectional and employ parent-child relationships between the communicating processes. In addition, reading and writing to the pipe can be accomplished with the ordinary \texttt{ReadFile()} and \texttt{WriteFile()} functions. The Windows API for creating pipes is the \texttt{CreatePipe()} function, which is passed four parameters. The parameters provide separate handles for (1) reading and (2) writing to the pipe, as well as (3) an instance of the \texttt{STARTUPINFO} structure, which is used to specify that the child process is to inherit the handles of the pipe. Furthermore, (4) the size of the pipe (in bytes) may be specified.
+
+Figure \ref{fig:windows-anonymous-pipe-parent} illustrates a parent process creating an anonymous pipe for communicating with its child. Unlike UNIX systems, in which a child process automatically inherits a pipe created by its parent, Windows requires the programmer to specify which attributes the child process will inherit. This is accomplished by first initializing the \texttt{SECURITY\_ATTRIBUTES} structure to allow handles to be inherited and then redirecting the child process's handles for standard input or standard output to the read or write handle of the pipe. Since the child will be reading from the pipe, the parent must redirect the child's standard input to the read handle of the pipe. Furthermore, as the pipes are half duplex, it is necessary to prohibit the child from inheriting the write end of the pipe. The program to create the child process is similar to the program in Figure \hyperref[fig:process-creation-windows]{3.3.4}, except that the fifth parameter is set to \texttt{TRUE}, indicating that the child process is to inherit designated handles from its parent. Before writing to the pipe, the parent first closes its unused read end of the pipe. The child process that reads from the pipe is shown in Figure \ref{fig:windows-anonymous-pipe-child}. Before reading from the pipe, this program obtains the read handle to the pipe by invoking \texttt{GetStdHandle()}.
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+ 
+#define BUFFER_SIZE 25
+ 
+int main(VOID)
+{
+  HANDLE ReadHandle, WriteHandle;
+  STARTUPINFO si;
+  PROCESS_INFORMATION pi;
+  char message[BUFFER_SIZE] = "Greetings";
+  DWORD written;
+ 
+/* set up security attributes allowing pipes to be inherited */
+SECURITY_ATTRIBUTES sa = {sizeof(SECURITY_ATTRIBUTES),{NULL},{TRUE};
+/* allocate memory */
+ZeroMemory(&pi, sizeof(pi));
+ 
+/* create the pipe */
+if (!CreatePipe(&ReadHandle, &WriteHandle, &sa, 0)) {
+   fprintf(stderr, "Create Pipe Failed");
+   return 1;
+}
+ 
+/* establish the START_INFO structure for the child process */
+GetStartupInfo(&si);
+si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+ 
+/* redirect standard input to the read end of the pipe */
+si.hStdInput = ReadHandle;
+si.dwFlags = STARTF_USESTDHANDLES;
+ 
+/* don't allow the child to inherit the write end of pipe */
+SetHandleInformation(WriteHandle, HANDLE_FLAG_INHERIT, 0);
+ 
+/* create the child process */
+CreateProcess({NULL}, "child.exe", {NULL, NULL},
+ TRUE, /* inherit handles */
+ 0, NULL, NULL, &si, &pi);
+ 
+/* close the unused end of the pipe */
+CloseHandle(ReadHandle);
+ 
+/* the parent writes to the pipe */
+if (!WriteFile(WriteHandle, message,BUFFER_SIZE,&written,NULL))
+   fprintf(stderr, "Error writing to pipe.");
+ 
+/* close the write end of the pipe */
+CloseHandle(WriteHandle);
+ 
+/* wait for the child to exit */
+WaitForSingleObject(pi.hProcess, INFINITE);
+CloseHandle(pi.hProcess);
+CloseHandle(pi.hThread);
+return 0;
+}
+\end{verbatim}
+\caption{Windows anonymous pipe—parent process.}\label{fig:windows-anonymous-pipe-parent}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\begin{verbatim}
+#include <stdio.h>
+#include <windows.h>
+ 
+#define BUFFER SIZE 25
+ 
+int main(VOID)
+{
+HANDLE Readhandle;
+CHAR buffer[BUFFER_SIZE];
+DWORD read;
+ 
+   /* get the read handle of the pipe */
+   ReadHandle = GetStdHandle(STD_INPUT_HANDLE);
+ 
+   /* the child reads from the pipe */
+   if (ReadFile(ReadHandle, buffer, BUFFER_SIZE, &read, NULL))
+     printf("child read %s",buffer);
+   else
+     fprintf(stderr, "Error reading from pipe");
+ 
+return 0;
+}
+\end{verbatim}
+\caption{Windows anonymous pipes—child process.}\label{fig:windows-anonymous-pipe-child}
+\end{figure}
+
+Note that ordinary pipes require a parent-child relationship between the communicating processes on both UNIX and Windows systems. This means that these pipes can be used only for communication between processes on the same machine.
+
+<h4>Named pipes</h4>
+Ordinary pipes provide a simple mechanism for allowing a pair of processes to communicate. However, ordinary pipes exist only while the processes are communicating with one another. On both UNIX and Windows systems, once the processes have finished communicating and have terminated, the ordinary pipe ceases to exist.
+
+Named pipes provide a much more powerful communication tool. Communication can be bidirectional, and no parent-child relationship is required. Once a named pipe is established, several processes can use it for communication. In fact, in a typical scenario, a named pipe has several writers. Additionally, named pipes continue to exist after communicating processes have finished. Both UNIX and Windows systems support named pipes, although the details of implementation differ greatly. Next, we explore named pipes in each of these systems.
+
+Named pipes are referred to as FIFOs in UNIX systems. Once created, they appear as typical files in the file system. A FIFO is created with the \texttt{mkfifo()} system call and manipulated with the ordinary \texttt{open()}, \texttt{read()}, \texttt{write()}, and \texttt{close()} system calls. It will continue to exist until it is explicitly deleted from the file system. Although FIFOs allow bidirectional communication, only half-duplex transmission is permitted. If data must travel in both directions, two FIFOs are typically used. Additionally, the communicating processes must reside on the same machine. If intermachine communication is required, sockets (Section Sockets) must be used.
+
+Named pipes on Windows systems provide a richer communication mechanism than their UNIX counterparts. Full-duplex communication is allowed, and the communicating processes may reside on either the same or different machines. Additionally, only byte-oriented data may be transmitted across a UNIX FIFO, whereas Windows systems allow either byte- or message-oriented data. Named pipes are created with the \texttt{CreateNamedPipe()} function, and a client can connect to a named pipe using \texttt{ConnectNamedPipe()}. Communication over the named pipe can be accomplished using the \texttt{ReadFile()} and \texttt{WriteFile()} functions.
+
+\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{message} & In networking, a communication, contained in one or more packets, that includes source and destination information to allow correct delivery. In message-passing communications, a packet of information with metadata about its sender and receiver. \\
+\textbf{port} & A communication address; a system may have one IP address for network connections but many ports, each for a separate communication. In computer I/O, a connection point for devices to attach to computers. In software development, to move code from its current platform to another platform (e.g., between operating systems or hardware systems). In the Mach OS, a mailbox for communication. \\
+\textbf{bootstrap port} & In Mach message passing, a predefined port that allows a task to register a port it has created. \\
+\textbf{bootstrap server} & In Mach message passing, a system-wide service for registering ports. \\
+\textbf{advanced local procedure call (ALPC)} & In Windows OS, a method used for communication between two processes on the same machine. \\
+\textbf{connection port} & In Windows OS, a communications port used to maintain connection between two processes, published by a server process. \\
+\textbf{communication port} & In Windows OS, a port used to send messages between two processes. \\
+\textbf{section object} & The Windows data structure that is used to implement shared memory. \\
+\textbf{pipe} & A logical conduit allowing two processes to communicate. \\
+\textbf{write end} & In ordinary pipes, the end of the pipe to which the producer writes. \\
+\textbf{read end} & In ordinary pipes, the end of the pipe from which the consumer reads. \\
+\textbf{anonymous pipes} & Ordinary pipes on Windows systems. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

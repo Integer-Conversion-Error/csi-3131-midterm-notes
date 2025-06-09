@@ -1,0 +1,67 @@
+\phantomsection
+\section{Process scheduling}\label{sec:3.2}
+
+The objective of multiprogramming is to have some process running at all times so as to maximize CPU utilization. The objective of time sharing is to switch a CPU core among processes so frequently that users can interact with each program while it is running. To meet these objectives, the \textbf{process scheduler} selects an available process (possibly from a set of several available processes) for program execution on a core. Each CPU core can run one process at a time. For a system with a single CPU core, there will never be more than one process running at a time, whereas a multicore system can run multiple processes at one time. If there are more processes than cores, excess processes will have to wait until a core is free and can be rescheduled. The number of processes currently in memory is known as the \textbf{degree of multiprogramming}.
+
+Balancing the objectives of multiprogramming and time sharing also requires taking the general behavior of a process into account. In general, most processes can be described as either I/O bound or CPU bound. An \textbf{I/O-bound process} is one that spends more of its time doing I/O than it spends doing computations. A \textbf{CPU-bound process}, in contrast, generates I/O requests infrequently, using more of its time doing computations.
+
+\phantomsection
+\subsection*{Scheduling queues}\addcontentsline{toc}{subsection}{Scheduling queues}\label{sec:3.2:scheduling_queues}
+As processes enter the system, they are put into a \textbf{ready queue}, where they are ready and waiting to execute on a CPU's core. This queue is generally stored as a linked list; a ready-queue header contains pointers to the first PCB in the list, and each PCB includes a pointer field that points to the next PCB in the ready queue.
+
+The system also includes other queues. When a process is allocated a CPU core, it executes for a while and eventually terminates, is interrupted, or waits for the occurrence of a particular event, such as the completion of an I/O request. Suppose the process makes an I/O request to a device such as a disk. Since devices run significantly slower than processors, the process will have to wait for the I/O to become available. Processes that are waiting for a certain event to occur --- such as completion of I/O --- are placed in a \textbf{wait queue}.
+
+A common representation of process scheduling is a \textbf{queueing diagram}. Two types of queues are present: the ready queue and a set of wait queues. The circles represent the resources that serve the queues, and the arrows indicate the flow of processes in the system.
+
+A new process is initially put in the ready queue. It waits there until it is selected for execution, or \textbf{dispatched}. Once the process is allocated a CPU core and is executing, one of several events could occur:
+\begin{itemize}
+    \item The process could issue an I/O request and then be placed in an I/O wait queue.
+    \item The process could create a new child process and then be placed in a wait queue while it awaits the child's termination.
+    \item The process could be removed forcibly from the core, as a result of an interrupt or having its time slice expire, and be put back in the ready queue.
+\end{itemize}
+In the first two cases, the process eventually switches from the waiting state to the ready state and is then put back in the ready queue. A process continues this cycle until it terminates, at which time it is removed from all queues and has its PCB and resources deallocated.
+
+\phantomsection
+\subsection*{CPU scheduling}\addcontentsline{toc}{subsection}{CPU scheduling}\label{sec:3.2:cpu_scheduling}
+A process migrates among the ready queue and various wait queues throughout its lifetime. The role of the \textbf{CPU scheduler} is to select from among the processes that are in the ready queue and allocate a CPU core to one of them. The CPU scheduler must select a new process for the CPU frequently. An I/O-bound process may execute for only a few milliseconds before waiting for an I/O request. Although a CPU-bound process will require a CPU core for longer durations, the scheduler is unlikely to grant the core to a process for an extended period. Instead, it is likely designed to forcibly remove the CPU from a process and schedule another process to run. Therefore, the CPU scheduler executes at least once every 100 milliseconds, although typically much more frequently.
+
+Some operating systems have an intermediate form of scheduling, known as \textbf{swapping}, whose key idea is that sometimes it can be advantageous to remove a process from memory (and from active contention for the CPU) and thus reduce the degree of multiprogramming. Later, the process can be reintroduced into memory, and its execution can be continued where it left off. This scheme is known as \textit{swapping} because a process can be "swapped out" from memory to disk, where its current status is saved, and later "swapped in" from disk back to memory, where its status is restored. Swapping is typically only necessary when memory has been overcommitted and must be freed up.
+
+\phantomsection
+\subsection*{Context switch}\addcontentsline{toc}{subsection}{Context switch}\label{sec:3.2:context_switch}
+Interrupts cause the operating system to change a CPU core from its current task and to run a kernel routine. Such operations happen frequently on general-purpose systems. When an interrupt occurs, the system needs to save the current \textbf{context} of the process running on the CPU core so that it can restore that context when its processing is done, essentially suspending the process and then resuming it. The context is represented in the PCB of the process. It includes the value of the CPU registers, the process state, and memory-management information. Generically, we perform a \textbf{state save} of the current state of the CPU core, be it in kernel or user mode, and then a \textbf{state restore} to resume operations.
+
+Switching the CPU core to another process requires performing a state save of the current process and a state restore of a different process. This task is known as a \textbf{context switch}. When a context switch occurs, the kernel saves the context of the old process in its PCB and loads the saved context of the new process scheduled to run. Context-switch time is pure overhead, because the system does no useful work while switching. Switching speed varies from machine to machine, depending on the memory speed, the number of registers that must be copied, and the existence of special instructions (such as a single instruction to load or store all registers). A typical speed is a several microseconds.
+
+Context-switch times are highly dependent on hardware support. For instance, some processors provide multiple sets of registers. A context switch here simply requires changing the pointer to the current register set. Of course, if there are more active processes than there are register sets, the system resorts to copying register data to and from memory, as before. Also, the more complex the operating system, the greater the amount of work that must be done during a context switch. Advanced memory-management techniques may require that extra data be switched with each context. For instance, the address space of the current process must be preserved as the space of the next task is prepared for use. How the address space is preserved, and what amount of work is needed to preserve it, depend on the memory-management method of the operating system.
+
+\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{process scheduler} & A scheduler that selects an available process (possibly from a set of several processes) for execution on a CPU. \\
+\textbf{degree of multiprogramming} & The number of processes in memory. \\
+\textbf{parent} & In a tree data structure, a node that has one or more nodes connected below it. \\
+\textbf{children} & In a tree data structure, nodes connected below another node. \\
+\textbf{siblings} & In a tree data structure, child nodes of the same parent. \\
+\textbf{I/O-bound process} & A process that spends more of its time doing I/O than doing computations \\
+\textbf{CPU-bound process} & A process that spends more time executing on CPU than it does performing I/O. \\
+\textbf{ready queue} & The set of processes ready and waiting to execute. \\
+\textbf{wait queue} & In process scheduling, a queue holding processes waiting for an event to occur before they need to be put on CPU. \\
+\textbf{dispatched} & Selected by the process scheduler to be executed next. \\
+\textbf{CPU scheduler} & Kernel routine that selects a thread from the threads that are ready to execute and allocates a core to that thread. \\
+\textbf{swapping} & Moving a process between main memory and a backing store. A process may be swapped out to free main memory temporarily and then swapped back in to continue execution. \\
+\textbf{context} & When describing a process, the state of its execution, including the contents of registers, its program counter, and its memory context, including its stack and heap. \\
+\textbf{state save} & Copying a process's context to save its state in order to pause its execution in preparation for putting another process on the CPU. \\
+\textbf{state restore} & Copying a process's context from its saved location to the CPU registers in preparation for continuing the process's execution. \\
+\textbf{context switch} & The switching of the CPU from one process or thread to another; requires performing a state save of the current process or thread and a state restore of the other. \\
+\textbf{foreground} & Describes a process or thread that is interactive (has input directed to it), such as a window currently selected as active or a terminal window currently selected to receive input. \\
+\textbf{background} & Describes a process or thread that is not currently interactive (has no interactive input directed to it), such as one not currently being used by a user. In the Grand Central Dispatch Apple OS scheduler, the scheduling class representing tasks that are not time sensitive and are not visible to the user. \\
+\textbf{split-screen} & Running multiple foreground processes (e.g., on an iPad) but splitting the screen among the processes. \\
+\textbf{service} & A software entity running on one or more machines and providing a particular type of function to calling clients. In Android, an application component with no user interface; it runs in the background while executing long-running operations or performing work for remote processes. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

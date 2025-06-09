@@ -1,6 +1,7 @@
-\section{Process concept}
+\phantomsection
+\section{Process concept}\label{sec:3.1}
 
-\subsection*{Introduction}
+\subsection*{Introduction}\addcontentsline{toc}{subsection}{Introduction}\label{sec:3.1:introduction}
 A \textit{process} is a program in execution. A process will need certain resources---such as CPU time, memory, files, and I/O devices---to accomplish its task. These resources are typically allocated to the process while it is executing.
 
 A process is the unit of work in most systems. Systems consist of a collection of processes: operating-system processes execute system code, and user processes execute user code. All these processes may execute concurrently.
@@ -13,7 +14,17 @@ Early computers allowed only one program to be executed at a time. This program 
 
 Although the main concern of the operating system is the execution of user programs, it also needs to take care of various system tasks that are best done in user space, rather than within the kernel. A system therefore consists of a collection of processes, some executing user code, others executing operating system code. Potentially, all these processes can execute concurrently, with the CPU (or CPUs) multiplexed among them.
 
-\subsection*{The process}
+\subsection*{Chapter objectives}\addcontentsline{toc}{subsection}{Chapter objectives}
+\begin{itemize}
+    \item Identify the separate components of a process and illustrate how they are represented and scheduled in an operating system.
+    \item Describe how processes are created and terminated in an operating system, including developing programs using the appropriate system calls that perform these operations.
+    \item Describe and contrast interprocess communication using shared memory and message passing.
+    \item Design programs that use pipes and POSIX shared memory to perform interprocess communication.
+    \item Describe client-server communication using sockets and remote procedure calls.
+    \item Design kernel modules that interact with the Linux operating system.
+\end{itemize}
+
+\subsection*{The process}\addcontentsline{toc}{subsection}{The process}\label{sec:3.1:the_process}
 Informally, as mentioned earlier, a process is a program in execution. The status of the current activity of a process is represented by the value of the \textbf{program counter} and the contents of the processor's registers. The memory layout of a process is typically divided into multiple sections. These sections include:
 \begin{itemize}
     \item \textbf{Text section}---the executable code
@@ -29,7 +40,7 @@ Although two processes may be associated with the same program, they are neverth
 
 A process can itself be an execution environment for other code. The Java programming environment provides a good example. In most circumstances, an executable Java program is executed within the Java virtual machine (JVM). The JVM executes as a process that interprets the loaded Java code and takes actions (via native machine instructions) on behalf of that code. For example, to run the compiled Java program \texttt{Program.class}, we would enter \texttt{java Program}. The command \texttt{java} runs the JVM as an ordinary process, which in turns executes the Java program \texttt{Program} in the virtual machine.
 
-\subsection*{Process state}
+\subsection*{Process state}\addcontentsline{toc}{subsection}{Process state}\label{sec:3.1:process_state}
 As a process executes, it changes \textbf{state}. The state of a process is defined in part by the current activity of that process. A process may be in one of the following states:
 \begin{itemize}
     \item \textbf{New.} The process is being created.
@@ -40,7 +51,7 @@ As a process executes, it changes \textbf{state}. The state of a process is defi
 \end{itemize}
 These names are arbitrary, and they vary across operating systems. The states that they represent are found on all systems, however. Certain operating systems also more finely delineate process states. It is important to realize that only one process can be \textit{running} on any processor core at any instant. Many processes may be \textit{ready} and \textit{waiting}, however.
 
-\subsection*{Process control block}
+\subsection*{Process control block}\addcontentsline{toc}{subsection}{Process control block}\label{sec:3.1:process_control_block}
 Each process is represented in the operating system by a \textbf{process control block} (\textit{PCB})---also called a \textbf{task control block}. It contains many pieces of information associated with a specific process, including these:
 \begin{itemize}
     \item \textbf{Process state.} The state may be new, ready, running, waiting, halted, and so on.
@@ -53,5 +64,31 @@ Each process is represented in the operating system by a \textbf{process control
 \end{itemize}
 In brief, the PCB simply serves as the repository for all the data needed to start, or restart, a process, along with some accounting data.
 
-\subsection*{Threads}
+\subsection*{Threads}\addcontentsline{toc}{subsection}{Threads}\label{sec:3.1:threads}
 The process model discussed so far has implied that a process is a program that performs a single \textbf{thread} of execution. For example, when a process is running a word-processor program, a single thread of instructions is being executed. This single thread of control allows the process to perform only one task at a time. Thus, the user cannot simultaneously type in characters and run the spell checker. Most modern operating systems have extended the process concept to allow a process to have multiple threads of execution and thus to perform more than one task at a time. This feature is especially beneficial on multicore systems, where multiple threads can run in parallel. A multithreaded word processor could, for example, assign one thread to manage user input while another thread runs the spell checker. On systems that support threads, the PCB is expanded to include information for each thread. Other changes throughout the system are also needed to support threads.
+
+\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{process} & A program loaded into memory and executing. \\
+\textbf{job} & A set of commands or processes executed by a batch system. \\
+\textbf{user programs} & User-level programs, as opposed to system programs. \\
+\textbf{task} & A process, a thread activity, or, generally, a unit of computation on a computer. \\
+\textbf{program counter} & A CPU register indicating the main memory location of the next instruction to load and execute. \\
+\textbf{text section} & The executable code of a program or process. \\
+\textbf{data section} & The data part of a program or process; it contains global variables. \\
+\textbf{heap section} & The section of process memory that is dynamically allocated during process run time; it stores temporary variables. \\
+\textbf{stack section} & The section of process memory that contains the stack; it contains activation records and other temporary data. \\
+\textbf{activation record} & A record created when a function or subroutine is called; added to the stack by the call and removed when the call returns. Contains function parameters, local variables, and the return address. \\
+\textbf{executable file} & A file containing a program that is ready to be loaded into memory and executed. \\
+\textbf{state} & The condition of a process, including its current activity as well as its associated memory and disk contents. \\
+\textbf{process control block} & A per-process kernel data structure containing many pieces of information associated with the process. \\
+\textbf{task control block} & A per-process kernel data structure containing many pieces of information associated with the process. \\
+\textbf{thread} & A process control structure that is an execution location. A process with a single thread executes only one task at a time, while a multithreaded process can execute a task per thread. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
