@@ -1,162 +1,93 @@
 \phantomsection
-\section{Communication in client-server systems}\label{sec:3.8}
+\section{Communication in Client-Server Systems}\label{sec:3.8}
 
-In Section \hyperref[sec:3.4]{3.4}, we described how processes can communicate using shared memory and message passing. These techniques can be used for communication in client-server systems (sub-section Client-server computing in \hyperref[sec:1.10]{1.10}) as well. In this section, we explore two other strategies for communication in client-server systems: sockets and remote procedure calls (RPCs). As we shall see in our coverage of RPCs, not only are they useful for client-server computing, but Android also uses remote procedures as a form of IPC between processes running on the same system.
+\subsection{Introduction to Client-Server Communication}
+\begin{itemize}
+    \item IPC techniques (shared memory, message passing) used in client-server systems.
+    \item Focus on \textbf{sockets} and \textbf{Remote Procedure Calls (RPCs)}.
+\end{itemize}
 
-<h3>Sockets</h3>
-A \textbf{socket} is defined as an endpoint for communication. A pair of processes communicating over a network employs a pair of sockets---one for each process. A socket is identified by an IP address concatenated with a port number. In general, sockets use a client-server architecture. The server waits for incoming client requests by listening to a specified port. Once a request is received, the server accepts a connection from the client socket to complete the connection. Servers implementing specific services (such as SSH, FTP, and HTTP listen to \textbf{well-known} ports (an SSH server listens to port 22; an FTP server listens to port 21; and a web, or HTTP, server listens to port 80). All ports below 1024 are considered \textbf{well known} and are used to implement standard services.
+\subsection{Sockets}
+\begin{itemize}
+    \item \textbf{Sockets}:
+        \begin{itemize}
+            \item Endpoint for communication.
+            \item Pair of sockets for network communication (one per process).
+            \item Identified by IP address + port number.
+            \item Client-server architecture: Server listens on specified port, accepts client connection.
+            \item \textbf{Well-known ports}: Below 1024 (e.g., SSH 22, FTP 21, HTTP 80).
+            \item Client assigned arbitrary port > 1024.
+            \item Connection: unique pair of sockets (client IP:port, server IP:port).
+            \item Java socket types:
+                \begin{itemize}
+                    \item \textbf{Connection-oriented (TCP)}: `Socket` class.
+                    \item \textbf{Connectionless (UDP)}: `DatagramSocket` class.
+                    \item `MulticastSocket`: subclass of `DatagramSocket`, sends to multiple recipients.
+                \end{itemize}
+            \item Example: Date server (TCP) listens on port 6013.
+                \begin{itemize}
+                    \item Server creates `ServerSocket`, `accept()` blocks until client connects.
+                    \item `accept()` returns `Socket` for communication.
+                    \item Server uses `PrintWriter` to write to socket (`println()`).
+                    \item Client creates `Socket`, connects to server IP:port.
+                    \item Client reads from socket using stream I/O.
+                    \item \textbf{Loopback} (127.0.0.1): refers to self, allows client/server on same host to communicate via TCP/IP.
+                \end{itemize}
+            \item Sockets are low-level: unstructured stream of bytes. Application imposes data structure.
+        \end{itemize}
+\end{itemize}
 
-When a client process initiates a request for a connection, it is assigned a port by its host computer. This port has some arbitrary number greater than 1024. For example, if a client on host \texttt{X} with IP address 146.86.5.20 wishes to establish a connection with a web server (which is listening on port 80) at address 161.25.19.8, host \texttt{X} may be assigned port 1625. The connection will consist of a pair of sockets: (146.86.5.20:1625) on host \texttt{X} and (161.25.19.8:80) on the web server. This situation is illustrated in Figure \ref{fig:sockets-communication}. The packets traveling between the hosts are delivered to the appropriate process based on the destination port number.
+\subsection{Remote Procedure Calls (RPCs)}
+\begin{itemize}
+    \item \textbf{Remote Procedure Calls (RPCs)}:
+        \begin{itemize}
+            \item Abstracts procedure-call mechanism for network connections. Built on IPC.
+            \item Messages are well-structured (function identifier, parameters).
+            \item Addressed to RPC daemon listening on a \textbf{port} on remote system.
+            \item Client invokes remote procedure as if local.
+            \item \textbf{Stub}: Client-side code that hides communication details.
+                \begin{itemize}
+                    \item Locates server port, \textbf{marshals} parameters (converts to machine-independent format).
+                    \item Transmits message to server.
+                    \item Server-side stub receives, invokes procedure.
+                    \item Return values passed back similarly.
+                    \item Windows: Stub code from \textbf{Microsoft Interface Definition Language (MIDL)}.
+                \end{itemize}
+            \item \textbf{Parameter marshaling}: Handles data representation differences (e.g., \textbf{big-endian} vs. \textbf{little-endian}).
+                \begin{itemize}
+                    \item Uses machine-independent representation (e.g., \textbf{External Data Representation (XDR)}).
+                    \item Client: machine-dependent $\rightarrow$ XDR. Server: XDR $\rightarrow$ machine-dependent.
+                \end{itemize}
+            \item \textbf{Semantics of call}: RPCs can fail/duplicate due to network errors.
+                \begin{itemize}
+                    \item \textbf{Exactly once}: OS ensures message acted on once. Harder to implement. This typically involves the server implementing an "at most once" semantic and acknowledging the client, with the client resending until an acknowledgment is received.
+                    \item \textbf{At most once}: Attach timestamp to message. Server keeps history, ignores repeated timestamps.
+                \end{itemize}
+            \item \textbf{Binding}: Client needs to know server port numbers.
+                \begin{itemize}
+                    \item Predetermined: Fixed port addresses at compile time. Less flexible.
+                    \item Dynamic: \textbf{Rendezvous} (or \textbf{matchmaker}) daemon on fixed RPC port. Client requests port address from daemon. More flexible.
+                \end{itemize}
+            \item Useful for distributed file systems (RPC daemons/clients, messages for disk operations).
+        \end{itemize}
+\end{itemize}
 
-\begin{figure}[h!]
-\centering
-% \includegraphics[width=0.8\textwidth]{ch3/images/1ee08ce3-2f8f-45b8-bc35-5ec3aa817488.png}
-\caption{Communication using sockets.}\label{fig:sockets-communication}
-\end{figure}
-
-All connections must be unique. Therefore, if another process also on host \texttt{X} wished to establish another connection with the same web server, it would be assigned a port number greater than 1024 and not equal to 1625. This ensures that all connections consist of a unique pair of sockets.
-
-Although most program examples in this text use C, we will illustrate sockets using Java, as it provides a much easier interface to sockets and has a rich library for networking utilities. Those interested in socket programming in C or C++ should consult the bibliographical notes at the end of the chapter.
-
-Java provides three different types of sockets. \textbf{Connection-oriented} (\textit{TCP}) sockets are implemented with the \texttt{Socket} class. \textbf{Connectionless} (\textit{UDP}) sockets use the \texttt{DatagramSocket} class. Finally, the \texttt{MulticastSocket} class is a subclass of the \texttt{DatagramSocket} class. A multicast socket allows data to be sent to multiple recipients.
-
-Our example describes a date server that uses connection-oriented TCP sockets. The operation allows clients to request the current date and time from the server. The server listens to port 6013, although the port could have any arbitrary, unused number greater than 1024. When a connection is received, the server returns the date and time to the client.
-
-The date server is shown in Figure \ref{fig:date-server}. The server creates a \texttt{ServerSocket} that specifies that it will listen to port 6013. The server then begins listening to the port with the \texttt{accept()} method. The server blocks on the \texttt{accept()} method waiting for a client to request a connection. When a connection request is received, \texttt{accept()} returns a socket that the server can use to communicate with the client.
-
-\begin{figure}[h!]
-\centering
-\begin{verbatim}
-import java.net.*;
-import java.io.*;
- 
-public class DateServer
-{
-  public static void main(String[] args) {
-    try {
-      ServerSocket sock = new ServerSocket(6013);
- 
-      /* now listen for connections */
-      while (true) {
-        Socket client = sock.accept();
- 
-        PrintWriter pout = new
-         PrintWriter(client.getOutputStream(), true);
- 
-        /* write the Date to the socket */
-        pout.println(new java.util.Date().toString());
- 
-        /* close the socket and resume */
-        /* listening for connections */
-        client.close();
-     }
-  }
-  catch (IOException ioe) {
-    System.err.println(ioe);
-  }
- }
-}
-\end{verbatim}
-\caption{Date server.}\label{fig:date-server}
-\end{figure}
-
-The details of how the server communicates with the socket are as follows. The server first establishes a \texttt{PrintWriter} object that it will use to communicate with the client. A \texttt{PrintWriter} object allows the server to write to the socket using the routine \texttt{print()} and \texttt{println()} methods for output. The server process sends the date to the client, calling the method \texttt{println()}. Once it has written the date to the socket, the server closes the socket to the client and resumes listening for more requests.
-
-A client communicates with the server by creating a socket and connecting to the port on which the server is listening. We implement such a client in the Java program shown in Figure \ref{fig:date-client}. The client creates a \texttt{Socket} and requests a connection with the server at IP address 127.0.0.1 on port 6013. Once the connection is made, the client can read from the socket using normal stream I/O statements. After it has received the date from the server, the client closes the socket and exits. The IP address 127.0.0.1 is a special IP address known as the \textbf{loopback}. When a computer refers to IP address 127.0.0.1, it is referring to itself. This mechanism allows a client and server on the same host to communicate using the TCP/IP protocol. The IP address 127.0.0.1 could be replaced with the IP address of another host running the date server. In addition to an IP address, an actual host name, such as \texttt{www.westminstercollege.edu}, can be used as well.
-
-\begin{figure}[h!]
-\centering
-\begin{verbatim}
-import java.net.*;
-import java.io.*;
- 
-public class DateClient
-{
-  public static void main(String[] args)  {
-    try {
-      /* make connection to server socket */
-      Socket sock = new Socket("127.0.0.1",6013);
- 
-      InputStream in = sock.getInputStream();
-      BufferedReader bin = new
-        BufferedReader(new InputStreamReader(in));
- 
-      /* read the date from the socket */
-      String line;
-      while ( (line = bin.readLine()) != null)
-        System.out.println(line);
- 
-      /* close the socket connection*/
-      sock.close();
-    }
-    catch (IOException ioe) {
-      System.err.println(ioe);
-    }
-  }
-}
-\end{verbatim}
-\caption{Date client.}\label{fig:date-client}
-\end{figure}
-
-Communication using sockets---although common and efficient---is considered a low-level form of communication between distributed processes. One reason is that sockets allow only an unstructured stream of bytes to be exchanged between the communicating threads. It is the responsibility of the client or server application to impose a structure on the data. In the next subsection, we look a higher-level method of communication: remote procedure calls (RPCs).
-
-<h3>Remote procedure calls</h3>
-One of the most common forms of remote service is the RPC paradigm, which was designed as a way to abstract the procedure-call mechanism for use between systems with network connections. It is similar in many respects to the IPC mechanism described in Section \hyperref[sec:3.4]{3.4}, and it is usually built on top of such a system. Here, however, because we are dealing with an environment in which the processes are executing on separate systems, we must use a message-based communication scheme to provide remote service.
-
-In contrast to IPC messages, the messages exchanged in RPC communication are well structured and are thus no longer just packets of data. Each message is addressed to an RPC daemon listening to a port on the remote system, and each contains an identifier specifying the function to execute and the parameters to pass to that function. The function is then executed as requested, and any output is sent back to the requester in a separate message.
-
-A \textbf{port} in this context is simply a number included at the start of a message packet. Whereas a system normally has one network address, it can have many ports within that address to differentiate the many network services it supports. If a remote process needs a service, it addresses a message to the proper port. For instance, if a system wished to allow other systems to be able to list its current users, it would have a daemon supporting such an RPC attached to a port---say, port 3027. Any remote system could obtain the needed information (that is, the list of current users) by sending an RPC message to port 3027 on the server. The data would be received in a reply message.
-
-The semantics of RPCs allows a client to invoke a procedure on a remote host as it would invoke a procedure locally. The RPC system hides the details that allow communication to take place by providing a \textbf{stub} on the client side. Typically, a separate stub exists for each separate remote procedure. When the client invokes a remote procedure, the RPC system calls the appropriate stub, passing it the parameters provided to the remote procedure. This stub locates the port on the server and \textbf{marshals} the parameters. The stub then transmits a message to the server using message passing. A similar stub on the server side receives this message and invokes the procedure on the server. If necessary, return values are passed back to the client using the same technique. On Windows systems, stub code is compiled from a specification written in the \textbf{Microsoft Interface Definition Language} (\textit{MIDL}), which is used for defining the interfaces between client and server programs.
-
-Parameter marshaling addresses the issue concerning differences in data representation on the client and server machines. Consider the representation of 32-bit integers. Some systems (known as \textbf{big-endian}) store the most significant byte first, while other systems (known as \textbf{little-endian}) store the least significant byte first. Neither order is "better" per se; rather, the choice is arbitrary within a computer architecture. To resolve differences like this, many RPC systems define a machine-independent representation of data. One such representation is known as \textbf{external data representation} (\textit{XDR}). On the client side, parameter marshaling involves converting the machine-dependent data into XDR before they are sent to the server. On the server side, the XDR data are unmarshaled and converted to the machine-dependent representation for the server.
-
-Another important issue involves the semantics of a call. Whereas local procedure calls fail only under extreme circumstances, RPCs can fail, or be duplicated and executed more than once, as a result of common network errors. One way to address this problem is for the operating system to ensure that messages are acted on \textbf{exactly once}, rather than \textbf{at most once}. Most local procedure calls have the "exactly once" functionality, but it is more difficult to implement.
-
-First, consider "at most once." This semantic can be implemented by attaching a timestamp to each message. The server must keep a history of all the timestamps of messages it has already processed or a history large enough to ensure that repeated messages are detected. Incoming messages that have a timestamp already in the history are ignored. The client can then send a message one or more times and be assured that it only executes once.
-
-For "exactly once," we need to remove the risk that the server will never receive the request. To accomplish this, the server must implement the "at most once" protocol described above but must also acknowledge to the client that the RPC call was received and executed. These ACK messages are common throughout networking. The client must resend each RPC call periodically until it receives the ACK for that call.
-
-Yet another important issue concerns the communication between a server and a client. With standard procedure calls, some form of binding takes place during link, load, or execution time (Chapter Main Memory) so that a procedure call's name is replaced by the memory address of the procedure call. The RPC scheme requires a similar binding of the client and the server port, but how does a client know the port numbers on the server? Neither system has full information about the other, because they do not share memory.
-
-Two approaches are common. First, the binding information may be predetermined, in the form of fixed port addresses. At compile time, an RPC call has a fixed port number associated with it. Once a program is compiled, the server cannot change the port number of the requested service. Second, binding can be done dynamically by a rendezvous mechanism. Typically, an operating system provides a rendezvous (also called a \textbf{matchmaker}) daemon on a fixed RPC port. A client then sends a message containing the name of the RPC to the rendezvous daemon requesting the port address of the RPC it needs to execute. The port number is returned, and the RPC calls can be sent to that port until the process terminates (or the server crashes). This method requires the extra overhead of the initial request but is more flexible than the first approach. Figure \ref{fig:rpc-execution} shows a sample interaction.
-
-\begin{figure}[h!]
-\centering
-% \includegraphics[width=0.8\textwidth]{ch3/images/98ca0b51-e6bc-4588-a86d-70be7f5b1720.png}
-\caption{Execution of a remote procedure call (RPC).}\label{fig:rpc-execution}
-\end{figure}
-
-The RPC scheme is useful in implementing a distributed file system (Chapter Networks and Distributed Systems). Such a system can be implemented as a set of RPC daemons and clients. The messages are addressed to the distributed file system port on a server on which a file operation is to take place. The message contains the disk operation to be performed. The disk operation might be \texttt{read()}, \texttt{write()}, \texttt{rename()}, \texttt{delete()}, or \texttt{status()}, corresponding to the usual file-related system calls. The return message contains any data resulting from that call, which is executed by the DFS daemon on behalf of the client. For instance, a message might contain a request to transfer a whole file to a client or be limited to a simple block request. In the latter case, several requests may be needed if a whole file is to be transferred.
-
-<h4>Android RPC</h4>
-Although RPCs are typically associated with client-server computing in a distributed system, they can also be used as a form of IPC between processes running on the same system. The Android operating system has a rich set of IPC mechanisms contained in its \textbf{binder} framework, including RPCs that allow one process to request services from another process.
-
-Android defines an \textbf{application component} as a basic building block that provides utility to an Android application, and an app may combine multiple application components to provide functionality to an app. One such application component is a \textbf{service}, which has no user interface but instead runs in the background while executing long-running operations or performing work for remote processes. Examples of services include playing music in the background and retrieving data over a network connection on behalf of another process, thereby preventing the other process from blocking as the data are being downloaded. When a client app invokes the \texttt{bindService()} method of a service, that service is "bound" and available to provide client-server communication using either message passing or RPCs.
-
-A bound service must extend the Android class \texttt{Service} and must implement the method \texttt{onBind()}, which is invoked when a client calls \texttt{bindService()}. In the case of message passing, the \texttt{onBind()} method returns a \texttt{Messenger} service, which is used for sending messages from the client to the service. The \texttt{Messenger} service is only one-way; if the service must send a reply back to the client, the client must also provide a \texttt{Messenger} service, which is contained in the \texttt{replyTo} field of the \texttt{Message} object sent to the service. The service can then send messages back to the client.
-
-To provide RPCs, the \texttt{onBind()} method must return an interface representing the methods in the remote object that clients use to interact with the service. This interface is written in regular Java syntax and uses the Android Interface Definition Language---AIDL---to create stub files, which serve as the client interface to remote services.
-
-Here, we briefly outline the process required to provide a generic remote service named \texttt{remoteMethod()} using AIDL and the binder service. The interface for the remote service appears as follows:
-\begin{verbatim}
-/* RemoteService.aidl */
-interface RemoteService
-{
-  boolean remoteMethod(int x, double y);
-{
-\end{verbatim}
-This file is written as \texttt{RemoteService.aidl}. The Android development kit will use it to generate a \texttt{.java} interface from the \texttt{.aidl} file, as well as a stub that serves as the RPC interface for this service. The server must implement the interface generated by the \texttt{.aidl} file, and the implementation of this interface will be called when the client invokes \texttt{remoteMethod()}.
-
-When a client calls \texttt{bindService()}, the \texttt{onBind()} method is invoked on the server, and it returns the stub for the \texttt{RemoteService} object to the client. The client can then invoke the remote method as follows:
-\begin{verbatim}
-RemoteService service;
-   . . .
-service.remoteMethod(3, 0.14);
-\end{verbatim}
-Internally, the Android binder framework handles parameter marshaling, transferring marshaled parameters between processes, and invoking the necessary implementation of the service, as well as sending any return values back to the client process.
-
-\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\subsubsection{Android RPC}
+\begin{itemize}
+    \item \textbf{Android RPC}:
+        \begin{itemize}
+            \item IPC between processes on same system via \textbf{binder} framework.
+            \item \textbf{Application component}: Basic building block for Android app.
+            \item \textbf{Service}: Application component with no UI, runs in background (e.g., playing music).
+            \item `bindService()`: client binds to service.
+            \item `onBind()`: invoked on service, returns `Messenger` (for message passing) or interface (for RPC).
+            \item `Messenger` service: one-way. Client provides `replyTo` field for service to reply.
+            \item RPCs: `onBind()` returns interface representing remote methods.
+            \item Uses Android Interface Definition Language (AIDL) to create stub files (client interface).
+            \item Android binder framework handles parameter marshaling, transfer, invocation.
+        \end{itemize}
+\end{itemize}
+\subsection*{Section glossary}
 \rowcolors{2}{gray!10}{white}
 \centering
 \begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}

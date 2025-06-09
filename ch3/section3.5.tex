@@ -1,63 +1,49 @@
 \phantomsection
-\section{IPC in shared-memory systems}\label{sec:3.5}
+\section{IPC in Shared-Memory Systems}\label{sec:3.5}
 
-Interprocess communication using shared memory requires communicating processes to establish a region of shared memory. Typically, a shared-memory region resides in the address space of the process creating the shared-memory segment. Other processes that wish to communicate using this shared-memory segment must attach it to their address space. Recall that, normally, the operating system tries to prevent one process from accessing another process's memory. Shared memory requires that two or more processes agree to remove this restriction. They can then exchange information by reading and writing data in the shared areas. The form of the data and the location are determined by these processes and are not under the operating system's control. The processes are also responsible for ensuring that they are not writing to the same location simultaneously.
+\subsection{Shared Memory Setup}
+\begin{itemize}
+    \item \textbf{Shared Memory Setup}:
+        \begin{itemize}
+            \item Communicating processes establish a shared memory region.
+            \item Region typically in address space of creator process.
+            \item Other processes attach it to their address space.
+            \item OS restriction on memory access removed by agreement.
+            \item Processes responsible for data form, location, and concurrent access synchronization.
+        \end{itemize}
+\end{itemize}
 
-To illustrate the concept of cooperating processes, let's consider the producer-consumer problem, which is a common paradigm for cooperating processes. A \textbf{producer} process produces information that is consumed by a \textbf{consumer} process. For example, a compiler may produce assembly code that is consumed by an assembler. The assembler, in turn, may produce object modules that are consumed by the loader. The producer-consumer problem also provides a useful metaphor for the client-server paradigm. We generally think of a server as a producer and a client as a consumer. For example, a web server produces (that is, provides) web content such as HTML files and images, which are consumed (that is, read) by the client web browser requesting the resource.
+\subsection{Producer-Consumer Problem}
+\begin{itemize}
+    \item \textbf{Producer-Consumer Problem}: Common paradigm for cooperating processes.
+        \begin{itemize}
+            \item \textbf{Producer} process: produces information.
+            \item \textbf{Consumer} process: consumes information.
+            \item Example: compiler (producer) $\rightarrow$ assembler (consumer).
+            \item Metaphor for client-server paradigm (server=producer, client=consumer).
+            \item Requires a buffer for items.
+            \item \textbf{Buffer types}:
+                \begin{itemize}
+                    \item \textbf{Unbounded buffer}: No practical limit on size. Consumer may wait, producer always produces.
+                    \item \textbf{Bounded buffer}: Fixed size. Consumer waits if empty, producer waits if full.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
 
-One solution to the producer-consumer problem uses shared memory. To allow producer and consumer processes to run concurrently, we must have available a buffer of items that can be filled by the producer and emptied by the consumer. This buffer will reside in a region of memory that is shared by the producer and consumer processes. A producer can produce one item while the consumer is consuming another item. The producer and consumer must be synchronized, so that the consumer does not try to consume an item that has not yet been produced.
-
-Two types of buffers can be used. The \textbf{unbounded buffer} places no practical limit on the size of the buffer. The consumer may have to wait for new items, but the producer can always produce new items. The \textbf{bounded buffer} assumes a fixed buffer size. In this case, the consumer must wait if the buffer is empty, and the producer must wait if the buffer is full.
-
-Let's look more closely at how the bounded buffer illustrates interprocess communication using shared memory. The following variables reside in a region of memory shared by the producer and consumer processes:
-\begin{verbatim}
-#define BUFFER_SIZE 10
- 
-typedef struct {
-   . . .
-} item;
- 
-item buffer[BUFFER_SIZE];
-int in = 0;
-int out = 0;
-\end{verbatim}
-The shared \texttt{buffer} is implemented as a circular array with two logical pointers: \texttt{in} and \texttt{out}. The variable \texttt{in} points to the next free position in the buffer; \texttt{out} points to the first full position in the buffer. The buffer is empty when \texttt{in == out}; the buffer is full when
-\begin{verbatim}
-((in + 1) % BUFFER_SIZE) == out
-\end{verbatim}
-
-The producer process has a local variable \texttt{next\_produced} in which the new item to be produced is stored. The consumer process has a local variable \texttt{next\_consumed} in which the item to be consumed is stored.
-\begin{verbatim}
-item next_produced;
- 
-while (true) {
-     /* produce an item in next_produced */
- 
-     while (((in + 1) % BUFFER_SIZE) == out)
-       ; /* do nothing */
- 
-     buffer[in] = next_produced;
-     in = (in + 1) % BUFFER_SIZE;
-}
-\end{verbatim}
-\begin{verbatim}
-item next_consumed;
- 
-while (true) {
-     while (in == out)
-       ; /* do nothing */
- 
-     next_consumed = buffer[out];
-     out = (out + 1) % BUFFER_SIZE;
- 
-     /* consume the item in next_consumed */
-}
-\end{verbatim}
-This scheme allows at most \texttt{BUFFER\_SIZE - 1} items in the buffer at the same time. We leave it as an exercise for you to provide a solution in which \texttt{BUFFER\_SIZE} items can be in the buffer at the same time. In Section POSIX shared memory, we illustrate the POSIX API for shared memory.
-
-One issue this illustration does not address concerns the situation in which both the producer process and the consumer process attempt to access the shared buffer concurrently. In chapter Synchronization Tools and chapter Synchronization Examples, we discuss how synchronization among cooperating processes can be implemented effectively in a shared-memory environment.
-
-\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\subsection{Bounded Buffer Implementation}
+\begin{itemize}
+    \item \textbf{Bounded Buffer Implementation (Shared Memory Example)}:
+        \begin{itemize}
+            \item Shared variables: \texttt{buffer} (circular array), \texttt{in} (next free position), \texttt{out} (first full position).
+            \item Buffer empty: \texttt{in == out}.
+            \item Buffer full: \texttt{((in + 1) \% BUFFER\_SIZE) == out}.
+            \item Allows \texttt{BUFFER\_SIZE - 1} items at most.
+            \item Producer loop: produce item, wait if buffer full, add to buffer, update \texttt{in}.
+            \item Consumer loop: wait if buffer empty, consume item, update \texttt{out}.
+            \item \textbf{Issue}: Concurrent access to shared buffer requires synchronization (covered in later chapters).
+        \end{itemize}
+\end{itemize}
+\subsection*{Section glossary}
 \rowcolors{2}{gray!10}{white}
 \centering
 \begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}

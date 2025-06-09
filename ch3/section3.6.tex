@@ -1,124 +1,83 @@
 \phantomsection
-\section{IPC in message-passing systems}\label{sec:3.6}
+\section{IPC in Message-Passing Systems}\label{sec:3.6}
 
-In Section \hyperref[sec:3.5]{3.5}, we showed how cooperating processes can communicate in a shared-memory environment. The scheme requires that these processes share a region of memory and that the code for accessing and manipulating the shared memory be written explicitly by the application programmer. Another way to achieve the same effect is for the operating system to provide the means for cooperating processes to communicate with each other via a message-passing facility.
-
-Message passing provides a mechanism to allow processes to communicate and to synchronize their actions without sharing the same address space. It is particularly useful in a distributed environment, where the communicating processes may reside on different computers connected by a network. For example, an Internet \texttt{chat} program could be designed so that chat participants communicate with one another by exchanging messages.
-
-A message-passing facility provides at least two operations:
-\begin{verbatim}
-send(message)
-\end{verbatim}
-and
-\begin{verbatim}
-receive(message)
-\end{verbatim}
-Messages sent by a process can be either fixed or variable in size. If only fixed-sized messages can be sent, the system-level implementation is straightforward. This restriction, however, makes the task of programming more difficult. Conversely, variable-sized messages require a more complex system-level implementation, but the programming task becomes simpler. This is a common kind of tradeoff seen throughout operating-system design.
-
-If processes $P$ and $Q$ want to communicate, they must send messages to and receive messages from each other: a \textbf{communication link} must exist between them. This link can be implemented in a variety of ways. We are concerned here not with the link's physical implementation (such as shared memory, hardware bus, or network, which are covered in chapter Networks and Distributed Systems) but rather with its logical implementation. Here are several methods for logically implementing a link and the \texttt{send()}/\texttt{receive()} operations:
+\subsection{Introduction to Message Passing}
 \begin{itemize}
-\item Direct or indirect communication
-\item Synchronous or asynchronous communication
-\item Automatic or explicit buffering
+    \item Message passing: allows processes to communicate and synchronize without shared address space.
+    \item Useful in distributed environments (processes on different computers).
+    \item Provides `send(message)` and `receive(message)` operations.
+    \item Messages can be fixed or variable size (trade-off: implementation complexity vs. programming ease).
+    \item \textbf{Communication Link}: Must exist between communicating processes.
+    \item \textbf{Logical Implementation Methods}:
+        \begin{itemize}
+            \item Direct or indirect communication.
+            \item Synchronous or asynchronous communication.
+            \item Automatic or explicit buffering.
+        \end{itemize}
 \end{itemize}
-We look at issues related to each of these features next.
 
-<h3>Naming</h3>
-Processes that want to communicate must have a way to refer to each other. They can use either direct or indirect communication.
+\subsection{Naming in Message Passing}
+\begin{itemize}
+    \item \textbf{Naming}: How processes refer to each other.
+        \begin{itemize}
+            \item \textbf{Direct Communication}: Explicitly name recipient/sender.
+                \begin{itemize}
+                    \item `send(P, message)`: Send to process P.
+                    \item `receive(Q, message)`: Receive from process Q.
+                    \item Properties: Link established automatically, exactly two processes per link, exactly one link per pair.
+                    \item \textbf{Symmetry}: Both sender/receiver name each other.
+                    \item \textbf{Asymmetry}: Only sender names recipient (`receive(id, message)` from any process).
+                    \item Disadvantage: Limited modularity, \textbf{hard-coding} identifiers is undesirable.
+                \end{itemize}
+            \item \textbf{Indirect Communication}: Messages sent/received via \textbf{mailboxes} (or \textbf{ports}).
+                \begin{itemize}
+                    \item Mailbox: Object for placing/removing messages, unique ID.
+                    \item `send(A, message)`: Send to mailbox A.
+                    \item `receive(A, message)`: Receive from mailbox A.
+                    \item Properties: Link only if shared mailbox, link may be associated with >2 processes, multiple links per pair.
+                    \item Handling multiple receivers for one message:
+                        \begin{itemize}
+                            \item Link associated with $\le$ two processes.
+                            \item At most one process executes `receive()` at a time.
+                            \item System arbitrarily selects receiver (e.g., \textbf{round robin}).
+                        \end{itemize}
+                    \item Mailbox ownership:
+                        \begin{itemize}
+                            \item By process: Part of process address space. Owner receives, user sends. Disappears on owner termination.
+                            \item By OS: Independent existence. OS provides create/send/receive/delete mechanisms. Can have multiple receivers.
+                        \end{itemize}
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
 
-Under \textbf{direct communication}, each process that wants to communicate must explicitly name the recipient or sender of the communication. In this scheme, the \texttt{send()} and \texttt{receive()} primitives are defined as:
+\subsection{Synchronization in Message Passing}
 \begin{itemize}
-\item \texttt{send(P, message)}---Send a \texttt{message} to process \texttt{P}.
-\item \texttt{receive(Q, message)}---Receive a \texttt{message} from process \texttt{Q}.
+    \item \textbf{Synchronization}: `send()` and `receive()` primitives.
+        \begin{itemize}
+            \item \textbf{Blocking} (synchronous):
+                \begin{itemize}
+                    \item \textbf{Blocking send}: Sender blocked until message received by receiver/mailbox.
+                    \item \textbf{Blocking receive}: Receiver blocked until message available.
+                \end{itemize}
+            \item \textbf{Nonblocking} (asynchronous):
+                \begin{itemize}
+                    \item \textbf{Nonblocking send}: Sender sends message, resumes operation.
+                    \item \textbf{Nonblocking receive}: Receiver retrieves valid message or null.
+                \end{itemize}
+            \item \textbf{Rendezvous}: Both `send()` and `receive()` are blocking.
+        \end{itemize}
 \end{itemize}
-A communication link in this scheme has the following properties:
-\begin{itemize}
-\item A link is established automatically between every pair of processes that want to communicate. The processes need to know only each other's identity to communicate.
-\item A link is associated with exactly two processes.
-\item Between each pair of processes, there exists exactly one link.
-\end{itemize}
-This scheme exhibits \textbf{symmetry} in addressing; that is, both the sender process and the receiver process must name the other to communicate. A variant of this scheme employs \textbf{asymmetry} in addressing. Here, only the sender names the recipient; the recipient is not required to name the sender. In this scheme, the \texttt{send()} and \texttt{receive()} primitives are defined as follows:
-\begin{itemize}
-\item \texttt{send(P, message)}---Send a \texttt{message} to process \texttt{P}.
-\item \texttt{receive(id, message)}---Receive a \texttt{message} from any process. The variable \texttt{id} is set to the name of the process with which communication has taken place.
-\end{itemize}
-The disadvantage in both of these schemes (symmetric and asymmetric) is the limited modularity of the resulting process definitions. Changing the identifier of a process may necessitate examining all other process definitions. All references to the old identifier must be found, so that they can be modified to the new identifier. In general, any such \textbf{hard-coding} techniques, where identifiers must be explicitly stated, are less desirable than techniques involving indirection, as described next.
 
-With \textbf{indirect communication}, the messages are sent to and received from \textbf{mailboxes}, or \textbf{ports}. A mailbox can be viewed abstractly as an object into which messages can be placed by processes and from which messages can be removed. Each mailbox has a unique identification. For example, POSIX message queues use an integer value to identify a mailbox. A process can communicate with another process via a number of different mailboxes, but two processes can communicate only if they have a shared mailbox. The \texttt{send()} and \texttt{receive()} primitives are defined as follows:
+\subsection{Buffering in Message Passing}
 \begin{itemize}
-\item \texttt{send(A, message)}---Send a \texttt{message} to mailbox \texttt{A}.
-\item \texttt{receive(A, message)}---Receive a \texttt{message} from mailbox \texttt{A}.
+    \item \textbf{Buffering}: Temporary queue for messages.
+        \begin{itemize}
+            \item \textbf{Zero capacity}: Queue length 0. Sender blocks until recipient receives. No buffering.
+            \item \textbf{Bounded capacity}: Finite length $n$. Sender blocks if queue full. Automatic buffering.
+            \item \textbf{Unbounded capacity}: Potentially infinite length. Sender never blocks. Automatic buffering.
+        \end{itemize}
 \end{itemize}
-In this scheme, a communication link has the following properties:
-\begin{itemize}
-\item A link is established between a pair of processes only if both members of the pair have a shared mailbox.
-\item A link may be associated with more than two processes.
-\item Between each pair of communicating processes, a number of different links may exist, with each link corresponding to one mailbox.
-\end{itemize}
-Now suppose that processes $P_1$, $P_2$, and $P_3$ all share mailbox $A$. Process $P_1$ sends a message to $A$, while both $P_2$ and $P_3$ execute a \texttt{receive()} from $A$. Which process will receive the message sent by $P_1$? The answer depends on which of the following methods we choose:
-\begin{itemize}
-\item Allow a link to be associated with two processes at most.
-\item Allow at most one process at a time to execute a \texttt{receive()} operation.
-\item Allow the system to select arbitrarily which process will receive the message (that is, either $P_2$ or $P_3$, but not both, will receive the message). The system may define an algorithm for selecting which process will receive the message (for example, \textbf{round robin}, where processes take turns receiving messages). The system may identify the receiver to the sender.
-\end{itemize}
-A mailbox may be owned either by a process or by the operating system. If the mailbox is owned by a process (that is, the mailbox is part of the address space of the process), then we distinguish between the owner (which can only receive messages through this mailbox) and the user (which can only send messages to the mailbox). Since each mailbox has a unique owner, there can be no confusion about which process should receive a message sent to this mailbox. When a process that owns a mailbox terminates, the mailbox disappears. Any process that subsequently sends a message to this mailbox must be notified that the mailbox no longer exists.
-
-In contrast, a mailbox that is owned by the operating system has an existence of its own. It is independent and is not attached to any particular process. The operating system then must provide a mechanism that allows a process to do the following:
-\begin{itemize}
-\item Create a new mailbox.
-\item Send and receive messages through the mailbox.
-\item Delete a mailbox.
-\end{itemize}
-The process that creates a new mailbox is that mailbox's owner by default. Initially, the owner is the only process that can receive messages through this mailbox. However, the ownership and receiving privilege may be passed to other processes through appropriate system calls. Of course, this provision could result in multiple receivers for each mailbox.
-
-<h3>Synchronization</h3>
-Communication between processes takes place through calls to \texttt{send()} and \texttt{receive()} primitives. There are different design options for implementing each primitive. Message passing may be either \textbf{blocking} or \textbf{nonblocking}---also known as \textbf{synchronous} and \textbf{asynchronous}. (Throughout this text, you will encounter the concepts of synchronous and asynchronous behavior in relation to various operating-system algorithms.)
-\begin{itemize}
-\item \textbf{Blocking send.} The sending process is blocked until the message is received by the receiving process or by the mailbox.
-\item \textbf{Nonblocking send.} The sending process sends the message and resumes operation.
-\item \textbf{Blocking receive.} The receiver blocks until a message is available.
-\item \textbf{Nonblocking receive.} The receiver retrieves either a valid message or a null.
-\end{itemize}
-Different combinations of \texttt{send()} and \texttt{receive()} are possible. When both \texttt{send()} and \texttt{receive()} are blocking, we have a \textbf{rendezvous} between the sender and the receiver. The solution to the producer-consumer problem becomes trivial when we use blocking \texttt{send()} and \texttt{receive()} statements. The producer merely invokes the blocking \texttt{send()} call and waits until the message is delivered to either the receiver or the mailbox. Likewise, when the consumer invokes \texttt{receive()}, it blocks until a message is available. This is illustrated in Figures \hyperref[fig:producer-message-passing]{3.6.1} and \hyperref[fig:consumer-message-passing]{3.6.2}.
-
-\begin{figure}[h!]
-\centering
-\begin{verbatim}
-message next_produced;
- 
-while (true) {
-     /* produce an item in next_produced */
- 
-     send(next_produced);
-}
-\end{verbatim}
-\caption{The producer process using message passing.}\label{fig:producer-message-passing}
-\end{figure}
-
-\begin{figure}[h!]
-\centering
-\begin{verbatim}
-message next_consumed;
- 
-while (true) {
-     receive(next_consumed);
- 
-     /* consume the item in next_consumed */
-}
-\end{verbatim}
-\caption{The consumer process using message passing.}\label{fig:consumer-message-passing}
-\end{figure}
-
-<h3>Buffering</h3>
-Whether communication is direct or indirect, messages exchanged by communicating processes reside in a temporary queue. Basically, such queues can be implemented in three ways:
-\begin{itemize}
-\item \textbf{Zero capacity.} The queue has a maximum length of zero; thus, the link cannot have any messages waiting in it. In this case, the sender must block until the recipient receives the message.
-\item \textbf{Bounded capacity.} The queue has finite length $n$; thus, at most $n$ messages can reside in it. If the queue is not full when a new message is sent, the message is placed in the queue (either the message is copied or a pointer to the message is kept), and the sender can continue execution without waiting. The link's capacity is finite, however. If the link is full, the sender must block until space is available in the queue.
-\item \textbf{Unbounded capacity.} The queue's length is potentially infinite; thus, any number of messages can wait in it. The sender never blocks.
-\end{itemize}
-The zero-capacity case is sometimes referred to as a message system with no buffering. The other cases are referred to as systems with automatic buffering.
-
-\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\subsection*{Section glossary}
 \rowcolors{2}{gray!10}{white}
 \centering
 \begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}

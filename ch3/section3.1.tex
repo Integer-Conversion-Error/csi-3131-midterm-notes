@@ -1,73 +1,82 @@
 \phantomsection
-\section{Process concept}\label{sec:3.1}
+\section{Process Concept}\label{sec:3.1}
 
-\subsection*{Introduction}\addcontentsline{toc}{subsection}{Introduction}\label{sec:3.1:introduction}
-A \textit{process} is a program in execution. A process will need certain resources---such as CPU time, memory, files, and I/O devices---to accomplish its task. These resources are typically allocated to the process while it is executing.
-
-A process is the unit of work in most systems. Systems consist of a collection of processes: operating-system processes execute system code, and user processes execute user code. All these processes may execute concurrently.
-
-Modern operating systems support processes having multiple \textit{threads} of control. On systems with multiple hardware processing cores, these threads can run in parallel.
-
-One of the most important aspects of an operating system is how it schedules threads onto available processing cores. Several choices for designing CPU schedulers are available to programmers.
-
-Early computers allowed only one program to be executed at a time. This program had complete control of the system and had access to all the system's resources. In contrast, contemporary computer systems allow multiple programs to be loaded into memory and executed concurrently. This evolution required firmer control and more compartmentalization of the various programs; and these needs resulted in the notion of a \textbf{process}, which is a program in execution. A process is the unit of work in a modern computing system.
-
-Although the main concern of the operating system is the execution of user programs, it also needs to take care of various system tasks that are best done in user space, rather than within the kernel. A system therefore consists of a collection of processes, some executing user code, others executing operating system code. Potentially, all these processes can execute concurrently, with the CPU (or CPUs) multiplexed among them.
-
-\subsection*{Chapter objectives}\addcontentsline{toc}{subsection}{Chapter objectives}
+\subsection{Process Definition and Characteristics}
 \begin{itemize}
-    \item Identify the separate components of a process and illustrate how they are represented and scheduled in an operating system.
-    \item Describe how processes are created and terminated in an operating system, including developing programs using the appropriate system calls that perform these operations.
-    \item Describe and contrast interprocess communication using shared memory and message passing.
-    \item Design programs that use pipes and POSIX shared memory to perform interprocess communication.
-    \item Describe client-server communication using sockets and remote procedure calls.
-    \item Design kernel modules that interact with the Linux operating system.
+    \item \textbf{Process}: Program in execution.
+    \item Requires resources: CPU time, memory, files, I/O devices.
+    \item Unit of work in most systems.
+    \item Systems comprise OS processes (system code) and user processes (user code), executing concurrently.
+    \item Modern OS supports multiple \textit{threads} of control within processes; threads can run in parallel on multicore systems.
+    \item OS schedules threads onto available processing cores.
 \end{itemize}
 
-\subsection*{The process}\addcontentsline{toc}{subsection}{The process}\label{sec:3.1:the_process}
-Informally, as mentioned earlier, a process is a program in execution. The status of the current activity of a process is represented by the value of the \textbf{program counter} and the contents of the processor's registers. The memory layout of a process is typically divided into multiple sections. These sections include:
+\subsection{Program vs. Process}
 \begin{itemize}
-    \item \textbf{Text section}---the executable code
-    \item \textbf{Data section}---global variables
-    \item \textbf{Heap section}---memory that is dynamically allocated during program run time
-    \item \textbf{Stack section}---temporary data storage when invoking functions (such as function parameters, return addresses, and local variables)
+    \item \textbf{Program vs. Process}:
+        \begin{itemize}
+            \item Program: Passive entity (e.g., executable file on disk).
+            \item Process: Active entity (program counter, associated resources).
+            \item Program becomes a process when loaded into memory.
+        \end{itemize}
+    \item Multiple processes can be associated with the same program (e.g., multiple instances of a web browser); text sections are identical, but data, heap, and stack sections differ.
 \end{itemize}
-Notice that the sizes of the text and data sections are fixed, as their sizes do not change during program run time. However, the stack and heap sections can shrink and grow dynamically during program execution. Each time a function is called, an \textbf{activation record} containing function parameters, local variables, and the return address is pushed onto the stack; when control is returned from the function, the activation record is popped from the stack. Similarly, the heap will grow as memory is dynamically allocated, and will shrink when memory is returned to the system. Although the stack and heap sections grow \textit{toward} one another, the operating system must ensure they do not \textit{overlap} one another.
 
-A program by itself is not a process. A program is a \textit{passive} entity, such as a file containing a list of instructions stored on disk (often called an \textbf{executable file}). In contrast, a process is an \textit{active} entity, with a program counter specifying the next instruction to execute and a set of associated resources. A program becomes a process when an executable file is loaded into memory. Two common techniques for loading executable files are double-clicking an icon representing the executable file and entering the name of the executable file on the command line (as in \texttt{prog.exe} or \texttt{a.out}).
-
-Although two processes may be associated with the same program, they are nevertheless considered two separate execution sequences. For instance, several users may be running different copies of the mail program, or the same user may invoke many copies of the web browser program. Each of these is a separate process; and although the text sections are equivalent, the data, heap, and stack sections vary. It is also common to have a process that spawns many processes as it runs.
-
-A process can itself be an execution environment for other code. The Java programming environment provides a good example. In most circumstances, an executable Java program is executed within the Java virtual machine (JVM). The JVM executes as a process that interprets the loaded Java code and takes actions (via native machine instructions) on behalf of that code. For example, to run the compiled Java program \texttt{Program.class}, we would enter \texttt{java Program}. The command \texttt{java} runs the JVM as an ordinary process, which in turns executes the Java program \texttt{Program} in the virtual machine.
-
-\subsection*{Process state}\addcontentsline{toc}{subsection}{Process state}\label{sec:3.1:process_state}
-As a process executes, it changes \textbf{state}. The state of a process is defined in part by the current activity of that process. A process may be in one of the following states:
+\subsection{Process Memory Layout}
 \begin{itemize}
-    \item \textbf{New.} The process is being created.
-    \item \textbf{Running.} Instructions are being executed.
-    \item \textbf{Waiting.} The process is waiting for some event to occur (such as an I/O completion or reception of a signal).
-    \item \textbf{Ready.} The process is waiting to be assigned to a processor.
-    \item \textbf{Terminated.} The process has finished execution.
+    \item \textbf{Process Memory Layout}:
+        \begin{itemize}
+            \item \textbf{Text section}: Executable code (fixed size).
+            \item \textbf{Data section}: Global variables (fixed size).
+            \item \textbf{Heap section}: Dynamically allocated memory during runtime (grows/shrinks).
+            \item \textbf{Stack section}: Temporary data for function calls (parameters, return addresses, local variables) (grows/shrinks).
+            \item Stack and heap grow towards each other; OS prevents overlap.
+            \item \textbf{Activation record}: Pushed onto stack on function call, popped on return.
+        \end{itemize}
 \end{itemize}
-These names are arbitrary, and they vary across operating systems. The states that they represent are found on all systems, however. Certain operating systems also more finely delineate process states. It is important to realize that only one process can be \textit{running} on any processor core at any instant. Many processes may be \textit{ready} and \textit{waiting}, however.
 
-\subsection*{Process control block}\addcontentsline{toc}{subsection}{Process control block}\label{sec:3.1:process_control_block}
-Each process is represented in the operating system by a \textbf{process control block} (\textit{PCB})---also called a \textbf{task control block}. It contains many pieces of information associated with a specific process, including these:
+\subsection{Process States}
 \begin{itemize}
-    \item \textbf{Process state.} The state may be new, ready, running, waiting, halted, and so on.
-    \item \textbf{Program counter.} The counter indicates the address of the next instruction to be executed for this process.
-    \item \textbf{CPU registers.} The registers vary in number and type, depending on the computer architecture. They include accumulators, index registers, stack pointers, and general-purpose registers, plus any condition-code information. Along with the program counter, this state information must be saved when an interrupt occurs, to allow the process to be continued correctly afterward when it is rescheduled to run.
-    \item \textbf{CPU-scheduling information.} This information includes a process priority, pointers to scheduling queues, and any other scheduling parameters.
-    \item \textbf{Memory-management information.} This information may include such items as the value of the base and limit registers and the page tables, or the segment tables, depending on the memory system used by the operating system.
-    \item \textbf{Accounting information.} This information includes the amount of CPU and real time used, time limits, account numbers, job or process numbers, and so on.
-    \item \textbf{I/O status information.} This information includes the list of I/O devices allocated to the process, a list of open files, and so on.
+    \item \textbf{Process States}: A process changes state during execution.
+        \begin{itemize}
+            \item \textbf{New}: Process is being created.
+            \item \textbf{Running}: Instructions are being executed (only one process per processor core at any instant).
+            \item \textbf{Waiting}: Process is waiting for an event (e.g., I/O completion, signal reception).
+            \item \textbf{Ready}: Process is waiting to be assigned to a processor.
+            \item \textbf{Terminated}: Process has finished execution.
+        \end{itemize}
 \end{itemize}
-In brief, the PCB simply serves as the repository for all the data needed to start, or restart, a process, along with some accounting data.
 
-\subsection*{Threads}\addcontentsline{toc}{subsection}{Threads}\label{sec:3.1:threads}
-The process model discussed so far has implied that a process is a program that performs a single \textbf{thread} of execution. For example, when a process is running a word-processor program, a single thread of instructions is being executed. This single thread of control allows the process to perform only one task at a time. Thus, the user cannot simultaneously type in characters and run the spell checker. Most modern operating systems have extended the process concept to allow a process to have multiple threads of execution and thus to perform more than one task at a time. This feature is especially beneficial on multicore systems, where multiple threads can run in parallel. A multithreaded word processor could, for example, assign one thread to manage user input while another thread runs the spell checker. On systems that support threads, the PCB is expanded to include information for each thread. Other changes throughout the system are also needed to support threads.
+\subsection{Process Control Block (PCB)}
+\begin{itemize}
+    \item \textbf{Process Control Block (PCB)} / \textbf{Task Control Block}:
+        \begin{itemize}
+            \item Data structure in OS representing each process.
+            \item Contains information:
+                \begin{itemize}
+                    \item Process state.
+                    \item Program counter.
+                    \item CPU registers.
+                    \item CPU-scheduling information (priority, queue pointers).
+                    \item Memory-management information (base/limit registers, page/segment tables).
+                    \item Accounting information (CPU/real time used, limits).
+                    \item I/O status information (allocated devices, open files).
+                \end{itemize}
+            \item Serves as repository for data needed to start/restart a process.
+        \end{itemize}
+\end{itemize}
 
-\subsection*{Section glossary}\addcontentsline{toc}{subsection}{Section glossary}
+\subsection{Threads}
+\begin{itemize}
+    \item \textbf{Threads}:
+        \begin{itemize}
+            \item Single thread of execution: process performs one task at a time.
+            \item Multithreaded process: multiple threads of execution, performs multiple tasks concurrently.
+            \item Especially beneficial on multicore systems for parallel execution.
+            \item PCB expanded to include per-thread information.
+        \end{itemize}
+\end{itemize}
+\subsection*{Section glossary}
 \rowcolors{2}{gray!10}{white}
 \centering
 \begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
