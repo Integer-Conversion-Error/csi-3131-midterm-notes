@@ -1,0 +1,44 @@
+\section*{2.7 Operating-system debugging}
+\addcontentsline{toc}{section}{2.7 Operating-system debugging}
+
+Debugging is a crucial task in operating system development, involving the detection and correction of errors. Errors can range from hardware failures to application bugs.
+
+\subsection*{2.7.1: Section review questions.}
+\addcontentsline{toc}{subsection}{2.7.1: Section review questions.}
+
+\textbf{Debugging} is the process of finding and fixing errors, or \textbf{bugs}. Operating systems, being large and complex, are prone to bugs. Debugging can be challenging due to the difficulty of reproducing errors and the system's concurrent nature.
+
+Common debugging tools and techniques:
+\begin{itemize}
+    \item \textbf{Log files:} System-generated files that record events, errors, and warnings. Analyzing these logs helps identify the cause of issues.
+    \item \textbf{Core dump:} A snapshot of the memory of a process at the time of a crash. It contains the state of the program, including register values, stack, and memory, useful for post-mortem analysis.
+    \item \textbf{Crash dump (or system dump):} Similar to a core dump but for the entire operating system. It captures the system's state when a kernel panic or system crash occurs.
+    \item \textbf{Debugger:} A software tool that allows developers to step through code, inspect variables, and set breakpoints to understand program execution flow and identify bugs.
+    \item \textbf{Tracing:} A technique to record the sequence of events or function calls during program execution, providing insights into behavior.
+    \item \textbf{Profiling:} Analyzing program performance to identify bottlenecks and areas for optimization.
+\end{itemize}
+
+\textbf{Performance tuning} is a related activity focused on improving system efficiency. Tools for performance tuning often include:
+\begin{itemize}
+    \item \textbf{Profilers:} Identify which parts of a program consume the most resources (CPU, memory).
+    \item \textbf{System monitors:} Track real-time system resource usage (CPU utilization, memory usage, disk I/O, network activity).
+\item \textbf{Benchmarking tools:} Measure system performance under specific workloads to compare against baselines or other systems.
+\end{itemize}
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{debugging} & The process of finding and fixing errors. \\
+\textbf{bug} & An error in a program. \\
+\textbf{core dump} & A file containing the state of a program when it crashed. \\
+\textbf{crash dump} & A file containing the state of the operating system when it crashed. \\
+\textbf{system dump} & A file containing the state of the operating system when it crashed. \\
+\textbf{performance tuning} & An activity that improves the performance of a system. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

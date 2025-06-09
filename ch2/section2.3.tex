@@ -1,0 +1,126 @@
+\section*{2.3 System calls}
+\addcontentsline{toc}{section}{2.3 System calls}
+
+\subsection*{Example}
+\addcontentsline{toc}{subsection}{Example}
+\begin{itemize}
+    \item System calls provide an interface to OS services, typically as C/C++ functions, sometimes assembly.
+    \item Even simple programs (e.g., file copy) make extensive use of system calls.
+    \item A file copy program (\texttt{cp in.txt out.txt}) involves:
+    \begin{itemize}
+        \item Obtaining file names (command line, user input, GUI).
+        \item Opening input file, creating/opening output file (with error handling for non-existence, protection, or existing files).
+        \item Looping to read from input and write to output (with error handling for EOF, hardware failure, disk space).
+        \item Closing files, displaying messages, and terminating the program.
+    \end{itemize}
+    \item System calls are fundamental for program interaction with the OS.
+\end{itemize}
+
+\subsection*{Application programming interface}
+\addcontentsline{toc}{subsection}{Application programming interface}
+\begin{itemize}
+    \item Application developers typically use an \textbf{application programming interface} (\textit{API}) rather than direct system calls.
+    \item An API specifies functions, parameters, and return values available to programmers (e.g., Windows API, POSIX API, Java API).
+    \item APIs are accessed via libraries (e.g., \textbf{libc} for C programs on UNIX/Linux).
+    \item API functions invoke actual system calls in the kernel (e.g., \texttt{CreateProcess()} calls \texttt{NTCreateProcess()}).
+    \item Benefits of using APIs:
+    \begin{itemize}
+        \item \textbf{Portability:} Programs can run on any system supporting the same API.
+        \item \textbf{Simplicity:} APIs are often less detailed and easier to use than raw system calls.
+    \end{itemize}
+    \item The \textbf{run-time environment} (\textit{RTE}) provides a \textbf{system-call interface} that links API calls to OS system calls.
+    \item The system-call interface uses a table indexed by system call numbers to invoke the correct kernel function.
+    \item Details of system call implementation are hidden from the programmer by the API and managed by the RTE.
+    \item Parameters to system calls can be passed via registers, memory blocks, or a \textbf{stack} (using \textbf{push} and \textbf{pop} operations).
+\end{itemize}
+
+\subsection*{Types of system calls}
+\addcontentsline{toc}{subsection}{Types of system calls}
+System calls are broadly categorized into six types:
+\begin{itemize}
+    \item \textbf{Process control:}
+    \begin{itemize}
+        \item Terminate program normally (\texttt{end()}) or abnormally (\texttt{abort()}).
+        \item Debugging tools (\textbf{debugger}) can examine memory dumps from abnormal terminations.
+        \item Load and execute other programs (\texttt{load()}, \texttt{execute()}).
+        \item Create new processes (\texttt{create\_process()}, \texttt{fork()}).
+        \item Control process attributes (priority, execution time) (\texttt{get\_process\_attributes()}, \texttt{set\_process\_attributes()}).
+        \item Terminate created processes (\texttt{terminate\_process()}).
+        \item Wait for processes to finish (\texttt{wait\_time()}, \texttt{wait\_event()}) or signal events (\texttt{signal\_event()}).
+        \item \textbf{Lock} shared data for integrity (\texttt{acquire\_lock()}, \texttt{release\_lock()}).
+        \item Examples: Arduino (single-tasking, \textbf{sketch}, \textbf{boot loader}); FreeBSD (multitasking, \texttt{fork()}, \texttt{exec()}, \texttt{exit()}).
+    \end{itemize}
+    \item \textbf{File management:}
+    \begin{itemize}
+        \item Basic operations: \texttt{create()}, \texttt{delete()}, \texttt{open()}, \texttt{read()}, \texttt{write()}, \texttt{reposition()}, \texttt{close()} files.
+        \item Similar operations apply to directories.
+        \item Get/set file/directory attributes (\texttt{get\_file\_attributes()}, \texttt{set\_file\_attributes()}).
+    \end{itemize}
+    \item \textbf{Device management:}
+    \begin{itemize}
+        \item Request (\texttt{request()}) and release (\texttt{release()}) devices for exclusive use.
+        \item Read, write, and reposition devices, similar to files.
+        \item Many OS (e.g., UNIX) merge files and devices into a combined structure.
+    \end{itemize}
+    \item \textbf{Information maintenance:}
+    \begin{itemize}
+        \item Transfer information between user program and OS.
+        \item Examples: current \texttt{time()} and \texttt{date()}, OS version, free memory/disk space.
+        \item Debugging aids: \texttt{dump()} memory, \texttt{strace} (Linux), \textbf{single step} CPU mode.
+        \item Get/set process information (\texttt{get\_process\_attributes()}, \texttt{set\_process\_attributes()}).
+    \end{itemize}
+    \item \textbf{Communications:}
+    \begin{itemize}
+        \item \textbf{Message-passing model:} Processes exchange messages directly or via mailboxes.
+        \begin{itemize}
+            \item Requires opening connections, knowing \textbf{host name} and \textbf{process name}.
+            \item \textbf{Daemons} (\textbf{server}) wait for connections from \textbf{clients}.
+            \item Use \texttt{read\_message()} and \texttt{write\_message()} for exchange.
+        \end{itemize}
+        \item \textbf{Shared-memory model:} Processes access shared memory regions.
+        \begin{itemize}
+            \item Processes agree to remove memory access restrictions.
+            \item Exchange information by reading/writing shared data.
+            \item Faster communication, but requires protection and synchronization.
+        \end{itemize}
+        \item Most systems implement both models.
+    \end{itemize}
+    \item \textbf{Protection:}
+    \begin{itemize}
+        \item Control access to computer system resources.
+        \item System calls: \texttt{set\_permission()}, \texttt{get\_permission()}, \texttt{allow\_user()}, \texttt{deny\_user()}.
+        \item Essential for multiprogrammed, networked, and mobile systems.
+    \end{itemize}
+\end{itemize}
+\rowcolors{2}{gray!10}{white}
+
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{system call} & Software-triggered interrupt allowing a process to request a kernel service. \\
+\textbf{application programming interface (API)} & A set of commands, functions, and other tools that can be used by a programmer in developing a program. \\
+\textbf{C library (libc)} & The standard UNIX/Linux system API for programs written in the C programming language. \\
+\textbf{run-time environment (RTE)} & The full suite of software needed to execute applications written in a given programming language, including its compilers, libraries, and loaders. \\
+\textbf{system-call interface} & An interface that serves as the link to system calls made available by the operating system and that is called by processes to invoke system calls. \\
+\textbf{push} & The action of placing a value on a stack data structure. \\
+\textbf{stack} & A sequentially ordered data structure that uses the last-in, first-out (LIFO) principle for adding and removing items; the last item placed onto a stack is the first item removed. \\
+\textbf{process control} & A category of system calls. \\
+\textbf{information maintenance} & A category of system calls. \\
+\textbf{communications} & A category of system calls. \\
+\textbf{protection} & A category of system calls. Any mechanism for controlling the access of processes or users to the resources defined by a computer system. \\
+\textbf{debugger} & A system program designed to aid programmers in finding and correcting errors. \\
+\textbf{bug} & An error in computer software or hardware. \\
+\textbf{lock} & A mechanism that restricts access by processes or subroutines to ensure integrity of shared data. \\
+\textbf{sketch} & An Arduino program. \\
+\textbf{single step} & A CPU mode in which a trap is executed by the CPU after every instruction (to allow examination of the system state after every instruction); useful in debugging. \\
+\textbf{message-passing model} & A method of interprocess communication in which messages are exchanged. \\
+\textbf{host name} & A human-readable name for a computer. \\
+\textbf{process name} & A human-readable name for a process. \\
+\textbf{daemon} & A service that is provided outside of the kernel by system programs that are loaded into memory at boot time and run continuously. \\
+\textbf{client} & A computer that uses services from other computers (such as a web client). The source of a communication. \\
+\textbf{server} & In general, any computer, no matter the size, that provides resources to other computers.\\
+\textbf{shared-memory model} & An interprocess communication method in which multiple processes share memory and use that memory for message passing. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

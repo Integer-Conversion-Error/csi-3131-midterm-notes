@@ -1,0 +1,124 @@
+\section*{2.8 Operating-system structure}
+\addcontentsline{toc}{section}{2.8 Operating-system structure}
+
+Operating systems are complex and structured into components or modules for proper function and easy modification. This section discusses common kernel structures.
+
+\subsection*{Monolithic structure}
+\addcontentsline{toc}{subsection}{Monolithic structure}
+All kernel functionality in a single, static binary file in one address space.
+\begin{itemize}
+    \item \textbf{Example:} Original UNIX OS.
+    \item \textbf{Linux:} Monolithic kernel, but with modular design for runtime modification.
+    \item \textbf{Advantages:} High performance (minimal overhead, fast internal communication).
+    \item \textbf{Disadvantages:} Difficult to implement and extend.
+\end{itemize}
+
+\subsection*{Layered approach}
+\addcontentsline{toc}{subsection}{Layered approach}
+Kernel divided into separate, smaller components (\textbf{loosely coupled}) vs. \textbf{tightly coupled} monolithic.
+\begin{itemize}
+    \item \textbf{Concept:} OS broken into layers (Layer 0: hardware, Layer N: user interface). Each layer uses functions only from lower layers.
+    \item \textbf{Advantages:} Simplicity in construction and debugging.
+    \item \textbf{Disadvantages:} Challenges in defining layers, potential poor performance (multiple layer traversals).
+    \item \textbf{Current use:} Pure layered systems rare; some layering with fewer, more functional layers is common.
+\end{itemize}
+
+\subsection*{Microkernels}
+\addcontentsline{toc}{subsection}{Microkernels}
+Removes nonessential components from kernel, implementing them as user-level programs in separate address spaces (smaller kernel).
+\begin{itemize}
+    \item \textbf{Core functions:} Minimal process/memory management, communication facility.
+    \item \textbf{Communication:} Indirect via message passing through microkernel.
+    \item \textbf{Benefits:} Easier OS extension/modification, easier portability, enhanced security/reliability.
+    \item \textbf{Examples:} \textbf{Mach} (kernel of \textbf{Darwin}), QNX.
+    \item \textbf{Disadvantages:} Performance can suffer (message copying, process switching overhead).
+\end{itemize}
+
+\subsection*{Modules}
+\addcontentsline{toc}{subsection}{Modules}
+\textbf{Loadable kernel modules (LKMs)} allow dynamic linking of additional services.
+\begin{itemize}
+    \item \textbf{Design:} Kernel provides core services; others are dynamic. Avoids kernel recompilation for changes.
+    \item \textbf{Comparison:} More flexible than layered; more efficient than microkernels.
+    \item \textbf{Linux:} Uses LKMs for device drivers, file systems (dynamic insertion/removal).
+\end{itemize}
+
+\subsection*{Hybrid systems}
+\addcontentsline{toc}{subsection}{Hybrid systems}
+Combine different structures to balance performance, security, usability.
+\begin{itemize}
+    \item \textbf{Linux:} Monolithic + Modular.
+    \item \textbf{Windows:} Largely monolithic + Microkernel-like behavior (user-mode subsystems/OS \textbf{personalities}) + Dynamically loadable kernel modules.
+\end{itemize}
+
+\subsubsection*{macOS and iOS}
+\addcontentsline{toc}{subsection}{macOS and iOS}
+Apple's OSes share a layered structure:
+\begin{itemize}
+    \item \textbf{User experience layer:} User interaction (\textbf{Aqua}/macOS, \textbf{Springboard}/iOS).
+    \item \textbf{Application frameworks layer:} \textbf{Cocoa} (macOS), \textbf{Cocoa Touch} (iOS) for Objective-C/Swift APIs.
+    \item \textbf{Core frameworks:} Graphics/media (Quicktime, OpenGL).
+    \item \textbf{Kernel environment:} \textbf{Darwin} (Mach microkernel + BSD UNIX kernel).
+\end{itemize}
+\textbf{Darwin} hybrid structure:
+\begin{itemize}
+    \item \textbf{System-call interfaces:} Two interfaces: Mach (\textbf{traps}), BSD (POSIX).
+    \item \textbf{Mach services:} Memory management, CPU scheduling, IPC (\textbf{kernel abstractions}: tasks, threads, memory objects, ports).
+    \item \textbf{Kernel environment additions:} I/O kit, dynamic modules (\textbf{kernel extensions}/\textbf{kexts}).
+    \item \textbf{Performance mitigation:} Combines components in single address space to reduce message copying.
+\end{itemize}
+
+\subsubsection*{Android}
+\addcontentsline{toc}{subsection}{Android}
+Open-source mobile OS (Google-led). Layered software stack.
+\begin{itemize}
+    \item \textbf{Application development:} Java with Android API. Compiled to `.dex` for Android RunTime (ART) VM.
+    \item \textbf{ART compilation:} \textbf{Ahead-of-time (AOT) compilation} to native code on installation.
+    \item \textbf{JNI:} Java Native Interface for direct hardware access (less portable).
+    \item \textbf{Native libraries:} webkit, SQLite, SSLs.
+    \item \textbf{Hardware abstraction layer (HAL):} Abstracts hardware for portability.
+    \item \textbf{C library:} \textbf{Bionic} (smaller, efficient on mobile CPUs).
+    \item \textbf{Linux kernel:} Modified for mobile needs (power/memory management, \textbf{Binder} IPC).
+\end{itemize}
+
+\subsection*{Windows subsystem for linux}
+\addcontentsline{toc}{subsection}{Windows subsystem for linux}
+Windows hybrid architecture with subsystems. \textbf{WSL} allows native Linux apps (ELF binaries) on Windows 10.
+\begin{itemize}
+    \item \textbf{Operation:} `bash.exe` starts \textbf{Linux instance} (init, bash shell) in Windows \textbf{Pico} process.
+    \item \textbf{Pico processes:} Load Linux binaries.
+    \item \textbf{System call translation:} LXCore/LXSS translate Linux calls (provide functionality or combine with Windows calls).
+\end{itemize}
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{monolithic} & Kernel without structure. \\
+\textbf{tightly coupled systems} & Processors in close communication, sharing resources. \\
+\textbf{loosely coupled} & Kernel composed of components with specific, limited functions. \\
+\textbf{layered approach} & OS separated into layers (hardware to user interface). \\
+\textbf{Mach} & Microkernel OS with threading (Carnegie Mellon). \\
+\textbf{microkernel} & Removes nonessential components from kernel, implements as user-level programs. \\
+\textbf{loadable kernel module (LKM)} & Kernel links additional services dynamically. \\
+\textbf{user experience layer} & Software interface for user interaction (macOS/iOS). \\
+\textbf{application frameworks layer} & Includes Cocoa/Cocoa Touch (macOS/iOS) for APIs. \\
+\textbf{core frameworks} & Graphics/media support (macOS/iOS). \\
+\textbf{kernel environment} & Darwin layer (Mach microkernel + BSD UNIX kernel). \\
+\textbf{Darwin} & Apple's open-source kernel. \\
+\textbf{trap} & Software interrupt (error or OS service request). \\
+\textbf{kernel abstractions} & Components adding functionality to Mach (tasks, threads, memory objects, ports). \\
+\textbf{kernel extensions (kexts)} & Third-party components added to kernel (macOS). \\
+\textbf{kexts} & Third-party components added to kernel (macOS). \\
+\textbf{ahead-of-time (AOT) compilation} & ART compiles Java apps to native code on installation. \\
+\textbf{Bionic} & Android standard C library (smaller, efficient on mobile CPUs). \\
+\textbf{Windows Subsystem for Linux (WSL)} & Windows 10 component for running native Linux apps. \\
+\textbf{Linux instance} & Set of Pico processes in Windows created by WSL. \\
+\textbf{Pico} & WSL process translating Linux system calls. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

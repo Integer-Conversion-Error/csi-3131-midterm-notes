@@ -1,0 +1,41 @@
+\section*{2.6 Why applications are operating-system specific}
+\addcontentsline{toc}{section}{2.6 Why applications are operating-system specific}
+
+Applications compiled on one operating system are generally not executable on others due to unique system calls and other barriers. However, some applications can run on multiple operating systems through specific techniques.
+
+\subsection*{2.6.1: Section review questions.}
+\addcontentsline{toc}{subsection}{2.6.1: Section review questions.}
+
+An application can be made available to run on multiple operating systems in one of three ways:
+\begin{enumerate}
+    \item \textbf{Interpreted languages:} Applications written in languages like Python or Ruby use an interpreter available for multiple operating systems. The interpreter executes equivalent native instructions and calls native OS functions. Performance may suffer, and features might be limited.
+    \item \textbf{Virtual machines:} Languages like Java include a virtual machine as part of their runtime environment (RTE). The RTE, ported to various operating systems, loads the application into the virtual machine. This approach has similar disadvantages to interpreters.
+    \item \textbf{Standard language/API with porting:} Application developers use a standard language or API where the compiler generates machine- and OS-specific binaries. The application must be ported to each OS, which is time-consuming. POSIX API is an example for UNIX-like systems.
+\end{enumerate}
+
+Despite these approaches, cross-platform application development remains challenging due to several architectural differences:
+\begin{itemize}
+    \item \textbf{Binary formats:} Each OS has a unique binary format (header, instructions, variables layout) for applications, dictating how the OS loads and executes the file.
+    \item \textbf{CPU instruction sets:} CPUs have varying instruction sets, requiring applications to contain appropriate instructions for correct execution.
+    \item \textbf{System calls:} OS system calls vary significantly in operands, ordering, invocation methods, numbering, meanings, and result returns.
+\end{itemize}
+
+Approaches like Linux's adoption of the \textbf{ELF format} for binary executable files provide a common standard across Linux and UNIX systems, but do not guarantee cross-hardware platform compatibility.
+
+An \textbf{application binary interface (ABI)} defines how different components of binary code interface for a given operating system on a specific architecture. ABIs specify low-level details such as address width, parameter passing methods for system calls, runtime stack organization, binary format of system libraries, and data type sizes. While an ABI ensures compatibility on systems supporting that ABI, it does not provide cross-platform compatibility as it is defined for a specific OS and architecture.
+
+In summary, these differences necessitate that applications are written for and compiled on a specific operating system and CPU type (e.g., Intel x86 or ARM v8) unless an interpreter or RTE is used. This explains the extensive work required for programs like Firefox to run across various platforms (Windows, macOS, Linux, iOS, Android) and CPU architectures.
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{port} & To move code from its current platform to another platform (e.g., between operating systems or hardware systems). \\
+\textbf{application binary interface (ABI)} & Defines how different components of binary code can interface for a given operating system on a given architecture. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

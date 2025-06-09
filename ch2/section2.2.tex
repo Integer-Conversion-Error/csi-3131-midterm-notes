@@ -1,0 +1,73 @@
+\section*{2.2 User and operating-system interface}
+\addcontentsline{toc}{section}{2.2 User and operating-system interface}
+
+Users interface with the OS via three fundamental approaches: command-line interface (CLI) or \textbf{command interpreter}, and two forms of graphical user interface (GUI).
+
+\subsection*{Command interpreters}
+\addcontentsline{toc}{subsection}{Command interpreters}
+\begin{itemize}
+    \item Most OS (Linux, UNIX, Windows) treat the command interpreter as a special program run at process initiation or user login.
+    \item Systems with multiple command interpreters are known as \textbf{shells} (e.g., C shell, Bourne-Again shell, Korn shell on UNIX/Linux).
+    \item Shells provide similar functionality; choice is personal preference.
+    \item Main function: get and execute user commands, often manipulating files (create, delete, list, print, copy, execute).
+    \item Commands can be implemented:
+    \begin{itemize}
+        \item \textbf{Interpreter contains code:} Interpreter holds execution code, increasing its size.
+        \item \textbf{System programs:} Most commands are separate system programs (e.g., UNIX `rm file.txt` executes the `rm` program). Allows easy addition of new commands without changing the interpreter.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Graphical user interface}
+\addcontentsline{toc}{subsection}{Graphical user interface}
+\begin{itemize}
+    \item A second interface is the \textbf{graphical user interface (GUI)}.
+    \item Users interact with a mouse-based window-and-menu system using a \textbf{desktop} metaphor.
+    \item \textbf{Icons} represent programs, files, and functions; clicking them or selecting from menus invokes actions.
+    \item GUIs originated from Xerox PARC (1973, Xerox Alto) and became widespread with Apple Macintosh (1980s).
+    \item macOS adopted the Aqua interface.
+    \item Microsoft Windows (Version 1.0) added a GUI to MS-DOS, with later versions enhancing functionality.
+    \item Traditionally CLI-dominated UNIX systems now offer GUIs like KDE and GNOME, available under open-source licenses.
+\end{itemize}
+
+\subsection*{Touch-screen interface}
+\addcontentsline{toc}{subsection}{Touch-screen interface}
+\begin{itemize}
+    \item Smartphones and tablets typically use a touch-screen interface, as CLI/mouse systems are impractical.
+    \item Users interact via \textbf{gestures} (e.g., pressing, swiping).
+    \item Most mobile devices simulate keyboards on the touch screen.
+    \item Apple iPhone/iPad use the \textbf{Springboard} touch-screen interface.
+\end{itemize}
+
+\subsection*{Choice of interface}
+\addcontentsline{toc}{subsection}{Choice of interface}
+\begin{itemize}
+    \item Choice between CLI and GUI is often personal preference.
+    \item \textbf{System administrators} and \textbf{power users} prefer CLI for efficiency and faster access, especially for repetitive tasks via \textbf{shell scripts}.
+    \item Some systems offer only a subset of functions via GUI, reserving less common tasks for CLI.
+    \item Most Windows users prefer the GUI; recent Windows versions offer both standard GUI and touch-screen interfaces.
+    \item macOS (based on a UNIX kernel) now provides both the Aqua GUI and a command-line interface.
+    \item Mobile systems (iOS, Android) predominantly use touch-screen interfaces.
+    \item The user interface is typically separate from the core OS structure; this book focuses on providing adequate service to user programs, not UI design.
+\end{itemize}
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{command interpreter} & OS component interpreting user commands. \\
+\textbf{shell} & A command interpreter on systems with multiple choices. \\
+\textbf{desktop} & GUI workspace on screen. \\
+\textbf{icons} & Images representing objects in GUI. \\
+\textbf{folder} & File system component for grouping files. \\
+\textbf{gestures} & Motions causing computer actions (e.g., "pinching"). \\
+\textbf{Springboard} & The iOS touch-screen interface. \\
+\textbf{system administrators} & Users who configure, monitor, and manage systems. \\
+\textbf{power users} & Users with deep system knowledge. \\
+\textbf{shell script} & File containing a series of commands for a specific shell. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

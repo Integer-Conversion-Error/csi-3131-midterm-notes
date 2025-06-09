@@ -1,0 +1,90 @@
+\section*{2.10 Operating-system debugging}
+\addcontentsline{toc}{section}{2.10 Operating-system debugging}
+
+\textbf{Debugging} is the activity of finding and fixing errors (bugs) in a system, including hardware and software. It can also involve \textbf{performance tuning} to remove processing \textbf{bottlenecks}. This section focuses on debugging process and kernel errors, and performance problems.
+
+\subsection*{Failure analysis}
+\addcontentsline{toc}{subsection}{Failure analysis}
+When a process fails, operating systems typically:
+\begin{itemize}
+    \item Write error information to a \textbf{log file}.
+    \item Create a \textbf{core dump} (a capture of the process's memory) for later analysis.
+    \item Debuggers can then probe running programs and core dumps.
+\end{itemize}
+Kernel debugging is more complex due to its size, control of hardware, and lack of user-level tools.
+\begin{itemize}
+    \item A kernel failure is a \textbf{crash}.
+    \item Error information is saved to a log file, and memory state to a \textbf{crash dump}.
+    \item Kernel memory state is often saved to a dedicated disk section without a file system to ensure data integrity during a crash.
+\end{itemize}
+
+\subsection*{Performance monitoring and tuning}
+\addcontentsline{toc}{subsection}{Performance monitoring and tuning}
+\textbf{Performance tuning} aims to improve system efficiency by removing bottlenecks. This requires monitoring system behavior, using either \textbf{counters} or \textbf{tracing}.
+
+\subsubsection*{Counters}
+\addcontentsline{toc}{subsection}{Counters}
+Operating systems track activity via counters (e.g., system calls, network/disk operations).
+\begin{itemize}
+    \item \textbf{Per-process Linux tools:}
+    \begin{itemize}
+        \item \texttt{ps}: Reports information for processes.
+        \item \texttt{top}: Reports real-time statistics for current processes.
+    \end{itemize}
+    \item \textbf{System-wide Linux tools:}
+    \begin{itemize}
+        \item \texttt{vmstat}: Reports memory-usage statistics.
+        \item \texttt{netstat}: Reports network interface statistics.
+        \item \texttt{iostat}: Reports disk I/O usage.
+    \end{itemize}
+    \item Most Linux counter tools read statistics from the \texttt{/proc} pseudo file system (kernel memory).
+    \item \textbf{Windows:} \textbf{Windows Task Manager} provides information on applications, processes, CPU/memory usage, and networking statistics.
+\end{itemize}
+
+\subsubsection*{Tracing}
+\addcontentsline{toc}{subsection}{Tracing}
+Tracing tools collect data for specific events (e.g., system-call invocation steps).
+\begin{itemize}
+    \item \textbf{Per-process Linux tools:}
+    \begin{itemize}
+        \item \texttt{strace}: Traces system calls invoked by a process.
+        \item \texttt{gdb}: A source-level debugger.
+    \end{itemize}
+    \item \textbf{System-wide Linux tools:}
+    \begin{itemize}
+        \item \texttt{perf}: Collection of Linux performance tools.
+        \item \texttt{tcpdump}: Collects network packets.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{BCC}
+\addcontentsline{toc}{subsection}{BCC}
+\textbf{BCC} (BPF Compiler Collection) is a toolkit for dynamic kernel tracing in Linux, providing a dynamic, secure, low-impact debugging environment.
+\begin{itemize}
+    \item \textbf{Functionality:} Front-end interface to eBPF (extended Berkeley Packet Filter) tool.
+    \item \textbf{eBPF:} Programs written in a subset of C, compiled into eBPF instructions, dynamically inserted into a running Linux system to capture events or monitor performance.
+    \item \textbf{Verifier:} Checks eBPF instructions for system performance/security impact before insertion.
+    \item \textbf{BCC tools:} Written in Python, embedding C code for eBPF instrumentation. Compiles C to eBPF instructions and inserts using probes or tracepoints.
+    \item \textbf{Example:} \texttt{disksnoop.py} traces disk I/O activity (timestamp, R/W, bytes, latency).
+    \item \textbf{Power:} Can be used on live production systems without harm, useful for system administrators to identify bottlenecks or security exploits.
+\end{itemize}
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{debugging} & The activity of finding and removing errors. \\
+\textbf{performance tuning} & The activity of improving performance by removing bottlenecks. \\
+\textbf{bottleneck} & A performance-limiting aspect of computing. \\
+\textbf{log file} & A file containing error or "logging" information. \\
+\textbf{core dump} & A copy of the state of a process written to disk when it crashes. \\
+\textbf{crash} & Termination of execution due to a problem (kernel or process). \\
+\textbf{crash dump} & A copy of the state of the kernel written to disk during a crash. \\
+\textbf{BPF compiler collection (BCC)} & A rich toolkit for tracing system activity on Linux for debugging and performance-tuning. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

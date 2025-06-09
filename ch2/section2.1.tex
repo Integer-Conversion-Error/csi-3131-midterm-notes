@@ -1,0 +1,55 @@
+\section*{2.1 Operating-system services}
+\addcontentsline{toc}{section}{2.1 Operating-system services}
+
+\subsection*{Introduction}
+\addcontentsline{toc}{subsection}{Introduction}
+An operating system (OS) provides the environment for program execution. OS designs vary, but defining system goals is crucial before design begins. We can view an OS by its services, user/programmer interface, or internal components. This chapter explores these aspects, covering OS services, their provision, debugging, design methodologies, creation, and booting process.
+
+\subsection*{Chapter objectives}
+\addcontentsline{toc}{subsection}{Chapter objectives}
+\begin{itemize}
+    \item Identify services provided by an operating system.
+    \item Illustrate how system calls are used to provide operating system services.
+    \item Compare and contrast monolithic, layered, microkernel, modular, and hybrid strategies for designing operating systems.
+    \item Illustrate the process for booting an operating system.
+    \item Apply tools for monitoring operating system performance.
+    \item Design and implement kernel modules for interacting with a Linux kernel.
+\end{itemize}
+
+\subsection*{Operating-system services}
+\addcontentsline{toc}{subsection}{Operating-system services}
+An OS provides an environment for program execution, offering services to programs and users. While specific services vary, common classes exist. These services also simplify programming tasks.
+
+OS services helpful to the user:
+\begin{itemize}
+    \item \textbf{User interface (UI):} Provides interaction via GUI, touch-screen, or CLI.
+    \item \textbf{Program execution:} Loads, runs, and terminates programs.
+    \item \textbf{I/O operations:} Manages program access to files and I/O devices for efficiency and protection.
+    \item \textbf{File-system manipulation:} Handles file/directory operations (read, write, create, delete, search, list) and permissions.
+    \item \textbf{Communications:} Enables inter-process communication (IPC) via shared memory or message passing, locally or across networks.
+    \item \textbf{Error detection:} Constantly detects and corrects errors in hardware, I/O devices, and user programs, taking appropriate action (e.g., halting, terminating process, returning error code).
+\end{itemize}
+OS functions ensuring efficient system operation by sharing computer resources among multiple processes:
+\begin{itemize}
+    \item \textbf{Resource allocation:} Manages allocation of CPU cycles, memory, file storage, and I/O devices to multiple running processes, using scheduling routines.
+    \item \textbf{Logging:} Tracks resource usage for accounting or accumulating statistics to improve computing services.
+    \item \textbf{Protection and security:} Controls access to system resources and defends against external/internal attacks (e.g., viruses, DoS). Requires user authentication and safeguards for I/O devices.
+\end{itemize}
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{user interface (UI)} & A method by which a user interacts with a computer. \\
+\textbf{graphical user interface (GUI)} & A computer interface comprising a window system with a pointing device to direct I/O, choose from menus, and make selections and, usually, a keyboard to enter text. \\
+\textbf{touch-screen interface} & A user interface in which touching a screen allows the user to interact with the computer. \\
+\textbf{command-line interface (CLI)} & A method of giving commands to a computer based on a text input device (such as a keyboard). \\
+\textbf{shared memory} & In interprocess communication, a section of memory shared by multiple processes and used for message passing. \\
+\textbf{message passing} & In interprocess communication, a method of sharing data in which messages are sent and received by processes. Packets of information in predefined formats are moved between processes or between computers. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

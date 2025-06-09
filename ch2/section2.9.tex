@@ -1,0 +1,98 @@
+\section*{2.9 Building and booting an operating system}
+\addcontentsline{toc}{section}{2.9 Building and booting an operating system}
+
+Operating systems are commonly designed to run on a class of machines with various peripheral configurations, rather than a single specific machine.
+
+\subsection*{Operating-system generation}
+\addcontentsline{toc}{subsection}{Operating-system generation}
+When generating (or building) an operating system from scratch, the following steps are typically involved:
+\begin{enumerate}
+    \item Write or obtain the OS source code.
+    \item Configure the OS for the target system.
+    \item Compile the OS.
+    \item Install the OS.
+    \item Boot the computer with the new OS.
+\end{enumerate}
+Configuration involves specifying features, usually stored in a configuration file.
+\begin{itemize}
+    \item \textbf{System build:} Modifying source code and recompiling the entire OS for a tailored version.
+    \item \textbf{Precompiled modules:} Selecting and linking precompiled object modules from a library. Faster, but less tailored.
+    \item \textbf{Completely modular:} Selection occurs at execution time by setting parameters.
+\end{itemize}
+Most modern OSes for desktops, laptops, and mobile devices use the second approach, combining specific hardware generation with modular support (e.g., loadable kernel modules) for dynamic changes.
+
+Building a Linux system from scratch typically involves:
+\begin{enumerate}
+    \item Downloading Linux source code (e.g., from \texttt{http://www.kernel.org}).
+    \item Configuring the kernel using \texttt{make menuconfig} to generate a \texttt{.config} file.
+    \item Compiling the main kernel using \texttt{make}, producing the \texttt{vmlinuz} kernel image.
+    \item Compiling kernel modules using \texttt{make modules}.
+    \item Installing kernel modules into \texttt{vmlinuz} using \texttt{make modules\_install}.
+    \item Installing the new kernel using \texttt{make install}.
+\end{enumerate}
+The system will run the new OS upon reboot.
+
+Alternatively, Linux can be installed as a virtual machine (VM):
+\begin{itemize}
+    \item \textbf{Building from scratch:} Similar to building Linux, but without OS compilation.
+    \item \textbf{VM appliance:} Downloading a pre-built and configured OS appliance and installing it with virtualization software (e.g., VirtualBox, VMware).
+\end{itemize}
+Example for building a VM: download Ubuntu ISO, use VM software to boot from ISO, answer installation questions, install and boot.
+
+\subsection*{System boot}
+\addcontentsline{toc}{subsection}{System boot}
+The process of starting a computer by loading the kernel is known as \textbf{booting}.
+\begin{enumerate}
+    \item A small piece of code (\textbf{bootstrap program} or \textbf{boot loader}) locates the kernel.
+    \item The kernel is loaded into memory and started.
+    \item The kernel initializes hardware.
+    \item The root file system is mounted.
+\end{enumerate}
+\textbf{Multistage boot process:}
+\begin{itemize}
+    \item Initial boot loader in nonvolatile firmware (\textbf{BIOS}) loads a second boot loader from a \textbf{boot block} on disk.
+    \item \textbf{UEFI} (Unified Extensible Firmware Interface) is a modern replacement for BIOS, offering better 64-bit/large disk support and faster single-stage booting.
+\end{itemize}
+The bootstrap program performs diagnostics, initializes system aspects (CPU registers, device controllers, memory), starts the OS, and mounts the root file system. The system is then considered \textbf{running}.
+
+\textbf{GRUB} is an open-source bootstrap program for Linux/UNIX.
+\begin{itemize}
+    \item Boot parameters are set in a GRUB configuration file.
+    \item Allows runtime changes (kernel parameters, selecting different kernels).
+    \item Linux kernel image is compressed; extracted after loading.
+    \item Creates a temporary RAM file system (\texttt{initramfs}) for necessary drivers/modules.
+    \item Switches to the real root file system after drivers are installed.
+    \item Creates the \texttt{systemd} process (initial process), then starts other services.
+\end{itemize}
+Booting mechanisms are boot loader-dependent (e.g., specific GRUB versions for BIOS/UEFI).
+
+\textbf{Mobile system boot (e.g., Android):}
+\begin{itemize}
+    \item Different from PCs; vendors provide boot loaders (e.g., LK for Android).
+    \item Uses compressed kernel image and initial RAM file system.
+    \item Android maintains \texttt{initramfs} as the root file system (unlike Linux, which discards it).
+    \item Starts the \texttt{init} process and creates services before displaying the home screen.
+\end{itemize}
+Most OS boot loaders (Windows, Linux, macOS, iOS, Android) provide \textbf{recovery mode} or \textbf{single-user mode} for diagnostics and repairs.
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{system build} & Creation of an operating-system build and configuration for a specific computer site. \\
+\textbf{booting} & The procedure of starting a computer by loading the kernel. \\
+\textbf{bootstrap program} & The program that allows the computer to start running by initializing hardware and loading the kernel. \\
+\textbf{BIOS} & Code stored in firmware and run at boot time to start system operation. \\
+\textbf{boot block} & A block of code stored in a specific location on disk with the instructions to boot the kernel stored on that disk. \\
+\textbf{unified extensible firmware interface (UEFI)} & The modern replacement for BIOS containing a complete boot manager. \\
+\textbf{running} & The state of the operating system after boot when all kernel initialization has completed and system services have started. \\
+\textbf{GRUB} & A common open-source bootstrap loader that allows selection of boot partitions and options to be passed to the selected kernel. \\
+\textbf{recovery mode} & A system boot state providing limited services and designed to enable the system admin to repair system problems and debug system startup. \\
+\textbf{single-user mode} & A system boot state providing limited services and designed to enable the system admin to repair system problems and debug system startup. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

@@ -1,0 +1,66 @@
+\section*{2.5 Linkers and loaders}
+\addcontentsline{toc}{section}{2.5 Linkers and loaders}
+
+A program typically resides on disk as a binary executable file (e.g., \texttt{a.out}, \texttt{prog.exe}). To execute, it must be loaded into memory within a process's context. This section details the compilation-to-execution procedure, involving compilers, linkers, and loaders.
+
+\subsection*{2.5.1: The role of the linker and loader.}
+\addcontentsline{toc}{subsection}{2.5.1: The role of the linker and loader.}
+
+The process of preparing a program for execution involves several key steps:
+\begin{itemize}
+    \item A source program (e.g., \texttt{main.c}) is processed by a \textbf{compiler} (e.g., \texttt{gcc}), producing \textbf{object code}.
+    \item A \textbf{linker} combines these object files, along with any necessary libraries (e.g., standard C or math libraries), into a single \textbf{executable file}.
+    \item At runtime, a \textbf{loader} brings the executable file into memory. This includes loading \textbf{dynamically linked libraries (DLLs)} as needed, and performing \textbf{relocation} to adjust addresses for proper execution.
+\end{itemize}
+
+Source files are compiled into \textbf{relocatable object files}, designed for loading into any physical memory location. The \textbf{linker} then combines these into a single binary \textbf{executable file}, potentially incorporating other object files or libraries.
+
+Key concepts related to program loading and execution:
+\begin{itemize}
+    \item \textbf{Loader:} Responsible for loading the executable file into memory.
+    \item \textbf{Relocation:} A crucial activity during linking and loading that assigns final addresses to program parts and adjusts code/data to match.
+    \item \textbf{Dynamic Linking:} Modern systems often use \textbf{dynamically linked libraries (DLLs)}, where libraries are linked and loaded only when required at runtime. This avoids loading unused libraries and allows multiple processes to share common libraries, saving memory.
+\end{itemize}
+
+On UNIX systems, invoking a program (e.g., \texttt{./main}) triggers the shell to create a new process via \texttt{fork()} and then use \texttt{exec()} to invoke the loader.
+
+Standard formats for object and executable files:
+\begin{itemize}
+    \item \textbf{ELF (Executable and Linkable Format):} The standard for UNIX/Linux systems, including compiled machine code and a symbol table. It contains the program's \textbf{entry point}.
+    \item \textbf{Portable Executable (PE):} Used by Windows systems.
+    \item \textbf{Mach-O:} Used by macOS.
+\end{itemize}
+
+\subsection*{ELF format}
+\addcontentsline{toc}{subsection}{ELF format}
+
+Linux provides various commands to identify and evaluate ELF files. For example, the \texttt{file} command determines a file type. If \texttt{main.o} is an object file, and \texttt{main} is an executable file, the command
+\begin{verbatim}
+file main.o
+\end{verbatim}
+will report that \texttt{main.o} is an ELF relocatable file, while the command
+\begin{verbatim}
+file main
+\end{verbatim}
+will report that \texttt{main} is an ELF executable. ELF files are divided into a number of sections and can be evaluated using the \texttt{readelf} command.
+
+\subsection*{Section glossary}
+\addcontentsline{toc}{subsection}{Section glossary}
+
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{relocatable object file} & The output of a compiler in which the contents can be loaded into any location in physical memory. \\
+\textbf{linker} & A system service that combines relocatable object files into a single binary executable file. \\
+\textbf{executable file} & A file containing a program that is ready to be loaded into memory and executed. \\
+\textbf{loader} & A system service that loads a binary executable file into memory, where it is eligible to run on a CPU core. \\
+\textbf{relocation} & An activity associated with linking and loading that assigns final addresses to program parts and adjusts code and data in the program to match those addresses. \\
+\textbf{dynamically linked libraries (DLLs)} & System libraries that are linked to user programs when the processes are run, with linking postponed until execution time. \\
+\textbf{executable and linkable format (ELF)} & The UNIX standard format for relocatable and executable files. \\
+\textbf{portable executable (PE)} & The Windows format for executable files. \\
+\textbf{Mach-O} & The macOS format of executable files. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}
