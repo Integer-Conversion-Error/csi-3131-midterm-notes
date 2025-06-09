@@ -5,3 +5,10 @@ notes.aux
 notes.fls
 notes.fdb_latexmk
 notes.synctex.gz
+*.log
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.gz
+*.toc
