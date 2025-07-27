@@ -24,4 +24,49 @@ Here are the rules you must follow:
     *   Properly escape special LaTeX characters, such as underscores (`_`), with a backslash (e.g., `\_`).
     *   After generating each section of LaTeX, you must review it to ensure there are no syntax errors.
 
+7.  **File Structure**:
+    *   Each chapter's notes should be organized into its own directory (e.g., `ch1/`, `ch2/`).
+    *   Each section of a chapter should be in its own file (e.g., `section1.1.tex`, `section1.2.tex`).
+    *   A main chapter file (e.g., `notes-ch1.tex`), located in the root directory, should use the `\input{}` command to include each section file from the chapter's directory (e.g., `\input{ch1/section1.1.tex}`).
+
+8.  **LaTeX Preamble and Document Structure**: The main `.tex` file for each chapter must use the following preamble and document structure exactly. The title should be adjusted for the correct chapter number, and the `\input` commands should correspond to the section files for that chapter.
+
+    ```latex
+    \documentclass{article}
+    \usepackage[utf8]{inputenc}
+    \usepackage{amsmath}
+    \usepackage{amssymb}
+    \usepackage{booktabs}
+    \usepackage{enumitem}
+    \usepackage{geometry}
+    \usepackage{array}
+    \usepackage[table]{xcolor} % For alternating row colors in tables
+    \usepackage{hyperref} % For clickable ToC and links
+    \usepackage{parskip} % For compact paragraphs
+
+    \geometry{a4paper, margin=0.2in}
+
+    \hypersetup{
+        colorlinks=true,
+        linkcolor=blue,
+        filecolor=magenta,      
+        urlcolor=cyan,
+        pdftitle={Operating Systems Notes - Chapter X},
+        pdfpagemode=FullScreen,
+    }
+
+    \title{Operating Systems Notes - Chapter X}
+
+    \begin{document}
+    \linespread{1.0}\selectfont % Ensure normal linespread for title and ToC
+    \maketitle
+    \tableofcontents
+    \newpage
+    \linespread{0.8}\selectfont % Apply compact spacing for the rest of the document
+    \input{chX/sectionX.1.tex}
+    \input{chX/sectionX.2.tex}
+    % ... and so on for all sections
+    \end{document}
+    ```
+
 By following these instructions, you will create a set of notes that are not only informative but also easy to read and study.
