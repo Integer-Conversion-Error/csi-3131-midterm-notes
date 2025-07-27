@@ -1,0 +1,114 @@
+\section{The critical-section problem}
+\begin{itemize}
+    \item \textbf{Critical-section problem}: Designing a protocol for $n$ processes ($P_0, \dots, P_{n-1}$) to cooperatively share data and synchronize activity.
+    \item Each process has a \textbf{critical section}:
+    \begin{itemize}
+        \item Code segment where shared data is accessed and updated.
+        \item \textbf{Key rule}: Only one process allowed in its critical section at any given time (mutual exclusion).
+    \end{itemize}
+    \item \textbf{Protocol components for each process:}
+    \begin{itemize}
+        \item \textbf{Entry section}: Code to request permission to enter the critical section.
+        \item \textbf{Critical section}: The shared data access/update code.
+        \item \textbf{Exit section}: Code to cleanly exit the critical section.
+        \item \textbf{Remainder section}: All other code.
+    \end{itemize}
+    \item \textbf{General process structure:}
+\begin{verbatim}
+while (true) {
+ 
+    entry section
+ 
+        critical section
+ 
+    exit section
+ 
+        remainder section
+ 
+}
+\end{verbatim}
+    \item \textbf{Three requirements for a critical-section problem solution:}
+    \begin{enumerate}
+        \item \textbf{Mutual exclusion}: If $P_i$ is in its critical section, no other process can be.
+        \item \textbf{Progress}:
+        \begin{itemize}
+            \item If no process is in its critical section, and some wish to enter.
+            \item Only processes not in their remainder sections can participate in deciding who enters next.
+            \item Selection cannot be postponed indefinitely.
+        \end{itemize}
+        \item \textbf{Bounded waiting}:
+        \begin{itemize}
+            \item A limit exists on how many times other processes can enter their critical sections.
+            \item This limit applies after a process requests entry and before its request is granted.
+        \end{itemize}
+    \end{enumerate}
+    \item \textbf{Assumptions}:
+    \begin{itemize}
+        \item Each process executes at a nonzero speed.
+        \item No assumptions about the relative speeds of processes.
+    \end{itemize}
+    \item \textbf{Kernel Code and Race Conditions}:
+    \begin{itemize}
+        \item Many kernel-mode processes are active in the OS.
+        \item \textbf{Kernel code} is susceptible to race conditions.
+        \item \textbf{Example 1}: Kernel data structure for open files.
+        \begin{itemize}
+            \item Modified when files are opened/closed (add/remove from list).
+            \item Simultaneous file opening by two processes could cause a race condition on this list.
+        \end{itemize}
+        \item \textbf{Example 2}: Two processes using `fork()` system call.
+        \begin{itemize}
+            \item Race condition on `next\_available\_pid` kernel variable.
+            \item Without mutual exclusion, same PID could be assigned to two processes.
+        \end{itemize}
+        \item \textbf{Other prone kernel data structures}: Memory allocation, process lists, interrupt handling.
+        \item Kernel developers must ensure OS is free from such race conditions.
+    \end{itemize}
+    \item \textbf{Single-core vs. Multiprocessor Environments}:
+    \begin{itemize}
+        \item \textbf{Single-core}: Critical-section problem could be solved by preventing interrupts during shared variable modification.
+        \begin{itemize}
+            \item Ensures current instruction sequence executes without preemption.
+            \item No unexpected modifications to shared variable.
+        \end{itemize}
+        \item \textbf{Multiprocessor}: This solution is less feasible.
+        \begin{itemize}
+            \item Disabling interrupts on multiprocessor is time-consuming (message to all processors).
+            \item Delays critical section entry, decreases system efficiency.
+            \item Affects system clock if updated by interrupts.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Approaches to handle critical sections in OS}:
+    \begin{enumerate}
+        \item \textbf{Preemptive kernels}:
+        \begin{itemize}
+            \item Allows a process to be preempted while running in kernel mode.
+            \item Must be carefully designed for shared kernel data to be race-condition free.
+            \item Especially difficult for SMP architectures (two kernel-mode processes can run simultaneously).
+            \item \textbf{Advantages}: More responsive (less risk of long kernel-mode runs), more suitable for real-time programming (real-time process can preempt kernel process).
+        \end{itemize}
+        \item \textbf{Nonpreemptive kernels}:
+        \begin{itemize}
+            \item Does not allow a process in kernel mode to be preempted.
+            \item Kernel-mode process runs until it exits kernel mode, blocks, or voluntarily yields CPU.
+            \item Essentially free from race conditions on kernel data structures (only one process active in kernel at a time).
+        \end{itemize}
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{critical section} & A section of code responsible for changing data that must only be executed by one thread or process at a time to avoid a race condition. \\
+\textbf{entry section} & The section of code within a process that requests permission to enter its critical section. \\
+\textbf{exit section} & The section of code within a process that cleanly exits the critical section. \\
+\textbf{remainder section} & Whatever code remains to be processed after the critical and exit sections. \\
+\textbf{preemptive kernel} & A type of kernel that allows a process to be preempted while it is running in kernel mode. \\
+\textbf{nonpreemptive kernels} & A type of kernel that does not allow a process running in kernel mode to be preempted; a kernel-mode process will run until it exits kernel mode, blocks, or voluntarily yields control of the CPU. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

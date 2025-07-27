@@ -1,0 +1,276 @@
+\section{Classic problems of synchronization}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item Previous chapter: Synchronization Tools.
+    \item Focused on critical-section problem and race conditions with shared data.
+    \item Examined tools to prevent race conditions:
+    \begin{itemize}
+        \item Low-level hardware: memory barriers, compare-and-swap.
+        \item Higher-level: mutex locks, semaphores, monitors.
+    \end{itemize}
+    \item Discussed challenges: liveness hazards like deadlocks.
+    \item This chapter:
+    \begin{itemize}
+        \item Applies synchronization tools to classic problems.
+        \item Explores synchronization mechanisms in Linux, UNIX, Windows.
+        \item Describes API details for Java and POSIX systems.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Chapter objectives}
+\begin{itemize}
+    \item Explain: bounded-buffer, readers-writers, dining-philosophers synchronization problems.
+    \item Describe: specific tools used by Linux and Windows for process synchronization.
+    \item Illustrate: how POSIX and Java solve process synchronization problems.
+    \item Design and develop: solutions using POSIX and Java APIs.
+\end{itemize}
+
+\subsection{Classic problems of synchronization}
+\begin{itemize}
+    \item Examples of concurrency-control problems.
+    \item Used for testing new synchronization schemes.
+    \item Solutions traditionally use semaphores; mutex locks can be used for binary semaphores in actual implementations.
+\end{itemize}
+
+\subsection{The bounded-buffer problem}
+\begin{itemize}
+    \item Introduced in Section \hyperref[sec:6.1]{6.1}.
+    \item Illustrates power of synchronization primitives.
+    \item General structure presented; related programming project in exercises.
+    \item Producer and consumer processes share data structures:
+    \begin{verbatim}
+int N;
+semaphore mutex = 1;
+semaphore empty = N;
+semaphore full = 0
+\end{verbatim}
+    \item Pool: \texttt{N} buffers, each holding one item.
+    \item \texttt{mutex}: binary semaphore, mutual exclusion for buffer pool access, initialized to 1.
+    \item \texttt{empty}: counts empty buffers, initialized to \texttt{N}.
+    \item \texttt{full}: counts full buffers, initialized to 0.
+    \item Producer process (Figure \ref{fig:7.1.1}):
+    \begin{verbatim}
+while (true) {
+     . . .
+  /* produce an item in next_produced */
+     . . .
+  wait(empty);
+  wait(mutex);
+     . . .
+  /* add next_produced to the buffer */
+     . . .
+  signal(mutex);
+  signal(full);
+}
+    \end{verbatim}
+    \item Consumer process (Figure \ref{fig:7.1.2}):
+    \begin{verbatim}
+while (true) {
+  wait(full);
+  wait(mutex);
+    . . .
+  /* remove an item from buffer to next_consumed */
+    . . .
+  signal(mutex);
+  signal(empty);
+    . . .
+  /* consume the item in next_consumed */
+    . . .
+}
+    \end{verbatim}
+    \item Symmetry between producer and consumer.
+    \item Interpretation: producer produces full buffers for consumer, or consumer produces empty buffers for producer.
+\end{itemize}
+
+\subsection{The readers-writers problem}
+\begin{itemize}
+    \item Shared database accessed by concurrent processes.
+    \item \textbf{\textit{Readers}}: only read database.
+    \item \textbf{\textit{Writers}}: update (read and write) database.
+    \item Problem: If writer and another process (reader/writer) access simultaneously, chaos may ensue.
+    \item Requirement: Writers must have exclusive access while writing.
+    \item \textit{Readers-writers problem}: Synchronization problem to ensure this.
+    \item Variations involve priorities:
+    \begin{itemize}
+        \item \textbf{\textit{First}} readers-writers problem: No reader waits unless a writer already has permission. Readers don't wait for other readers if a writer is waiting.
+        \item \textbf{\textit{Second}} readers-writers problem: Writer performs write ASAP once ready. If writer is waiting, no new readers may start.
+    \end{itemize}
+    \item Starvation: Solutions may lead to starvation (writers in first case, readers in second).
+    \item Solution to first readers-writers problem:
+    \begin{itemize}
+        \item Shared data structures for reader processes:
+        \begin{verbatim}
+semaphore rw_mutex = 1;
+semaphore mutex = 1;
+int read_count = 0;
+\end{verbatim}
+        \item \texttt{mutex} and \texttt{rw\_mutex}: binary semaphores, initialized to 1.
+        \item \texttt{read\_count}: integer, number of active readers, initialized to 0.
+        \item \texttt{rw\_mutex}: common to reader and writer processes, acts as mutual exclusion for writers, used by first/last reader entering/exiting critical section.
+        \item \texttt{mutex}: ensures mutual exclusion when \texttt{read\_count} is updated.
+        \item \texttt{read\_count}: tracks current readers.
+        \item Writer process (Figure \ref{fig:7.1.3}):
+        \begin{verbatim}
+while (true) {
+  wait(rw_mutex);
+    . . .
+  /* writing is performed */
+    . . .
+  signal(rw_mutex);
+}
+        \end{verbatim}
+        \item Reader process (Figure \ref{fig:7.1.4}):
+        \begin{verbatim}
+while (true) {
+  wait(mutex);
+  read_count++;
+  if (read_count == 1)
+    wait(rw_mutex);
+  signal(mutex);
+    . . .
+  /* reading is performed */
+    . . .
+  wait(mutex);
+  read_count--;
+  if (read_count == 0)
+    signal(rw_mutex);
+  signal(mutex);
+}
+        \end{verbatim}
+        \item If writer in critical section and \textit{n} readers waiting: 1 reader queued on \texttt{rw\_mutex}, \textit{n} $-$ 1 readers queued on \texttt{mutex}.
+        \item When writer executes \texttt{signal(rw\_mutex)}, scheduler selects waiting readers or a single waiting writer.
+    \end{itemize}
+    \item \textit{Reader-writer locks}: generalization of problem/solutions.
+    \begin{itemize}
+        \item Acquire lock by specifying mode: \textit{read} or \textit{write}.
+        \item Read mode: multiple processes concurrently.
+        \item Write mode: only one process (exclusive access).
+        \item Most useful when:
+        \begin{itemize}
+            \item Easy to identify read-only vs. read-write processes.
+            \item More readers than writers (increased concurrency compensates for overhead).
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{The dining-philosophers problem}
+\begin{itemize}
+    \item Five philosophers, circular table, five chairs, bowl of rice, five single chopsticks.
+    \item Philosopher thinks, then gets hungry.
+    \item Tries to pick up two closest chopsticks (left and right neighbors).
+    \item Picks up one chopstick at a time. Cannot pick up if neighbor holds it.
+    \item Eats with both chopsticks, then puts them down and thinks.
+    \item Classic synchronization problem: example of allocating several resources among several processes.
+    \item Goal: deadlock-free and starvation-free allocation.
+
+    \subsubsection{Semaphore solution}
+    \begin{itemize}
+        \item Each chopstick represented by a semaphore.
+        \item Grab chopstick: \texttt{wait()} operation on semaphore.
+        \item Release chopstick: \texttt{signal()} operation on semaphore.
+        \item Shared data:
+        \begin{verbatim}
+semaphore chopstick[5];
+\end{verbatim}
+        \item All \texttt{chopstick} elements initialized to 1.
+        \item Philosopher $i$ structure (Figure \ref{fig:7.1.5}):
+        \begin{verbatim}
+while (true) {
+  wait(chopstick[i]);
+  wait(chopstick[(i+1) % 5]);
+    . . .
+  /* eat for a while */
+    . . .
+  signal(chopstick[i]);
+  signal(chopstick[(i+1) % 5]);
+    . . .
+  /* think for awhile */
+    . . .
+}
+        \end{verbatim}
+        \item Guarantees no two neighbors eat simultaneously.
+        \item \textbf{Problem}: Could create deadlock.
+        \begin{itemize}
+            \item Example: All five philosophers hungry, each grabs left chopstick. All \texttt{chopstick} elements become 0.
+            \item Each tries to grab right chopstick, delayed forever.
+        \end{itemize}
+        \item Remedies to deadlock:
+        \begin{itemize}
+            \item Allow at most four philosophers at table simultaneously.
+            \item Philosopher picks up both chopsticks only if both available (in critical section).
+            \item Asymmetric solution: odd-numbered philosopher picks left then right; even-numbered picks right then left.
+        \end{itemize}
+        \item Section \hyperref[sec:6.7]{6.7} presents a deadlock-free solution.
+        \item Satisfactory solution must guard against starvation (deadlock-free $\neq$ starvation-free).
+    \end{itemize}
+
+    \subsubsection{Monitor solution}
+    \begin{itemize}
+        \item Deadlock-free solution using monitors.
+        \item Restriction: Philosopher picks up chopsticks only if both available.
+        \item Three states for a philosopher:
+        \begin{verbatim}
+enum {THINKING, HUNGRY, EATING} state[5];
+\end{verbatim}
+        \item \texttt{state[i] = EATING} only if neighbors not eating: (\texttt{state[(i+4) \% 5] != EATING}) and (\texttt{state[(i+1) \% 5] != EATING}).
+        \item Condition variable:
+        \begin{verbatim}
+condition self[5];
+\end{verbatim}
+        \item Allows philosopher $i$ to delay if hungry but cannot get chopsticks.
+        \item Chopstick distribution controlled by monitor \texttt{DiningPhilosophers} (Figure \ref{fig:7.1.6}).
+        \item Philosopher $i$ sequence:
+        \begin{verbatim}
+DiningPhilosophers.pickup(i);
+                ...
+                eat
+                ...
+DiningPhilosophers.putdown(i);
+\end{verbatim}
+        \item Monitor definition (Figure \ref{fig:7.1.6}):
+        \begin{verbatim}
+monitor DiningPhilosophers
+{
+  enum {THINKING, HUNGRY, EATING} state[5];
+  condition self[5];
+ 
+  void pickup(int i) {
+    state[i] = HUNGRY;
+    test(i);
+    if (state[i] != EATING)
+      self[i].wait();
+  }
+ 
+  void putdown(int i) {
+    state[i] = THINKING;
+    test((i + 4) % 5);
+    test((i + 1) % 5);
+  }
+ 
+  void test(int i) {
+    if ((state[(i + 4) % 5] != EATING) &&
+     (state[i] == HUNGRY) &&
+     (state[(i + 1) % 5] != EATING)) {
+       state[i] = EATING;
+       self[i].signal();
+    }
+  }
+ 
+  initialization_code() {
+    for (int i = 0; i < 5; i++)
+      state[i] = THINKING;
+   }
+}
+        \end{verbatim}
+        \item Ensures no two neighbors eat simultaneously and no deadlocks.
+        \item Possible for a philosopher to starve (solution not presented, left as exercise).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{itemize}
+    \item \textit{readers-writers problem}: Synchronization problem where processes/threads either read or read/write shared data.
+    \item \textit{reader-writer lock}: Lock for item access by read-only and read-write accessors.
+    \item \textit{dining-philosophers problem}: Classic synchronization problem where multiple operators (philosophers) access multiple items (chopsticks) simultaneously.
+\end{itemize}

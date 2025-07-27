@@ -1,0 +1,173 @@
+\section{POSIX synchronization}
+
+\begin{itemize}
+    \item Synchronization methods in previous section: kernel-level, for kernel developers.
+    \item POSIX API: available for user-level programmers, not part of specific OS kernel.
+    \item Implemented using host OS tools.
+    \item This section covers: mutex locks, semaphores, condition variables in Pthreads and POSIX APIs.
+    \item Widely used for thread creation and synchronization on UNIX, Linux, macOS.
+\end{itemize}
+
+\subsection{POSIX mutex locks}
+\begin{itemize}
+    \item Fundamental synchronization technique with Pthreads.
+    \item Purpose: protect critical sections of code.
+    \item Thread acquires lock before entering, releases upon exiting.
+    \item Data type: \texttt{pthread\_mutex\_t}.
+    \item Creation: \texttt{pthread\_mutex\_init()} function.
+    \begin{itemize}
+        \item First parameter: pointer to mutex.
+        \item Second parameter: \texttt{NULL} for default attributes.
+    \end{itemize}
+    \item Example:
+    \begin{verbatim}
+#include <pthread.h>
+ 
+pthread_mutex_t mutex;
+ 
+/* create and initialize  the mutex lock */
+pthread_mutex_init(&mutex,NULL);
+    \end{verbatim}
+    \item Acquisition and Release: \texttt{pthread\_mutex\_lock()} and \texttt{pthread\_mutex\_unlock()}.
+    \begin{itemize}
+        \item If \texttt{pthread\_mutex\_lock()} invoked and mutex unavailable: calling thread blocks until owner invokes \texttt{pthread\_mutex\_unlock()}.
+    \end{itemize}
+    \item Protecting critical section example:
+    \begin{verbatim}
+/* acquire the mutex lock */
+pthread_mutex_lock(&mutex);
+ 
+/* critical section */
+ 
+/* release the mutex lock */
+pthread_mutex_unlock(&mutex);
+    \end{verbatim}
+    \item Return values: 0 for correct operation, nonzero for error.
+\end{itemize}
+
+\subsection{POSIX semaphores}
+\begin{itemize}
+    \item Many systems implementing Pthreads provide semaphores.
+    \item Not part of POSIX standard; belong to POSIX SEM extension.
+    \item Two types: \textit{named} and \textit{unnamed}.
+    \item Differences: how they are created and shared between processes.
+    \item Linux systems (Version 2.6+ kernel) support both.
+
+    \subsubsection{POSIX named semaphores}
+    \begin{itemize}
+        \item Creation and opening: \texttt{sem\_open()} function.
+        \item Example:
+        \begin{verbatim}
+#include <semaphore.h>
+sem_t *sem;
+ 
+/* Create the semaphore and initialize it to 1 */
+sem = sem_open("SEM", O_CREAT, 0666, 1);
+        \end{verbatim}
+        \item \texttt{"SEM"}: semaphore name.
+        \item \texttt{O\_CREAT} flag: semaphore created if it doesn't exist.
+        \item \texttt{0666}: read and write access for other processes.
+        \item Initialized to 1.
+        \item Advantage: multiple unrelated processes can easily use common semaphore by name.
+        \item Subsequent \texttt{sem\_open()} calls (with same parameters) by other processes return descriptor to existing semaphore.
+        \item Operations:
+        \begin{itemize}
+            \item \texttt{wait()} $\rightarrow$ \texttt{sem\_wait()}
+            \item \texttt{signal()} $\rightarrow$ \texttt{sem\_post()}
+        \end{itemize}
+        \item Protecting critical section example:
+        \begin{verbatim}
+/* acquire the semaphore */
+sem_wait(sem);
+ 
+/* critical section */
+ 
+/* release the semaphore */
+sem_post(sem);
+        \end{verbatim}
+        \item Supported by Linux and macOS.
+    \end{itemize}
+
+    \subsubsection{POSIX unnamed semaphores}
+    \begin{itemize}
+        \item Creation and initialization: \texttt{sem\_init()} function.
+        \item Parameters:
+        \begin{enumerate}
+            \item Pointer to the semaphore.
+            \item Flag indicating level of sharing.
+            \item Semaphore's initial value.
+        \end{enumerate}
+        \item Example:
+        \begin{verbatim}
+#include <semaphore.h>
+sem_t sem;
+ 
+/* Create the semaphore and initialize it to 1 */
+sem_init(&sem, 0, 1);
+        \end{verbatim}
+        \item Flag 0: semaphore shared only by threads in creating process.
+        \item Nonzero flag: allows sharing between separate processes (by placing in shared memory).
+        \item Initialized to 1.
+        \item Operations: uses same \texttt{sem\_wait()} and \texttt{sem\_post()} as named semaphores.
+        \item Protecting critical section example:
+        \begin{verbatim}
+/* acquire the semaphore */
+sem_wait(&sem);
+ 
+/* critical section */
+ 
+/* release the semaphore */
+sem_post(&sem);
+        \end{verbatim}
+        \item Return values: 0 for success, nonzero for error.
+    \end{itemize}
+\end{itemize}
+
+\subsection{POSIX condition variables}
+\begin{itemize}
+    \item Pthreads condition variables similar to those in Section \hyperref[sec:6.7]{6.7}.
+    \item Difference: Section \hyperref[sec:6.7]{6.7} uses monitors for locking; C (used with Pthreads) lacks monitors.
+    \item Locking accomplished by associating condition variable with a mutex lock.
+    \item Data type: \texttt{pthread\_cond\_t}.
+    \item Initialization: \texttt{pthread\_cond\_init()} function.
+    \item Example of creating and initializing condition variable and associated mutex:
+    \begin{verbatim}
+pthread_mutex_t mutex;
+pthread_cond_t cond_var;
+ 
+pthread_mutex_init(&mutex,NULL);
+pthread_cond_init(&cond_var,NULL);
+    \end{verbatim}
+    \item Waiting on condition variable: \texttt{pthread\_cond\_wait()} function.
+    \item Example of waiting for \texttt{a == b}:
+    \begin{verbatim}
+pthread_mutex_lock(&mutex);
+while (a != b)
+     pthread_cond_wait(&cond_var, &mutex);
+pthread_mutex_unlock(&mutex);
+    \end{verbatim}
+    \item Mutex lock must be acquired before \texttt{pthread\_cond\_wait()} call.
+    \item Mutex protects data in conditional clause from race conditions.
+    \item If condition not true: \texttt{pthread\_cond\_wait()} invoked, passing mutex and condition variable.
+    \item \texttt{pthread\_cond\_wait()} releases mutex lock, allowing other threads to access/update shared data.
+    \item Conditional clause within a loop: important to recheck condition after being signaled (protects against program errors).
+    \item Signaling a condition variable: \texttt{pthread\_cond\_signal()} function.
+    \item Thread modifying shared data invokes \texttt{pthread\_cond\_signal()} to signal one waiting thread.
+    \item Example of signaling:
+    \begin{verbatim}
+pthread_mutex_lock(&mutex);
+a = b;
+pthread_cond_signal(&cond_var);
+pthread_mutex_unlock(&mutex);
+    \end{verbatim}
+    \item \texttt{pthread\_cond\_signal()} does NOT release mutex lock.
+    \item Subsequent \texttt{pthread\_mutex\_unlock()} releases mutex.
+    \item Once mutex released, signaled thread becomes owner of mutex and returns from \texttt{pthread\_cond\_wait()}.
+    \item Programming problems/projects at end of chapter use Pthreads mutex locks, condition variables, and POSIX semaphores.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{itemize}
+    \item \textit{named semaphore}: POSIX scheduling construct, exists in file system, shareable by unrelated processes.
+    \item \textit{unnamed semaphore}: POSIX scheduling construct, usable only by threads in the same process.
+\end{itemize}

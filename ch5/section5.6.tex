@@ -1,0 +1,115 @@
+\section{Real-time CPU scheduling}\label{sec:5.6}
+
+\subsection{Overview}
+\begin{itemize}
+    \item CPU scheduling for real-time operating systems involves special considerations.
+    \item \textbf{Soft real-time systems}: Provide no guarantee on when a critical real-time process will be scheduled, only preference over noncritical processes.
+    \item \textbf{Hard real-time systems}: Have stricter requirements; a task must be serviced by its deadline, or it's considered a failure.
+    \item This section explores scheduling issues in both soft and hard real-time OS.
+\end{itemize}
+
+\subsection{Minimizing latency}
+\begin{itemize}
+    \item Real-time systems are often event-driven and must respond quickly to events.
+    \item \textbf{Event latency}: The time elapsed from when an event occurs to when it is serviced.
+    \item Two types of latencies affect real-time system performance:
+        \begin{enumerate}
+            \item \textbf{Interrupt latency}: Time from interrupt arrival at CPU to the start of the interrupt service routine (ISR).
+                \begin{itemize}
+                    \item Involves completing current instruction, determining interrupt type, and saving current process state.
+                    \item Must be minimized (and bounded for hard real-time systems).
+                    \item Interrupts should be disabled for very short periods.
+                \end{itemize}
+            \item \textbf{Dispatch latency}: Time for the scheduling dispatcher to stop one process and start another.
+                \begin{itemize}
+                    \item Must be minimized for real-time tasks to get immediate CPU access.
+                    \item Achieved with preemptive kernels.
+                    \item For hard real-time systems, typically measured in microseconds.
+                \end{itemize}
+        \end{enumerate}
+    \item Dispatch latency has a \textbf{conflict phase} (preemption of kernel processes, release of resources by low-priority processes) and a dispatch phase (scheduling high-priority process).
+\end{itemize}
+
+\subsection{Priority-based scheduling}
+\begin{itemize}
+    \item Real-time OS schedulers must support a priority-based algorithm with preemption to respond immediately to real-time processes.
+    \item Higher-priority processes preempt lower-priority ones.
+    \item Providing a preemptive, priority-based scheduler guarantees only soft real-time functionality.
+    \item Hard real-time systems require additional features to guarantee tasks meet deadlines.
+    \item Characteristics of processes for hard real-time scheduling:
+        \begin{itemize}
+            \item \textbf{Periodic}: Require CPU at constant intervals (periods).
+            \item Fixed processing time ($t$), deadline ($d$), and period ($p$). Relationship: $0 \le t \le d \le p$.
+            \item \textbf{Rate} of a periodic task: $1/p$.
+        \end{itemize}
+    \item Schedulers can assign priorities based on deadline or rate.
+    \item \textbf{Admission-control} algorithm: Scheduler admits a process only if it can guarantee completion by its deadline; otherwise, it rejects the request.
+\end{itemize}
+
+\subsection{Rate-monotonic scheduling}
+\begin{itemize}
+    \item Schedules periodic tasks using a static priority policy with preemption.
+    \item Priority is inversely based on its period: shorter period = higher priority.
+    \item Rationale: Assign higher priority to tasks requiring CPU more often.
+    \item Assumes processing time is constant for each CPU burst.
+    \item Considered optimal: if a set of processes cannot be scheduled by rate-monotonic, it cannot be scheduled by any other static-priority algorithm.
+    \item Limitation: CPU utilization is bounded. Worst-case CPU utilization for $N$ processes is $N\left( {{2^{1/N}} - 1} \right){\rm{.}}$
+        \begin{itemize}
+            \item For one process, 100\%.
+            \item For two processes, approx. 83\%.
+            \item Approaches 69\% as $N \to \infty$.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Earliest-deadline-first scheduling}
+\begin{itemize}
+    \item \textbf{Earliest-deadline-first} (\textbf{EDF}) scheduling assigns priorities dynamically based on deadline: earlier deadline = higher priority.
+    \item When a process becomes runnable, it announces its deadline. Priorities are adjusted dynamically.
+    \item Unlike rate-monotonic, EDF does not require processes to be periodic or have constant CPU burst times.
+    \item Theoretically optimal: can schedule processes to meet deadlines with 100\% CPU utilization (in practice, limited by context switching and interrupt handling).
+\end{itemize}
+
+\subsection{Proportional share scheduling}
+\begin{itemize}
+    \item \textbf{Proportional share} schedulers allocate shares among applications.
+    \item An application with $N$ shares out of a total $T$ shares receives $N/T$ of the total processor time.
+    \item Works with an admission-control policy: a client is admitted only if sufficient shares are available.
+\end{itemize}
+
+\subsection{POSIX real-time scheduling}
+\begin{itemize}
+    \item POSIX.1b defines two scheduling classes for real-time threads:
+        \begin{itemize}
+            \item \texttt{SCHED\_FIFO}: First-come, first-served policy with a FIFO queue. No time slicing among equal-priority threads; highest-priority thread runs until termination or blocking.
+            \item \texttt{SCHED\_RR}: Round-robin policy, similar to \texttt{SCHED\_FIFO} but provides time slicing among equal-priority threads.
+        \end{itemize}
+    \item \texttt{SCHED\_OTHER} is an additional, system-specific scheduling class.
+    \item POSIX API functions for getting/setting scheduling policy:
+        \begin{itemize}
+            \item \texttt{pthread\_attr\_getschedpolicy(pthread\_attr\_t *attr, int *policy)}
+            \item \texttt{pthread\_attr\_setschedpolicy(pthread\_attr\_t *attr, int policy)}
+        \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{soft real-time systems} & Soft real-time systems provide no guarantee as to when a critical real-time thread will be scheduled - they guarantee only that the thread will be given preference over noncritical threads \\
+\textbf{hard real-time systems} & Hard real-time systems have strict scheduling facilities - a thread must be serviced by its deadline and service after the deadline has expired is the same as no service at all. \\
+\textbf{event latency} & The amount of time that elapses from when an event occurs to when it is serviced. \\
+\textbf{Interrupt latency} & The period of time from the arrival of an interrupt at the CPU to the start of the routine that services the interrupt. \\
+\textbf{dispatch latency} & The amount of time the dispatcher takes to stop one thread and put another thread onto CPU. \\
+\textbf{conflict phase} & During scheduling, the time the dispatcher spends moving a thread off of a CPU and releasing resources held but lower-priority threads that are needed by the higher-priority thread that is about to be put onto CPU. \\
+\textbf{periodic} & A type of real-time process that repeatedly moves between two modes at fixed intervals- needing CPU time and not needing CPU time. \\
+\textbf{rate} & A periodic real-time process has a scheduling rate of 1 / p (where p is the length of its running period). \\
+\textbf{admission-control} & In real-time scheduling, the scheduler may not allow a process to start if its scheduling request as impossible - if it cannot guarantee that the task will be serviced by its deadline. \\
+\textbf{rate-monotonic} & The rate-monotonic scheduling algorithm schedules periodic tasks using a static priority policy with preemption. \\
+\textbf{Earliest-Deadline-First (EDF)} & A real-time scheduling algorithm in which the scheduler dynamically assigns priorities according to completion deadlines. \\
+\textbf{proportional share} & Proportional share schedulers operate by allocating shares among all applications assuring each gets a specific portion of CPU time. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

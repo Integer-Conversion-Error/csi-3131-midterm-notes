@@ -1,0 +1,68 @@
+\section{Multithreading Models}\label{sec:4.3}
+
+\subsection{User Threads vs. Kernel Threads}
+\begin{itemize}
+    \item Support for threads can be provided at the user level (\textbf{user threads}) or by the kernel (\textbf{kernel threads}).
+    \item \textbf{User threads}: Supported above the kernel and managed without kernel support.
+    \item \textbf{Kernel threads}: Supported and managed directly by the operating system.
+    \item Most contemporary operating systems (Windows, Linux, macOS) support kernel threads.
+    \item A relationship must exist between user threads and kernel threads.
+\end{itemize}
+
+\subsection{Many-to-One Model}
+\begin{itemize}
+    \item Maps many user-level threads to one kernel thread.
+    \item Thread management is done by the thread library in user space, making it efficient.
+    \item \textbf{Drawbacks}:
+        \begin{itemize}
+            \item The entire process blocks if a user thread makes a blocking system call.
+            \item Multiple user threads cannot run in parallel on multicore systems because only one kernel thread can access the kernel at a time.
+        \end{itemize}
+    \item \textbf{Example}: Green threads (Solaris, early Java).
+    \item Rarely used now due to inability to leverage multicore systems.
+\end{itemize}
+
+\subsection{One-to-One Model}
+\begin{itemize}
+    \item Maps each user thread to a kernel thread.
+    \item Provides more concurrency than the many-to-one model:
+        \begin{itemize}
+            \item Another thread can run when a thread makes a blocking system call.
+            \item Allows multiple threads to run in parallel on multiprocessors.
+        \end{itemize}
+    \item \textbf{Drawback}: Creating a user thread requires creating a corresponding kernel thread, which can burden system performance if too many kernel threads are created.
+    \item \textbf{Implementations}: Linux, Windows operating systems.
+    \item Most operating systems currently use this model.
+\end{itemize}
+
+\subsection{Many-to-Many Model}
+\begin{itemize}
+    \item Multiplexes many user-level threads to a smaller or equal number of kernel threads.
+    \item The number of kernel threads can be specific to the application or machine (e.g., more kernel threads on a system with more cores).
+    \item \textbf{Advantages}:
+        \begin{itemize}
+            \item Developers can create as many user threads as needed.
+            \item Corresponding kernel threads can run in parallel on a multiprocessor.
+            \item When a thread performs a blocking system call, the kernel can schedule another thread.
+        \end{itemize}
+    \item \textbf{Two-level model}: A variation where many user-level threads are multiplexed to a smaller or equal number of kernel threads, but also allows a user-level thread to be bound to a kernel thread.
+    \item Difficult to implement in practice.
+    \item Less common now as limiting kernel threads is less important with increasing core counts, but some contemporary concurrency libraries still use this model.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{user thread} & A thread running in user mode, managed without kernel support. \\
+\textbf{kernel threads} & Threads running in kernel mode, supported and managed directly by the operating system. \\
+\textbf{many-to-one model} & A multithreading model that maps many user-level threads to one kernel thread. \\
+\textbf{one-to-one model} & A multithreading model that maps each user thread to a kernel thread. \\
+\textbf{many-to-many model} & A multithreading model that multiplexes many user-level threads to a smaller or equal number of kernel threads. \\
+\textbf{two-level model} & A variation of the many-to-many model that also allows a user-level thread to be bound to a kernel thread. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

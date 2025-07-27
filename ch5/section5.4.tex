@@ -1,0 +1,49 @@
+\section{Thread scheduling}\label{sec:5.4}
+
+\subsection{Overview}
+\begin{itemize}
+    \item Modern operating systems schedule kernel-level threads, not processes.
+    \item User-level threads are managed by a thread library and must be mapped to kernel-level threads (possibly via a lightweight process, LWP) to run on a CPU.
+    \item This section explores scheduling issues for user-level and kernel-level threads, with Pthread examples.
+\end{itemize}
+
+\subsection{Contention scope}
+\begin{itemize}
+    \item Distinction in scheduling between user-level and kernel-level threads:
+        \begin{itemize}
+            \item \textbf{Process-contention scope} (\textbf{PCS}): Thread library schedules user-level threads onto available LWPs. Competition for the CPU occurs among threads within the same process.
+            \item \textbf{System-contention scope} (\textbf{SCS}): Kernel schedules kernel-level threads onto a CPU. Competition for the CPU occurs among all threads in the system.
+        \end{itemize}
+    \item Systems using the one-to-one model (e.g., Windows, Linux) schedule threads using only SCS.
+    \item PCS typically uses priority-based scheduling, preempting lower-priority threads. No guarantee of time slicing among equal-priority threads.
+\end{itemize}
+
+\subsection{Pthread scheduling}
+\begin{itemize}
+    \item POSIX Pthread API allows specifying PCS or SCS during thread creation using:
+        \begin{itemize}
+            \item \texttt{PTHREAD\_SCOPE\_PROCESS}: schedules threads using PCS.
+            \item \texttt{PTHREAD\_SCOPE\_SYSTEM}: schedules threads using SCS.
+        \end{itemize}
+    \item On many-to-many systems, \texttt{PTHREAD\_SCOPE\_PROCESS} schedules user-level threads onto LWPs managed by the thread library.
+    \item \texttt{PTHREAD\_SCOPE\_SYSTEM} on many-to-many systems creates and binds an LWP for each user-level thread, effectively using a one-to-one policy.
+    \item Functions for setting/getting contention scope:
+        \begin{itemize}
+            \item \texttt{pthread\_attr\_setscope(pthread\_attr\_t *attr, int scope)}
+            \item \texttt{pthread\_attr\_getscope(pthread\_attr\_t *attr, int *scope)}
+        \end{itemize}
+    \item Some systems (e.g., Linux, macOS) only allow \texttt{PTHREAD\_SCOPE\_SYSTEM}.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{process-contention scope (PCS)} & On systems implementing the many-to-one and many-to-many threading models, the thread library schedules user-level threads to run on an available LWP (and thus threads contend with others within the same process contend for CPU time). \\
+\textbf{system-contention scope (SCS)} & A thread scheduling method in which kernel-level threads are scheduled onto a CPU, regardless of which process they are associated with (and thus contending with all other threads on the system for CPU time). \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

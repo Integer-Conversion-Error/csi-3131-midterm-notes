@@ -1,0 +1,118 @@
+\section{Multi-processor scheduling}\label{sec:5.5}
+
+\subsection{Overview}
+\begin{itemize}
+    \item Scheduling in systems with multiple processing cores introduces \textbf{load sharing} and increased complexity.
+    \item The term \textbf{multiprocessor} now applies to multicore CPUs, multithreaded cores, NUMA systems, and heterogeneous multiprocessing.
+    \item This section discusses multiprocessor scheduling concerns in these architectures, focusing on homogeneous processors first, then heterogeneous.
+\end{itemize}
+
+\subsection{Approaches to multiple-processor scheduling}
+\begin{itemize}
+    \item \textbf{Asymmetric multiprocessing}: A single main server processor handles all scheduling, I/O, and system activities; other processors execute user code.
+        \begin{itemize}
+            \item Simple, reduces data sharing.
+            \item Main server can become a performance bottleneck.
+        \end{itemize}
+    \item \textbf{Symmetric multiprocessing} (\textbf{SMP}): Each processor is self-scheduling.
+        \begin{itemize}
+            \item Processors examine a ready queue and select a thread to run.
+            \item Two strategies for organizing threads:
+                \begin{enumerate}
+                    \item Common ready queue: All threads in one queue. Potential race conditions require locking, which can be a performance bottleneck.
+                    \item Private per-processor queues: Each processor has its own queue. Avoids locking overhead and is common in SMP systems. Benefits from processor affinity.
+                \end{enumerate}
+            \item Most modern OS (Windows, Linux, macOS, Android, iOS) support SMP.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Multicore processors}
+\begin{itemize}
+    \item Contemporary hardware uses \textbf{multicore processor} chips, where multiple computing cores reside on the same physical chip.
+    \item Each core appears as a separate logical CPU to the operating system.
+    \item Multicore processors are faster and consume less power than systems with separate physical CPU chips.
+    \item \textbf{Memory stall}: Processor waits for data from memory (e.g., due to cache miss), wasting significant time.
+    \item To mitigate memory stalls, many designs implement multithreaded processing cores with two or more \textbf{hardware threads} per core.
+    \item \textbf{Chip multithreading} (\textbf{CMT}), also known as \textbf{hyper-threading} or \textbf{simultaneous multithreading} (SMT), allows a core to switch to another hardware thread if one stalls.
+    \item Two ways to multithread a processing core:
+        \begin{itemize}
+            \item \textbf{Coarse-grained multithreading}: Switches threads on long-latency events (e.g., memory stall). High switching cost due to pipeline flushing.
+            \item \textbf{Fine-grained multithreading}: Switches threads at a finer granularity (e.g., instruction cycle boundary). Low switching cost due to architectural design.
+        \end{itemize}
+    \item Multithreaded, multicore processors require two levels of scheduling:
+        \begin{enumerate}
+            \item Operating system schedules software threads onto hardware threads (logical CPUs).
+            \item Each core decides which hardware thread to run (e.g., round-robin, urgency-based).
+        \end{enumerate}
+    \item OS scheduling can be more effective if it is aware of processor resource sharing (e.g., scheduling software threads on separate cores to avoid sharing resources).
+\end{itemize}
+
+\subsection{Load balancing}
+\begin{itemize}
+    \item \textbf{Load balancing} attempts to keep the workload evenly distributed across all processors in an SMP system.
+    \item Necessary for systems with private per-processor ready queues. Unnecessary for common ready queues.
+    \item Two general approaches:
+        \begin{itemize}
+            \item \textbf{Push migration}: A task periodically checks processor loads and moves threads from overloaded to idle/less-busy processors.
+            \item \textbf{Pull migration}: An idle processor pulls a waiting task from a busy processor.
+        \end{itemize}
+    \item Both push and pull migration can be implemented in parallel.
+    \item "Balanced load" can mean equal number of threads or equal distribution of thread priorities.
+\end{itemize}
+
+\subsection{Processor affinity}
+\begin{itemize}
+    \item \textbf{Processor affinity}: A process has an affinity for the processor on which it is currently running.
+    \item Benefits from "warm cache" (data recently accessed by the thread populates the processor's cache).
+    \item Migrating a thread to another processor incurs cost of invalidating and repopulating caches.
+    \item Private per-processor ready queues naturally provide processor affinity.
+    \item Forms of processor affinity:
+        \begin{itemize}
+            \item \textbf{Soft affinity}: OS attempts to keep a process on the same processor but does not guarantee it (migration can occur during load balancing).
+            \item \textbf{Hard affinity}: System calls allow a process to specify a subset of processors on which it can run.
+        \end{itemize}
+    \item Load balancing often counteracts processor affinity benefits.
+    \item Non-uniform memory access (NUMA) systems: CPUs have faster access to local memory. NUMA-aware scheduling and memory placement can improve performance by allocating memory closest to the CPU running the thread.
+    \item There is a tension between load balancing and minimizing memory access times in modern multicore NUMA systems.
+\end{itemize}
+
+\subsection{Heterogeneous multiprocessing}
+\begin{itemize}
+    \item \textbf{Heterogeneous multiprocessing} (HMP): Systems with cores that run the same instruction set but vary in clock speed and power management.
+    \item Not asymmetric multiprocessing; both system and user tasks can run on any core.
+    \item Intention: better power consumption management by assigning tasks to cores based on demands.
+    \item ARM's \textbf{big.LITTLE} architecture combines high-performance "big" cores with energy-efficient "LITTLE" cores.
+        \begin{itemize}
+            \item "Big" cores: higher energy consumption, for short, high-performance tasks.
+            \item "LITTLE" cores: lower energy consumption, for longer background tasks.
+        \end{itemize}
+    \item Advantages: preserves battery, assigns appropriate cores for interactive vs. background tasks, allows disabling energy-intensive cores in power-saving mode.
+    \item Windows 10 supports HMP scheduling.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{load sharing} & The ability of a system with multiple CPU cores to schedule threads on those cores. \\
+\textbf{asymmetric multiprocessing} & A simple multiprocessor scheduling algorithm in which only one processor accesses the system data structures and others run user threads, reducing the need for data sharing. \\
+\textbf{symmetric multiprocessing} & A multiprocessor scheduling method, where each processor is self-scheduling and may run kernel threads or user level threads (contending for access to kernel data structures and requiring locking). \\
+\textbf{memory stall} & When a thread is on CPU and accesses memory contents that is not in the CPU's cache, the thread execution stalls while the contents of that memory is fetched. \\
+\textbf{hardware threads} & A given CPU core can run a single thread (one hardware thread per core) or more than one per core (multiple hardware threads per core) to optimize core use, for example to avoid memory stalls by switching hardware threads if the current thread causes a stall. \\
+\textbf{chip multithreading (CMT)} & A CPU with multiple cores, where each core supports multiple hardware threads supports chip multithreading. \\
+\textbf{hyper-threading} & See chip multithreading. \\
+\textbf{simultaneous multithreading (SMT)} & See chip multithreading. \\
+\textbf{Load balancing} & Load balancing attempts to keep the workload evenly distributed across all processors in an SMP system. \\
+\textbf{push migration} & With push migration, a specific task periodically checks the load on each processor and—if it finds an imbalance—evenly distributes the load by moving (or pushing) threads from overloaded to idle or less-busy processors. \\
+\textbf{pull migration} & Pull migration occurs when an idle processor pulls a waiting thread from a busy processor. \\
+\textbf{processor affinity} & A kernel scheduling method in which a process has an affinity for the processor in which it is currently running (to keep the cache warm for example). \\
+\textbf{soft affinity} & When an operating system has a policy of attempting to keep a process running on the same processor—but not guaranteeing that it will do so. \\
+\textbf{hard affinity} & When an operating system supports or allows a process's threads to run on the same processor at all times (as opposed to being moved to various processors as the thread is scheduled onto CPU). \\
+\textbf{heterogeneous multiprocessing (HMP)} & A feature of some mobile computing CPUs in which cores vary in their clock speed and power management. \\
+\textbf{big.LITTLE} & ARM processor implementation of HMP in which high performance big cores are combined with energy efficient LITTLE cores. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

@@ -1,0 +1,68 @@
+\section{Operating-System Examples}\label{sec:4.7}
+
+\subsection{Windows Threads}
+\begin{itemize}
+    \item A Windows application runs as a separate process, which can contain one or more threads.
+    \item Windows uses the one-to-one mapping model, where each user-level thread maps to an associated kernel thread.
+    \item \textbf{General Components of a Thread}:
+        \begin{itemize}
+            \item Thread ID (unique identifier).
+            \item Register set (processor status).
+            \item Program counter.
+            \item User stack (for user mode) and kernel stack (for kernel mode).
+            \item Private storage area (for run-time libraries and DLLs).
+        \end{itemize}
+    \item The register set, stacks, and private storage area constitute the \textbf{context} of the thread.
+    \item \textbf{Primary Data Structures of a Thread}:
+        \begin{itemize}
+            \item \textbf{ETHREAD} (executive thread block): Contains a pointer to the owning process and the thread's starting routine address; also points to the corresponding KTHREAD.
+            \item \textbf{KTHREAD} (kernel thread block): Includes scheduling and synchronization information, the kernel stack, and a pointer to the TEB.
+            \item \textbf{TEB} (thread environment block): A user-space data structure containing the thread identifier, user-mode stack, and an array for thread-local storage.
+        \end{itemize}
+    \item ETHREAD and KTHREAD exist in kernel space (only accessible by the kernel); TEB is in user space.
+\end{itemize}
+
+\subsection{Linux Threads}
+\begin{itemize}
+    \item Linux provides the \texttt{fork()} system call for duplicating a process.
+    \item Linux also provides the \texttt{clone()} system call for creating threads.
+    \item Linux does not distinguish between processes and threads; it uses the term \textbf{task} to refer to a flow of control.
+    \item \textbf{\texttt{clone()} System Call}:
+        \begin{itemize}
+            \item Passed a set of flags that determine the level of sharing between parent and child tasks.
+            \item \textbf{Examples of flags}:
+                \begin{itemize}
+                    \item \texttt{CLONE\_FS}: Shares file-system information.
+                    \item \texttt{CLONE\_VM}: Shares the same memory space.
+                    \item \texttt{CLONE\_SIGHAND}: Shares signal handlers.
+                    \item \texttt{CLONE\_FILES}: Shares the set of open files.
+                \end{itemize}
+            \item If these flags are set, \texttt{clone()} behaves like thread creation (parent shares most resources).
+            \item If no flags are set, \texttt{clone()} provides functionality similar to \texttt{fork()} (no sharing).
+        \end{itemize}
+    \item \textbf{Task Representation in Linux Kernel}:
+        \begin{itemize}
+            \item A unique kernel data structure (\texttt{struct task\_struct}) exists for each task.
+            \item This structure contains pointers to other data structures (e.g., open files, signal handling, virtual memory) rather than storing the data directly.
+            \item When \texttt{fork()} is invoked, a new task is created with copies of all associated data structures.
+            \item When \texttt{clone()} is invoked, the new task points to the parent's data structures, depending on the flags, allowing varying levels of sharing.
+        \end{itemize}
+    \item The flexibility of \texttt{clone()} extends to creating Linux containers, which are virtualized systems running in isolation under a single Linux kernel.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{context} & When describing a thread, the state of its execution, including its register set, program counter, user stack, kernel stack, and private storage area. \\
+\textbf{ETHREAD} & Executive thread block; a primary data structure for a Windows thread, existing in kernel space. \\
+\textbf{KTHREAD} & Kernel thread block; a primary data structure for a Windows thread, existing in kernel space, containing scheduling and synchronization information. \\
+\textbf{TEB} & Thread environment block; a primary data structure for a Windows thread, existing in user space, containing thread-specific information. \\
+\textbf{task} & In Linux, a term referring to a flow of control within a program, encompassing both processes and threads. \\
+\textbf{clone()} & The Linux system call used to create threads, allowing varying levels of resource sharing with the parent task via flags. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

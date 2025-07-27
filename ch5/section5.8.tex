@@ -1,0 +1,83 @@
+\section{Algorithm evaluation}\label{sec:5.8}
+
+\subsection{Overview}
+\begin{itemize}
+    \item Selecting a CPU-scheduling algorithm is challenging due to various algorithms and parameters.
+    \item First step: Define criteria for selection (e.g., maximizing CPU utilization under response time constraints, maximizing throughput with proportional turnaround time).
+    \item This section describes various evaluation methods.
+\end{itemize}
+
+\subsection{Deterministic modeling}
+\begin{itemize}
+    \item \textbf{Analytic evaluation}: Uses an algorithm and system workload to produce a formula or number for performance evaluation.
+    \item \textbf{Deterministic modeling}: A type of analytic evaluation that takes a predetermined workload and defines each algorithm's performance for that workload.
+    \item Example: Comparing FCFS, SJF, and RR (quantum = 10ms) for a given workload of 5 processes.
+        \begin{itemize}
+            \item FCFS average waiting time: 28 milliseconds.
+            \item SJF average waiting time: 13 milliseconds.
+            \item RR average waiting time: 23 milliseconds.
+        \end{itemize}
+    \item Advantages: Simple, fast, provides exact numbers, useful for describing algorithms and identifying trends.
+    \item Limitations: Requires exact input, results apply only to the specific workload, may not reflect real-world variability.
+\end{itemize}
+
+\subsection{Queueing models}
+\begin{itemize}
+    \item Useful when processes vary daily, but distributions of CPU/I/O bursts and arrival times can be measured/estimated.
+    \item System described as a network of servers (CPU, I/O) with queues.
+    \item \textbf{Queueing-network analysis}: Area of study to compute utilization, average queue length, average wait time, etc., from arrival and service rates.
+    \item \textbf{Little's formula}: $n = \lambda \times W$
+        \begin{itemize}
+            \item $n$: average long-term queue length (excluding serviced process).
+            \item $\lambda$: average arrival rate for new processes.
+            \item $W$: average waiting time in the queue.
+            \item Valid for any scheduling algorithm and arrival distribution.
+        \end{itemize}
+    \item Limitations: Limited classes of algorithms/distributions, complex mathematics, often relies on unrealistic independent assumptions, results may be approximations.
+\end{itemize}
+
+\subsection{Simulations}
+\begin{itemize}
+    \item Provides more accurate evaluation than analytic methods.
+    \item Involves programming a model of the computer system with software data structures representing components.
+    \item Simulator uses a clock variable to modify system state and gather performance statistics.
+    \item Data generation:
+        \begin{itemize}
+            \item Random-number generator based on probability distributions (mathematical or empirical).
+            \item \textbf{Trace files}: Monitoring real system to record sequence of actual events, then using this sequence to drive the simulation.
+        \end{itemize}
+    \item Advantages: Trace files provide excellent comparison of algorithms on identical real inputs, producing accurate results for those inputs.
+    \item Limitations: Can be expensive (computer time, storage for trace files), complex to design, code, and debug.
+\end{itemize}
+
+\subsection{Implementation}
+\begin{itemize}
+    \item The most accurate evaluation method: code the algorithm, integrate it into the OS, and test under real operating conditions.
+    \item Costs: Coding, modifying OS, testing (often in virtual machines).
+    \item \textbf{Regression testing}: Confirms changes haven't introduced new bugs or reintroduced old ones.
+    \item Challenges:
+        \begin{itemize}
+            \item Environment changes: New programs, changing problem types.
+            \item Scheduler performance can influence user behavior (e.g., breaking large processes into smaller ones if short processes are prioritized).
+            \item Human/program behavior can attempt to circumvent scheduling algorithms.
+        \end{itemize}
+    \item Flexible scheduling algorithms can be altered by system managers or users (e.g., Solaris's \texttt{dispadmin} command, Java/POSIX/Windows APIs).
+    \item Downfall of API-based tuning: performance improvements are often not generalizable.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{analytic evaluation} & A means of comparing scheduling algorithm effectiveness by analyzing an algorithm against a workload and assigning it a score. \\
+\textbf{deterministic modeling} & One type of analytic evaluation - takes a particular predetermined workload and defines the performance of each algorithm for that workload. \\
+\textbf{queueing-network analysis} & An area of computing study in which algorithms are analyzed for various aspects and effectiveness. \\
+\textbf{Little's formula} & A scheduling equation (n = $\lambda$ $\times$ W) that is particularly useful because it is valid for any scheduling algorithm and arrival distribution. \\
+\textbf{trace files} & A scheduling algorithm evaluation method in which thread details are captured on real systems and various scheduling algorithms analyzed to determine effectiveness. \\
+\textbf{Regression testing} & Confirms that the changes haven't made anything worse, and haven't caused new bugs or caused old bugs to be recreated (for example because the algorithm being replaced solved some bug and changing it caused that bug to reoccur). \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

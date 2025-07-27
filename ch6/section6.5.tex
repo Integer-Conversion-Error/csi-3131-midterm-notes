@@ -1,0 +1,90 @@
+\section{Mutex locks}
+\begin{itemize}
+    \item Hardware-based solutions (Section \ref{sec:6.4}) are complex and generally inaccessible to application programmers.
+    \item Operating system designers build higher-level software tools.
+    \item The simplest tool is the \textbf{mutex lock} (short for \textbf{mutual exclusion}).
+    \item \textbf{Purpose}: Protect critical sections and prevent race conditions.
+    \item \textbf{Usage}: A process must `acquire()` the lock before entering a critical section and `release()` it upon exiting.
+    \item \textbf{General structure}:
+\begin{verbatim}
+while (true) {
+ 
+   acquire lock
+ 
+       critical section
+ 
+   release lock
+ 
+       remainder section
+ 
+}
+\end{verbatim}
+    \item \textbf{Mutex Lock Properties}:
+    \begin{itemize}
+        \item Has a boolean variable `available`.
+        \item `available = true`: Lock is available.
+        \item `acquire()` succeeds if `available` is true, then sets `available = false`.
+        \item Process attempting to acquire an unavailable lock is blocked until released.
+    \end{itemize}
+    \item \textbf{`acquire()` definition}:
+\begin{verbatim}
+acquire() {
+   while (!available)
+     ; /* busy wait */
+   available = false;
+}
+\end{verbatim}
+    \item \textbf{`release()` definition}:
+\begin{verbatim}
+release() {
+  available = true;
+}
+\end{verbatim}
+    \item \textbf{Atomicity}: Calls to `acquire()` and `release()` must be atomic.
+    \begin{itemize}
+        \item Can be implemented using the CAS operation (Section \ref{sec:6.4}).
+    \end{itemize}
+    \item \textbf{Lock Contention}:
+    \begin{itemize}
+        \item \textbf{Contended lock}: A thread blocks while trying to acquire the lock.
+        \item \textbf{Uncontended lock}: Lock is available when a thread attempts to acquire it.
+        \item \textbf{High contention}: Many threads attempt to acquire the lock.
+        \item \textbf{Low contention}: Few threads attempt to acquire the lock.
+        \item Highly contended locks decrease overall performance of concurrent applications.
+    \end{itemize}
+    \item \textbf{Spinlocks}:
+    \begin{itemize}
+        \item The type of mutex lock described is also called a \textbf{spinlock}.
+        \item Process "spins" (loops continuously) while waiting for the lock.
+        \item \textbf{Disadvantage}: Requires \textbf{busy waiting}.
+        \begin{itemize}
+            \item Wastes CPU cycles, especially problematic in single-CPU core multiprogramming systems.
+            \item (Section \ref{sec:6.6} discusses strategies to avoid busy waiting by putting processes to sleep.)
+        \end{itemize}
+        \item \textbf{Advantage}: No context switch required when waiting on a lock.
+        \begin{itemize}
+            \item Context switches can be time-consuming.
+            \item Preferable on multicore systems for short-duration locks.
+            \item One thread can "spin" on one core while another performs its critical section on another core.
+            \item Widely used in modern operating systems on multicore systems.
+        \end{itemize}
+        \item \textbf{Rule of thumb}: Use a spinlock if the lock will be held for less than two context switches (as waiting involves two context switches).
+    \end{itemize}
+    \item \textbf{Further Discussion}: Chapter Synchronization Examples will cover mutex locks in classical synchronization problems and their use in various operating systems and Pthreads.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{mutex lock} & A mutual exclusion lock; the simplest software tool for assuring mutual exclusion. \\
+\textbf{contended} & A term describing the condition of a lock when a thread blocks while trying to acquire it. \\
+\textbf{uncontended} & A term describing a lock that is available when a thread attempts to acquire it. \\
+\textbf{busy waiting} & A practice that allows a thread or process to use CPU time continuously while waiting for something. An I/O loop in which an I/O thread continuously reads status information while waiting for I/O to complete. \\
+\textbf{spinlock} & A locking mechanism that continuously uses the CPU while waiting for access to the lock. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

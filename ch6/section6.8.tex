@@ -1,0 +1,98 @@
+\section{Liveness}
+\begin{itemize}
+    \item The critical-section problem is a type of \textbf{liveness} problem.
+    \item \textbf{Liveness}: Properties a system must satisfy to ensure processes make progress.
+    \item This section discusses two common liveness problems: deadlock and starvation.
+
+    \subsection{Deadlock}
+    \item In multiprogramming, processes compete for finite resources.
+    \item \textbf{Normal process operation sequence}:
+    \begin{enumerate}
+        \item \textbf{Request}: Process requests resource. If unavailable, process waits.
+        \item \textbf{Use}: Process operates on the resource.
+        \item \textbf{Release}: Process releases the resource.
+    \end{enumerate}
+    \item \textbf{Deadlock}: A situation where two or more processes wait indefinitely for an event that can only be caused by one of the waiting processes.
+    \item \textbf{Consequences}: Deadlocked processes never complete, and their resources are never released.
+    \item \textbf{Example (Printer and DVD drive)}:
+    \begin{itemize}
+        \item $P_1$ holds DVD drive, $P_2$ holds printer.
+        \item $P_1$ requests printer, $P_2$ requests DVD drive.
+        \item Result: Deadlock. $P_1$ waits for $P_2$'s printer, $P_2$ waits for $P_1$'s DVD drive. Neither can proceed or release resources.
+    \end{itemize}
+    \item \textbf{Deadlock Scenarios}:
+    \begin{itemize}
+        \item \textbf{Single-core system}: Process waits for an event that never occurs (e.g., message from a terminated process).
+        \item \textbf{Multicore system}: Two or more processes wait for each other to release resources.
+    \end{itemize}
+    \item \textbf{Scope}: Deadlock is not limited to process synchronization; it can occur in memory management, file systems, etc.
+    \item \textbf{Semaphores and Deadlock}: Semaphores can lead to deadlock.
+    \item \textbf{Example (Semaphores S and Q, both initialized to 1)}:
+    \begin{itemize}
+        \item \textbf{Process $P_0$}:
+\begin{verbatim}
+wait(S);
+wait(Q);
+...
+signal(S);
+signal(Q);
+\end{verbatim}
+        \item \textbf{Process $P_1$}:
+\begin{verbatim}
+wait(Q);
+wait(S);
+...
+signal(Q);
+signal(S);
+\end{verbatim}
+        \item \textbf{Scenario}: $P_0$ executes `wait(S)`, then $P_1$ executes `wait(Q)`.
+        \item \textbf{Result}:
+        \begin{itemize}
+            \item $P_0$ waits for `wait(Q)` (needs $P_1$ to `signal(Q)`).
+            \item $P_1$ waits for `wait(S)` (needs $P_0$ to `signal(S)`).
+            \item Both `signal()` operations never execute, leading to deadlock.
+        \end{itemize}
+    \end{itemize}
+    \item Deadlock can involve multiple processes and resources.
+    \item \textbf{Further Discussion}: Chapter Deadlocks covers prevention, avoidance, detection, and recovery methods.
+
+    \subsection{Starvation}
+    \item \textbf{Starvation}: A process is ready to run but cannot obtain a required resource (CPU core, mutex lock) for an indefinite period.
+    \item \textbf{Distinction from Deadlock}: In starvation, resources *do* become available, but the process is repeatedly denied access. In deadlock, the event never occurs.
+    \item \textbf{Example (Priority-based CPU scheduling)}:
+    \begin{itemize}
+        \item Low-priority process is continuously preempted by high-priority processes.
+        \item May never get a chance to execute.
+        \item This is a form of starvation.
+    \end{itemize}
+    \item \textbf{Example (Mutex locks)}:
+    \begin{itemize}
+        \item One process repeatedly acquires and releases a mutex lock.
+        \item Other waiting processes may never acquire the lock if the scheduling algorithm continuously favors the same processes.
+    \end{itemize}
+    \item \textbf{Impact}: Serious problem in real-time systems; a starving process may miss its deadline, causing system failure.
+    \item \textbf{Techniques for Preventing Starvation}:
+    \begin{enumerate}
+        \item \textbf{Aging}: Gradually increases the priority of processes waiting in the system for a long time.
+        \begin{itemize}
+            \item Example: If priorities are 0-127, increment priority by 1 every 15 minutes.
+            \item Eventually, the process reaches highest priority and executes.
+        \end{itemize}
+        \item \textbf{Fair scheduling algorithm}: Ensures every process eventually gets access to needed resources.
+    \end{enumerate}
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{liveness} & A set of properties that a system must satisfy to ensure that processes make progress. \\
+\textbf{deadlock} & A situation in which two or more processes are waiting indefinitely for an event that can be caused only by one of the waiting processes. \\
+\textbf{starvation} & A situation in which a process is ready to run but is unable to obtain a required resource for an indefinite period. \\
+\textbf{aging} & A technique of gradually increasing the priority of processes that wait in the system for a long time. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

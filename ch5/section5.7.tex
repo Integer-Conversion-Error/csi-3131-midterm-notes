@@ -1,0 +1,126 @@
+\section{Operating-system examples}\label{sec:5.7}
+
+\subsection{Overview}
+\begin{itemize}
+    \item This section describes the scheduling policies of Linux, Windows, and Solaris operating systems.
+    \item The term "process scheduling" is used generally, referring to kernel threads (Solaris, Windows) or tasks (Linux).
+\end{itemize}
+
+\subsection{Example: Linux scheduling}
+\begin{itemize}
+    \item Linux scheduling history:
+        \begin{itemize}
+            \item Prior to Version 2.5: Traditional UNIX scheduling (poor SMP support, poor performance with many runnable processes).
+            \item Version 2.5: Introduced O(1) scheduler (constant time regardless of tasks), improved SMP support, processor affinity, and load balancing.
+            \item Version 2.6.23: \textbf{Completely Fair Scheduler} (CFS) became default.
+        \end{itemize}
+    \item Linux scheduling is based on \textbf{scheduling classes}, each with a specific priority.
+    \item Scheduler selects the highest-priority task from the highest-priority scheduling class.
+    \item Standard Linux kernels implement two classes: default (CFS) and real-time.
+    \item CFS scheduler:
+        \begin{itemize}
+            \item Assigns a proportion of CPU time to each task based on its \textbf{nice value} (range -20 to +19; lower value = higher priority).
+            \item Uses a \textbf{targeted latency}: an interval during which every runnable task should run at least once.
+            \item Maintains \textbf{virtual run time} (\texttt{vruntime}) for each task, which decays based on priority (lower priority = higher decay rate).
+            \item Selects the task with the smallest \texttt{vruntime} to run next.
+            \item Higher-priority tasks can preempt lower-priority tasks.
+            \item Handles I/O-bound vs. CPU-bound tasks by giving I/O-bound tasks higher priority due to their lower \texttt{vruntime} (they run for shorter bursts).
+            \item Uses a red-black tree (balanced binary search tree) to store runnable tasks, keyed by \texttt{vruntime}. The leftmost node is the highest priority.
+        \end{itemize}
+    \item Linux real-time scheduling:
+        \begin{itemize}
+            \item Uses POSIX standard (\texttt{SCHED\_FIFO} or \texttt{SCHED\_RR}).
+            \item Real-time tasks run at higher priority than normal tasks.
+            \item Priority ranges: 0-99 for real-time (static), 100-139 for normal (based on nice values). Lower numeric value = higher priority.
+        \end{itemize}
+    \item CFS load balancing:
+        \begin{itemize}
+            \item Equalizes load among processing cores, is NUMA-aware, and minimizes thread migration.
+            \item Load of a thread: combination of priority and average CPU utilization.
+            \item Uses hierarchical \textbf{scheduling domains}: sets of CPU cores balanced against each other based on shared resources (e.g., L1, L2, L3 caches, \textbf{NUMA node}s).
+            \item Balances loads within domains, starting at the lowest level. Reluctant to migrate threads between NUMA nodes to avoid memory latency penalties.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Example: Windows scheduling}
+\begin{itemize}
+    \item Windows uses a priority-based, preemptive scheduling algorithm.
+    \item The \textbf{dispatcher} handles scheduling.
+    \item A thread runs until preempted by higher priority, terminates, time quantum ends, or calls a blocking system call.
+    \item 32-level priority scheme:
+        \begin{itemize}
+            \item Variable class: priorities 1-15.
+            \item \textbf{Real-time class}: priorities 16-31.
+            \item Priority 0: memory management thread.
+        \end{itemize}
+    \item Dispatcher uses a queue for each priority; executes an \textbf{idle thread} if no ready thread is found.
+    \item Windows API priority classes for processes: \texttt{IDLE\_PRIORITY\_CLASS}, \texttt{BELOW\_NORMAL\_PRIORITY\_CLASS}, \texttt{NORMAL\_PRIORITY\_CLASS}, \texttt{ABOVE\_NORMAL\_PRIORITY\_CLASS}, \texttt{HIGH\_PRIORITY\_CLASS}, \texttt{REALTIME\_PRIORITY\_CLASS}.
+    \item Thread priority is based on its process's priority class and its relative priority within that class (\texttt{IDLE}, \texttt{LOWEST}, \texttt{BELOW\_NORMAL}, \texttt{NORMAL}, \texttt{ABOVE\_NORMAL}, \texttt{HIGHEST}, \texttt{TIME\_CRITICAL}).
+    \item Base priority: default is \texttt{NORMAL} relative priority for its class. Can be modified by \texttt{SetThreadPriority()}.
+    \item Dynamic priority adjustments:
+        \begin{itemize}
+            \item Variable-priority threads: priority lowered when quantum expires (never below base priority).
+            \item Priority boosted when released from a wait operation (amount depends on what it was waiting for).
+            \item Foreground process (currently selected window) receives increased scheduling quantum (e.g., 3x longer).
+        \end{itemize}
+    \item \textbf{User-mode scheduling} (\textbf{UMS}): Allows applications to create and manage threads independently of the kernel (Windows 7+).
+        \begin{itemize}
+            \item More efficient for many threads, no kernel intervention.
+            \item Predecessor: \textbf{fibers} (limited use due to shared thread environment block).
+            \item UMS provides each user-mode thread with its own thread context.
+            \item Not for direct programmer use; built upon by language libraries (e.g., Microsoft \textbf{Concurrency Runtime} (ConcRT) for C++).
+        \end{itemize}
+    \item Multiprocessor scheduling in Windows:
+        \begin{itemize}
+            \item Attempts to schedule threads on optimal cores, maintaining preferred/most recent processor.
+            \item Uses \textbf{SMT sets} (sets of logical processors on the same CPU core, e.g., hyper-threaded cores).
+            \item Assigns an \textbf{ideal processor} (preferred processor) to each thread, incrementing a seed value for new threads to distribute load across logical processors and SMT sets.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Example: Solaris scheduling}
+\begin{itemize}
+    \item Solaris uses priority-based thread scheduling with six classes: Time sharing (TS), Interactive (IA), Real time (RT), System (SYS), Fair share (FSS), Fixed priority (FP).
+    \item Each class has different priorities and scheduling algorithms.
+    \item Default class: Time sharing. Dynamically alters priorities and time slices using a multilevel feedback queue (inverse relationship: higher priority = smaller time slice).
+    \item Interactive class: Same as time-sharing, but gives windowing applications higher priority.
+    \item Dispatch table for TS/IA threads includes:
+        \begin{itemize}
+            \item Priority: Class-dependent (higher number = higher priority).
+            \item Time quantum: Inverse relationship with priority.
+            \item Time quantum expired: New (lower) priority for CPU-intensive threads.
+            \item Return from sleep: Boosted priority for threads returning from I/O wait.
+        \end{itemize}
+    \item Real-time class: Highest priority; real-time processes run before any other class, guaranteeing bounded response time. Few processes belong to this class.
+    \item System class: For kernel threads (e.g., scheduler, paging daemon); static priorities, reserved for kernel use.
+    \item Fixed-priority class (Solaris 9+): Same priority range as time-sharing, but priorities are not dynamically adjusted.
+    \item Fair-share class (Solaris 9+): Uses CPU \textbf{shares} (entitlement to CPU resources) instead of priorities, allocated to a \textbf{project} (set of processes).
+    \item Scheduler converts class-specific priorities to global priorities and selects the highest global priority thread.
+    \item Selected thread runs until it blocks, uses its time slice, or is preempted.
+    \item Multiple threads with same priority use a round-robin queue.
+    \item Solaris traditionally used many-to-many model, switched to one-to-one model with Solaris 9.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{scheduling classes} & Scheduling in the Linux system is based on scheduling classes - each class is assigned a specific priority. \\
+\textbf{nice value} & Nice values range from -20 to +19, where a numerically lower nice value indicates a higher relative scheduling priority. \\
+\textbf{targeted latency} & Targeted latency is an interval of time during which every runnable thread should run at least once. \\
+\textbf{virtual run time} & A Linux scheduling aspect in which it records how long each task has run by maintaining the virtual run time of each task. \\
+\textbf{scheduling domain} & A set of CPU cores that can be balanced against one another. \\
+\textbf{NUMA node} & One or more cores (for example, cores that share a cache) that are grouped together as a scheduling entity for affinity or other uses. \\
+\textbf{real-time class} & A scheduling class that segreates real-time threads from other threads to schedule them separate and provide them with their needed priority. \\
+\textbf{idle thread} & In some operating systems, If no ready thread is found, the dispatcher will execute a special thread called the idle thread that runs on the CPU until the CPU is needed for some other activity. \\
+\textbf{User-Mode Scheduling (UMS)} & A Microsoft Windows 7 feature that allows applications to create and manage threads independently of the kernel. \\
+\textbf{fibers} & The Microsoft Windows predecessor to User-Mode Scheduling allowed several user-mode threads (fibers) to be mapped to a single kernel thread. \\
+\textbf{Concurrency Runtime (ConcRT)} & A Microsoft Windows concurrent programming framework for C++ that is designed for task-based parallelism on multicore processors. \\
+\textbf{shares} & A scheduling concept in which CPU shares instead of priorities are used to make scheduling decisions, providing an entitlement to CPU time for a process or a set of processes. \\
+\textbf{project} & A Solaris scheduling concept in which processes are grouped into a project and the project is scheduled. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

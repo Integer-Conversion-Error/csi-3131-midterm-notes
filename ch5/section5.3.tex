@@ -1,0 +1,121 @@
+\section{Scheduling algorithms}\label{sec:5.3}
+
+\subsection{Overview}
+\begin{itemize}
+    \item CPU scheduling involves deciding which process in the ready queue is allocated the CPU's core.
+    \item Various CPU-scheduling algorithms exist.
+    \item These algorithms are described in the context of a single processing core, capable of running one process at a time. Multiprocessor scheduling is discussed in Section 5.5.
+    \item For demonstration, each process is associated with a CPU burst time, although in practice, this is not known in advance.
+\end{itemize}
+
+\subsection{First-come, first-served scheduling}
+\begin{itemize}
+    \item The simplest CPU-scheduling algorithm: \textbf{first-come, first-served} (\textbf{FCFS}).
+    \item The process that requests the CPU first is allocated the CPU first.
+    \item Implemented with a FIFO queue: process PCBs are linked to the tail, and the CPU is allocated to the process at the head.
+    \item Average waiting time under FCFS is often long and can vary substantially with CPU burst times.
+    \item \textbf{Convoy effect}: A CPU-bound process holds the CPU, causing I/O-bound processes to wait in the ready queue, leading to lower CPU and device utilization.
+    \item FCFS is nonpreemptive; once allocated, a process keeps the CPU until it terminates or requests I/O. This is problematic for interactive systems.
+\item A \textbf{Gantt chart} is a bar chart that illustrates a particular schedule, including the start and finish times of each of the participating processes.
+\end{itemize}
+
+\subsection{Shortest-job-first scheduling}
+\begin{itemize}
+    \item The \textbf{shortest-job-first} (\textbf{SJF}) scheduling algorithm associates each process with the length of its next CPU burst.
+    \item The CPU is assigned to the process with the smallest next CPU burst. FCFS breaks ties.
+    \item More accurately called the \textbf{shortest-next-CPU-burst} algorithm.
+    \item SJF is provably optimal, providing the minimum average waiting time for a given set of processes.
+    \item Cannot be implemented at the CPU scheduling level directly, as the length of the next CPU burst is unknown.
+    \item Can be approximated by predicting the next CPU burst using an \textbf{exponential average} of previous CPU bursts:
+    \[{\tau _{n + 1}} = \alpha {t_n} + \left( {1 - \alpha } \right){\tau _n}{\rm{.}}\]
+    \begin{itemize}
+        \item $t_n$: length of the $n$th CPU burst.
+        \item $\tau_{n+1}$: predicted value for the next CPU burst.
+        \item $\alpha$: parameter (0 $\le \alpha \le$ 1) controlling the weight of recent vs. past history.
+        \item If $\alpha = 0$, $\tau_{n+1} = \tau_n$ (recent history has no effect).
+        \item If $\alpha = 1$, $\tau_{n+1} = t_n$ (only most recent CPU burst matters).
+        \item Commonly, $\alpha = 1/2$, weighting recent and past history equally.
+    \end{itemize}
+    \item SJF can be preemptive or nonpreemptive.
+    \item Preemptive SJF is called \textbf{shortest-remaining-time-first} scheduling. It preempts the current process if a new process has a shorter remaining CPU burst.
+\end{itemize}
+
+\subsection{Round-robin scheduling}
+\begin{itemize}
+    \item The \textbf{round-robin} (\textbf{RR}) scheduling algorithm is similar to FCFS but includes preemption.
+    \item A small unit of time, called a \textbf{time quantum} or \textbf{time slice} (typically 10-100 milliseconds), is defined.
+    \item The ready queue is treated as a circular queue. The CPU scheduler allocates the CPU to each process for up to 1 time quantum.
+    \item If a process finishes its CPU burst before the time quantum expires, it voluntarily releases the CPU.
+    \item If a process's CPU burst is longer than 1 time quantum, it is preempted by a timer interrupt and moved to the tail of the ready queue.
+    \item RR is a preemptive scheduling algorithm.
+    \item If there are $n$ processes and a time quantum of $q$, each process gets $1/n$ of the CPU time in chunks of at most $q$ time units. Each process waits no longer than $(n-1)q$ time units.
+    \item Performance depends heavily on time quantum size:
+        \begin{itemize}
+            \item Large quantum: RR degenerates to FCFS.
+            \item Small quantum: results in many context switches, increasing overhead.
+        \end{itemize}
+    \item Time quantum should be large relative to context-switch time (e.g., context-switch time < 10\% of time quantum).
+    \item Average turnaround time does not necessarily improve with increasing time quantum; it improves if most processes finish their CPU burst within one quantum.
+    \item Rule of thumb: 80\% of CPU bursts should be shorter than the time quantum.
+\end{itemize}
+
+\subsection{Priority scheduling}
+\begin{itemize}
+    \item The SJF algorithm is a special case of the general \textbf{priority-scheduling} algorithm.
+    \item A priority is associated with each process; the CPU is allocated to the process with the highest priority.
+    \item Equal-priority processes are scheduled in FCFS order.
+    \item SJF is a priority algorithm where priority is the inverse of the (predicted) next CPU burst (shorter burst = higher priority).
+    \item Priorities can be defined internally (e.g., time limits, memory requirements) or externally (e.g., importance of process, payment).
+    \item Priority scheduling can be preemptive (new higher-priority process preempts current) or nonpreemptive (new higher-priority process goes to head of queue).
+    \item Major problem: \textbf{indefinite blocking} or \textbf{starvation}, where low-priority processes may wait indefinitely for the CPU.
+    \item Solution to starvation: \textbf{aging}, which gradually increases the priority of processes that wait for a long time.
+    \item Can combine RR and priority scheduling: highest-priority process executes, and processes with the same priority use RR.
+\end{itemize}
+
+\subsection{Multilevel queue scheduling}
+\begin{itemize}
+    \item \textbf{Multilevel queue} scheduling partitions the ready queue into several separate queues.
+    \item Each queue may have its own scheduling algorithm (e.g., foreground/interactive processes with RR, background/batch processes with FCFS).
+    \item Scheduling among queues is commonly fixed-priority preemptive scheduling (e.g., real-time queue has absolute priority over interactive queue).
+    \item Processes are typically permanently assigned to a queue.
+    \item Can also time-slice among queues (e.g., foreground queue gets 80\% CPU time, background gets 20\%).
+\end{itemize}
+
+\subsection{Multilevel feedback queue scheduling}
+\begin{itemize}
+    \item The \textbf{multilevel feedback queue} scheduling algorithm allows a process to move between queues.
+    \item Separates processes by CPU burst characteristics: processes using too much CPU time are moved to lower-priority queues.
+    \item This keeps I/O-bound and interactive processes (short CPU bursts) in higher-priority queues.
+    \item Aging is implemented by moving processes that wait too long in lower-priority queues to higher-priority queues, preventing starvation.
+    \item Example: Queue 0 (8ms quantum), Queue 1 (16ms quantum), Queue 2 (FCFS). Processes start in Queue 0, move to Queue 1 if not finished, then to Queue 2.
+    \item Defined by: number of queues, scheduling algorithm for each queue, methods for upgrading/demoting processes, and method for initial queue entry.
+    \item Most general and configurable CPU-scheduling algorithm, but also the most complex to define optimally.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{First-come first-served (FCFS)} & The simplest scheduling algorithm - the thread that requests a core first is allocated the core first, and others following get cores in the order of their requests. \\
+\textbf{Gantt chart} & A bar chart that is used in the text to illustrate a schedule. \\
+\textbf{convoy effect} & A scheduling phenomenon in which threads wait for the one thread to get off a core, causing overall device and CPU utilization to be suboptimal. \\
+\textbf{shortest-job-first (SJF)} & A scheduling algorithm that associates with each thread the length of the threads next CPU burst and schedules the shortest first. \\
+\textbf{exponential average} & A calculation used in scheduling to estimate the next CPU burst time based on the previous burst times (with exponential decay on older values). \\
+\textbf{shortest-remaining-time-first (SJRF)} & Similar to SJF, this scheduling algorithm optimizes for the shortest remaining time until thread completion. \\
+\textbf{round-robin (RR)} & A scheduling algorithm that is designed especially for time-sharing systems - similar to FCFS scheduling, but preemption is added to enable the system to switch between threads. \\
+\textbf{time quantum} & A small unit of time used by scheduling algorithms as a basis for determining when to preempt a thread from the CPU to allow another to run. \\
+\textbf{time slice} & See time quantum. \\
+\textbf{priority-scheduling} & A scheduling algorithm in which a priority is associated with each thread and the free CPU core is allocated to the thread with the highest priority. \\
+\textbf{infinite blocking} & See starvation. \\
+\textbf{starvation} & A scheduling risk in which a thread that is ready to run never gets put onto the CPU due to the scheduling algorithm - it is starved for CPU time. \\
+\textbf{aging} & Aging is a solution to scheduling starvation and involves gradually increasing the priority of threads as they wait for CPU time. \\
+\textbf{multilevel queue} & A multilevel queue scheduling algorithm partitions the ready queue into several separate queues. \\
+\textbf{foreground} & A thread that is interactive and has input directed to it (such as a window currently selected as active or a terminal window that is currently selected to receive input). \\
+\textbf{background} & A thread that is not currently interactive (has no interactive input directed to it) such as one in a batch job or not currently being used by a user. \\
+\textbf{multilevel feedback queue} & The multilevel feedback queue scheduling algorithm that allows a process to move between queues. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

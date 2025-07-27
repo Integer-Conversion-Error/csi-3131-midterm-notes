@@ -1,0 +1,275 @@
+\section{Monitors}
+\begin{itemize}
+    \item Semaphores are convenient but incorrect use can lead to hard-to-detect timing errors.
+    \item These errors occur only with specific execution sequences and may not be reproducible.
+    \item \textbf{Example}: Producer-consumer problem with `count` (Section \ref{sec:6.1}) showed `count` off by 1, an unacceptable solution.
+    \item Timing errors can still occur with mutex locks or semaphores if not used correctly.
+    \item \textbf{Review of Semaphore Critical-Section Solution}:
+    \begin{itemize}
+        \item Processes share binary semaphore `mutex`, initialized to 1.
+        \item Each process must execute `wait(mutex)` before critical section and `signal(mutex)` afterward.
+        \item If this sequence is not observed, mutual exclusion can be violated.
+        \item Difficulties arise even if a *single* process is ill-behaved (due to programming error or uncooperative programmer).
+    \end{itemize}
+    \item \textbf{Examples of Incorrect Semaphore Usage}:
+    \begin{itemize}
+        \item \textbf{Interchanged `wait()` and `signal()`}:
+\begin{verbatim}
+signal(mutex);
+   ...
+  critical section
+   ...
+wait(mutex);
+\end{verbatim}
+        \begin{itemize}
+            \item Result: Multiple processes may enter critical section simultaneously, violating mutual exclusion.
+            \item Error may not always be reproducible.
+        \end{itemize}
+        \item \textbf{Replacing `signal(mutex)` with `wait(mutex)`}:
+\begin{verbatim}
+wait(mutex);
+    ...
+  critical section
+    ...
+wait(mutex);
+\end{verbatim}
+        \begin{itemize}
+            \item Result: Process permanently blocks on the second `wait()` call (semaphore unavailable).
+        \end{itemize}
+        \item \textbf{Omitting `wait(mutex)` or `signal(mutex)` (or both)}:
+        \begin{itemize}
+            \item Result: Mutual exclusion violated or process permanently blocks.
+        \end{itemize}
+    \end{itemize}
+    \item These examples show how easily errors can be generated with incorrect semaphore/mutex lock usage.
+    \item \textbf{Solution Strategy}: Incorporate simple synchronization tools as high-level language constructs.
+    \item This section describes the \textbf{monitor type}, a fundamental high-level synchronization construct.
+
+    \subsection{Monitor usage}
+    \item \textbf{Abstract Data Type (ADT)}: Encapsulates data with a set of functions, independent of implementation.
+    \item \textbf{Monitor type}: An ADT that includes programmer-defined operations with mutual exclusion *within* the monitor.
+    \item Declares variables defining its state and bodies of functions operating on those variables.
+    \item \textbf{Syntax of a monitor type}:
+\begin{verbatim}
+monitor monitor name
+{
+  /* shared variable declarations */
+ 
+  function P1 ( . . . ) {
+    . . .
+  }
+ 
+  function P2 ( . . . ) {
+    . . .
+  }
+ 
+        .
+        .
+        .
+  function Pn ( . . . ) {
+    . . .
+  }
+ 
+  initialization_code ( . . . ) {
+    . . .
+  }
+}
+\end{verbatim}
+    \item \textbf{Access Rules}:
+    \begin{itemize}
+        \item Monitor type representation cannot be used directly by processes.
+        \item Functions within a monitor can only access locally declared variables and formal parameters.
+        \item Local variables of a monitor can only be accessed by local functions.
+    \end{itemize}
+    \item \textbf{Mutual Exclusion Guarantee}: The monitor construct ensures only one process is active within the monitor at a time.
+    \begin{itemize}
+        \item Programmer does not need to explicitly code this synchronization constraint.
+    \end{itemize}
+    \item \textbf{Limitation}: Monitor construct alone is not powerful enough for all synchronization schemes.
+    \item \textbf{Additional Mechanism}: The `condition` construct.
+    \begin{itemize}
+        \item Programmers define one or more variables of type `condition`:
+\begin{verbatim}
+condition x, y;
+\end{verbatim}
+        \item \textbf{Operations on condition variables}: Only `wait()` and `signal()`.
+        \item \textbf{`x.wait()` operation}:
+\begin{verbatim}
+x.wait();
+\end{verbatim}
+        \begin{itemize}
+            \item Process invoking it is suspended until another process invokes `x.signal()`.
+        \end{itemize}
+        \item \textbf{`x.signal()` operation}:
+\begin{verbatim}
+x.signal();
+\end{verbatim}
+        \begin{itemize}
+            \item Resumes exactly one suspended process.
+            \item If no process is suspended, `signal()` has no effect (state of `x` unchanged).
+            \item \textbf{Contrast with semaphore `signal()`}: Semaphore `signal()` always affects its state.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{`x.signal()` and Concurrent Processes}:
+    \begin{itemize}
+        \item If process $P$ invokes `x.signal()` and process $Q$ is suspended on `x`.
+        \item If $Q$ resumes, $P$ must wait (otherwise both $P$ and $Q$ would be active in monitor simultaneously).
+        \item \textbf{Two possibilities for $P$ and $Q$ continuation}:
+        \begin{enumerate}
+            \item \textbf{Signal and wait}: $P$ waits until $Q$ leaves the monitor or waits for another condition.
+            \item \textbf{Signal and continue}: $Q$ waits until $P$ leaves the monitor or waits for another condition.
+        \end{enumerate}
+        \item \textbf{Arguments}:
+        \begin{itemize}
+            \item Signal-and-continue seems more reasonable as $P$ was already executing in the monitor.
+            \item However, if $P$ continues, the logical condition $Q$ was waiting for might no longer hold when $Q$ resumes.
+        \end{itemize}
+        \item \textbf{Compromise}: When $P$ executes `signal()`, it immediately leaves the monitor, and $Q$ is immediately resumed.
+    \end{itemize}
+    \item \textbf{Language Support}: Many languages (Java, C\#) incorporate monitors; others (Erlang) provide similar concurrency support.
+
+    \subsection{Implementing a monitor using semaphores}
+    \item \textbf{Mutual Exclusion}:
+    \begin{itemize}
+        \item For each monitor, a binary semaphore `mutex` (initialized to 1) ensures mutual exclusion.
+        \item Process executes `wait(mutex)` before entering monitor, `signal(mutex)` after leaving.
+    \end{itemize}
+    \item \textbf{Signal-and-Wait Scheme Implementation}:
+    \begin{itemize}
+        \item An additional binary semaphore `next` (initialized to 0) is introduced.
+        \item Signaling processes use `next` to suspend themselves.
+        \item Integer variable `next\_count` counts processes suspended on `next`.
+        \item \textbf{Each external function `F` is replaced by}:
+\begin{verbatim}
+wait(mutex);
+    ...
+  body of F
+    ...
+if (next_count > 0)
+  signal(next);
+else
+  signal(mutex);
+\end{verbatim}
+        \item Mutual exclusion within the monitor is ensured.
+    \end{itemize}
+    \item \textbf{Condition Variable Implementation (using semaphores)}:
+    \begin{itemize}
+        \item For each condition `x`, introduce binary semaphore `x\_sem` and integer `x\_count` (both initialized to 0).
+        \item \textbf{`x.wait()` implementation}:
+\begin{verbatim}
+x_count++;
+if (next_count > 0)
+  signal(next);
+else
+  signal(mutex);
+wait(x_sem);
+x_count--;
+\end{verbatim}
+        \item \textbf{`x.signal()` implementation}:
+\begin{verbatim}
+if (x_count > 0) {
+  next_count++;
+  signal(x_sem);
+  wait(next);
+  next_count--;
+}
+\end{verbatim}
+        \item This implementation applies to Hoare and Brinch-Hansen monitor definitions.
+        \item Efficiency improvements are possible in some cases where generality is not needed.
+    \end{itemize}
+
+    \subsection{Resuming processes within a monitor}
+    \item \textbf{Problem}: If multiple processes are suspended on condition `x` and `x.signal()` is executed, which process resumes?
+    \item \textbf{Simple Solution}: First-Come, First-Served (FCFS) ordering (longest waiting process resumes first).
+    \item \textbf{Limitation of FCFS}: Not adequate in many circumstances.
+    \item \textbf{Alternative}: \textbf{Conditional-wait} construct.
+    \begin{itemize}
+        \item \textbf{Form}:
+\begin{verbatim}
+x.wait(c);
+\end{verbatim}
+        \item `c`: Integer expression evaluated when `wait()` is executed.
+        \item `c` is a \textbf{priority number}, stored with the suspended process.
+        \item When `x.signal()` is executed, the process with the smallest priority number resumes.
+    \end{itemize}
+    \item \textbf{Example: `ResourceAllocator` monitor}:
+    \begin{itemize}
+        \item Controls allocation of a single resource among competing processes.
+        \item Process specifies maximum resource usage time when requesting.
+        \item Monitor allocates resource to process with shortest time-allocation request.
+        \item \textbf{Required access sequence for a process}:
+\begin{verbatim}
+R.acquire(t);
+     ...
+   access the resource;
+     ...
+R.release();
+\end{verbatim}
+        \item `R` is an instance of `ResourceAllocator`.
+        \item \textbf{`ResourceAllocator` monitor structure}:
+\begin{verbatim}
+monitor ResourceAllocator
+{
+  boolean busy;
+  condition x;
+ 
+  void acquire(int time) {
+    if (busy)
+      x.wait(time);
+    busy = true;
+  }
+ 
+  void release() {
+    busy = false;
+    x.signal();
+  }
+  initialization_code() {
+    busy = false;
+  }
+}
+\end{verbatim}
+    \end{itemize}
+    \item \textbf{Limitations of Monitor Concept (regarding access sequence)}:
+    \begin{itemize}
+        \item Cannot guarantee the required access sequence will be observed.
+        \item \textbf{Possible problems}:
+        \begin{itemize}
+            \item Process accesses resource without permission.
+            \item Process never releases a granted resource.
+            \item Process attempts to release a resource it never requested.
+            \item Process requests same resource twice without releasing.
+        \end{itemize}
+        \item These are similar to semaphore misuse issues, but now with higher-level operations where the compiler cannot assist.
+    \end{itemize}
+    \item \textbf{Possible Solution (and its drawback)}: Include resource-access operations within `ResourceAllocator` monitor.
+    \begin{itemize}
+        \item Drawback: Scheduling would follow built-in monitor-scheduling algorithm, not the custom one.
+    \end{itemize}
+    \item \textbf{Ensuring Correct Sequence and Preventing Direct Access}:
+    \begin{itemize}
+        \item Requires inspecting all programs using `ResourceAllocator` monitor and its resource.
+        \item \textbf{Two conditions to check for correctness}:
+        \begin{enumerate}
+            \item User processes always make calls on the monitor in a correct sequence.
+            \item Uncooperative processes do not ignore mutual-exclusion gateway and access shared resource directly.
+        \end{enumerate}
+        \item Only if both conditions are ensured can time-dependent errors be prevented and scheduling algorithm not be defeated.
+    \end{itemize}
+    \item \textbf{Scalability Issue}: Inspection is feasible for small, static systems but not large or dynamic ones.
+    \item \textbf{Ultimate Solution}: This access-control problem requires additional mechanisms described in the chapter Protection.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{monitor} & A high-level language synchronization construct that protects variables from race conditions. \\
+\textbf{abstract data type (ADT)} & A programming construct that encapsulates data with a set of functions to operate on that data that are independent of any specific implementation of the ADT. \\
+\textbf{conditional-wait} & A component of the monitor construct that allows for waiting on a variable with a priority number to indicate which process should get the lock next. \\
+\textbf{priority number} & A number indicating the position of a process in a conditional-wait queue in a monitor construct. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

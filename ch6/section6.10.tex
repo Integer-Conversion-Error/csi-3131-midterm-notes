@@ -1,0 +1,64 @@
+\section{Summary}
+\begin{itemize}
+    \item \textbf{Race Condition}:
+    \begin{itemize}
+        \item Occurs when processes concurrently access shared data.
+        \item Final result depends on the specific order of concurrent accesses.
+        \item Can lead to corrupted values of shared data.
+    \end{itemize}
+    \item \textbf{Critical Section}:
+    \begin{itemize}
+        \item A code segment where shared data may be manipulated.
+        \item A possible race condition may occur here.
+        \item \textbf{Critical-section problem}: Design a protocol for processes to synchronize activity and cooperatively share data.
+    \end{itemize}
+    \item \textbf{Requirements for a Critical-Section Solution}:
+    \begin{enumerate}
+        \item \textbf{Mutual exclusion}: Only one process active in its critical section at a time.
+        \item \textbf{Progress}: Processes cooperatively determine which process enters its critical section next.
+        \item \textbf{Bounded waiting}: Limits the time a program waits before entering its critical section.
+    \end{enumerate}
+    \item \textbf{Software Solutions}:
+    \begin{itemize}
+        \item Peterson's solution is an example.
+        \item Do not work well on modern computer architectures due to instruction reordering.
+    \end{itemize}
+    \item \textbf{Hardware Support for Critical Section}:
+    \begin{itemize}
+        \item Memory barriers.
+        \item Hardware instructions (e.g., `compare-and-swap` instruction).
+        \item Atomic variables.
+    \end{itemize}
+    \item \textbf{Mutex Locks}:
+    \begin{itemize}
+        \item Provide mutual exclusion.
+        \item Process must acquire a lock before entering a critical section.
+        \item Process must release the lock on exiting the critical section.
+    \end{itemize}
+    \item \textbf{Semaphores}:
+    \begin{itemize}
+        \item Can provide mutual exclusion, similar to mutex locks.
+        \item Unlike mutex locks (binary value), semaphores have an integer value.
+        \item Can solve a wider variety of synchronization problems.
+    \end{itemize}
+    \item \textbf{Monitors}:
+    \begin{itemize}
+        \item An abstract data type (ADT).
+        \item Provide a high-level form of process synchronization.
+        \item Use condition variables:
+        \begin{itemize}
+            \item Allow processes to wait for specific conditions to become true.
+            \item Allow processes to signal one another when conditions are met.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Liveness Problems}:
+    \begin{itemize}
+        \item Solutions to the critical-section problem may suffer from liveness issues.
+        \item Includes problems like deadlock and starvation.
+    \end{itemize}
+    \item \textbf{Tool Evaluation}:
+    \begin{itemize}
+        \item Various synchronization tools can be evaluated under different contention levels.
+        \item Some tools perform better than others under specific contention loads (e.g., uncontended, moderate, high contention).
+    \end{itemize}
+\end{itemize}

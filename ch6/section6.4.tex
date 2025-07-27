@@ -1,0 +1,224 @@
+\section{Hardware support for synchronization}
+\begin{itemize}
+  \item Software-based solutions (like Peterson's) are not guaranteed on modern
+        architectures.
+  \item This section introduces three hardware instructions for critical-section
+        problem support.
+  \item These primitives can be used directly or as foundations for more abstract
+        synchronization.
+
+        \subsection{Memory barriers}
+  \item \textbf{Problem}: Systems may reorder instructions, leading to unreliable data states.
+  \item \textbf{Memory model}: How a computer architecture guarantees memory visibility to applications.
+  \item \textbf{Categories of Memory Models}:
+        \begin{enumerate}
+          \item \textbf{Strongly ordered}: Memory modification on one processor is immediately visible to all others.
+          \item \textbf{Weakly ordered}: Memory modifications on one processor may not be immediately visible to others.
+        \end{enumerate}
+  \item \textbf{Issue}: Kernel developers cannot assume memory modification visibility on shared-memory multiprocessors due to varying memory models.
+  \item \textbf{Solution}: \textbf{Memory barriers} (or \textbf{memory fences}) are instructions that force memory changes to propagate to all other processors.
+  \item \textbf{Functionality}: When a memory barrier is performed, all preceding loads and stores are completed before any subsequent load or store operations.
+  \item \textbf{Benefit}: Even if instructions are reordered, memory barriers ensure store operations are completed and visible before future operations.
+  \item \textbf{Example (Thread 1 with memory barrier):}
+        \begin{verbatim}
+while (!flag)
+  memory\_barrier();
+print x;
+\end{verbatim}
+        \begin{itemize}
+          \item Guarantees `flag` is loaded before `x`.
+        \end{itemize}
+  \item \textbf{Example (Thread 2 with memory barrier):}
+        \begin{verbatim}
+x = 100;
+memory\_barrier();
+flag = true;
+\end{verbatim}
+        \begin{itemize}
+          \item Ensures assignment to `x` occurs before assignment to `flag`.
+        \end{itemize}
+  \item \textbf{Application to Peterson's Solution}: A memory barrier could be placed between the first two assignment statements in the entry section to prevent reordering.
+  \item \textbf{Note}: Memory barriers are low-level operations, typically used by kernel developers for specialized mutual exclusion code.
+
+        \subsection{Hardware instructions}
+  \item Modern systems provide special hardware instructions for \textbf{atomically}
+        (as one uninterruptible unit) testing/modifying a word or swapping two words.
+  \item These instructions simplify critical-section problem solving.
+  \item \textbf{Abstracted Instructions}: `test\_and\_set()` and `compare\_and\_swap()` (CAS).
+
+  \item \textbf{`test\_and\_set()` instruction}:
+        \begin{itemize}
+          \item \textbf{Definition}:
+                \begin{verbatim}
+boolean test\_and\_set(boolean *target) {
+  boolean rv = *target;
+  *target = true;
+ 
+  return rv;
+}
+\end{verbatim}
+          \item \textbf{Characteristic}: Executed atomically.
+          \item \textbf{Behavior}: If two `test\_and\_set()` instructions run simultaneously (on different cores), they execute sequentially in an arbitrary order.
+          \item \textbf{Mutual Exclusion Implementation}:
+                \begin{itemize}
+                  \item Declare `boolean lock`, initialized to `false`.
+                  \item \textbf{Process $P\_i$ structure}:
+                        \begin{verbatim}
+do {
+  while (test\_and\_set(&lock))
+     ; /* do nothing */
+ 
+     /* critical section */
+ 
+  lock = false;
+ 
+     /* remainder section */
+} while (true);
+\end{verbatim}
+                \end{itemize}
+        \end{itemize}
+
+  \item \textbf{`compare\_and\_swap()` (CAS) instruction}:
+        \begin{itemize}
+          \item Operates on three operands atomically.
+          \item \textbf{Definition}:
+                \begin{verbatim}
+int compare\_and\_swap(int *value, int expected, int new\_value) {
+  int temp = *value;
+ 
+  if (*value == expected)
+    *value = new\_value;
+ 
+  return temp;
+}
+\end{verbatim}
+          \item \textbf{Functionality}: `value` is set to `new\_value` ONLY if `(*value == expected)` is true.
+          \item \textbf{Return Value}: Always returns the original value of `value`.
+          \item \textbf{Characteristic}: Executed atomically.
+          \item \textbf{Behavior}: If two CAS instructions run simultaneously, they execute sequentially.
+          \item \textbf{Mutual Exclusion Implementation (Basic)}:
+                \begin{itemize}
+                  \item Global variable `lock`, initialized to 0.
+                  \item First process calling `compare\_and\_swap(\&lock, 0, 1)` sets `lock` to 1 and
+                        enters critical section (original `lock` was 0).
+                  \item Subsequent calls fail (current `lock` is not 0).
+                  \item Process exits critical section: sets `lock` back to 0, allowing another
+                        process.
+                  \item \textbf{Process $P\_i$ structure}:
+                        \begin{verbatim}
+while (true) {
+  while (compare\_and\_swap(&lock, 0, 1) != 0)
+     ; /* do nothing */
+ 
+     /* critical section */
+ 
+     lock = 0;
+ 
+     /* remainder section */
+}
+\end{verbatim}
+                  \item \textbf{Limitation}: This basic algorithm satisfies mutual exclusion but NOT bounded waiting.
+                \end{itemize}
+          \item \textbf{Mutual Exclusion with Bounded Waiting using CAS}:
+                \begin{itemize}
+                  \item \textbf{Common data structures}:
+                        \begin{verbatim}
+boolean waiting[n];
+int lock;
+\end{verbatim}
+                  \item `waiting` array elements initialized to `false`, `lock` initialized to 0.
+                  \item \textbf{Mutual Exclusion Proof}:
+                        
+                          \item $P_i$ enters the critical section only if \texttt{waiting[i] == false || key == 0}.
+                          \item `key` becomes 0 only if `compare\_and\_swap()` is executed.
+                          \item First process executing CAS finds `key == 0`; others wait.
+                          \item `waiting[i]` becomes `false` only when another process leaves critical section; only one `waiting[i]` is set to `false`, maintaining mutual exclusion.
+                        
+                  \item \textbf{Process $P\_i$ structure (with bounded waiting):}
+                        \begin{verbatim}
+while (true) {
+  waiting[i] = true;
+  key = 1;
+  while (waiting[i] && key == 1)
+    key = compare\_and\_swap(&lock,0,1);
+  waiting[i] = false;
+ 
+    /* critical section */
+ 
+  j = (i + 1) % n;
+  while ((j != i) && !waiting[j])
+    j = (j + 1) % n;
+ 
+  if (j == i)
+    lock = 0;
+  else
+     waiting[j] = false;
+ 
+     /* remainder section */
+}
+\end{verbatim}
+                  \item \textbf{Progress Proof}: A process exiting critical section sets `lock` to 0 or `waiting[j]` to `false`, allowing a waiting process to proceed.
+                  \item \textbf{Bounded-Waiting Proof}:
+
+                  \item When a process leaves its critical section, it cyclically scans `waiting` array
+                        ($i+1, \dots, n-1, 0, \dots, i-1$).
+                  \item It designates the first process in the entry section (`waiting[j] == true`) as
+                        the next to enter.
+                  \item Any waiting process will enter its critical section within $n-1$ turns.
+
+                \end{itemize}
+          \item \textbf{Intel x86 Architecture}: `cmpxchg` assembly instruction implements `compare\_and\_swap()`.
+                \begin{itemize}
+                  \item `lock` prefix used to enforce atomic execution by locking the bus during destination operand update.
+                  \item \textbf{General form}: `lock cmpxchg <destination operand>, <source operand>`
+                \end{itemize}
+        \end{itemize}
+
+        \subsection{Atomic variables}
+  \item `compare\_and\_swap()` is often a building block for other synchronization tools, not used directly for mutual exclusion.
+  \item \textbf{Atomic variable}: A programming construct providing atomic operations on basic data types (integers, booleans).
+  \item \textbf{Purpose}: Ensures mutual exclusion for single variable updates (e.g., counter increments) where data races might occur.
+  \item \textbf{Implementation}: Often use `compare\_and\_swap()` operations.
+  \item \textbf{Example: Incrementing atomic integer `sequence`}:
+        \begin{verbatim}
+increment(&sequence);
+\end{verbatim}
+  \item \textbf{`increment()` function using CAS}:
+        \begin{verbatim}
+void increment(atomic\_int *v)
+{
+  int temp;
+ 
+  do {
+    temp = *v;
+  }
+  while (temp != compare\_and\_swap(v, temp, temp+1));
+}
+\end{verbatim}
+  \item \textbf{Limitation}: Atomic variables provide atomic updates but don't solve all race conditions.
+  \item \textbf{Bounded-Buffer Problem Example (with atomic `count`):}
+        \begin{itemize}
+          \item If buffer is empty and two consumers wait for `count > 0`.
+          \item Producer adds one item, `count` becomes 1 (atomically).
+          \item Both consumers could exit their `while` loops and proceed to consume, even
+                though `count` is only 1.
+        \end{itemize}
+  \item \textbf{Usage}: Commonly used in OS and concurrent applications, but often limited to single updates of shared data (counters, sequence generators).
+  \item \textbf{Next}: Explore more robust tools for generalized race conditions.
+\end{itemize}
+
+\subsection{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+  \toprule
+  \textbf{Term}            & \textbf{Definition}                                                                                                 \\
+  \midrule
+  \textbf{memory model}    & Computer architecture memory guarantee, usually either strongly ordered or weakly ordered.                          \\
+  \textbf{memory barriers} & Computer instructions that force any changes in memory to be propagated to all other processors in the system.      \\
+  \textbf{memory fences}   & Computer instructions that force any changes in memory to be propagated to all other processors in the system.      \\
+  \textbf{atomically}      & A computer activity (such as a CPU instruction) that operates as one uninterruptable unit.                          \\
+  \textbf{atomic variable} & A programming language construct that provides atomic operations on basic data types such as integers and booleans. \\
+  \bottomrule
+\end{tabular}
+\vspace{\baselineskip}

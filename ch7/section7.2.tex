@@ -1,0 +1,130 @@
+\section{Synchronization within the kernel}
+
+\subsection{Synchronization in Windows}
+\begin{itemize}
+    \item Windows OS: multithreaded kernel, supports real-time applications and multiple processors.
+    \item Single-processor systems:
+    \begin{itemize}
+        \item Kernel accesses global resource: temporarily masks interrupts for all interrupt handlers that may access the resource.
+    \end{itemize}
+    \item Multiprocessor systems:
+    \begin{itemize}
+        \item Kernel protects global resource access using spinlocks.
+        \item Spinlocks used only for short code segments.
+        \item Kernel ensures thread never preempted while holding a spinlock (for efficiency).
+    \end{itemize}
+    \item Thread synchronization outside kernel: \textit{dispatcher objects}.
+    \begin{itemize}
+        \item Threads synchronize using: mutex locks, semaphores, events, timers.
+        \item Mutex locks: protect shared data; thread gains ownership to access, releases when finished.
+        \item Semaphores: behave as described in Section \hyperref[sec:6.6]{6.6}.
+        \item \textit{Events}: similar to condition variables; notify waiting thread when condition occurs.
+        \item Timers: notify one (or more) threads when specified time expires.
+    \end{itemize}
+    \item Dispatcher objects states:
+    \begin{itemize}
+        \item \textit{Signaled state}: object available, thread will not block.
+        \item \textit{Nonsignaled state}: object not available, thread will block.
+        \item State transitions of mutex lock dispatcher object illustrated in Figure \ref{fig:7.2.1}.
+    \end{itemize}
+    \item Relationship between dispatcher object state and thread state:
+    \begin{itemize}
+        \item Thread blocks on nonsignaled object: state changes from ready to waiting, placed in waiting queue.
+        \item Object moves to signaled state: kernel checks waiting threads.
+        \item Kernel moves one (or more) threads from waiting to ready state.
+        \item Number of threads selected depends on dispatcher object type:
+        \begin{itemize}
+            \item Mutex: only one thread (mutex owned by single thread).
+            \item Event: all waiting threads.
+        \end{itemize}
+    \end{itemize}
+    \item Mutex lock illustration:
+    \begin{itemize}
+        \item Thread tries to acquire nonsignaled mutex: suspended, placed in waiting queue.
+        \item Mutex moves to signaled state (released by another thread): thread at front of queue moves from waiting to ready, acquires mutex.
+    \end{itemize}
+    \item \textit{Critical-section object}:
+    \begin{itemize}
+        \item User-mode mutex, often acquired/released without kernel intervention.
+        \item Multiprocessor system: first uses spinlock while waiting.
+        \item If spins too long: acquiring thread allocates kernel mutex and yields CPU.
+        \item Efficient: kernel mutex allocated only when contention exists (rare in practice, significant savings).
+    \end{itemize}
+    \item Programming project at end of chapter uses mutex locks and semaphores in Windows API.
+\end{itemize}
+
+\subsection{Synchronization in Linux}
+\begin{itemize}
+    \item Prior to Version 2.6: nonpreemptive kernel (process in kernel mode could not be preempted).
+    \item Now: Linux kernel is fully preemptive (task can be preempted while running in kernel).
+    \item Mechanisms for synchronization in kernel:
+    \begin{itemize}
+        \item \textbf{Atomic integers}:
+        \begin{itemize}
+            \item Simplest synchronization technique.
+            \item Opaque data type: \texttt{atomic\_t}.
+            \item All math operations are atomic (performed without interruption).
+            \item Example:
+            \begin{verbatim}
+atomic_t counter;
+int value;
+            \end{verbatim}
+            \item Atomic operations:
+            \begin{itemize}
+                \item \texttt{atomic\_set(\&counter,5);}: \texttt{counter = 5}
+                \item \texttt{atomic\_add(10,\&counter);}: \texttt{counter = counter + 10}
+                \item \texttt{atomic\_sub(4,\&counter);}: \texttt{counter = counter - 4}
+                \item \texttt{atomic\_inc(\&counter);}: \texttt{counter = counter + 1}
+                \item \texttt{value = atomic\_read(\&counter);}: \texttt{value = 12} (example result)
+            \end{itemize}
+            \item Efficient for updating integer variables (e.g., counters); no locking overhead.
+            \item Limited use: only for single integer variables. More sophisticated tools needed for multiple variables in race conditions.
+        \end{itemize}
+        \item \textbf{Mutex locks}:
+        \begin{itemize}
+            \item Protect critical sections within kernel.
+            \item Task invokes \texttt{mutex\_lock()} before critical section, \texttt{mutex\_unlock()} after.
+            \item If unavailable: task calling \texttt{mutex\_lock()} sleeps, awakened when owner invokes \texttt{mutex\_unlock()}.
+        \end{itemize}
+        \item \textbf{Spinlocks and Semaphores}:
+        \begin{itemize}
+            \item Linux also provides these (and reader-writer versions).
+            \item SMP machines: spinlock is fundamental locking mechanism, held for short durations.
+            \item Single-processor machines (e.g., embedded systems): spinlocks inappropriate. Replaced by enabling/disabling kernel preemption.
+            \item Summary for single-processor:
+            \begin{itemize}
+                \item Instead of holding spinlock: kernel disables kernel preemption.
+                \item Instead of releasing spinlock: kernel enables kernel preemption.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{\textit{Nonrecursive}} locks:
+    \begin{itemize}
+        \item Both spinlocks and mutex locks in Linux kernel are nonrecursive.
+        \item If thread acquires lock, cannot acquire same lock again without releasing it first.
+        \item Second attempt to acquire will block.
+    \end{itemize}
+    \item Disabling/Enabling kernel preemption:
+    \begin{itemize}
+        \item Linux approach: \texttt{preempt\_disable()} and \texttt{preempt\_enable()} system calls.
+        \item Kernel not preemptible if task running in kernel holds a lock.
+        \item Enforcement: each task has \texttt{thread-info} structure with \texttt{preempt\_count} counter.
+        \item \texttt{preempt\_count}: indicates number of locks held by task.
+        \item Lock acquired: \texttt{preempt\_count} incremented.
+        \item Lock released: \texttt{preempt\_count} decremented.
+        \item If \texttt{preempt\_count} $>$ 0: not safe to preempt kernel (task holds lock).
+        \item If \texttt{preempt\_count} = 0: kernel can be safely interrupted (assuming no outstanding \texttt{preempt\_disable()} calls).
+    \end{itemize}
+    \item When to use which lock:
+    \begin{itemize}
+        \item Spinlocks (and kernel preemption disable/enable): only when lock held for short duration.
+        \item Semaphores or mutex locks: when lock must be held for longer period.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{itemize}
+    \item \textit{dispatcher objects}: Windows scheduler feature controlling dispatching and synchronization. Threads synchronize via mutex locks, semaphores, events, and timers.
+    \item \textit{event}: Windows OS scheduling feature, similar to a condition variable.
+    \item \textit{critical-section object}: User-mode mutex object in Windows OS, often acquired/released without kernel intervention.
+\end{itemize}

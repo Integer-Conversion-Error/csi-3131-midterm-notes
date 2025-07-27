@@ -1,0 +1,113 @@
+\section{Process Synchronization}\label{sec:6.1}
+
+\subsection{Background}
+\begin{itemize}
+    \item Systems have many concurrent/parallel threads, often sharing user data.
+    \item \textbf{Race condition}: Occurs when shared data access is uncontrolled, leading to potential data corruption.
+    \item \textbf{Process synchronization}: Tools to control shared data access, preventing race conditions.
+    \item \textbf{Caution}: Incorrect use of synchronization tools can cause poor system performance, including deadlock.
+\end{itemize}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item A \textbf{cooperating process} can affect or be affected by other processes.
+    \item Cooperating processes share a logical address space (code and data) or data via shared memory/message passing.
+    \item Concurrent access to shared data can lead to data inconsistency.
+    \item This chapter focuses on mechanisms to ensure orderly execution of cooperating processes sharing a logical address space to maintain data consistency.
+\end{itemize}
+
+\subsection{Chapter objectives}
+\begin{itemize}
+    \item Describe the critical-section problem and illustrate a race condition.
+    \item Illustrate hardware solutions to the critical-section problem using memory barriers, compare-and-swap operations, and atomic variables.
+    \item Demonstrate how mutex locks, semaphores, monitors, and condition variables can be used to solve the critical-section problem.
+    \item Evaluate tools that solve the critical-section problem in low-, moderate-, and high-contention scenarios.
+\end{itemize}
+
+\subsection{Background (continued)}
+\begin{itemize}
+    \item Processes can execute concurrently (CPU scheduler switches rapidly) or in parallel (simultaneous execution on separate cores).
+    \item A process can be interrupted at any point, and the core reassigned to another process.
+    \item Concurrent/parallel execution can lead to data integrity issues with shared data.
+    \item \textbf{Example: Bounded Buffer with `count` variable}
+    \begin{itemize}
+        \item Original bounded buffer allowed `BUFFER\_SIZE - 1` items.
+        \item To remedy, added `count` variable, initialized to 0.
+        \item `count` increments when item added, decrements when item removed.
+    \end{itemize}
+    \item \textbf{Producer Process Code Modification:}
+\begin{verbatim}
+while (true) {
+     /* produce an item in next_produced */
+ 
+     while (count ==  BUFFER_SIZE)
+        ; /* do nothing */
+
+     buffer[in] = next_produced;
+     in = (in + 1) % BUFFER_SIZE;
+     count++;
+}
+\end{verbatim}
+    \item \textbf{Consumer Process Code Modification:}
+\begin{verbatim}
+while (true) {
+     while (count == 0)
+        ; /* do nothing */
+ 
+     next_consumed = buffer[out];
+     out = (out + 1) % BUFFER_SIZE;
+     count--;
+ 
+     /* consume the item in next_consumed */
+}
+\end{verbatim}
+    \item \textbf{Issue with Concurrent Execution:}
+    \begin{itemize}
+        \item If `count` is 5, and producer (`count++`) and consumer (`count--`) execute concurrently.
+        \item Expected result: `count` == 5.
+        \item Possible incorrect results: `count` == 4, 5, or 6 due to interleaving.
+    \end{itemize}
+    \item \textbf{Machine Language Implementation of `count++`:}
+\begin{verbatim}
+register1 = count
+register1 = register1 + 1
+count = register1
+\end{verbatim}
+    \item \textbf{Machine Language Implementation of `count--`:}
+\begin{verbatim}
+register2 = count
+register2 = register2 - 1
+count = register2
+\end{verbatim}
+    \item \textbf{Race Condition Interleaving Example (Incorrect `count` == 4):}
+\begin{verbatim}
+T0: producer execute register1 = count         {register1 = 5}
+T1: producer execute register1 = register1 + 1 {register1 = 6}
+T2: consumer execute register2 = count         {register2 = 5}
+T3: consumer execute register2 = register2 - 1  {register2 = 4}
+T4: producer execute count = register1         {count = 6}
+T5: consumer execute count = register2         {count = 4}
+\end{verbatim}
+    \item \textbf{Race Condition Definition:}
+    \begin{itemize}
+        \item Several processes access and manipulate the same data concurrently.
+        \item Outcome depends on the specific order of access.
+    \end{itemize}
+    \item \textbf{Solution Requirement:} To prevent race conditions, only one process at a time should manipulate shared variables (e.g., `count`). This requires process synchronization.
+    \item \textbf{Importance:} Race conditions are frequent in OS (resource manipulation) and multithreaded applications (shared data on multicore systems). Process synchronization and coordination are crucial to prevent interference.
+\end{itemize}
+
+\subsection{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{cooperating process} & A process that can affect or be affected by other processes executing in the system. \\
+\textbf{race condition} & A situation in which two threads are concurrently trying to change the value of a variable. \\
+\textbf{process synchronization} & Coordination of access to data by two or more threads or processes. \\
+\textbf{coordination} & Ordering of the access to data by multiple threads or processes. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

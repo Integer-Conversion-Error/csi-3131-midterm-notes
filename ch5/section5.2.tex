@@ -1,0 +1,36 @@
+\section{Scheduling criteria}\label{sec:5.2}
+
+\subsection{Overview}
+\begin{itemize}
+    \item Different CPU-scheduling algorithms have varying properties, favoring certain process classes.
+    \item The choice of algorithm depends on the desired characteristics for comparison.
+\end{itemize}
+
+\subsection{Criteria for Comparison}
+\begin{itemize}
+    \item \textbf{CPU utilization}: Keep the CPU as busy as possible (ideally 40-90\% in real systems).
+    \item \textbf{Throughput}: Number of processes completed per unit time.
+    \item \textbf{Turnaround time}: Total time from process submission to completion (includes waiting in ready queue, CPU execution, and I/O).
+    \item \textbf{Waiting time}: Total time a process spends waiting in the ready queue.
+    \item \textbf{Response time}: Time from request submission until the first response is produced (for interactive systems).
+\end{itemize}
+
+\subsection{Optimization Goals}
+\begin{itemize}
+    \item Maximize CPU utilization and throughput.
+    \item Minimize turnaround time, waiting time, and response time.
+    \item Often, the goal is to optimize the average measure, but sometimes minimum or maximum values are preferred (e.g., minimizing maximum response time for guaranteed service).
+    \item For interactive systems, minimizing the variance in response time may be more important than minimizing the average.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{throughput} & Generally, the amount of work done over time. In scheduling, the number of threads completed per unit time. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

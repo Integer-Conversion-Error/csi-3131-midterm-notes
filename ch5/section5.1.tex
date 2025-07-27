@@ -1,0 +1,90 @@
+\section{CPU Scheduling}\label{sec:5.1}
+
+\subsection{Basic Concepts}
+\begin{itemize}
+    \item CPU scheduling is fundamental to multiprogrammed operating systems, maximizing CPU utilization by switching the CPU among processes.
+    \item On modern operating systems, kernel-level threads are scheduled, though "process scheduling" and "thread scheduling" are often used interchangeably.
+    \item A process executes on a CPU's core; general terminology of scheduling a process to "run on a CPU" implies running on a core.
+\end{itemize}
+
+\subsection{Basic concepts}
+\begin{itemize}
+    \item In a single CPU core system, only one process runs at a time; others wait. Multiprogramming aims to keep a process running at all times to maximize CPU utilization.
+    \item When one process waits (e.g., for I/O), the OS gives the CPU to another process. This continues, ensuring productive use of waiting time.
+    \item On multicore systems, this concept extends to all processing cores.
+    \item CPU scheduling is a fundamental OS function, central to its design.
+\end{itemize}
+
+\subsubsection{CPU-I/O burst cycle}
+\begin{itemize}
+    \item Process execution consists of a \textbf{cycle} of CPU execution and I/O wait, alternating between \textbf{CPU burst} and \textbf{I/O burst}.
+    \item The final CPU burst ends with a system request to terminate execution.
+    \item Durations of CPU bursts vary but tend to have an exponential or hyperexponential frequency curve (many short, few long bursts).
+    \item I/O-bound programs have many short CPU bursts; CPU-bound programs have a few long CPU bursts. This distribution is important for CPU-scheduling algorithms.
+\end{itemize}
+
+\subsubsection{CPU scheduler}
+\begin{itemize}
+    \item When the CPU becomes idle, the operating system selects a process from the ready queue to execute.
+    \item The \textbf{CPU scheduler} performs this selection and allocates the CPU to the chosen process.
+    \item The ready queue is not necessarily FIFO; it can be a FIFO queue, priority queue, tree, or unordered linked list.
+    \item Records in queues are generally process control blocks (PCBs).
+\end{itemize}
+
+\subsubsection{Preemptive and nonpreemptive scheduling}
+\begin{itemize}
+    \item CPU-scheduling decisions occur under four circumstances:
+    \begin{enumerate}
+        \item Process switches from running to waiting state (e.g., I/O request, \texttt{wait()} for child termination).
+        \item Process switches from running to ready state (e.g., interrupt occurs).
+        \item Process switches from waiting to ready state (e.g., I/O completion).
+        \item Process terminates.
+    \end{enumerate}
+    \item For circumstances 1 and 4, no scheduling choice; a new process must be selected. Choices exist for 2 and 3.
+    \item \textbf{Nonpreemptive} or \textbf{cooperative} scheduling: CPU allocated to a process until it releases it (terminates or switches to waiting state).
+    \item \textbf{Preemptive} scheduling: CPU can be taken away from a process. Most modern OS (Windows, macOS, Linux, UNIX) use preemptive scheduling.
+    \item Preemptive scheduling can cause race conditions with shared data (e.g., one process updates, is preempted, second process reads inconsistent data).
+    \item Preemption affects OS kernel design:
+        \begin{itemize}
+            \item Nonpreemptive kernel: waits for system call completion or process block before context switch, ensuring simple kernel structure and consistent data. Poor for real-time computing.
+            \item Preemptive kernel: requires mechanisms (e.g., mutex locks) to prevent race conditions when accessing shared kernel data structures. Most modern OS are fully preemptive in kernel mode.
+        \end{itemize}
+    \item Sections of code affected by interrupts must be guarded (e.g., disable interrupts at entry, reenable at exit) to prevent simultaneous use and data loss.
+\end{itemize}
+
+\subsubsection{Dispatcher}
+\begin{itemize}
+    \item The \textbf{dispatcher} is a component of the CPU-scheduling function.
+    \item It gives control of the CPU's core to the process selected by the CPU scheduler.
+    \item Functions include:
+        \begin{itemize}
+            \item Switching context from one process to another.
+            \item Switching to user mode.
+            \item Jumping to the proper location in the user program to resume that program.
+        \end{itemize}
+    \item The dispatcher should be fast, as it's invoked during every context switch.
+    \item \textbf{Dispatch latency}: time for the dispatcher to stop one process and start another.
+    \item Context switch frequency can be observed using tools like \texttt{vmstat} on Linux (system-wide) or \texttt{/proc} file system (per-process).
+    \item \textbf{Voluntary context switch}: process gives up CPU (e.g., blocking for I/O).
+    \item \textbf{Nonvoluntary context switch}: CPU taken from process (e.g., time slice expired, preempted by higher-priority process).
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{cycle} & Repeating loop \\
+\textbf{CPU burst} & Scheduling process state in which the process executes on CPU. \\
+\textbf{I/O burst} & Scheduling process state in which the CPU performs I/O. \\
+\textbf{CPU scheduler} & Kernel routine that selects a thread from the threads that are ready to execute and allocates a core to that thread. \\
+\textbf{nonpreemptive} & Under nonpreemptive scheduling, once a core has been allocated to a thread the thread keeps the core until it releases the core either by terminating or by switching to the waiting state. \\
+\textbf{cooperative} & A form of scheduling in which threads voluntarily move from the running state. \\
+\textbf{preemptive} & A form of scheduling in which processes or threads are involuntarily moved from the running state (by for example a timer signaling the kernel to allow the next thread to run). \\
+\textbf{dispatcher} & The kernel routine that gives control of a core to the thread selected by the scheduler. \\
+\textbf{dispatch latency} & The time it takes for the dispatcher to stop one thread and start another running. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

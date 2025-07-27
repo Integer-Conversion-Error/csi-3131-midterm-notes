@@ -1,0 +1,118 @@
+\section{Peterson's solution}
+\begin{itemize}
+    \item \textbf{Peterson's solution}: A classic software-based solution to the critical-section problem.
+    \item \textbf{Modern Architecture Limitations}:
+    \begin{itemize}
+        \item Not guaranteed to work correctly on modern architectures due to reordering of `load` and `store` instructions.
+        \item Presented for its algorithmic description and illustration of complexities in designing software for mutual exclusion, progress, and bounded waiting.
+    \end{itemize}
+    \item \textbf{Scope}: Restricted to two processes ($P_0, P_1$) that alternate execution between critical and remainder sections.
+    \item \textbf{Notation}: When discussing $P_i$, $P_j$ denotes the other process (i.e., $j = 1 - i$).
+    \item \textbf{Shared Data Items}:
+\begin{verbatim}
+int turn;
+boolean flag[2];
+\end{verbatim}
+    \begin{itemize}
+        \item `turn`: Indicates whose turn it is to enter the critical section (`turn == i` means $P_i$ can enter).
+        \item `flag` array: Indicates if a process is ready to enter its critical section (`flag[i] == true` means $P_i$ is ready).
+    \end{itemize}
+    \item \textbf{Peterson's Algorithm (for process $P_i$):}
+\begin{verbatim}
+while (true) {
+    flag[i] = true;
+    turn = j;
+    while (flag[j] && turn == j)
+        ;
+ 
+        /* critical section */
+ 
+    flag[i] = false;
+ 
+        /*remainder section */
+}
+\end{verbatim}
+    \item \textbf{Entry Mechanism}:
+    \begin{itemize}
+        \item $P_i$ sets `flag[i] = true`.
+        \item $P_i$ sets `turn = j`, signaling that $P_j$ can enter if it wishes.
+        \item If both processes try to enter concurrently, `turn` is set to both `i` and `j` almost simultaneously.
+        \item Only one `turn` assignment will persist; the final value determines which process enters first.
+    \end{itemize}
+    \item \textbf{Proof of Correctness (Requirements):}
+    \begin{enumerate}
+        \item \textbf{Mutual exclusion is preserved}:
+        \begin{itemize}
+            \item $P_i$ enters critical section only if `flag[j] == false` OR `turn == i`.
+            \item If both $P_0$ and $P_1$ are in critical sections, then `flag[0] == true` and `flag[1] == true`.
+            \item This implies they couldn't have both passed their `while` statements simultaneously, as `turn` can only be 0 or 1.
+            \item One process (e.g., $P_j$) must have successfully executed its `while` statement.
+            \item At that point, `flag[j] == true` and `turn == j`, which persists while $P_j$ is in its critical section, thus preserving mutual exclusion.
+        \end{itemize}
+        \item \textbf{Progress requirement is satisfied}:
+        \begin{itemize}
+            \item $P_i$ is prevented from entering only if stuck in `while (flag[j] \&\& turn == j)`.
+            \item If $P_j$ is not ready (`flag[j] == false`), $P_i$ enters.
+            \item If $P_j$ is ready (`flag[j] == true`) and in its `while` loop:
+            \begin{itemize}
+                \item If `turn == i`, $P_i$ enters.
+                \item If `turn == j`, $P_j$ enters.
+            \end{itemize}
+            \item Once $P_j$ exits its critical section, it sets `flag[j] = false`, allowing $P_i$ to enter.
+            \item If $P_j$ re-enters, it sets `flag[j] = true` and `turn = i`.
+            \item Since $P_i$ doesn't change `turn` in its `while` loop, $P_i$ will eventually enter.
+        \end{itemize}
+        \item \textbf{Bounded-waiting requirement is met}:
+        \begin{itemize}
+            \item As shown above, $P_i$ will enter after at most one entry by $P_j$.
+        \end{itemize}
+    \end{enumerate}
+    \item \textbf{Why Peterson's Solution Fails on Modern Architectures}:
+    \begin{itemize}
+        \item Processors/compilers may reorder read/write operations without data dependencies for performance.
+        \item For single-threaded apps, reordering is fine (final values consistent).
+        \item For multithreaded apps with shared data, reordering can lead to inconsistent/unexpected results.
+    \end{itemize}
+    \item \textbf{Reordering Example}:
+    \begin{itemize}
+        \item Shared data: `boolean flag = false; int x = 0;`
+        \item Thread 1:
+\begin{verbatim}
+while (!flag)
+   ;
+print x;
+\end{verbatim}
+        \item Thread 2:
+\begin{verbatim}
+x = 100;
+flag = true;
+\end{verbatim}
+        \item \textbf{Expected}: Thread 1 prints 100.
+        \item \textbf{Possible Reordering (Thread 2)}: `flag = true; x = 100;`
+        \begin{itemize}
+            \item Thread 1 could print 0 if `flag` is set before `x` is updated.
+        \end{itemize}
+        \item \textbf{Possible Reordering (Thread 1)}: Processor loads `x` before `flag`.
+        \begin{itemize}
+            \item Thread 1 could print 0 even if Thread 2's instructions are not reordered.
+        \end{itemize}
+    \item \textbf{Impact on Peterson's Solution}:
+    \begin{itemize}
+        \item If the first two statements in Peterson's entry section (`flag[i] = true; turn = j;`) are reordered.
+        \item It's possible for both threads to be in their critical sections simultaneously.
+    \end{itemize}
+    \item \textbf{Conclusion}: Proper synchronization tools are necessary to preserve mutual exclusion.
+    \item \textbf{Next Steps}: Discussion will cover hardware support and abstract software APIs for synchronization.
+\end{itemize}
+
+\subsection{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Peterson's solution} & A historically interesting algorithm for implementing critical sections. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

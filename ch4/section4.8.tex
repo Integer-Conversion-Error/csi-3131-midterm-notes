@@ -1,0 +1,14 @@
+\section{Summary}\label{sec:4.8}
+
+\begin{itemize}
+    \item A thread is a basic unit of CPU utilization; threads belonging to the same process share many process resources, including code and data.
+    \item There are four primary benefits to multithreaded applications: (1) responsiveness, (2) resource sharing, (3) economy, and (4) scalability.
+    \item \textbf{Concurrency} exists when multiple threads are making progress. \textbf{Parallelism} exists when multiple threads are making progress simultaneously. On a single-CPU system, only concurrency is possible; parallelism requires a multicore system with multiple CPUs.
+    \item Designing multithreaded applications presents several challenges, including dividing and balancing work, dividing data between threads, identifying data dependencies, and the increased difficulty of testing and debugging.
+    \item \textbf{Data parallelism} distributes subsets of the same data across different computing cores and performs the same operation on each core. \textbf{Task parallelism} distributes tasks (not data) across multiple cores, with each task running a unique operation.
+    \item User applications create user-level threads, which must be mapped to kernel threads for execution on a CPU. Common mapping models include many-to-one, one-to-one, and many-to-many.
+    \item A \textbf{thread library} provides an API for creating and managing threads. Key thread libraries include Windows, Pthreads, and Java threading. Windows is specific to Windows systems, Pthreads is for POSIX-compatible systems (UNIX, Linux, macOS), and Java threads run on any system supporting a Java Virtual Machine.
+    \item \textbf{Implicit threading} involves identifying tasks (not threads) and allowing languages or API frameworks to create and manage threads. Approaches include thread pools, fork-join frameworks, and Grand Central Dispatch. Implicit threading is increasingly common for developing concurrent and parallel applications.
+    \item Threads can be terminated using either \textbf{asynchronous cancellation} (immediate termination) or \textbf{deferred cancellation} (target thread periodically checks for termination, allowing orderly shutdown). Deferred cancellation is generally preferred due to issues with resource reclamation and data consistency in asynchronous cancellation.
+    \item Unlike many other operating systems, Linux does not distinguish between processes and threads, referring to both as \textbf{tasks}. The Linux \texttt{clone()} system call can create tasks that behave more like processes or threads, depending on the flags passed for resource sharing.
+\end{itemize}

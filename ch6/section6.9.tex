@@ -1,0 +1,98 @@
+\section{Evaluation}
+\begin{itemize}
+    \item This section evaluates different synchronization tools for solving the critical-section problem.
+    \item Given correct implementation and usage, these tools ensure mutual exclusion and address liveness issues.
+    \item With the rise of concurrent programs on multicore systems, performance of synchronization tools is crucial.
+    \item Choosing the right tool can be challenging. This section provides strategies for tool selection.
+
+    \item \textbf{Hardware Solutions (Section \ref{sec:6.4})}:
+    \begin{itemize}
+        \item Considered very low-level.
+        \item Typically used as foundations for constructing other synchronization tools (e.g., mutex locks).
+        \item Recent focus on using CAS instruction for \textbf{lock-free} algorithms.
+        \begin{itemize}
+            \item \textbf{Lock-free algorithms}: Provide race condition protection without locking overhead.
+            \item \textbf{Advantages}: Low overhead, ability to scale.
+            \item \textbf{Disadvantage}: Often difficult to develop and test.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Priority Inversion}:
+    \begin{itemize}
+        \item More than a scheduling inconvenience, especially in real-time systems.
+        \item Can cause a process to take longer than expected, leading to cascading failures and system failure.
+        \item \textbf{Mars Pathfinder Example (1997)}:
+        \begin{itemize}
+            \item Sojourner rover experienced frequent computer resets.
+            \item \textbf{Cause}: High-priority task ("bc\_dist") was delayed waiting for a shared resource held by a lower-priority task ("ASI/MET").
+            \item The lower-priority task was preempted by multiple medium-priority tasks.
+            \item "bc\_dist" stalled, "bc\_sched" detected the problem and initiated a reset.
+            \item This was a typical case of priority inversion.
+            \item \textbf{Solution}: VxWorks real-time OS (on Sojourner) had a global variable to enable priority inheritance on all semaphores. Setting this variable solved the problem.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{CAS-based Synchronization vs. Traditional Locking}:
+    \begin{itemize}
+        \item \textbf{CAS-based (Optimistic approach)}:
+        \begin{itemize}
+            \item Optimistically update a variable first.
+            \item Use collision detection to see if another thread updated concurrently.
+            \item If conflict, retry operation until successful without conflict.
+        \end{itemize}
+        \item \textbf{Mutual-exclusion locking (Pessimistic strategy)}:
+        \begin{itemize}
+            \item Assume another thread is concurrently updating the variable.
+            \item Pessimistically acquire the lock before making any updates.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Performance Guidelines (CAS vs. Traditional Synchronization)}:
+    \begin{itemize}
+        \item \textbf{Uncontended loads}: Both are generally fast; CAS protection is somewhat faster.
+        \item \textbf{Moderate contention}: CAS protection is faster (possibly much faster).
+        \begin{itemize}
+            \item CAS operation succeeds most of the time.
+            \item If it fails, it iterates only a few times before succeeding.
+            \item Traditional locking: Any contended lock acquisition involves a more complex, time-intensive code path (suspends thread, places on wait queue, context switch).
+        \end{itemize}
+        \item \textbf{High contention}: Traditional synchronization is ultimately faster than CAS-based synchronization.
+    \end{itemize}
+
+    \item \textbf{Choosing Synchronization Mechanisms and Performance Impact}:
+    \begin{itemize}
+        \item Atomic integers are much lighter-weight than traditional locks.
+        \item More appropriate than mutex locks or semaphores for single updates to shared variables (e.g., counters).
+        \item Spinlocks are used on multiprocessor systems when locks are held for short durations.
+        \item Mutex locks are simpler and have less overhead than semaphores.
+        \item Mutex locks are preferable to binary semaphores for protecting critical section access.
+        \item Counting semaphores are more appropriate than mutex locks for controlling access to a finite number of resources.
+        \item Reader-writer locks may be preferred over mutex locks for higher concurrency (multiple readers allowed).
+    \end{itemize}
+
+    \item \textbf{Higher-Level Tools (Monitors, Condition Variables)}:
+    \begin{itemize}
+        \item \textbf{Appeal}: Simplicity and ease of use.
+        \item \textbf{Drawbacks}: Significant overhead; may scale less effectively in highly contended situations depending on implementation.
+    \end{itemize}
+
+    \item \textbf{Ongoing Research}: Much research is focused on developing scalable, efficient tools for concurrent programming.
+    \begin{itemize}
+        \item Designing compilers for more efficient code.
+        \item Developing languages with built-in concurrent programming support.
+        \item Improving performance of existing libraries and APIs.
+    \end{itemize}
+    \item \textbf{Next Chapter}: Examines how various operating systems and APIs implement the synchronization tools discussed in this chapter.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{lock-free} & An algorithmic strategy that provides protection from race conditions without requiring the overhead of locking. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

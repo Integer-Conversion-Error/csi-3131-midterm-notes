@@ -1,0 +1,74 @@
+\section{Multicore Programming}\label{sec:4.2}
+
+\subsection{Introduction to Multicore Systems}
+\begin{itemize}
+    \item Modern systems place multiple computing cores on a single processing chip, appearing as separate CPUs to the operating system. These are referred to as \textbf{multicore} systems.
+    \item Multithreaded programming enables more efficient use of these multiple computing cores and improves concurrency.
+    \item \textbf{Concurrency vs. Parallelism}:
+        \begin{itemize}
+            \item \textbf{Concurrent system}: Supports more than one task by allowing all tasks to make progress (e.g., interleaving execution on a single-core system).
+            \item \textbf{Parallel system}: Can perform more than one task simultaneously (e.g., assigning separate threads to each core on a multicore system).
+            \item It is possible to have concurrency without parallelism.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Programming Challenges}
+\begin{itemize}
+    \item The trend towards multicore systems requires system designers and application programmers to better utilize multiple computing cores.
+    \item Operating system designers must create scheduling algorithms for parallel execution.
+    \item Application programmers must modify existing programs and design new ones to be multithreaded.
+    \item Five key challenges in programming for multicore systems:
+        \begin{enumerate}
+            \item \textbf{Identifying tasks}: Finding areas in applications that can be divided into separate, concurrent, and ideally independent tasks.
+            \item \textbf{Balance}: Ensuring that parallel tasks perform equal work of equal value to justify the use of separate execution cores.
+            \item \textbf{Data splitting}: Dividing the data accessed and manipulated by tasks to run on separate cores.
+            \item \textbf{Data dependency}: Examining data for dependencies between tasks and ensuring synchronized execution to accommodate these dependencies.
+            \item \textbf{Testing and debugging}: More difficult due to many possible execution paths in parallel programs.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Amdahl's Law}
+\begin{itemize}
+    \item A formula that identifies potential performance gains from adding additional computing cores.
+    \item If $S$ is the portion of the application that must be performed serially on a system with $N$ processing cores, the formula is:
+    $$speedup \le \frac{1}{{S + \frac{{\left( {1 - S} \right)}}{N}}}$$
+    \item \textbf{Example}: An application that is 75\% parallel and 25\% serial ($S=0.25$):
+        \begin{itemize}
+            \item On a 2-core system ($N=2$): speedup $\approx 1.6$ times.
+            \item On a 4-core system ($N=4$): speedup $\approx 2.28$ times.
+        \end{itemize}
+    \item As $N$ approaches infinity, the speedup converges to $1/S$.
+    \item The serial portion of an application can disproportionately affect the performance gained by adding computing cores.
+\end{itemize}
+
+\subsection{Types of Parallelism}
+\begin{itemize}
+    \item \textbf{Data parallelism}:
+        \begin{itemize}
+            \item Focuses on distributing subsets of the same data across multiple computing cores.
+            \item Performs the same operation on each core.
+            \item \textbf{Example}: Summing elements of an array by dividing the array into subsets for different threads.
+        \end{itemize}
+    \item \textbf{Task parallelism}:
+        \begin{itemize}
+            \item Distributes tasks (threads) across multiple computing cores.
+            \item Each thread performs a unique operation.
+            \item Threads may operate on the same or different data.
+            \item \textbf{Example}: Two threads performing unique statistical operations on the same array.
+        \end{itemize}
+    \item Data and task parallelism are not mutually exclusive; applications may use a hybrid approach.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{multicore} & Multiple processing cores within the same CPU chip or within a single system. \\
+\textbf{data parallelism} & A computing method that distributes subsets of the same data across multiple cores and performs the same operation on each core. \\
+\textbf{task parallelism} & A computing method that distributes tasks (threads) across multiple computing cores, with each task performing a unique operation. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

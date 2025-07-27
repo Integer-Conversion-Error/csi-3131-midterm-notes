@@ -1,0 +1,63 @@
+\section{Summary}
+
+\begin{itemize}
+    \item Classic process synchronization problems:
+    \begin{itemize}
+        \item Bounded-buffer problem.
+        \item Readers-writers problem.
+        \item Dining-philosophers problem.
+    \end{itemize}
+    \item Solutions use tools from "Synchronization Tools" chapter:
+    \begin{itemize}
+        \item Mutex locks.
+        \item Semaphores.
+        \item Monitors.
+        \item Condition variables.
+    \end{itemize}
+    \item \textbf{Windows synchronization}:
+    \begin{itemize}
+        \item Uses dispatcher objects.
+        \item Uses events to implement synchronization tools.
+    \end{itemize}
+    \item \textbf{Linux synchronization}:
+    \begin{itemize}
+        \item Uses various approaches to protect against race conditions.
+        \item Includes atomic variables.
+        \item Includes spinlocks.
+        \item Includes mutex locks.
+    \end{itemize}
+    \item \textbf{POSIX API synchronization}:
+    \begin{itemize}
+        \item Provides mutex locks.
+        \item Provides semaphores.
+        \item Provides condition variables.
+        \item Two forms of semaphores:
+        \begin{itemize}
+            \item Named semaphores: easily accessed by unrelated processes by name.
+            \item Unnamed semaphores: cannot be shared as easily; require placement in shared memory.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Java synchronization}:
+    \begin{itemize}
+        \item Rich library and API for synchronization.
+        \item Available tools:
+        \begin{itemize}
+            \item Monitors (provided at language level).
+            \item Reentrant locks (supported by API).
+            \item Semaphores (supported by API).
+            \item Condition variables (supported by API).
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Alternative approaches to critical-section problem}:
+    \begin{itemize}
+        \item Transactional memory.
+        \item OpenMP.
+        \item Functional languages.
+    \end{itemize}
+    \item \textbf{Functional languages}:
+    \begin{itemize}
+        \item Intriguing alternative programming paradigm to procedural languages.
+        \item Unlike procedural languages, do not maintain state.
+        \item Generally immune from race conditions and critical sections.
+    \end{itemize}
+\end{itemize}

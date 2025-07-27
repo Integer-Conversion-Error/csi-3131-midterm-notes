@@ -1,0 +1,159 @@
+\section{Semaphores}
+\begin{itemize}
+    \item Mutex locks are simple synchronization tools.
+    \item \textbf{Semaphore} $S$: A more robust integer variable, accessed only through two standard atomic operations: `wait()` and `signal()`.
+    \item Introduced by Edsger Dijkstra.
+    \item \textbf{Original terms}: `wait()` was `P` (proberen, "to test"); `signal()` was `V` (verhogen, "to increment").
+    \item \textbf{`wait(S)` definition (classical, with busy waiting)}:
+\begin{verbatim}
+wait(S) {
+   while (S <= 0)
+     ; /* busy wait */
+     S--;
+}
+\end{verbatim}
+    \item \textbf{`signal(S)` definition (classical)}:
+\begin{verbatim}
+signal(S) {
+   S++;
+}
+\end{verbatim}
+    \item \textbf{Atomicity Requirement}:
+    \begin{itemize}
+        \item All modifications to semaphore value in `wait()` and `signal()` must be atomic.
+        \item No two processes can simultaneously modify the same semaphore value.
+        \item For `wait(S)`, testing `S <= 0` and decrementing `S--` must be uninterruptible.
+    \end{itemize}
+
+    \subsection{Semaphore usage}
+    \item Operating systems distinguish between two types of semaphores:
+    \begin{enumerate}
+        \item \textbf{Counting semaphore}:
+        \begin{itemize}
+            \item Value can range over an unrestricted domain.
+            \item Used to control access to a resource with a finite number of instances.
+            \item Initialized to the number of available resources.
+            \item `wait()`: Decrements count when a process wishes to use a resource.
+            \item `signal()`: Increments count when a process releases a resource.
+            \item If count goes to 0, all resources are in use; processes block until count > 0.
+        \end{itemize}
+        \item \textbf{Binary semaphore}:
+        \begin{itemize}
+            \item Value can only be 0 or 1.
+            \item Behaves similarly to mutex locks.
+            \item Can be used for mutual exclusion on systems without mutex locks.
+        \end{itemize}
+    \end{enumerate}
+    \item \textbf{Solving Synchronization Problems (Example)}:
+    \begin{itemize}
+        \item Two concurrent processes: $P_1$ with statement $S_1$, $P_2$ with statement $S_2$.
+        \item Requirement: $S_2$ executes only after $S_1$ completes.
+        \item \textbf{Implementation}:
+        \begin{itemize}
+            \item Share a common semaphore `synch`, initialized to 0.
+            \item \textbf{In process $P_1$}:
+\begin{verbatim}
+S1;
+signal(synch);
+\end{verbatim}
+            \item \textbf{In process $P_2$}:
+\begin{verbatim}
+wait(synch);
+S2;
+\end{verbatim}
+            \item Result: $P_2$ executes $S_2$ only after $P_1$ calls `signal(synch)` (i.e., after $S_1$ completes).
+        \end{itemize}
+    \end{itemize}
+
+    \subsection{Semaphore implementation}
+    \item The classical `wait()` and `signal()` definitions suffer from busy waiting (like mutex locks in Section \ref{sec:6.5}).
+    \item \textbf{To overcome busy waiting}:
+    \begin{itemize}
+        \item When `wait()` finds semaphore value not positive, process suspends itself instead of busy waiting.
+        \item \textbf{Suspend operation}: Places process into a waiting queue associated with the semaphore; process state switches to waiting.
+        \item Control transfers to CPU scheduler, which selects another process.
+        \item \textbf{Restarting a suspended process}: When another process executes `signal()`, the suspended process is restarted by a `wakeup()` operation.
+        \item \textbf{`wakeup()` operation}: Changes process from waiting to ready state, places it in the ready queue.
+        \item CPU scheduling algorithm determines if CPU switches to newly ready process.
+    \end{itemize}
+    \item \textbf{Semaphore definition for this implementation}:
+\begin{verbatim}
+typedef struct {
+    int value;
+    struct process *list;
+} semaphore;
+\end{verbatim}
+    \begin{itemize}
+        \item `value`: Integer value of the semaphore.
+        \item `list`: List of processes waiting on this semaphore.
+    \end{itemize}
+    \item \textbf{`wait(semaphore *S)` definition (without busy waiting)}:
+\begin{verbatim}
+wait(semaphore *S) {
+     S-}value--;
+     if (S-}value < 0) {
+            add this process to S-}list;
+            sleep();
+     }
+}
+\end{verbatim}
+    \item \textbf{`signal(semaphore *S)` definition (without busy waiting)}:
+\begin{verbatim}
+signal(semaphore *S) {
+     S-}value++;
+     if (S-}value <= 0) {
+            remove a process P from S-}list;
+            wakeup(P);
+     }
+}
+\end{verbatim}
+    \item \textbf{`sleep()` operation}: Suspends the invoking process (system call).
+    \item \textbf{`wakeup(P)` operation}: Resumes execution of suspended process `P` (system call).
+    \item \textbf{Negative Semaphore Values}:
+    \begin{itemize}
+        \item In this implementation, semaphore values can be negative.
+        \item Magnitude of a negative value = number of processes waiting on that semaphore.
+        \item This results from decrementing `S->value` before testing it in `wait()`.
+    \end{itemize}
+    \item \textbf{Waiting Process List Implementation}:
+    \begin{itemize}
+        \item Can be a link field in each Process Control Block (PCB).
+        \item Semaphore contains integer value and pointer to a list of PCBs.
+        \item FIFO queue (with head/tail pointers) ensures bounded waiting.
+        \item Any queuing strategy can be used; correct semaphore usage doesn't depend on it.
+    \end{itemize}
+    \item \textbf{Atomicity of Semaphore Operations (Crucial)}:
+    \begin{itemize}
+        \item No two processes can execute `wait()` and `signal()` on the same semaphore simultaneously.
+        \item \textbf{Single-processor environment}: Solved by inhibiting interrupts during `wait()` and `signal()` execution.
+        \begin{itemize}
+            \item Ensures current process executes without interleaving until interrupts reenabled.
+        \end{itemize}
+        \item \textbf{Multicore environment}:
+        \begin{itemize}
+            \item Interrupts must be disabled on *every* processing core (difficult, diminishes performance).
+            \item SMP systems use alternative techniques like `compare\_and\_swap()` or spinlocks to ensure atomicity of `wait()` and `signal()`.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Busy Waiting Re-evaluation}:
+    \begin{itemize}
+        \item Busy waiting is not entirely eliminated; it's moved from application critical sections to the critical sections of `wait()` and `signal()` operations themselves.
+        \item These critical sections are very short (e.g., ~10 instructions).
+        \item Busy waiting occurs rarely and for a short time in this context.
+        \item In contrast, application critical sections can be long (minutes/hours) or always occupied, making busy waiting highly inefficient there.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{semaphore} & An integer variable that, apart from initialization, is accessed only through two standard atomic operations: wait() and signal(). \\
+\textbf{counting semaphore} & A semaphore that has a value between 0 and N, to control access to a resource with N instances. \\
+\textbf{binary semaphore} & A semaphore of values 0 and 1 that limits access to one resource (acting similarly to a mutex lock). \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

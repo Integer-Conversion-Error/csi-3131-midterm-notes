@@ -1,0 +1,65 @@
+\section{Threads \& Concurrency}\label{sec:4.1}
+
+\subsection{Overview}
+\begin{itemize}
+    \item A \textbf{thread} is a basic unit of CPU utilization, comprising a thread ID, program counter (PC), register set, and stack.
+    \item Threads share with other threads of the same process: code section, data section, and OS resources (e.g., open files, signals).
+    \item A traditional process has a single thread of control; a multithreaded process can perform multiple tasks concurrently.
+    \item Modern operating systems provide features for processes to contain multiple threads of control.
+    \item Identifying opportunities for parallelism using threads is crucial for modern multicore systems.
+\end{itemize}
+
+\subsection{Motivation}
+\begin{itemize}
+    \item Most modern software applications are multithreaded (e.g., web browsers, word processors, image thumbnail generators).
+    \item Multithreaded applications can leverage multicore systems for parallel CPU-intensive tasks.
+    \item \textbf{Web Server Example}:
+        \begin{itemize}
+            \item A busy web server may handle thousands of concurrent client requests.
+            \item Single-threaded server: services one client at a time, leading to long wait times.
+            \item Process-creation method: server creates a separate process for each request (time-consuming, resource-intensive).
+            \item Multithreaded server: creates a new thread for each request, more efficient.
+        \end{itemize}
+    \item Most OS kernels are multithreaded (e.g., Linux kernel threads like \texttt{kthreadd} for device management, memory management, interrupt handling).
+    \item Multithreading is beneficial for CPU-intensive problems in data mining, graphics, and AI.
+\end{itemize}
+
+\subsection{Benefits}
+\begin{itemize}
+    \item \textbf{Responsiveness}:
+        \begin{itemize}
+            \item Allows an application to continue running even if part is blocked or performing a lengthy operation.
+            \item Increases responsiveness to the user (e.g., UI remains active during a time-consuming background task).
+        \end{itemize}
+    \item \textbf{Resource Sharing}:
+        \begin{itemize}
+            \item Threads share memory and resources of their parent process by default.
+            \item More efficient than inter-process communication (shared memory, message passing).
+            \item Allows multiple threads of activity within the same address space.
+        \end{itemize}
+    \item \textbf{Economy}:
+        \begin{itemize}
+            \item More economical to create and context-switch threads than processes.
+            \item Thread creation consumes less time and memory than process creation.
+            \item Context switching is typically faster between threads.
+        \end{itemize}
+    \item \textbf{Scalability}:
+        \begin{itemize}
+            \item Greater benefits in multiprocessor architectures, where threads can run in parallel on different processing cores.
+            \item A single-threaded process runs on only one processor, regardless of available cores.
+        \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{single-threaded} & A process or program that has only one thread of control (and so executes on only one core at a time). \\
+\textbf{multithreaded} & A term describing a process or program with multiple threads of control, allowing multiple simultaneous execution points. \\
+\textbf{thread} & A basic unit of CPU utilization; it comprises a thread ID, a program counter (PC), a register set, and a stack. It shares with other threads belonging to the same process its code section, data section, and other operating-system resources, such as open files and signals. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

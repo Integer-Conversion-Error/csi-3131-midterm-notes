@@ -1,0 +1,124 @@
+\section{Thread Libraries}\label{sec:4.4}
+
+\subsection{Introduction to Thread Libraries}
+\begin{itemize}
+    \item A \textbf{thread library} provides an API for creating and managing threads.
+    \item \textbf{Implementation Approaches}:
+        \begin{itemize}
+            \item \textbf{User-space library}: Entirely in user space, no kernel support. Function calls are local, not system calls.
+            \item \textbf{Kernel-level library}: Supported directly by the operating system. Function calls typically result in system calls to the kernel.
+        \end{itemize}
+    \item \textbf{Main Thread Libraries}: POSIX Pthreads, Windows, and Java.
+    \item \textbf{Relationship to Host OS}:
+        \begin{itemize}
+            \item Pthreads: May be user-level or kernel-level; common on UNIX-type systems (Linux, macOS).
+            \item Windows thread library: Kernel-level library on Windows systems.
+            \item Java thread API: Implemented using the host system's thread library (e.g., Windows API on Windows, Pthreads on UNIX/Linux/macOS).
+        \end{itemize}
+    \item \textbf{Data Sharing}:
+        \begin{itemize}
+            \item POSIX and Windows: Global data (declared outside functions) are shared among all threads in the same process.
+            \item Java: No equivalent of global data; shared data access must be explicitly arranged.
+        \end{itemize}
+    \item \textbf{Summation Example}: Illustrative example for thread creation, calculating the summation of a non-negative integer $N$:
+    $$sum = \sum_{t = 1}^N i$$
+    \item \textbf{Threading Strategies}:
+        \begin{itemize}
+            \item \textbf{Asynchronous threading}: Parent creates child thread and resumes execution independently. Little data sharing. Used in multithreaded servers and responsive UIs.
+            \item \textbf{Synchronous threading}: Parent creates child threads and waits for all children to terminate before resuming. Involves significant data sharing (e.g., parent combining results from children). All examples in this section use synchronous threading.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Pthreads}
+\begin{itemize}
+    \item \textbf{Pthreads}: POSIX standard (IEEE 1003.1c) defining an API for thread creation and synchronization. It is a specification, not an implementation.
+    \item Implemented on most UNIX-type systems (Linux, macOS).
+    \item \textbf{Basic API (C program example)}:
+        \begin{itemize}
+            \item Include \texttt{pthread.h}.
+            \item Declare thread identifier (\texttt{pthread\_t tid}) and attributes (\texttt{pthread\_attr\_t attr}).
+            \item Initialize attributes: \texttt{pthread\_attr\_init(\&attr)}.
+            \item Create thread: \texttt{pthread\_create(\&tid, \&attr, runner, argv[1])}.
+                \begin{itemize}
+                    \item \texttt{tid}: thread identifier.
+                    \item \texttt{attr}: thread attributes.
+                    \item \texttt{runner}: function where new thread begins execution.
+                    \item \texttt{argv[1]}: parameter passed to the thread function.
+                \end{itemize}
+            \item Parent waits for child thread to terminate: \texttt{pthread\_join(tid, NULL)}.
+            \item Child thread terminates: \texttt{pthread\_exit(0)}.
+            \item Shared data (e.g., \texttt{sum}) is declared globally.
+        \end{itemize}
+    \item Waiting for multiple threads: Use a \texttt{for} loop with \texttt{pthread\_join()}.
+\end{itemize}
+
+\subsection{Windows Threads}
+\begin{itemize}
+    \item Similar to Pthreads in technique.
+    \item Include \texttt{windows.h}.
+    \item Shared data (e.g., \texttt{Sum}) is declared globally (e.g., \texttt{DWORD} for unsigned 32-bit integer).
+    \item Thread function (e.g., \texttt{Summation}) is passed a pointer to \texttt{void} (LPVOID).
+    \item \textbf{Thread Creation}: Use \texttt{CreateThread()} function.
+        \begin{itemize}
+            \item Parameters include security attributes, stack size, thread function, parameter to thread function, creation flags, and thread identifier.
+            \item Default attributes typically make the thread eligible to run immediately.
+        \end{itemize}
+    \item \textbf{Waiting for Thread Completion}:
+        \begin{itemize}
+            \item For a single thread: \texttt{WaitForSingleObject(ThreadHandle, INFINITE)}.
+            \item For multiple threads: \texttt{WaitForMultipleObjects(N, THandles, TRUE, INFINITE)}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Java Threads}
+\begin{itemize}
+    \item Fundamental model of program execution in Java; available on any system with a JVM.
+    \item All Java programs have at least one thread (the \texttt{main()} method).
+    \item \textbf{Techniques for explicit thread creation}:
+        \begin{enumerate}
+            \item Create a class derived from \texttt{Thread} and override its \texttt{run()} method.
+            \item Define a class that implements the \texttt{Runnable} interface (more common).
+                \begin{itemize}
+                    \item \texttt{Runnable} defines \texttt{public void run()}. Code in this method executes in a separate thread.
+                \end{itemize}
+        \end{enumerate}
+    \item \textbf{Lambda Expressions (Java 1.8+)}: Provide cleaner syntax for creating threads by using a lambda expression instead of a separate class implementing \texttt{Runnable}.
+    \item \textbf{Thread Execution}:
+        \begin{itemize}
+            \item Create a \texttt{Thread} object, passing an instance of a class that implements \texttt{Runnable}.
+            \item Invoke the \texttt{start()} method on the \texttt{Thread} object.
+                \begin{itemize}
+                    \item Allocates memory and initializes a new thread in the JVM.
+                    \item Calls the \texttt{run()} method (do not call \texttt{run()} directly).
+                \end{itemize}
+        \end{itemize}
+    \item \textbf{Waiting for Thread Completion}: Use the \texttt{join()} method (can throw \texttt{InterruptedException}).
+    \item \textbf{Java Executor Framework (\texttt{java.util.concurrent})}:
+        \begin{itemize}
+            \item Provides greater control over thread creation and communication.
+            \item Based on the \texttt{Executor} interface, which defines \texttt{void execute(Runnable command)}.
+            \item Separates thread creation from execution.
+            \item \textbf{Returning Results}:
+                \begin{itemize}
+                    \item Java threads cannot return results directly from \texttt{run()}.
+                    \item The \texttt{Callable} interface (similar to \texttt{Runnable}) allows returning a result.
+                    \item Results are returned as \texttt{Future} objects, retrieved using the \texttt{get()} method.
+                \end{itemize}
+            \item This framework offers benefits like returning results and separating thread creation from result retrieval, and can be combined with other features for robust thread management.
+        \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{thread library} & A programming library that provides programmers with an API for creating and managing threads. \\
+\textbf{asynchronous threading} & Threading in which a parent creates a child thread and then resumes execution, so that the parent and child execute concurrently and independently of one another. \\
+\textbf{synchronous threading} & Threading in which a parent thread creating one or more child threads waits for them to terminate before it resumes. \\
+\textbf{Pthreads} & The POSIX standard (IEEE 1003.1c) defining an API for thread creation and synchronization (a specification for thread behavior, not an implementation). \\
+\textbf{closure} & In functional programming languages, a construct to provide a simple syntax for parallel applications (also known as Lambda expressions in Java). \\
+\end{tabular}
+\vspace{\baselineskip}

@@ -1,0 +1,148 @@
+\section{Implicit Threading}\label{sec:4.5}
+
+\subsection{Introduction to Implicit Threading}
+\begin{itemize}
+    \item Designing applications with many threads (hundreds or thousands) is complex, involving challenges related to correctness (e.g., synchronization, deadlocks).
+    \item \textbf{Implicit threading}: A strategy to address these difficulties by transferring thread creation and management from application developers to compilers and run-time libraries.
+    \item Developers identify \textbf{tasks} (functions) that can run in parallel, and the run-time library maps these tasks to separate threads, typically using the many-to-many model.
+    \item \textbf{Advantage}: Developers focus on identifying parallelizable tasks, while libraries handle the details of thread creation and management.
+\end{itemize}
+
+\subsection{Thread Pools}
+\begin{itemize}
+    \item A \textbf{thread pool} involves creating a number of threads at startup and placing them into a pool, where they wait for work.
+    \item \textbf{Problem with creating a new thread per request (e.g., web server)}:
+        \begin{itemize}
+            \item Time and overhead to create and discard threads for each request.
+            \item Unbounded number of concurrent threads can exhaust system resources (CPU, memory).
+        \end{itemize}
+    \item \textbf{How thread pools work}:
+        \begin{itemize}
+            \item Server receives request, submits it to the thread pool.
+            \item An available thread from the pool is awakened to service the request immediately.
+            \item If no thread is available, the task is queued.
+            \item Once a thread completes its work, it returns to the pool.
+            \item Works well for asynchronously executed tasks.
+        \end{itemize}
+    \item \textbf{Benefits of thread pools}:
+        \begin{enumerate}
+            \item Faster request servicing with existing threads.
+            \item Limits the number of concurrent threads, preventing resource exhaustion.
+            \item Separates task definition from thread creation mechanics, allowing flexible scheduling (e.g., delayed or periodic execution).
+        \end{enumerate}
+    \item Number of threads in the pool can be set heuristically or dynamically adjusted based on system load.
+    \item \textbf{Windows Thread Pool API}:
+        \begin{itemize}
+            \item Functions like \texttt{QueueUserWorkItem()} submit a function to be executed by a thread from the pool.
+            \item Parameters include a pointer to the function, a parameter for the function, and flags for thread management.
+        \end{itemize}
+    \item \textbf{Java Thread Pools (\texttt{java.util.concurrent})}:
+        \begin{itemize}
+            \item Provides various thread pool architectures:
+                \begin{itemize}
+                    \item \texttt{newSingleThreadExecutor()}: Pool of size 1.
+                    \item \texttt{newFixedThreadPool(int size)}: Pool with a specified number of threads.
+                    \item \texttt{newCachedThreadPool()}: Unbounded pool that reuses threads.
+                \end{itemize}
+            \item Created using factory methods in the \texttt{Executors} class, returning an \texttt{ExecutorService} object.
+            \item \texttt{ExecutorService} extends \texttt{Executor} (with \texttt{execute()} method) and provides methods for managing pool termination (\texttt{shutdown()}).
+        \end{itemize}
+\end{itemize}
+
+\subsection{Fork-Join}
+\begin{itemize}
+    \item The \textbf{fork-join} model is a synchronous threading strategy where a parent thread creates (forks) child threads and waits for them to terminate and join with it to combine results.
+    \item An excellent candidate for implicit threading: parallel tasks are designated, and a library manages thread creation and task assignment.
+    \item Similar to a synchronous version of thread pools, where the library determines the number of threads.
+    \item \textbf{Java Fork-Join Library (Java 1.7+)}:
+        \begin{itemize}
+            \item Designed for recursive divide-and-conquer algorithms (e.g., Quicksort, Mergesort).
+            \item Tasks are forked during the divide step, assigned smaller subsets of the problem, and execute concurrently.
+            \item Problem is solved directly when small enough (below a \texttt{THRESHOLD}).
+            \item Uses \texttt{ForkJoinPool} to manage worker threads.
+            \item Tasks inherit from \texttt{ForkJoinTask} (abstract base class), which is extended by:
+                \begin{itemize}
+                    \item \texttt{RecursiveTask}: Returns a result via its \texttt{compute()} method.
+                    \item \texttt{RecursiveAction}: Does not return a result (void \texttt{compute()}).
+                \end{itemize}
+            \item \texttt{fork()} method creates new tasks; \texttt{join()} method blocks until a task completes and returns its result.
+            \item \textbf{Work Stealing}: Each thread in a \texttt{ForkJoinPool} maintains a queue of forked tasks; if a queue is empty, it can "steal" a task from another thread's queue to balance workload.
+        \end{itemize}
+\end{itemize}
+
+\subsection{OpenMP}
+\begin{itemize}
+    \item A set of compiler directives and an API for C, C++, or FORTRAN, supporting parallel programming in shared-memory environments.
+    \item Identifies \textbf{parallel regions} as blocks of code that may run in parallel.
+    \item Developers insert compiler directives (e.g., \texttt{\#pragma omp parallel}) to instruct the OpenMP run-time library to execute regions in parallel.
+    \item When \texttt{\#pragma omp parallel} is encountered, OpenMP creates as many threads as there are processing cores in the system, and all threads execute the parallel region simultaneously. Threads are terminated upon exiting the region.
+    \item Provides directives for parallelizing loops (e.g., \texttt{\#pragma omp parallel for}) to divide work among threads.
+    \item Allows manual control over the number of threads and identification of shared vs. private data.
+    \item Available on various compilers for Linux, Windows, and macOS.
+\end{itemize}
+
+\subsection{Grand Central Dispatch (GCD)}
+\begin{itemize}
+    \item Developed by Apple for macOS and iOS.
+    \item A combination of a run-time library, API, and language extensions for identifying code sections (tasks) to run in parallel.
+    \item Manages most threading details.
+    \item Schedules tasks by placing them on a \textbf{dispatch queue}. Tasks are assigned to available threads from a managed pool.
+    \item \textbf{Types of Dispatch Queues}:
+        \begin{itemize}
+            \item \textbf{Serial queues}: Tasks removed in FIFO order; one task completes before the next is removed. Each process has a \textbf{main queue} (private dispatch queue); developers can create additional local serial queues. Useful for sequential execution.
+            \item \textbf{Concurrent queues}: Tasks removed in FIFO order, but multiple tasks can execute in parallel. System-wide concurrent queues (global dispatch queues) are divided by quality-of-service classes:
+                \begin{itemize}
+                    \item \textbf{QOS\_CLASS\_USER\_INTERACTIVE}: User interface and event handling (small amount of work, responsive UI).
+                    \item \textbf{QOS\_CLASS\_USER\_INITIATED}: User-associated tasks requiring longer processing (e.g., opening files/URLs); must complete for user interaction to continue.
+                    \item \textbf{QOS\_CLASS\_UTILITY}: Longer-running tasks not requiring immediate results (e.g., importing data).
+                    \item \textbf{QOS\_CLASS\_BACKGROUND}: Non-visible, non-time-sensitive tasks (e.g., indexing, backups).
+                \end{itemize}
+        \end{itemize}
+    \item \textbf{Task Submission}:
+        \begin{itemize}
+            \item C, C++, Objective-C: Use a \textbf{block} (self-contained unit of work, specified by \texttt{\^{}\{\}}).
+            \item Swift: Use a \textbf{closure} (similar to a block, self-contained unit of functionality).
+            \item Tasks submitted using functions like \texttt{dispatch\_async()}.
+        \end{itemize}
+    \item Internally, GCD's thread pool uses POSIX threads and dynamically adjusts thread count. Implemented by \texttt{libdispatch}.
+\end{itemize}
+
+\subsection{Intel Threading Building Blocks (TBB)}
+\begin{itemize}
+    \item A template library for designing parallel C++ applications.
+    \item Requires no special compiler or language support.
+    \item Developers specify tasks, and the TBB task scheduler maps them to underlying threads.
+    \item Provides load balancing and is cache-aware (prioritizes tasks with data in cache).
+    \item Offers templates for parallel loop structures (\texttt{parallel\_for}), atomic operations, mutual exclusion locking, and concurrent data structures.
+    \item \textbf{Parallel For Loops}:
+        \begin{itemize}
+            \item \texttt{parallel\_for (range, body)}: \texttt{range} defines the iteration space, \texttt{body} specifies an operation on a subrange.
+            \item Example: \texttt{parallel\_for (size\_t(0), n, [=](size\_t i) \{apply(v[i]);\});}
+            \item TBB divides loop iterations into "chunks" and assigns tasks to available threads.
+            \item Developers identify parallelizable operations, and the library manages work division and parallel execution.
+        \end{itemize}
+    \item Available in commercial and open-source versions for Windows, Linux, and macOS.
+\end{itemize}
+
+\subsection*{Section glossary}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{implicit threading} & A programming model that transfers the creation and management of threading from application developers to compilers and run-time libraries. \\
+\textbf{thread pool} & A number of threads created at process startup and placed in a pool, where they sit and wait for work. \\
+\textbf{fork-join} & A strategy for thread creation in which the main parent thread creates (forks) one or more child threads and then waits for the children to terminate and join with it. \\
+\textbf{parallel regions} & Blocks of code that may run in parallel, identified by OpenMP. \\
+\textbf{dispatch queue} & An Apple OS feature for parallelizing code; blocks are placed in the queue by Grand Central Dispatch (GCD) and removed to be run by an available thread. \\
+\textbf{main queue} & Apple OS per-process serial dispatch queue. \\
+\textbf{user-interactive} & In the Grand Central Dispatch Apple OS scheduler, the scheduling class representing tasks that interact with the user. \\
+\textbf{user-initiated} & In the Grand Central Dispatch Apple OS scheduler, the scheduling class representing tasks that interact with the user but need longer processing times than user-interactive tasks. \\
+\textbf{utility} & In the Grand Central Dispatch Apple OS scheduler, the scheduling class representing tasks that require a longer time to complete but do not demand immediate results. \\
+\textbf{background} & In the Grand Central Dispatch Apple OS scheduler, the scheduling class representing tasks that are not time sensitive and are not visible to the user. \\
+\textbf{block} & In the Grand Central Dispatch Apple OS scheduler, a language extension (for C, C++, Objective-C) that allows designation of a self-contained unit of work to be submitted to dispatch queues. \\
+\textbf{iteration space} & In Intel Threading Building Blocks, the range of elements that will be iterated. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

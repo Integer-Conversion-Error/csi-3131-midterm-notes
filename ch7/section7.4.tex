@@ -1,0 +1,311 @@
+\section{Synchronization in Java}
+
+\begin{itemize}
+    \item Java language and API: rich support for thread synchronization since its origins.
+    \item This section covers:
+    \begin{itemize}
+        \item Java monitors (original mechanism).
+        \item Reentrant locks, semaphores, condition variables (introduced in Release 1.5).
+    \end{itemize}
+    \item Focus on common locking and synchronization mechanisms.
+    \item Java API has more features not covered (e.g., atomic variables, CAS instruction).
+\end{itemize}
+
+\subsection{Java monitors}
+\begin{itemize}
+    \item Java provides a monitor-like concurrency mechanism.
+    \item Illustrated with \texttt{BoundedBuffer} class (Figure \ref{fig:7.4.1}).
+    \item Producer/consumer invoke \texttt{insert()} and \texttt{remove()} methods.
+    \item \texttt{BoundedBuffer} class structure:
+    \begin{verbatim}
+public class BoundedBuffer<E>
+{
+  private static final int BUFFER_SIZE = 5;
+ 
+  private int count, in, out;
+  private E[] buffer;
+ 
+  public BoundedBuffer() {
+    count = 0;
+    in = 0;
+    out = 0;
+    buffer = (E[]) new Object[BUFFER_SIZE];
+  }
+ 
+  /* Producers call this method */
+  public synchronized void insert(E item) {
+    /* See Figure 7.4.3 */
+  }
+ 
+  /* Consumers call this method */
+  public synchronized E remove() {
+    /* See Figure 7.4.3 */
+  }
+}
+    \end{verbatim}
+    \item Every Java object has a single associated lock.
+    \item \texttt{synchronized} method: entering requires owning the object's lock.
+    \item Declared by placing \texttt{synchronized} keyword in method definition (e.g., \texttt{insert()}, \texttt{remove()}).
+    \item Entering \texttt{synchronized} method:
+    \begin{itemize}
+        \item Requires owning lock on \texttt{BoundedBuffer} object instance.
+        \item If lock owned by another thread: calling thread blocks, placed in object's \textit{entry set}.
+        \item \textit{Entry set}: set of threads waiting for lock to become available.
+        \item If lock available: calling thread becomes owner, enters method.
+        \item Lock released when thread exits method.
+        \item If entry set not empty on lock release: JVM arbitrarily selects thread from set to own lock (often FIFO in practice).
+    \end{itemize}
+    \item Entry set operation illustrated in Figure \ref{fig:7.4.2}.
+    \item Every object also has a \textit{wait set} (initially empty).
+    \item When thread enters \texttt{synchronized} method (owns lock):
+    \begin{itemize}
+        \item May be unable to continue if condition not met (e.g., producer calls \texttt{insert()} and buffer is full).
+        \item Thread releases lock and waits until condition is met.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Block synchronization}
+\begin{itemize}
+    \item \textit{Scope} of lock: time between acquisition and release.
+    \item \texttt{synchronized} method: large scope if only small part manipulates shared data.
+    \item Better: synchronize only the block of code manipulating shared data (smaller lock scope).
+    \item Java allows block synchronization:
+    \begin{verbatim}
+public void someMethod() {
+   /* non-critical section */
+ 
+   synchronized(this) {
+      /* critical section */
+   }
+ 
+   /* remainder section */
+}
+    \end{verbatim}
+    \item Only critical-section access requires ownership of \texttt{this} object lock.
+    \item When thread calls \texttt{wait()} method:
+    \begin{enumerate}
+        \item Releases lock for the object.
+        \item Thread state set to blocked.
+        \item Thread placed in wait set for the object.
+    \end{enumerate}
+    \item Example (Figure \ref{fig:7.4.3}):
+    \begin{itemize}
+        \item Producer calls \texttt{insert()}, buffer full, calls \texttt{wait()}.
+        \item \texttt{wait()} releases lock, blocks producer, puts producer in wait set.
+        \item Consumer enters \texttt{remove()} (lock now available), frees buffer space.
+    \end{itemize}
+    \item Entry and wait sets illustrated in Figure \ref{fig:7.4.4}.
+    \item \texttt{insert()} and \texttt{remove()} methods using \texttt{wait()} and \texttt{notify()} (Figure \ref{fig:7.4.3}):
+    \begin{verbatim}
+/* Producers call this method */
+public synchronized void insert(E item) {
+    while (count == BUFFER_SIZE) {
+      try {
+        wait();
+      }
+      catch (InterruptedException ie) { }
+    }
+ 
+    buffer[in] = item;
+    in = (in + 1) % BUFFER_SIZE;
+    count++;
+ 
+    notify();
+}
+
+/* Consumers call this method */
+public synchronized E remove() {
+    E item;
+ 
+    while (count == 0) {
+      try {
+        wait();
+      }
+      catch (InterruptedException ie) { }
+    }
+ 
+    item = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+    count--;
+ 
+    notify();
+ 
+    return item;
+}
+    \end{verbatim}
+    \item \texttt{notify()} method:
+    \begin{itemize}
+        \item Picks arbitrary thread \texttt{T} from wait set.
+        \item Moves \texttt{T} from wait set to entry set.
+        \item Sets state of \texttt{T} from blocked to runnable.
+    \end{itemize}
+    \item \texttt{T} now eligible to compete for lock.
+    \item Once \texttt{T} regains lock, returns from \texttt{wait()}, rechecks \texttt{count}.
+    \item \texttt{notify()} ignored if no thread in wait set.
+    \item Sequence of events with \texttt{wait()} and \texttt{notify()}:
+    \begin{itemize}
+        \item Buffer full, lock available.
+        \item Producer calls \texttt{insert()}, enters, finds buffer full, calls \texttt{wait()}.
+        \item \texttt{wait()} releases lock, blocks producer, puts producer in wait set.
+        \item Consumer calls \texttt{remove()}, enters (lock available), removes item, calls \texttt{notify()}. Consumer still owns lock.
+        \item \texttt{notify()} moves producer from wait set to entry set, sets state to runnable.
+        \item Consumer exits \texttt{remove()}, releases lock.
+        \item Producer reacquires lock, resumes from \texttt{wait()}.
+        \item Producer tests \texttt{while} loop, finds room, proceeds with \texttt{insert()}.
+        \item Producer exits \texttt{insert()}, releases lock.
+    \end{itemize}
+    \item \texttt{synchronized}, \texttt{wait()}, \texttt{notify()} are original Java mechanisms.
+    \item Later Java API revisions introduced more flexible/robust locking.
+\end{itemize}
+
+\subsection{Reentrant locks}
+\begin{itemize}
+    \item Simplest locking mechanism in API: \texttt{ReentrantLock}.
+    \item Similar to \texttt{synchronized} statement: owned by single thread, provides mutual exclusive access to shared resource.
+    \item Additional features: e.g., \textit{fairness} parameter (favors longest-waiting thread).
+    \item Acquisition: invoke \texttt{lock()} method.
+    \begin{itemize}
+        \item If lock available OR invoking thread already owns it (\textbf{\textit{reentrant}}): \texttt{lock()} assigns ownership, returns control.
+        \item If lock unavailable: invoking thread blocks until owner invokes \texttt{unlock()}.
+    \end{itemize}
+    \item Implements \texttt{Lock} interface.
+    \item Usage example:
+    \begin{verbatim}
+Lock key = new ReentrantLock();
+ 
+key.lock();
+try {
+  /* critical section */
+}
+finally {
+  key.unlock();
+}
+    \end{verbatim}
+    \item \texttt{try} and \texttt{finally} idiom:
+    \begin{itemize}
+        \item Ensures lock is released (via \texttt{unlock()}) after critical section completes or if exception occurs in \texttt{try} block.
+        \item \texttt{lock()} not placed in \texttt{try} clause because it doesn't throw checked exceptions.
+        \item Avoids \texttt{IllegalMonitorStateException} if unchecked exception occurs during \texttt{lock()} invocation (e.g., \texttt{OutofMemoryError}), which would obscure original failure reason.
+    \end{itemize}
+    \item \texttt{ReentrantLock} provides mutual exclusion.
+    \item \texttt{ReentrantReadWriteLock}: Java API also provides this for scenarios with more readers than writers.
+    \begin{itemize}
+        \item Allows multiple concurrent readers but only one writer.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Semaphores}
+\begin{itemize}
+    \item Java API provides counting semaphore (as in Section \hyperref[sec:6.6]{6.6}).
+    \item Constructor: \texttt{Semaphore(int value)}.
+    \item \texttt{value}: initial value of semaphore (negative allowed).
+    \item \texttt{acquire()} method: throws \texttt{InterruptedException} if acquiring thread interrupted.
+    \item Example using semaphore for mutual exclusion:
+    \begin{verbatim}
+Semaphore sem = new Semaphore(1);
+ 
+try {
+  sem.acquire();
+  /* critical section */
+}
+catch (InterruptedException ie) { }
+finally {
+  sem.release();
+}
+    \end{verbatim}
+    \item \texttt{release()} placed in \texttt{finally} clause to ensure semaphore is released.
+\end{itemize}
+
+\subsection{Condition variables}
+\begin{itemize}
+    \item Java API utility: condition variable.
+    \item Functionality similar to \texttt{wait()} and \texttt{notify()} methods.
+    \item Must be associated with a reentrant lock for mutual exclusion.
+    \item Creation:
+    \begin{enumerate}
+        \item Create a \texttt{ReentrantLock}.
+        \item Invoke its \texttt{newCondition()} method.
+    \end{enumerate}
+    \item Returns a \texttt{Condition} object (representing condition variable for associated \texttt{ReentrantLock}).
+    \item Example:
+    \begin{verbatim}
+Lock key = new ReentrantLock();
+Condition condVar = key.newCondition();
+    \end{verbatim}
+    \item Operations: \texttt{await()} and \texttt{signal()} methods.
+    \item Function same as \texttt{wait()} and \texttt{signal()} in Section \hyperref[sec:6.7]{6.7}.
+    \item Named vs. unnamed condition variables:
+    \begin{itemize}
+        \item Monitors (Section \hyperref[sec:6.7]{6.7}): \texttt{wait()} and \texttt{signal()} apply to \textbf{\textit{named}} condition variables.
+        \item Java (language level): does not provide named condition variables.
+        \item Each Java monitor: associated with one unnamed condition variable.
+        \item \texttt{wait()} and \texttt{notify()} (Section Java monitors): apply only to this single unnamed condition variable.
+        \item When Java thread awakened via \texttt{notify()}: receives no info on why; reactivated thread must check condition itself.
+        \item Condition variables (this section): remedy this by allowing specific thread to be notified.
+    \end{itemize}
+    \item Example: Five threads (0-4), shared variable \texttt{turn}.
+    \item \texttt{doWork(int threadNumber)} method (Figure \ref{fig:7.4.5}):
+    \begin{itemize}
+        \item Only thread with \texttt{threadNumber} matching \texttt{turn} proceeds; others wait.
+        \item \texttt{doWork()} method:
+        \begin{verbatim}
+/* threadNumber is the thread that wishes to do some work */
+public void doWork(int threadNumber)
+{
+  lock.lock();
+ 
+  try {
+    /**
+     * If it's not my turn, then wait
+     * until I'm signaled.
+     */
+    if (threadNumber != turn)
+      condVars[threadNumber].await();
+ 
+    /**
+     * Do some work for awhile ...
+     */
+ 
+    /**
+     * Now signal to the next thread.
+     */
+    turn = (turn + 1) % 5;
+    condVars[turn].signal();
+  }
+  catch (InterruptedException ie) { }
+  finally {
+    lock.unlock();
+  }
+}
+        \end{verbatim}
+    \end{itemize}
+    \item Requires \texttt{ReentrantLock} and five condition variables (\texttt{condVars}).
+    \item Initialization:
+    \begin{verbatim}
+Lock lock = new ReentrantLock();
+Condition[] condVars = new Condition[5];
+ 
+for (int i = 0; i < 5; i++)
+  condVars[i] = lock.newCondition();
+    \end{verbatim}
+    \item When thread enters \texttt{doWork()}:
+    \begin{itemize}
+        \item If \texttt{threadNumber != turn}: invokes \texttt{await()} on its associated condition variable.
+        \item Resumes only when signaled by another thread.
+        \item After work: signals condition variable for next thread's turn.
+    \end{itemize}
+    \item \texttt{doWork()} does not need to be \texttt{synchronized}.
+    \begin{itemize}
+        \item \texttt{ReentrantLock} provides mutual exclusion.
+        \item \texttt{await()} on condition variable releases associated \texttt{ReentrantLock}.
+        \item \texttt{signal()} only signals condition variable; lock released by \texttt{unlock()}.
+    \end{itemize}
+    \item Programming problems/projects at end of chapter use Pthreads mutex locks, condition variables, and POSIX semaphores.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{itemize}
+    \item \textit{entry set}: In Java, the set of threads waiting to enter a monitor.
+    \item \textit{wait set}: In Java, a set of threads, each waiting for a condition that will allow it to continue.
+    \item \textit{scope}: The time between when a lock is acquired and when it is released.
+\end{itemize}

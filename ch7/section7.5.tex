@@ -1,0 +1,161 @@
+\section{Alternative approaches}
+
+\begin{itemize}
+    \item Emergence of multicore systems: increased pressure to develop concurrent applications.
+    \item Concurrent applications: increased risk of race conditions and liveness hazards (e.g., deadlock).
+    \item Traditionally: mutex locks, semaphores, monitors used to address these.
+    \item Challenge: as processing cores increase, designing multithreaded applications free from race conditions and deadlock becomes harder.
+    \item This section explores: features in programming languages and hardware supporting thread-safe concurrent applications.
+\end{itemize}
+
+\subsection{Transactional memory}
+\begin{itemize}
+    \item Idea originated in database theory, now used for process synchronization.
+    \item \textit{Memory transaction}: sequence of memory read-write operations that are atomic.
+    \item If all operations complete: transaction committed.
+    \item Otherwise: operations aborted and rolled back.
+    \item Benefits obtained through language features.
+    \item Example: \texttt{update()} function modifying shared data.
+    \begin{itemize}
+        \item Traditional approach (with mutex locks/semaphores):
+        \begin{verbatim}
+void update ()
+{
+  acquire();
+ 
+  /* modify shared data */
+ 
+  release();
+}
+        \end{verbatim}
+        \item Problems with traditional locking: deadlock, poor scalability with increasing threads (high contention for lock ownership).
+        \item Alternative: new language features using transactional memory.
+        \item Construct \texttt{atomic\{S\}}: ensures operations in \texttt{S} execute as a transaction.
+        \item Rewritten \texttt{update()} function:
+        \begin{verbatim}
+void update ()
+{
+  atomic {
+     /* modify shared data */
+  }
+}
+        \end{verbatim}
+        \item Advantages of transactional memory:
+        \begin{itemize}
+            \item Transactional memory system (not developer) guarantees atomicity.
+            \item No locks involved $\rightarrow$ deadlock not possible.
+            \item System can identify concurrent execution of statements in atomic blocks (e.g., concurrent read access).
+            \item Programmer identifying these situations (e.g., for reader-writer locks) becomes difficult as thread count grows.
+        \end{itemize}
+    \end{itemize}
+    \item Implementation:
+    \begin{itemize}
+        \item \textit{Software transactional memory} (\textit{STM}):
+        \begin{itemize}
+            \item Implemented exclusively in software; no special hardware needed.
+            \item Works by inserting instrumentation code inside transaction blocks (by compiler).
+            \item Manages transactions by examining concurrency and low-level locking needs.
+        \end{itemize}
+        \item \textit{Hardware transactional memory} (\textit{HTM}):
+        \begin{itemize}
+            \item Uses hardware cache hierarchies and cache coherency protocols.
+            \item Manages and resolves conflicts for shared data in separate processors' caches.
+            \item Requires no special code instrumentation (less overhead than STM).
+            \item Requires modification of existing cache hierarchies and cache coherency protocols.
+        \end{itemize}
+    \end{itemize}
+    \item Status: existed for years without widespread implementation.
+    \item Current trend: growth of multicore systems and emphasis on concurrent/parallel programming has prompted significant research.
+\end{itemize}
+
+\subsection{OpenMP}
+\begin{itemize}
+    \item Overview in Section Fork join: supports parallel programming in shared-memory environment.
+    \item Includes: set of compiler directives and an API.
+    \item \texttt{\#pragma omp parallel}: compiler directive.
+    \begin{itemize}
+        \item Code following this is a parallel region.
+        \item Performed by number of threads equal to processing cores.
+    \end{itemize}
+    \item Advantage: OpenMP library handles thread creation and management (not application developers' responsibility).
+    \item \texttt{\#pragma omp critical}: compiler directive.
+    \begin{itemize}
+        \item Specifies code region as a critical section.
+        \item Only one thread active at a time.
+        \item Ensures threads do not generate race conditions.
+    \end{itemize}
+    \item Example: \texttt{update()} function modifying shared variable \texttt{counter}.
+    \begin{verbatim}
+void update(int value)
+{
+   counter += value;
+}
+    \end{verbatim}
+    \begin{itemize}
+        \item If \texttt{update()} is part of/invoked from parallel region, race condition possible on \texttt{counter}.
+        \item Remedy using critical-section compiler directive:
+        \begin{verbatim}
+void update(int value)
+{
+   \#pragma omp critical
+   {
+      counter += value;
+   }
+}
+        \end{verbatim}
+    \end{itemize}
+    \item Behavior of critical-section directive:
+    \begin{itemize}
+        \item Much like binary semaphore or mutex lock.
+        \item Ensures only one thread active in critical section at a time.
+        \item If thread tries to enter when another is active (owns section): calling thread blocks until owner exits.
+        \item Multiple critical sections: each can be named; rule specifies only one thread active in critical section of same name simultaneously.
+    \end{itemize}
+    \item Advantages of OpenMP critical-section directive:
+    \begin{itemize}
+        \item Generally considered easier to use than standard mutex locks.
+    \end{itemize}
+    \item Disadvantages:
+    \begin{itemize}
+        \item Developers must still identify possible race conditions.
+        \item Must adequately protect shared data using directive.
+        \item Deadlock still possible if two or more critical sections are identified (behaves like mutex lock).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Functional programming languages}
+\begin{itemize}
+    \item Most well-known languages (C, C++, Java, C\#): \textit{imperative} (or \textit{procedural}) languages.
+    \item Imperative languages:
+    \begin{itemize}
+        \item Implement state-based algorithms.
+        \item Flow of algorithm crucial for correct operation.
+        \item State represented with variables and data structures.
+        \item Program state is mutable (variables can change values).
+    \end{itemize}
+    \item Current emphasis on concurrent/parallel programming for multicore systems: greater focus on \textit{functional} programming languages.
+    \item Functional languages:
+    \begin{itemize}
+        \item Different programming paradigm from imperative.
+        \item Fundamental difference: do not maintain state.
+        \item Once variable defined and assigned value, its value is immutable (cannot change).
+        \item Because mutable state disallowed: no concern with race conditions and deadlocks.
+        \item Most problems addressed in this chapter are nonexistent.
+    \end{itemize}
+    \item Examples of functional languages:
+    \begin{itemize}
+        \item Erlang: gained attention for concurrency support and ease of developing parallel applications.
+        \item Scala: functional and object-oriented; syntax similar to Java and C\#.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{itemize}
+    \item \textit{transactional memory}: Type of memory supporting memory transactions.
+    \item \textit{memory transaction}: Sequence of memory read-write operations that are atomic.
+    \item \textit{software transactional memory (STM)}: Transactional memory implemented exclusively in software; no special hardware needed.
+    \item \textit{hardware transactional memory (HTM)}: Transactional memory using hardware cache hierarchies and cache coherency protocols to manage/resolve conflicts for shared data in separate processors' caches.
+    \item \textit{imperative language}: Language for implementing state-based algorithms (e.g., C, C++, Java, C\#).
+    \item \textit{procedural language}: A language that implements state-based algorithms (e.g., C, C++, Java, C\#).
+    \item \textit{functional language}: Programming language that does not require states to be managed by programs written in it (e.g., Erlang, Scala).
+\end{itemize}
