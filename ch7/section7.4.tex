@@ -13,10 +13,9 @@
 
 \subsection{Java monitors}
 \begin{itemize}
-    \item Java provides a monitor-like concurrency mechanism.
-    \item Illustrated with \texttt{BoundedBuffer} class (Figure \ref{fig:7.4.1}).
-    \item Producer/consumer invoke \texttt{insert()} and \texttt{remove()} methods.
-    \item \texttt{BoundedBuffer} class structure:
+    \item Java provides a monitor-like concurrency mechanism, which is illustrated below with a \texttt{BoundedBuffer} class that implements the bounded-buffer problem using a monitor.
+    \item The producer and consumer processes invoke the \texttt{insert()} and \texttt{remove()} methods, respectively.
+    \item The structure of the \texttt{BoundedBuffer} class is as follows:
     \begin{verbatim}
 public class BoundedBuffer<E>
 {
@@ -34,12 +33,12 @@ public class BoundedBuffer<E>
  
   /* Producers call this method */
   public synchronized void insert(E item) {
-    /* See Figure 7.4.3 */
+    // details to be shown later
   }
  
   /* Consumers call this method */
   public synchronized E remove() {
-    /* See Figure 7.4.3 */
+    // details to be shown later
   }
 }
     \end{verbatim}
@@ -55,7 +54,7 @@ public class BoundedBuffer<E>
         \item Lock released when thread exits method.
         \item If entry set not empty on lock release: JVM arbitrarily selects thread from set to own lock (often FIFO in practice).
     \end{itemize}
-    \item Entry set operation illustrated in Figure \ref{fig:7.4.2}.
+    \item The operation of the entry set is as follows: when a thread calls a \texttt{synchronized} method, it is added to the entry set for the object's lock. The thread is suspended until the lock is released, at which point the JVM selects a thread from the entry set to be granted the lock.
     \item Every object also has a \textit{wait set} (initially empty).
     \item When thread enters \texttt{synchronized} method (owns lock):
     \begin{itemize}
@@ -88,14 +87,9 @@ public void someMethod() {
         \item Thread state set to blocked.
         \item Thread placed in wait set for the object.
     \end{enumerate}
-    \item Example (Figure \ref{fig:7.4.3}):
-    \begin{itemize}
-        \item Producer calls \texttt{insert()}, buffer full, calls \texttt{wait()}.
-        \item \texttt{wait()} releases lock, blocks producer, puts producer in wait set.
-        \item Consumer enters \texttt{remove()} (lock now available), frees buffer space.
-    \end{itemize}
-    \item Entry and wait sets illustrated in Figure \ref{fig:7.4.4}.
-    \item \texttt{insert()} and \texttt{remove()} methods using \texttt{wait()} and \texttt{notify()} (Figure \ref{fig:7.4.3}):
+    \item For example, when a producer thread invokes the \texttt{insert()} method and finds the buffer full, it calls \texttt{wait()}. This action releases the lock, blocks the producer, and places it in the wait set. A consumer thread can then acquire the lock, enter the \texttt{remove()} method, and free up space in the buffer.
+    \item The relationship between the entry set and the wait set is as follows: when a thread in the wait set is notified, it is moved to the entry set and becomes eligible to be granted the lock.
+    \item The full implementation of the \texttt{insert()} and \texttt{remove()} methods, which use \texttt{wait()} and \texttt{notify()}, is shown below:
     \begin{verbatim}
 /* Producers call this method */
 public synchronized void insert(E item) {
@@ -196,7 +190,7 @@ finally {
 
 \subsection{Semaphores}
 \begin{itemize}
-    \item Java API provides counting semaphore (as in Section \hyperref[sec:6.6]{6.6}).
+    \item The Java API provides a counting semaphore, as described in a previous chapter.
     \item Constructor: \texttt{Semaphore(int value)}.
     \item \texttt{value}: initial value of semaphore (negative allowed).
     \item \texttt{acquire()} method: throws \texttt{InterruptedException} if acquiring thread interrupted.
@@ -233,10 +227,10 @@ Lock key = new ReentrantLock();
 Condition condVar = key.newCondition();
     \end{verbatim}
     \item Operations: \texttt{await()} and \texttt{signal()} methods.
-    \item Function same as \texttt{wait()} and \texttt{signal()} in Section \hyperref[sec:6.7]{6.7}.
+    \item The function of these methods is the same as that of the \texttt{wait()} and \texttt{signal()} methods described in a previous chapter.
     \item Named vs. unnamed condition variables:
     \begin{itemize}
-        \item Monitors (Section \hyperref[sec:6.7]{6.7}): \texttt{wait()} and \texttt{signal()} apply to \textbf{\textit{named}} condition variables.
+        \item The monitors described in a previous chapter apply the \texttt{wait()} and \texttt{signal()} methods to \textbf{\textit{named}} condition variables.
         \item Java (language level): does not provide named condition variables.
         \item Each Java monitor: associated with one unnamed condition variable.
         \item \texttt{wait()} and \texttt{notify()} (Section Java monitors): apply only to this single unnamed condition variable.
@@ -244,10 +238,10 @@ Condition condVar = key.newCondition();
         \item Condition variables (this section): remedy this by allowing specific thread to be notified.
     \end{itemize}
     \item Example: Five threads (0-4), shared variable \texttt{turn}.
-    \item \texttt{doWork(int threadNumber)} method (Figure \ref{fig:7.4.5}):
+    \item The \texttt{doWork(int threadNumber)} method demonstrates this concept.
     \begin{itemize}
-        \item Only thread with \texttt{threadNumber} matching \texttt{turn} proceeds; others wait.
-        \item \texttt{doWork()} method:
+        \item In this example, only the thread whose \texttt{threadNumber} matches the shared variable \texttt{turn} is allowed to proceed; all other threads must wait.
+        \item The implementation of the \texttt{doWork()} method is as follows:
         \begin{verbatim}
 /* threadNumber is the thread that wishes to do some work */
 public void doWork(int threadNumber)
@@ -304,8 +298,15 @@ for (int i = 0; i < 5; i++)
 \end{itemize}
 
 \subsection{Section glossary}
-\begin{itemize}
-    \item \textit{entry set}: In Java, the set of threads waiting to enter a monitor.
-    \item \textit{wait set}: In Java, a set of threads, each waiting for a condition that will allow it to continue.
-    \item \textit{scope}: The time between when a lock is acquired and when it is released.
-\end{itemize}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{entry set} & In Java, the set of threads waiting to enter a monitor. \\
+\textbf{wait set} & In Java, a set of threads, each waiting for a condition that will allow it to continue. \\
+\textbf{scope} & The time between when a lock is acquired and when it is released. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

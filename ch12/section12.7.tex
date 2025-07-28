@@ -1,0 +1,88 @@
+\section{Performance}
+
+\subsection{I/O and System Performance}
+\begin{itemize}
+    \item I/O: major factor in system performance.
+    \item Heavy demands on CPU: execute device-driver code, schedule processes (block/unblock).
+    \item Context switches: stress CPU and hardware caches.
+    \item Exposes inefficiencies in kernel's interrupt-handling mechanisms.
+    \item Loads memory bus: data copies between controllers/physical memory, and kernel buffers/application space.
+    \item Graceful coping with demands: major concern for computer architects.
+    \item Interrupt handling: relatively expensive (state change, execute handler, restore state).
+    \item Programmed I/O (PIO) can be more efficient than interrupt-driven I/O if busy waiting minimized.
+    \item I/O completion unblocks process: leads to full context switch overhead.
+    \item Network traffic: high context-switch rate.
+    \item Example: remote login character.
+    \begin{itemize}
+        \item Local machine: character typed $\rightarrow$ keyboard interrupt $\rightarrow$ interrupt handler $\rightarrow$ device driver $\rightarrow$ kernel $\rightarrow$ user process.
+        \item User process issues network I/O system call $\rightarrow$ local kernel $\rightarrow$ network layers (packet construction) $\rightarrow$ network device driver.
+        \item Network device driver transfers packet to controller $\rightarrow$ sends character, generates interrupt.
+        \item Interrupt back up through kernel $\rightarrow$ network I/O system call completes.
+        \item Remote system: network hardware receives packet $\rightarrow$ interrupt generated.
+        \item Character unpacked from protocols $\rightarrow$ appropriate network daemon.
+        \item Network daemon identifies session $\rightarrow$ passes packet to subdaemon.
+        \item Throughout: context switches and state switches.
+        \item Receiver echoes character: doubles work.
+    \end{itemize}
+\end{itemize}
+
+\subsection{I/O Efficiency Improvement Principles}
+\begin{itemize}
+    \item Some systems use separate \textbf{front-end processors} for terminal I/O to reduce main CPU interrupt burden.
+    \item \textbf{Terminal concentrator}: multiplexes traffic from hundreds of remote terminals into one port.
+    \item \textbf{I/O channel}: dedicated, special-purpose CPU in mainframes/high-end systems.
+    \item Channel job: offload I/O work from main CPU, keep data flowing smoothly.
+    \item Channels process more general/sophisticated programs, tuned for workloads.
+    \item Principles to improve I/O efficiency:
+    \begin{itemize}
+        \item Reduce number of context switches.
+        \item Reduce data copies in memory (between device/application).
+        \item Reduce interrupt frequency: use large transfers, smart controllers, polling (if busy waiting minimal).
+        \item Increase concurrency: use DMA-knowledgeable controllers/channels to offload data copying from CPU.
+        \item Move processing primitives into hardware: concurrent operation with CPU/bus.
+        \item Balance CPU, memory subsystem, bus, I/O performance: overload in one area causes idleness in others.
+    \end{itemize}
+    \item I/O device complexity varies (mouse simple, Windows disk driver complex).
+    \item Windows disk driver: manages individual disks, implements RAID arrays, converts requests to disk I/O, error handling, data recovery, optimizes performance.
+\end{itemize}
+
+\subsection{I/O Functionality Implementation Location}
+\begin{itemize}
+    \item Where to implement I/O functionality: device hardware, device driver, or application software?
+    \item Progression observed:
+    \begin{enumerate}
+        \item Initially: experimental I/O algorithms at application level.
+        \begin{itemize}
+            \item Flexible, bugs unlikely to crash system.
+            \item No reboot/reload drivers after code changes.
+            \item Inefficient: context switch overhead, no internal kernel data/functionality (messaging, threading, locking).
+            \item Example: FUSE system interface allows user-mode file systems.
+        \end{itemize}
+        \item When proven: reimplement in kernel.
+        \begin{itemize}
+            \item Improves performance.
+            \item More challenging development (large, complex kernel).
+            \item Must be thoroughly debugged (avoid data corruption, system crashes).
+        \end{itemize}
+        \item Highest performance: specialized implementation in hardware (device or controller).
+        \begin{itemize}
+            \item Disadvantages: difficulty/expense of improvements/bug fixes.
+            \item Increased development time (months vs. days).
+            \item Decreased flexibility (e.g., hardware RAID controller may not allow kernel to influence I/O order/location).
+        \end{itemize}
+    \end{enumerate}
+    \item I/O devices increasing in speed (NVM devices nearing DRAM speed).
+    \item Increases pressure on I/O subsystems and OS algorithms to leverage read/write speeds.
+    \item I/O performance of storage and network latency: CPU, caches, DRAM, NVM, PCIe, SSD, SAA, HDD.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{front-end processors} & Small computers performing tasks in overall system; manage I/O, offload CPU. \\
+    \textbf{terminal concentrator} & Type of front-end processor for terminals. \\
+    \textbf{I/O channel} & Dedicated, special-purpose CPU in large systems for I/O or offloading main CPU. \\
+    \bottomrule
+\end{tabular}

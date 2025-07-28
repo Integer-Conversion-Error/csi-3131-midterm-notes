@@ -1,0 +1,70 @@
+\section{Streams}
+
+\subsection{STREAMS Mechanism}
+\begin{itemize}
+    \item UNIX System V (and subsequent releases) has \textbf{STREAMS} mechanism.
+    \item Enables dynamic assembly of driver code pipelines.
+    \item Stream: full-duplex connection between device driver and user-level process.
+    \item Components:
+    \begin{itemize}
+        \item \textbf{Stream head}: interfaces with user process.
+        \item \textbf{Driver end}: controls the device.
+        \item Zero or more \textbf{stream modules}: between stream head and driver end.
+    \end{itemize}
+    \item Each component: pair of queues (read queue, write queue).
+    \item Data transfer: message passing between queues.
+\end{itemize}
+
+\subsection{Modules and Flow Control}
+\begin{itemize}
+    \item Modules provide STREAMS processing functionality.
+    \item Modules are \textit{pushed} onto a stream using `ioctl()` system call.
+    \item Example: open USB device (keyboard) via stream, push module for input editing.
+    \item Message exchange between queues in adjacent modules.
+    \item To prevent queue overflow: queue may support \textbf{flow control}.
+    \item Without flow control: queue accepts all messages, immediately sends to adjacent queue without buffering.
+    \item With flow control: buffers messages, does not accept messages without sufficient buffer space.
+    \item Involves control message exchanges between adjacent module queues.
+\end{itemize}
+
+\subsection{User Process Interaction}
+\begin{itemize}
+    \item User process writes data to device: `write()` or `putmsg()` system call.
+    \item `write()`: writes raw data to stream.
+    \item `putmsg()`: allows user to specify a message.
+    \item Stream head copies data into message, delivers to next module's queue.
+    \item Copying continues to driver end, then device.
+    \item User process reads data from stream head: `read()` or `getmsg()` system call.
+    \item `read()`: stream head gets message, returns ordinary data (unstructured byte stream).
+    \item `getmsg()`: message returned to process.
+    \item STREAMS I/O is asynchronous (or nonblocking) except when communicating with stream head.
+    \item Writing to stream: user process blocks (if next queue uses flow control) until room to copy message.
+    \item Reading from stream: user process blocks until data available.
+\end{itemize}
+
+\subsection{Driver End and Benefits}
+\begin{itemize}
+    \item Driver end (like stream head/modules) has read/write queue.
+    \item Driver end must respond to interrupts (e.g., frame ready from network).
+    \item Unlike stream head (may block), driver end must handle all incoming data.
+    \item Drivers must support flow control.
+    \item If device buffer full: device typically drops incoming messages (e.g., network card).
+    \item Benefit of STREAMS: framework for modular, incremental device drivers and network protocols.
+    \item Modules reusable by different streams/devices (e.g., networking module for Ethernet and 802.11 wireless).
+    \item Supports message boundaries and control info between modules (not just unstructured byte stream).
+    \item Most UNIX variants support STREAMS; preferred for protocols/device drivers.
+    \item Example: System V UNIX and Solaris implement socket mechanism using STREAMS.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{STREAMS} & UNIX I/O feature allowing dynamic assembly of driver code pipelines. \\
+    \textbf{stream head} & Interface between STREAMS and user processes. \\
+    \textbf{driver end} & Interface between STREAMS and the controlled device. \\
+    \textbf{stream modules} & Modules of functionality loadable into a STREAM. \\
+    \textbf{flow control} & Method to pause a sender of I/O; limits data flow rate. \\
+    \bottomrule
+\end{tabular}

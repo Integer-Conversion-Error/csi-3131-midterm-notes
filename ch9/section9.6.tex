@@ -1,0 +1,116 @@
+\section*{9.6 Example: Intel 32- and 64-bit Architectures}
+
+\subsection*{IA-32 Architecture}
+\begin{itemize}
+    \item Intel chips: dominated PC landscape for decades.
+    \item 16-bit Intel 8086 (late 1970s), then 8088 (original IBM PC).
+    \item 32-bit chips: \textbf{IA-32}, included Pentium processors.
+    \item 64-bit chips: based on \textbf{x86-64} architecture.
+    \item Current PC OS (Windows, Mac, Linux) run on Intel chips.
+    \item Intel dominance not in mobile systems; \textbf{ARM} architecture successful.
+    \item Focus: major memory-management concepts of Intel CPUs.
+    \item Memory management in IA-32: \textbf{segmentation} and \textbf{paging}.
+    \item CPU generates \textbf{logical addresses} $\rightarrow$ segmentation unit.
+    \item Segmentation unit produces \textbf{linear address} $\rightarrow$ paging unit.
+    \item Paging unit generates \textbf{physical address} in main memory.
+    \item Segmentation and paging units form \textbf{memory-management unit (MMU)}.
+    \item See Figure 9.6.1: Logical to physical address translation in IA-32.
+\end{itemize}
+
+\subsection*{IA-32 Segmentation}
+\begin{itemize}
+    \item IA-32 segment size: up to 4 GB.
+    \item Max segments per process: 16 K.
+    \item Logical address space divided into two partitions:
+    \begin{itemize}
+        \item First partition: up to 8 K segments, private to process.
+        \item Second partition: up to 8 K segments, shared among all processes.
+    \end{itemize}
+    \item Information for first partition: \textbf{local descriptor table (LDT)}.
+    \item Information for second partition: \textbf{global descriptor table (GDT)}.
+    \item Each LDT/GDT entry: 8-byte \textbf{segment descriptor}.
+    \item Segment descriptor: detailed info (base location, limit).
+    \item Logical address: (selector, offset).
+    \item Selector: 16-bit number.
+    \begin{itemize}
+        \item $s$: segment number.
+        \item $g$: GDT or LDT.
+        \item $p$: protection.
+    \end{itemize}
+    \item Offset: 32-bit number, byte location within segment.
+    \item Machine has six segment registers: allows six segments addressed at once.
+    \item Six 8-byte microprogram registers: hold descriptors (LDT/GDT cache).
+    \item Cache avoids reading descriptor from memory for every reference.
+    \item Linear address (IA-32): 32 bits long.
+    \item Segment register points to LDT/GDT entry.
+    \item Base and limit from segment descriptor generate linear address.
+    \item Limit checks address validity; invalid $\rightarrow$ memory fault (trap to OS).
+    \item Valid: offset added to base $\rightarrow$ 32-bit linear address.
+    \item See Figure 9.6.2: IA-32 segmentation.
+\end{itemize}
+
+\subsection*{IA-32 Paging}
+\begin{itemize}
+    \item IA-32 page size: 4 KB or 4 MB.
+    \item For 4-KB pages: two-level paging scheme.
+    \item 32-bit linear address division:
+    \begin{itemize}
+        \item Page number $p1$: 10 bits (high-order).
+        \item Page number $p2$: 10 bits (inner).
+        \item Page offset $d$: 12 bits (low-order).
+    \end{itemize}
+    \item See Figure 9.6.3: Paging in the IA-32 architecture.
+    \item 10 high-order bits reference entry in outermost page table: \textbf{page directory}.
+    \item \texttt{CR3} register points to page directory for current process.
+    \item Page directory entry points to inner page table (indexed by inner 10 bits).
+    \item Low-order bits 0-11: offset in 4-KB page.
+    \item Page directory entry: \texttt{Page\_Size} flag.
+    \item If \texttt{Page\_Size} set: page frame is 4 MB (bypasses inner page table).
+    \item 22 low-order bits in linear address: offset in 4-MB page frame.
+    \item IA-32 page tables can be swapped to disk for efficiency.
+    \item Invalid bit in page directory entry: indicates table in memory or on disk.
+    \item If on disk: OS uses other 31 bits for disk location; table brought into memory on demand.
+    \item 4-GB memory limitations of 32-bit architectures led to \textbf{page address extension (PAE)}.
+    \item PAE: allows 32-bit processors to access physical address space $>$ 4 GB.
+    \item PAE changes paging from two-level to three-level scheme.
+    \item Top two bits refer to \textbf{page directory pointer table}.
+    \item See Figure 9.6.4: Page address extensions (PAE also supports 2-MB pages).
+    \item PAE increased page-directory and page-table entries from 32 to 64 bits.
+    \item Allowed base address of page tables/frames to extend from 20 to 24 bits.
+    \item Combined with 12-bit offset: PAE increased address space to 36 bits.
+    \item Supports up to 64 GB physical memory.
+    \item OS support required for PAE (Linux, Mac support; 32-bit Windows desktop $\rightarrow$ 4 GB limit).
+\end{itemize}
+
+\subsection*{X86-64}
+\begin{itemize}
+    \item Intel's initial 64-bit architecture: \textbf{IA-64} (later \textbf{Itanium}), not widely adopted.
+    \item AMD developed \textbf{x86-64}: extended existing IA-32 instruction set.
+    \item x86-64: supported larger logical/physical address spaces, architectural advances.
+    \item Intel adopted AMD's x86-64 architecture.
+    \item Use general term \textbf{x86-64} (instead of AMD 64, Intel 64).
+    \item 64-bit address space: potentially $2^{64}$ bytes (16 quintillion / 16 exabytes).
+    \item In practice: fewer than 64 bits used for address representation.
+    \item x86-64 architecture: 48-bit virtual address.
+    \item Supports page sizes: 4 KB, 2 MB, or 1 GB.
+    \item Uses four levels of paging hierarchy.
+    \item See Figure 9.6.5: x86-64 linear address.
+    \item Addressing scheme uses PAE.
+    \item Virtual addresses 48 bits, support 52-bit physical addresses (4,096 terabytes).
+\end{itemize}
+
+\subsection*{Section Glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{page directory} & In Intel IA-32 CPU architecture, the outermost page table. \\
+\textbf{page address extension (PAE)} & Intel IA-32 CPU hardware allowing 32-bit processors to access physical address space larger than 4GB. \\
+\textbf{PAE} & Intel IA-32 CPU hardware allowing 32-bit processors to access physical address space larger than 4GB. \\
+\textbf{page directory pointer table} & PAE pointer to page tables. \\
+\textbf{Itanium} & Intel IA-64 CPU. \\
+\textbf{AMD 64} & A 64-bit CPU designed by Advanced Micro Devices; part of x86-64 class. \\
+\textbf{Intel 64} & Intel 64-bit CPUs, part of x86-64 class. \\
+\textbf{x86-64} & Class of 64-bit CPUs running identical instruction set; common in desktop/server systems. \\
+\bottomrule
+\end{tabular}

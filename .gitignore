@@ -12,3 +12,5 @@ notes.synctex.gz
 *.out
 *.gz
 *.toc
+config.json
+mcq_grabber/zybook_config.json

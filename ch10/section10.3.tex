@@ -1,0 +1,39 @@
+\section{10.3 Copy-on-write}
+
+\subsection{Process Creation with Copy-on-write}
+\begin{itemize}
+    \item Process creation using \texttt{fork()} can bypass demand paging initially.
+    \item Technique similar to page sharing for rapid process creation.
+    \item Minimizes new pages allocated to child process.
+    \item Traditionally, \texttt{fork()} copied parent's address space for child.
+    \item Copying may be unnecessary if child immediately calls \texttt{exec()}.
+    \item \textbf{Copy-on-write}: parent and child processes initially share same pages.
+    \item Shared pages marked as copy-on-write.
+    \item If either process writes to a shared page, a copy of the shared page is created.
+    \item Example: child modifies stack page (copy-on-write) $\rightarrow$ OS gets free frame, copies page, maps to child's address space.
+    \item Child modifies its copied page, not parent's.
+    \item Only modified pages are copied; unmodified pages (e.g., executable code) can be shared.
+    \item Common technique in Windows, Linux, macOS.
+\end{itemize}
+
+\subsection{Virtual Memory Fork (\texttt{vfork()})}
+\begin{itemize}
+    \item Variation of \texttt{fork()} in UNIX (Linux, macOS, BSD UNIX).
+    \item Parent process suspended; child uses parent's address space.
+    \item \texttt{vfork()} does not use copy-on-write.
+    \item Child process changes to parent's address space are visible to parent upon resumption.
+    \item Use with caution: child must not modify parent's address space.
+    \item Intended for use when child calls \texttt{exec()} immediately after creation.
+    \item Extremely efficient process creation (no page copying).
+    \item Sometimes used to implement UNIX command-line shell interfaces.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{copy-on-write} & Write causes data to be copied then modified; on shared page write, page copied, write to copy. \\
+    \textbf{virtual memory fork} & \texttt{vfork()} system call; child shares parent's address space for read/write, parent suspended. \\
+    \bottomrule
+\end{tabular}

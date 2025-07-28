@@ -1,0 +1,233 @@
+\section{I/O hardware}
+
+\subsection{Device Communication}
+\begin{itemize}
+    \item Computers operate many device types: storage (disks, tapes), transmission (network, Bluetooth), human-interface (screen, keyboard, mouse, audio).
+    \item Specialized devices exist (e.g., jet steering).
+    \item Device communicates via signals over cable/air.
+    \item Connection point: \textbf{port} (e.g., serial port).
+    \item Devices sharing wires: \textbf{bus} (e.g., PCI bus).
+    \item Bus: set of wires, rigidly defined protocol for messages (electrical voltages, timings).
+    \item \textbf{Daisy chain}: devices connected in string (A to B, B to C), usually operates as a bus.
+\end{itemize}
+
+\subsection{Bus Structures}
+\begin{itemize}
+    \item Buses vary in signaling, speed, throughput, connection.
+    \item Typical PC bus structure:
+    \begin{itemize}
+        \item \textbf{PCIe bus}: connects processor-memory subsystem to fast devices.
+        \item \textbf{Expansion bus}: connects slow devices (keyboard, serial, USB ports).
+        \item \textbf{Serial-attached SCSI (SAS)} bus: connects disks to SAS controller.
+    \end{itemize}
+    \item PCIe: flexible bus, data over "lanes".
+    \begin{itemize}
+        \item Lane: two signaling pairs (receive/transmit), full-duplex byte stream.
+        \item Data packets: eight-bit byte format, simultaneous in both directions.
+        \item Physical links: 1, 2, 4, 8, 12, 16, or 32 lanes (e.g., x8).
+        \item Multiple "generations" (e.g., PCIe gen3 x8: 8 GB/s throughput).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Controllers}
+\begin{itemize}
+    \item \textbf{Controller}: electronics operating a port, bus, or device.
+    \item Serial-port controller: simple, single chip.
+    \item \textbf{Fibre channel (FC)} bus controller: complex, often separate circuit board (\textbf{host bus adapter (HBA)}).
+    \item HBA: contains processor, microcode, private memory for FC protocol.
+    \item Some devices have built-in controllers (e.g., disk drive board).
+    \item Disk controller: implements disk-side protocol (SAS, SATA), microcode, processor for tasks (bad-sector mapping, prefetching, buffering, caching).
+\end{itemize}
+
+\subsection{Memory-mapped I/O}
+\begin{itemize}
+    \item Processor communicates with controller via registers (data, control).
+    \item Methods:
+    \begin{itemize}
+        \item Special I/O instructions: transfer byte/word to I/O port address.
+        \item \textbf{Memory-mapped I/O}: device-control registers mapped into processor address space.
+        \item CPU uses standard data-transfer instructions to read/write registers at mapped locations.
+    \end{itemize}
+    \item Past PCs: mixed I/O instructions and memory-mapped I/O.
+    \item Graphics controller: I/O ports for control, large memory-mapped region for screen contents.
+    \item Writing millions of bytes to graphics memory faster than millions of I/O instructions.
+    \item Trend: systems moved to memory-mapped I/O for efficiency.
+    \item Today: most I/O via device controllers using memory-mapped I/O.
+\end{itemize}
+
+\subsection{I/O Device Control Registers}
+\begin{itemize}
+    \item Typically four registers: status, control, data-in, data-out.
+    \item \textbf{Data-in register}: read by host for input.
+    \item \textbf{Data-out register}: written by host to send output.
+    \item \textbf{Status register}: bits read by host, indicate states (command complete, byte available, error).
+    \item \textbf{Control register}: written by host to start command or change device mode (e.g., full/half-duplex, parity, word length, speed).
+    \item Data registers: 1-4 bytes.
+    \item Some controllers have FIFO chips: hold several bytes, expand capacity, buffer data bursts.
+\end{itemize}
+
+\subsection{Polling}
+\begin{itemize}
+    \item Host-controller interaction: handshaking.
+    \item Example (2 bits for coordination):
+    \begin{enumerate}
+        \item Host reads `busy` bit until clear.
+        \item Host sets `write` bit in `command` register, writes byte to `data-out` register.
+        \item Host sets `command-ready` bit.
+        \item Controller notices `command-ready` set, sets `busy` bit.
+        \item Controller reads command, reads `data-out` byte, performs I/O.
+        \item Controller clears `command-ready`, clears `error` bit, clears `busy` bit.
+    \end{enumerate}
+    \item Loop repeated for each byte.
+    \item Step 1: host is \textbf{busy-waiting} or \textbf{polling} (repeatedly reading `status` register).
+    \item Polling efficient if controller/device fast.
+    \item Inefficient if wait is long and other CPU tasks pending.
+    \item Risk of data loss if host waits too long (buffer overflow).
+    \item Polling efficient for basic operation (3 CPU cycles).
+    \item Inefficient if rarely finds device ready.
+    \item Alternative: hardware controller notifies CPU when ready via \textbf{interrupt}.
+\end{itemize}
+
+\subsection{Interrupts}
+\begin{itemize}
+    \item Basic mechanism:
+    \begin{itemize}
+        \item CPU senses \textbf{interrupt-request line} after each instruction.
+        \item Controller asserts signal: CPU saves state, jumps to \textbf{interrupt-handler routine} at fixed address.
+        \item Handler determines cause, processes, restores state, executes `return from interrupt`.
+        \item Device controller \textit{raises} interrupt, CPU \textit{catches} and \textit{dispatches}, handler \textit{clears}.
+    \end{itemize}
+    \item Modern systems: hundreds of interrupts/second.
+    \item Sophisticated interrupt handling features needed:
+    \begin{enumerate}
+        \item Defer interrupt handling during critical processing.
+        \item Efficient dispatch to proper handler (avoid polling all devices).
+        \item Multilevel interrupts: distinguish high/low priority, respond urgently.
+        \item Instruction to get OS attention directly (\textbf{traps}) for page faults, errors (division by zero).
+    \end{enumerate}
+    \item Features provided by CPU and \textbf{interrupt-controller hardware}.
+    \item CPU has two interrupt request lines:
+    \begin{itemize}
+        \item \textbf{Nonmaskable interrupt}: for unrecoverable errors (e.g., memory errors).
+        \item \textbf{Maskable}: can be turned off by CPU for critical sequences, used by device controllers.
+    \end{itemize}
+    \item Interrupt mechanism accepts \textbf{address}: selects handler from \textbf{interrupt vector}.
+    \item Interrupt vector: table of memory addresses of specialized handlers.
+    \item Purpose: reduce need for single handler to search all sources.
+    \item More devices than vector elements: \textbf{interrupt chaining}.
+    \item \textbf{Interrupt chaining}: each vector element points to head of handler list; handlers called until one services request.
+    \item Compromise: avoids huge table, improves dispatch efficiency.
+    \item Intel Pentium event-vector table:
+    \begin{itemize}
+        \item 0-31 (nonmaskable): error conditions, page faults, debugging.
+        \item 32-255 (maskable): device-generated interrupts.
+    \end{itemize}
+    \item \textbf{Interrupt priority levels}: defer low-priority, allow high-priority preemption.
+    \item OS interaction with interrupts:
+    \begin{itemize}
+        \item Boot time: probes buses, installs handlers into vector.
+        \item During I/O: controllers raise interrupts (output complete, input available, failure).
+        \item Handles \textbf{exceptions}: division by zero, protected memory access, privileged instruction from user mode.
+        \item Events trigger urgent, self-contained routines.
+    \end{itemize}
+    \item Interrupt handling split:
+    \begin{itemize}
+        \item \textbf{First-level interrupt handler (FLIH)}: context switch, state storage, queuing.
+        \item \textbf{Second-level interrupt handler (SLIH)}: performs actual handling.
+    \end{itemize}
+    \item Other uses:
+    \begin{itemize}
+        \item Virtual memory paging: page fault raises interrupt, suspends process, handler fetches page, schedules another process.
+        \item System calls: library routines build data structure, execute \textbf{software interrupt} or \textbf{trap}.
+        \item Trap: saves user state, switches to kernel mode, dispatches to kernel routine.
+        \item Trap priority: low compared to device interrupts (less urgent).
+        \item Kernel flow control: disk read completion (high-priority handler records status, clears interrupt, starts next I/O, raises low-priority interrupt; low-priority handler copies data, calls scheduler).
+    \end{itemize}
+    \item Threaded kernel architecture (e.g., Solaris): interrupt handlers as kernel threads, high scheduling priorities, preemption, concurrent execution on multiprocessor.
+    \item Summary: interrupts handle asynchronous events, trap to supervisor mode. Use priority system. Device controllers, hardware faults, system calls raise interrupts. Efficient handling crucial for performance. Interrupt-driven I/O common, polling for high-throughput, sometimes combined.
+\end{itemize}
+
+\subsection{Direct memory access}
+\begin{itemize}
+    \item For large transfers (e.g., disk), \textbf{programmed I/O (PIO)} (CPU watching status bits, feeding data byte-by-byte) is wasteful.
+    \item Offload work to \textbf{direct-memory-access (DMA)} controller.
+    \item Initiate DMA: host writes DMA command block to memory (source, destination, byte count).
+    \item Command block can be complex: list of non-contiguous sources/destinations (\textbf{scatter-gather}).
+    \item CPU writes command block address to DMA controller, continues other work.
+    \item DMA controller operates memory bus directly, performs transfers without main CPU.
+    \item Standard component in modern computers.
+    \item Target address in kernel space is straightforward.
+    \item User space target: risk of modification during transfer.
+    \item Data to user space: second copy operation (\textbf{double buffering}) from kernel to user memory, inefficient.
+    \item Trend: OS moved to memory-mapping for direct I/O between devices and user address space.
+    \item Handshaking (DMA controller and device controller): \textbf{DMA-request} and \textbf{DMA-acknowledge} wires.
+    \item Device places signal on DMA-request when word available.
+    \item DMA controller seizes memory bus, places address, signals DMA-acknowledge.
+    \item Device receives DMA-acknowledge, transfers word, removes DMA-request.
+    \item Transfer finished: DMA controller interrupts CPU.
+    \item DMA controller seizing bus: CPU momentarily prevented from main memory access (\textbf{cycle stealing}).
+    \item Cycle stealing slows CPU, but DMA generally improves total system performance.
+    \item Some architectures use physical addresses for DMA, others \textbf{direct virtual memory access (DVMA)}.
+    \item DVMA: uses virtual addresses, translates to physical. Can transfer between memory-mapped devices without CPU/main memory.
+\end{itemize}
+
+\subsection{I/O hardware summary}
+\begin{itemize}
+    \item Key concepts:
+    \begin{itemize}
+        \item Bus
+        \item Controller
+        \item I/O port and its registers
+        \item Handshaking (host and device controller)
+        \item Handshaking execution: polling or interrupts
+        \item Offloading large transfers to DMA controller
+    \end{itemize}
+    \item Challenge for OS implementers: wide variety of devices, unique capabilities, control-bit definitions, protocols.
+    \item Questions: how to attach new devices without OS rewrite? How to provide uniform I/O interface to applications?
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{port} & Connection point for devices to attach to computers. \\
+    \textbf{PHY} & Physical hardware component connecting to a network (OSI layer 1). \\
+    \textbf{bus} & Communication system connecting computer components (CPU, I/O devices) for data/command transfer. \\
+    \textbf{daisy chain} & Devices connected in a string (A to B, B to C). \\
+    \textbf{PCIe bus} & Common computer I/O bus connecting CPU to I/O devices. \\
+    \textbf{expansion bus} & Computer bus for connecting slow devices (e.g., keyboards). \\
+    \textbf{serial-attached SCSI (SAS)} & Common type of I/O bus. \\
+    \textbf{SAS} & Common type of I/O bus. \\
+    \textbf{controller} & Special processor managing I/O devices. \\
+    \textbf{fibre channel (FC)} & Storage I/O bus used in data centers to connect computers to storage arrays. \\
+    \textbf{host bus adapter (HBA)} & Device controller installed in host bus port for device connection. \\
+    \textbf{memory-mapped I/O} & Device I/O method where device-control registers map into processor address space. \\
+    \textbf{data-in register} & Device I/O register for host to get input. \\
+    \textbf{data-out register} & Device I/O register for host to send output. \\
+    \textbf{status register} & Device I/O register indicating status. \\
+    \textbf{control register} & Device I/O register for host to place commands. \\
+    \textbf{busy waiting} & Thread/process continuously uses CPU while waiting; I/O loop reading status. \\
+    \textbf{polling} & I/O loop where I/O thread continuously reads status waiting for I/O completion. \\
+    \textbf{interrupt} & Hardware mechanism for device to notify CPU it needs attention. \\
+    \textbf{interrupt-request line} & Hardware connection to CPU for signaling interrupts. \\
+    \textbf{interrupt-handler routine} & OS routine called when interrupt signal received. \\
+    \textbf{interrupt-controller hardware} & Computer hardware components for interrupt management. \\
+    \textbf{nonmaskable interrupt} & Interrupt that cannot be delayed or blocked (e.g., unrecoverable memory error). \\
+    \textbf{maskable} & Describes an interrupt that can be delayed or blocked. \\
+    \textbf{interrupt vector} & OS data structure indexed by interrupt address, pointing to handlers. \\
+    \textbf{interrupt chaining} & Mechanism where interrupt vector element points to list of handlers. \\
+    \textbf{interrupt priority level} & Prioritization of interrupts for handling order. \\
+    \textbf{exception} & Software-generated interrupt by error or user program request for OS service. \\
+    \textbf{first-level interrupt handler (FLIH)} & Interrupt handler for reception and queuing of interrupts. \\
+    \textbf{second-level interrupt handler (SLIH)} & Interrupt handler that actually handles interrupts. \\
+    \textbf{software interrupt} & Software-generated interrupt; also called a trap. \\
+    \textbf{trap} & Software interrupt. \\
+    \textbf{programmed I/O (PIO)} & Data transfer method where CPU transfers data one byte at a time. \\
+    \textbf{direct memory access (DMA)} & Operation allowing device controllers to transfer large data directly to/from main memory. \\
+    \textbf{scatter-gather} & I/O method specifying multiple sources/destinations in one command. \\
+    \textbf{double buffering} & Copying data twice (e.g., device to kernel, then kernel to process), or using two buffers. \\
+    \textbf{cycle stealing} & Device (e.g., DMA controller) using bus, temporarily preventing CPU access. \\
+    \textbf{direct virtual memory access (DVMA)} & DMA using virtual addresses as transfer sources/destinations. \\
+    \bottomrule
+\end{tabular}

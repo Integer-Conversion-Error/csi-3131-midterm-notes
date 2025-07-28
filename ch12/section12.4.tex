@@ -1,0 +1,190 @@
+\section{Kernel I/O subsystem}
+
+\subsection{I/O Services}
+\begin{itemize}
+    \item Kernels provide many I/O-related services.
+    \item Services provided by kernel's I/O subsystem: scheduling, buffering, caching, spooling, device reservation, error handling.
+    \item Builds on hardware and device-driver infrastructure.
+    \item I/O subsystem responsible for protecting itself from errant processes and malicious users.
+\end{itemize}
+
+\subsection{I/O Scheduling}
+\begin{itemize}
+    \item Scheduling I/O requests: determine good execution order.
+    \item Application system call order rarely best.
+    \item Benefits: improve overall system performance, fair device access, reduce average waiting time.
+    \item Example: disk arm near beginning, 3 apps request blocks (end, beginning, middle). OS can serve 2, 3, 1 to reduce arm travel.
+    \item Implementation: maintain wait queue for each device.
+    \item Blocking I/O system call: request placed on device queue.
+    \item I/O scheduler rearranges queue for efficiency, average response time.
+    \item OS may prioritize delay-sensitive requests (e.g., virtual memory subsystem over applications).
+    \item Asynchronous I/O: kernel tracks many requests.
+    \item Uses \textbf{device-status table}: entry for each I/O device.
+    \item Table entry: device type, address, state (not functioning, idle, busy).
+    \item If busy, request type and parameters stored in table entry.
+    \item Scheduling I/O operations improves computer efficiency.
+    \item Also uses storage space in main memory/storage hierarchy via buffering, caching, spooling.
+\end{itemize}
+
+\subsection{Buffering}
+\begin{itemize}
+    \item \textbf{Buffer}: memory area storing data transferred between devices or device/application.
+    \item Reasons for buffering:
+    \begin{enumerate}
+        \item Cope with speed mismatch (producer/consumer).
+        \item Example: network (slow) to SSD (fast). Buffer accumulates network bytes, then writes to SSD in single operation.
+        \item \textbf{Double buffering}: two buffers used to decouple producer/consumer, relax timing. Network fills buffer 1, drive writes buffer 1; network fills buffer 2, drive writes buffer 2.
+        \item Provide adaptations for different data-transfer sizes (e.g., network fragmentation/reassembly).
+        \item Support \textbf{copy semantics} for application I/O.
+        \item Copy semantics: data written to disk is version at time of system call, independent of subsequent application buffer changes.
+        \item OS guarantees copy semantics: `write()` copies application data to kernel buffer before returning. Disk write from kernel buffer.
+        \item Copying data between kernel/application space common despite overhead, due to clean semantics.
+        \item More efficient: virtual memory mapping and copy-on-write page protection.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Caching}
+\begin{itemize}
+    \item \textbf{Cache}: region of fast memory holding copies of data.
+    \item Access to cached copy more efficient than original.
+    \item Example: process instructions on disk, cached in physical memory, copied to CPU caches.
+    \item Difference from buffer: buffer may hold only copy, cache holds copy of item residing elsewhere.
+    \item Caching and buffering distinct, but memory region can serve both.
+    \item OS uses main memory buffers for disk data (copy semantics, efficient scheduling).
+    \item These buffers also act as cache: improve I/O efficiency for shared files or rapid write/reread.
+    \item Kernel checks buffer cache for file I/O request: if available, avoids/defers physical disk I/O.
+    \item Disk writes accumulated in buffer cache for seconds: allows efficient write schedules.
+\end{itemize}
+
+\subsection{Spooling and Device Reservation}
+\begin{itemize}
+    \item \textbf{Spool}: buffer holding output for device (e.g., printer) that cannot accept interleaved data streams.
+    \item Printer serves one job at a time, but multiple apps may print concurrently.
+    \item OS intercepts printer output: each application's output spooled to separate secondary storage file.
+    \item Application finishes: spooling system queues spool file for printer output.
+    \item Spooling system copies queued files to printer one at a time.
+    \item Managed by system daemon process or in-kernel thread.
+    \item OS provides control interface: display queue, remove jobs, suspend printing.
+    \item Some devices (tape drives, printers) cannot multiplex I/O requests.
+    \item Spooling coordinates concurrent output.
+    \item Explicit coordination facilities: OS supports exclusive device access.
+    \item VMS: process allocates idle device, deallocates when done.
+    \item Other OS: limit one open file handle to such device.
+    \item Many OS provide functions for processes to coordinate exclusive access (e.g., Windows `wait` for device object, `OpenFile()` parameter for access types).
+    \item Applications responsible for avoiding deadlock.
+\end{itemize}
+
+\subsection{Error Handling}
+\begin{itemize}
+    \item Protected memory OS guards against hardware/application errors, prevents system failure from minor malfunctions.
+    \item Devices/I/O transfers can fail: transient (network overloaded) or permanent (defective controller).
+    \item OS compensates for transient failures: disk `read()` retry, network `send()` resend.
+    \item Permanent failure of important component: OS unlikely to recover.
+    \item I/O system call returns success/failure bit.
+    \item UNIX: `errno` integer variable returns error code (hundreds of values: argument out of range, bad pointer, file not open).
+    \item Some hardware provides detailed error info, but many OS don't convey to application.
+    \item SCSI protocol error reporting:
+    \begin{itemize}
+        \item \textbf{Sense key}: general nature of failure (hardware error, illegal request).
+        \item Additional sense code: category of failure (bad command parameter, self-test failure).
+        \item Additional sense-code qualifier: more detail (which parameter, which subsystem failed).
+    \end{itemize}
+    \item Many SCSI devices maintain internal error-log pages (seldom requested).
+\end{itemize}
+
+\subsection{I/O Protection}
+\begin{itemize}
+    \item Errors related to protection.
+    \item User process may disrupt system by illegal I/O instructions.
+    \item Prevention: all I/O instructions are privileged.
+    \item Users cannot issue I/O instructions directly; must use OS.
+    \item User program executes system call for OS to perform I/O.
+    \item OS (monitor mode) checks request validity, performs I/O, returns to user.
+    \item Memory-mapped and I/O port memory locations protected from user access by memory-protection system.
+    \item Kernel cannot deny all user access (e.g., graphics games need direct access to memory-mapped graphics memory).
+    \item Kernel might provide locking mechanism to allocate graphics memory section to one process at a time.
+\end{itemize}
+
+\subsection{Kernel Data Structures}
+\begin{itemize}
+    \item Kernel keeps state info on I/O components via in-kernel data structures.
+    \item Example: open-file table structure.
+    \item Tracks network connections, character-device communications, other I/O activities.
+    \item UNIX file-system access to various entities (user files, raw devices, process address spaces).
+    \item `read()` semantics differ for each entity.
+    \item UNIX encapsulates differences using object-oriented technique.
+    \item Open-file record: contains dispatch table with pointers to appropriate routines based on file type.
+    \item Some OS use message-passing for I/O (e.g., Windows).
+    \item I/O request converted to message, sent through kernel to I/O manager, then device driver.
+    \item Message contents may change.
+    \item Message-passing overhead vs. procedural techniques (shared data structures).
+    \item Benefits: simplifies I/O system structure/design, adds flexibility.
+\end{itemize}
+
+\subsection{Power Management}
+\begin{itemize}
+    \item Data centers: power costs, greenhouse gas emissions, heat generation (cooling uses twice as much electricity as powering equipment).
+    \item OS role in power use:
+    \begin{itemize}
+        \item Cloud computing: adjust processing loads, evacuate user processes, idle/power off systems.
+        \item Analyze load, power off components (CPUs, external I/O devices) if low and hardware-enabled.
+        \item CPU cores suspended/resumed based on load (state saved/restored).
+        \item Servers: disabling unneeded cores decreases electricity/cooling needs.
+    \end{itemize}
+    \item Mobile computing: power management high priority (maximize battery life).
+    \item Android power management features:
+    \begin{enumerate}
+        \item Power collapse: deep sleep state, marginally more power than off, responds to external stimuli, quick wake-up.
+        \item Achieved by powering off individual components (screen, speakers, I/O subsystem), CPU in lowest sleep state.
+        \item Idle Android phone uses little power, wakes quickly for calls.
+        \item Component-level power management: infrastructure understands component relationships and usage.
+        \item Android builds device tree (physical-device topology).
+        \item Each component associated with device driver, tracks usage (e.g., I/O pending to flash, open audio reference).
+        \item If component unused, turned off. If all components on bus unused, bus off. If all components in device tree unused, system enters power collapse.
+        \item Wakelocks: applications temporarily prevent power collapse.
+        \item Applications acquire/release wakelocks. Kernel prevents power collapse while wakelock held.
+        \item Example: Android Market holds wakelock during app update.
+    \end{enumerate}
+    \item Power management based on device management.
+    \item Boot time: firmware analyzes hardware, creates device tree in RAM.
+    \item Kernel uses device tree to load drivers, manage devices.
+    \item Additional activities: hot-plug (add/subtract devices), device state management, power management.
+    \item Modern computers use \textbf{advanced configuration and power interface (ACPI)} firmware.
+    \item ACPI: industry standard, provides callable routines for kernel (device state discovery/management, error management, power management).
+    \item Example: kernel calls device driver, which calls ACPI routines, which talk to device.
+\end{itemize}
+
+\subsection{Kernel I/O Subsystem Summary}
+\begin{itemize}
+    \item I/O subsystem coordinates extensive services for applications and kernel.
+    \item Supervises:
+    \begin{itemize}
+        \item Management of name space for files/devices.
+        \item Access control to files/devices.
+        \item Operation control (e.g., modem cannot `seek()`).
+        \item File-system space allocation.
+        \item Device allocation.
+        \item Buffering, caching, spooling.
+        \item I/O scheduling.
+        \item Device-status monitoring, error handling, failure recovery.
+        \item Device-driver configuration and initialization.
+        \item Power management of I/O devices.
+    \end{itemize}
+    \item Upper levels of I/O subsystem access devices via uniform interface from device drivers.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{device-status table} & Kernel data structure tracking status and queues of operations for devices. \\
+    \textbf{buffer} & Memory area storing data being transferred. \\
+    \textbf{double buffering} & Copying data twice or using two buffers to decouple producers/consumers. \\
+    \textbf{copy semantics} & Meaning assigned to data copying (e.g., if data can be modified after write request). \\
+    \textbf{cache} & Temporary copy of data in fast memory to improve performance. \\
+    \textbf{spool} & Buffer holding output for device that cannot accept interleaved data streams. \\
+    \textbf{sense key} & SCSI protocol info in status register indicating error. \\
+    \textbf{advanced configuration and power interface (ACPI)} & Firmware managing hardware aspects (power, device info). \\
+    \bottomrule
+\end{tabular}

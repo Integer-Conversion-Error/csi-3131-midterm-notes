@@ -1,0 +1,145 @@
+\section{Structure of the page table}
+
+\subsection{Hierarchical paging}
+\begin{itemize}
+    \item Explores common techniques for structuring the page table: hierarchical paging, hashed page tables, and inverted page tables.
+    \item Modern computer systems support large logical address spaces ($2^{32}$ to $2^{64}$).
+    \item Page table itself becomes excessively large.
+    \item \textbf{Example}: 32-bit logical address space, 4 KB page size ($2^{12}$).
+    \begin{itemize}
+        \item Page table: over 1 million entries ($2^{20}$).
+        \item Each entry: 4 bytes.
+        \item Each process: up to 4 MB physical address space for page table alone.
+        \item Solution: divide page table into smaller pieces.
+    \end{itemize}
+    \item \textbf{Two-level paging algorithm}: page table itself is paged.
+    \begin{itemize}
+        \item 32-bit logical address space, 4 KB page size.
+        \item Logical address divided into:
+        \begin{itemize}
+            \item Page number: 20 bits.
+            \item Page offset: 12 bits.
+        \end{itemize}
+        \item Page number further divided:
+        \begin{itemize}
+            \item $p_1$: 10-bit outer page number (index into outer page table).
+            \item $p_2$: 10-bit inner page offset (displacement within inner page table).
+        \end{itemize}
+        \item Address translation: from outer page table inward.
+        \item Also known as a \textbf{forward-mapped} page table.
+    \end{itemize}
+    \item \textbf{64-bit logical address space}: two-level paging scheme inappropriate.
+    \begin{itemize}
+        \item \textbf{Example}: 4 KB page size ($2^{12}$).
+        \item Page table: up to $2^{52}$ entries.
+        \item Inner page tables: one page long, $2^{10}$ 4-byte entries.
+        \item Outer page table: still $2^{42}$ entries, or $2^{44}$ bytes (16 GB).
+    \end{itemize}
+    \item \textbf{Three-level paging scheme}: paging the outer page table.
+    \begin{itemize}
+        \item Outer page table made up of standard-size pages ($2^{10}$ entries, or $2^{12}$ bytes).
+        \item 64-bit address space still daunting.
+        \item 64-bit UltraSPARC: would require seven levels of paging (prohibitive memory accesses).
+        \item Hierarchical page tables generally inappropriate for 64-bit architectures.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Hashed page tables}
+\begin{itemize}
+    \item Approach for handling address spaces larger than 32 bits.
+    \item Hash value: virtual page number.
+    \item Each entry in hash table: linked list of elements (to handle collisions).
+    \item Each element consists of three fields:
+    \begin{enumerate}
+        \item Virtual page number.
+        \item Value of mapped page frame.
+        \item Pointer to next element in linked list.
+    \end{enumerate}
+    \item \textbf{Algorithm}:
+    \begin{itemize}
+        \item Virtual page number in virtual address hashed into hash table.
+        \item Virtual page number compared with field 1 in first element of linked list.
+        \item Match: corresponding page frame (field 2) used to form physical address.
+        \item No match: subsequent entries in linked list searched.
+    \end{itemize}
+    \item \textbf{Clustered page tables}: variation for 64-bit address spaces.
+    \begin{itemize}
+        \item Similar to hashed page tables.
+        \item Each entry refers to several pages (e.g., 16) instead of a single page.
+        \item Single page-table entry stores mappings for multiple physical-page frames.
+        \item Useful for \textbf{sparse} address spaces (memory references noncontiguous, scattered).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Inverted page tables}
+\begin{itemize}
+    \item Usually, each process has an associated page table.
+    \item Standard page table: one entry for each page process is using (or each virtual address).
+    \item Drawback: each page table may consist of millions of entries, consuming large amounts of physical memory.
+    \item \textbf{Inverted page table}: one entry for each real page (frame) of memory.
+    \item Each entry: virtual address of page stored in that real memory location, plus process information.
+    \item Only one page table in system, one entry per physical memory page.
+    \item Often requires an address-space identifier (process-id) in each entry.
+    \item Ensures logical page for particular process maps to corresponding physical page frame.
+    \item \textbf{Examples}: 64-bit UltraSPARC and PowerPC.
+    \item \textbf{IBM RT simplified version}:
+    \begin{itemize}
+        \item Virtual address: \texttt{<process-id, page-number, offset>}.
+        \item Inverted page-table entry: \texttt{<process-id, page-number>}.
+        \item Memory reference: \texttt{<process-id, page-number>} presented to memory subsystem.
+        \item Inverted page table searched for match.
+        \item Match at entry $i$: physical address \texttt{<i, offset>} generated.
+        \item No match: illegal address access.
+    \end{itemize}
+    \item \textbf{Drawback}: increases time to search table (sorted by physical address, lookups by virtual address).
+    \item \textbf{Alleviation}: use a hash table to limit search.
+    \item Each access to hash table adds memory reference: one virtual memory reference requires at least two real memory reads (hash-table entry + page table).
+    \item TLB searched first for performance improvement.
+    \item \textbf{Shared memory issue}:
+    \begin{itemize}
+        \item Standard paging: multiple virtual addresses map to same physical address.
+        \item Inverted page tables: only one virtual page entry for every physical page.
+        \item One physical page cannot have two (or more) shared virtual addresses.
+        \item Reference by another process sharing memory: page fault, replaces mapping.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Oracle SPARC Solaris}
+\begin{itemize}
+    \item Modern 64-bit CPU and OS tightly integrated for low-overhead virtual memory.
+    \item \textbf{Solaris} running on \textbf{SPARC} CPU: fully 64-bit OS.
+    \item Solves virtual memory problem efficiently using hashed page tables.
+    \item Two hash tables: one for kernel, one for all user processes.
+    \item Each maps virtual to physical memory.
+    \item Each hash-table entry: contiguous area of mapped virtual memory (more efficient than per-page entry).
+    \item Entry has base address and span (number of pages represented).
+    \item \textbf{TLB (Translation Lookaside Buffer)}: holds translation table entries (TTEs) for fast hardware lookups.
+    \item Cache of TTEs: \textbf{translation storage buffer (TSB)}.
+    \item TSB includes entry per recently accessed page.
+    \item \textbf{Virtual address reference process}:
+    \begin{enumerate}
+        \item Hardware searches TLB for translation.
+        \item None found: hardware walks through in-memory TSB for TTE. (\textbf{TLB walk})
+        \item Match in TSB: CPU copies TSB entry into TLB, memory translation completes.
+        \item No match in TSB: kernel interrupted to search hash table.
+        \item Kernel creates TTE from hash table, stores in TSB for automatic loading into TLB by MMU.
+        \item Interrupt handler returns control to MMU, completes address translation, retrieves data.
+    \end{enumerate}
+\end{itemize}
+
+\vspace{1em}
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{forward-mapped} & Scheme for hierarchical page tables where address translation starts at the outer page table and moves inward. \\
+    \textbf{hashed page table} & A page table that is hashed for faster access; the hash value is the virtual page number. \\
+    \textbf{clustered page table} & Similar to a hashed page table, but an entry refers to a cluster of several pages. \\
+    \textbf{sparse} & In memory management, describes a page table with noncontiguous, scattered entries; an address space with many holes. \\
+    \textbf{inverted page table} & A page-table scheme with one entry for each real physical page frame in memory, mapping to a logical page (virtual address) value. \\
+    \textbf{Solaris} & A UNIX derivative, main operating system of Sun Microsystems (now Oracle); active open source version called Illumos. \\
+    \textbf{SPARC} & A proprietary RISC CPU created by Sun Microsystems (now Oracle); active open source version called OpenSPARC. \\
+    \textbf{TLB walk} & Steps involved in traversing page-table structures to locate a needed translation and copying the result into the TLB. \\
+    \bottomrule
+\end{tabular}

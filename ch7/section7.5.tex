@@ -70,7 +70,7 @@ void update ()
 
 \subsection{OpenMP}
 \begin{itemize}
-    \item Overview in Section Fork join: supports parallel programming in shared-memory environment.
+    \item OpenMP supports parallel programming in a shared-memory environment.
     \item Includes: set of compiler directives and an API.
     \item \texttt{\#pragma omp parallel}: compiler directive.
     \begin{itemize}
@@ -150,12 +150,19 @@ void update(int value)
 \end{itemize}
 
 \subsection{Section glossary}
-\begin{itemize}
-    \item \textit{transactional memory}: Type of memory supporting memory transactions.
-    \item \textit{memory transaction}: Sequence of memory read-write operations that are atomic.
-    \item \textit{software transactional memory (STM)}: Transactional memory implemented exclusively in software; no special hardware needed.
-    \item \textit{hardware transactional memory (HTM)}: Transactional memory using hardware cache hierarchies and cache coherency protocols to manage/resolve conflicts for shared data in separate processors' caches.
-    \item \textit{imperative language}: Language for implementing state-based algorithms (e.g., C, C++, Java, C\#).
-    \item \textit{procedural language}: A language that implements state-based algorithms (e.g., C, C++, Java, C\#).
-    \item \textit{functional language}: Programming language that does not require states to be managed by programs written in it (e.g., Erlang, Scala).
-\end{itemize}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{transactional memory} & Type of memory supporting memory transactions. \\
+\textbf{memory transaction} & Sequence of memory read-write operations that are atomic. \\
+\textbf{software transactional memory (STM)} & Transactional memory implemented exclusively in software; no special hardware needed. \\
+\textbf{hardware transactional memory (HTM)} & Transactional memory using hardware cache hierarchies and cache coherency protocols to manage/resolve conflicts for shared data in separate processors' caches. \\
+\textbf{imperative language} & Language for implementing state-based algorithms (e.g., C, C++, Java, C\#). \\
+\textbf{procedural language} & A language that implements state-based algorithms (e.g., C, C++, Java, C\#). \\
+\textbf{functional language} & Programming language that does not require states to be managed by programs written in it (e.g., Erlang, Scala). \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

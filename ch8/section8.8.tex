@@ -1,0 +1,70 @@
+\section{Recovery from deadlock}
+
+\begin{itemize}
+    \item When deadlock detected, options:
+    \begin{itemize}
+        \item Inform operator (manual recovery).
+        \item System recovers automatically.
+    \end{itemize}
+    \item Two options for breaking deadlock:
+    \begin{itemize}
+        \item Abort one or more threads (break circular wait).
+        \item Preempt resources from deadlocked threads.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Process and thread termination}
+\begin{itemize}
+    \item Eliminate deadlocks by aborting process/thread.
+    \item System reclaims all resources.
+    \item Methods:
+    \begin{itemize}
+        \item \textbf{Abort all deadlocked processes}: Breaks cycle, but expensive (discarded computations, recomputation needed).
+        \item \textbf{Abort one process at a time until deadlock eliminated}: High overhead (deadlock-detection after each abort).
+    \end{itemize}
+    \item Aborting process issues:
+    \begin{itemize}
+        \item File in incorrect state if updating.
+        \item Shared data integrity issues if updating while holding mutex lock (must restore lock status).
+    \end{itemize}
+    \item If partial termination, determine which process to terminate (policy decision, economic).
+    \item Factors for choosing victim (minimum cost):
+    \begin{itemize}
+        \item Process priority.
+        \item Computation time (how long computed, how much longer).
+        \item Resources used (types, ease of preemption).
+        \item Resources needed to complete.
+        \item Number of processes to terminate.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Resource preemption}
+\begin{itemize}
+    \item Successively preempt resources from processes, give to others until deadlock broken.
+    \item Three issues:
+    \begin{itemize}
+        \item \textbf{Selecting a victim}: Which resources/processes to preempt? Minimize cost (e.g., resources held, time consumed).
+        \item \textbf{Rollback}: What to do with preempted process?
+        \begin{itemize}
+            \item Cannot continue normal execution (missing resource).
+            \item Roll back to safe state, restart.
+            \item Simplest: total rollback (abort, restart).
+            \item More effective: roll back only as necessary (requires more state info).
+        \end{itemize}
+        \item \textbf{Starvation}: How to ensure resources not always preempted from same process?
+        \begin{itemize}
+            \item Process never completes.
+            \item Ensure process picked as victim finite number of times.
+            \item Common solution: include number of rollbacks in cost factor.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{recovery mode} & A system boot state providing limited services and designed to enable the system admin to repair system problems and debug system startup. \\
+    \bottomrule
+\end{tabular}

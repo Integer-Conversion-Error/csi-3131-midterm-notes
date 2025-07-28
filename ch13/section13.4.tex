@@ -1,0 +1,101 @@
+\section{Protection}
+
+Information safety:
+\begin{itemize}
+    \item Physical damage: \textbf{reliability} (duplicate copies, backups).
+    \item Improper access: \textbf{protection}.
+\end{itemize}
+
+Protection mechanisms:
+\begin{itemize}
+    \item User name/password authentication.
+    \item Encrypting secondary storage.
+    \item Firewalling network access.
+    \item Multiuser systems: advanced mechanisms for valid data access.
+\end{itemize}
+
+\subsection{Types of access}
+\begin{itemize}
+    \item Need for controlled access.
+    \item Protection limits types of file access.
+    \item Operations controlled:
+    \begin{itemize}
+        \item \textbf{Read}: Read from file.
+        \item \textbf{Write}: Write or rewrite file.
+        \item \textbf{Execute}: Load and execute file.
+        \item \textbf{Append}: Write new info at end of file.
+        \item \textbf{Delete}: Delete file, free space.
+        \item \textbf{List}: List name and attributes.
+        \item \textbf{Attribute change}: Change file attributes.
+    \end{itemize}
+    \item Higher-level functions (rename, copy, edit) often implemented by system programs using lower-level calls. Protection at lower level.
+\end{itemize}
+
+\subsection{Access control}
+\begin{itemize}
+    \item Access dependent on user identity.
+    \item Most general scheme: \textbf{access-control list (ACL)}.
+    \item ACL specifies user names and allowed access types.
+    \item OS checks ACL; allows if listed, denies otherwise.
+    \item Advantages: complex access methodologies.
+    \item Disadvantages:
+    \begin{itemize}
+        \item Lengthy lists (tedious to construct, especially if users unknown).
+        \item Variable-size directory entries (complicated space management).
+    \end{itemize}
+    \item Condensed ACL: three user classifications:
+    \begin{itemize}
+        \item \textbf{Owner}: User who created file.
+        \item \textbf{Group}: Set of users sharing file, needing similar access.
+        \item \textbf{Other}: All other users.
+    \end{itemize}
+    \item Common approach: combine ACLs with owner, group, universe scheme (e.g., Solaris).
+    \item UNIX permissions:
+    \begin{itemize}
+        \item Three fields: owner, group, universe.
+        \item Each field: three bits \texttt{rwx} (read, write, execute).
+        \item \texttt{r} for read, \texttt{w} for write, \texttt{x} for execution.
+        \item Example: \texttt{rwx} for owner, \texttt{rw-} for group, \texttt{r--} for others.
+        \item \texttt{d} as first character indicates subdirectory.
+        \item Sample listing shows links, owner, group, size, date, name.
+    \end{itemize}
+    \item Combining ACLs and permissions:
+    \begin{itemize}
+        \item User interface challenge: how to show optional ACLs.
+        \item Solaris: "+" appended to regular permissions (e.g., \texttt{-rw-r--r--+}).
+        \item Commands like \texttt{setfacl} and \texttt{getfacl} manage ACLs.
+        \item Windows: GUI for ACL management.
+        \item Precedence: ACLs typically take precedence over group permissions (specificity priority).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Other protection approaches}
+\begin{itemize}
+    \item Password with each file:
+    \begin{itemize}
+        \item Effective if passwords random and changed often.
+        \item Disadvantages: many passwords to remember; single password for all files (all-or-none protection).
+        \item Some systems: password with subdirectory.
+        \item More commonly: encryption of partition/files, with key password management.
+    \end{itemize}
+    \item Directory protection in multilevel structures:
+    \begin{itemize}
+        \item Control creation/deletion of files in directory.
+        \item Control user's ability to determine file existence (listing directory contents).
+        \item If path name refers to file, user needs access to both directory and file.
+        \item Different access rights depending on path name in acyclic/general graphs.
+    \end{itemize}
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Section glossary}
+\label{tab:section_glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{access-control list} & A list of user names allowed to access a file. \\
+\bottomrule
+\end{tabular}
+\end{table}

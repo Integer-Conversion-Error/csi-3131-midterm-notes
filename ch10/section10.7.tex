@@ -1,0 +1,53 @@
+\section{Memory compression}
+\begin{itemize}
+    \item Alternative to paging: \textbf{memory compression}.
+    \item Compress several frames into a single frame.
+    \item Reduces memory usage without swapping pages.
+    \item Example (Figure 10.7.1):
+    \begin{itemize}
+        \item Free-frame list below threshold $\rightarrow$ triggers page replacement.
+        \item Selects frames (e.g., 15, 3, 35, 26) to place on modified-frame list.
+        \item Instead of writing to swap space, compress frames (e.g., three) into single page frame.
+    \end{itemize}
+    \item Example (Figure 10.7.2):
+    \begin{itemize}
+        \item Frame 7 removed from free-frame list.
+        \item Frames 15, 3, 35 compressed and stored in frame 7.
+        \item Frame 7 stored in list of compressed frames.
+        \item Frames 15, 3, 35 moved to free-frame list.
+        \item If compressed frame referenced $\rightarrow$ page fault, decompressed, restoring original pages.
+    \end{itemize}
+    \item Mobile systems (Android, iOS) generally don't support standard swapping/paging.
+    \begin{itemize}
+        \item Memory compression integral to their memory-management strategy.
+    \end{itemize}
+    \item Windows 10 and macOS support memory compression.
+    \begin{itemize}
+        \item Windows 10: \textbf{Universal Windows Platform} (\textbf{UWP}) apps on mobile devices are candidates.
+        \item macOS (Version 10.9+): compresses LRU pages when free memory is short, then pages if needed.
+        \item Performance tests: memory compression faster than paging to SSD on macOS.
+    \end{itemize}
+    \item Memory compression requires allocating free frames for compressed pages.
+    \begin{itemize}
+        \item Significant memory saving possible (e.g., 3 frames to 1).
+    \end{itemize}
+    \item Contention between compression speed and \textbf{compression ratio} (amount of reduction).
+    \begin{itemize}
+        \item Higher compression ratios $\rightarrow$ slower, more computationally expensive algorithms.
+        \item Most algorithms balance factors: high ratios with fast algorithms.
+        \item Improved by parallel compression using multiple cores.
+        \item Examples: Microsoft's Xpress, Apple's WKdm $\rightarrow$ fast, compress to 30-50\% original size.
+    \end{itemize}
+\end{itemize}
+
+\vspace{1em}
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{memory compression} & Alternative to paging; compresses frame contents to decrease memory usage. \\
+    \textbf{universal Windows platform (UWP)} & Windows 10 architecture providing common app platform for all devices running it. \\
+    \textbf{compression ratio} & Measurement of compression effectiveness (ratio of compressed to uncompressed space). \\
+    \bottomrule
+\end{tabular}

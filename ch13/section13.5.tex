@@ -1,0 +1,65 @@
+\section{Memory-mapped files}
+
+Alternative file access method: \textbf{memory mapping} a file.
+\begin{itemize}
+    \item Treat file I/O as routine memory accesses using virtual memory techniques.
+    \item Can lead to significant performance increases.
+\end{itemize}
+
+\subsection{Basic mechanism}
+\begin{itemize}
+    \item Map disk block to page(s) in memory.
+    \item Initial access: demand paging, page fault.
+    \item Page-sized portion of file read into physical page.
+    \item Subsequent reads/writes: handled as routine memory accesses.
+    \item Simplifies and speeds up file access by avoiding \texttt{read()} and \texttt{write()} system call overhead.
+    \item Writes to memory-mapped file not necessarily immediate to secondary storage.
+    \item Generally, updates written back when file closed.
+    \item Under memory pressure, intermediate changes may go to swap space.
+    \item Some OS (e.g., Solaris) memory-map all file I/O, even with standard calls, to kernel address space.
+    \item Multiple processes can map same file concurrently for data sharing.
+    \item Writes by one process visible to others mapping same section.
+    \item Implemented by virtual memory map pointing to same physical page.
+    \item Supports copy-on-write: processes share read-only, get own copies for modification.
+    \item Processes use mutual exclusion for shared data coordination.
+    \item Shared memory often implemented by memory mapping files.
+\end{itemize}
+
+\subsection{Shared memory in the Windows API}
+\begin{itemize}
+    \item Outline for shared memory using memory-mapped files:
+    \begin{enumerate}
+        \item Create a \textbf{file mapping} for the file.
+        \item Establish a \textbf{view} of the mapped file in process's virtual address space.
+    \end{enumerate}
+    \item Second process opens and creates view of same mapped file.
+    \item Mapped file acts as shared-memory object for inter-process communication.
+    \item Example: Producer writes, Consumer reads.
+    \item Steps:
+    \begin{enumerate}
+        \item Open file with \texttt{CreateFile()} (returns \texttt{HANDLE}).
+        \item Create file mapping with \texttt{CreateFileMapping()} (uses file \texttt{HANDLE}).
+        \item Establish view with \texttt{MapViewOfFile()} (uses mapped object \texttt{HANDLE}).
+    \end{enumerate}
+    \item \texttt{CreateFileMapping()} creates a \textbf{named shared-memory object} (e.g., \texttt{SharedObject}).
+    \item \texttt{MapViewOfFile()} returns pointer to shared-memory object; accesses to this memory are accesses to the file.
+    \item Entire file or portion can be mapped.
+    \item Mapped file may be demand-paged.
+    \item Both processes remove view with \texttt{UnmapViewOfFile()}.
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Section glossary}
+\label{tab:section_glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{memory mapping} & File-access method where file is mapped into process memory space for direct memory access. \\
+\textbf{file mapping} & In Windows, the first step in memory-mapping a file. \\
+\textbf{view} & In Windows, an address range mapped in shared memory; second step in memory-mapping a file. \\
+\textbf{named shared-memory object} & In Windows API, a section of a memory-mapped file accessible by name from multiple processes. \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,100 @@
+\subsection{9.2 Contiguous memory allocation}
+
+\begin{itemize}
+    \item Main memory accommodates OS and user processes.
+    \item Need efficient memory allocation.
+    \item Memory usually divided into two partitions: one for OS, one for user processes.
+    \item OS can be in low or high memory (many OS, including Linux/Windows, use high memory).
+    \item Several user processes reside in memory concurrently.
+    \item \textbf{Contiguous memory allocation}: each process in single contiguous memory section.
+\end{itemize}
+
+\subsubsection*{Memory protection}
+\begin{itemize}
+    \item Prevent process from accessing unowned memory.
+    \item Combine \textbf{relocation register} (smallest physical address) and \textbf{limit register} (range of logical addresses).
+    \item Each logical address must fall within limit register range.
+    \item MMU maps logical address dynamically by adding relocation register value.
+    \item Mapped address sent to memory.
+    \item CPU scheduler loads relocation and limit registers during context switch.
+    \item Every CPU-generated address checked against these registers.
+    \item Protects OS and other user programs/data from modification by running process.
+    \item Relocation-register scheme allows dynamic OS size changes.
+    \item Desirable for device drivers: load only when needed, remove when no longer needed.
+\end{itemize}
+
+\subsubsection*{Memory allocation}
+\begin{itemize}
+    \item Simplest method: assign processes to variably sized partitions.
+    \item Each partition contains exactly one process (\textbf{variable-partition} scheme).
+    \item OS keeps table of available/occupied memory parts.
+    \item Initially: all memory available for user processes, one large block (\textbf{hole}).
+    \item Eventually: memory contains set of holes of various sizes.
+    \item When process arrives: OS considers memory requirements and available space.
+    \item Allocated space: process loaded into memory, competes for CPU time.
+    \item Process terminates: releases memory, OS provides to another process.
+    \item Insufficient memory for arriving process: reject or place in wait queue.
+    \item Memory blocks: set of holes scattered throughout memory.
+    \item Process needs memory: system searches for large enough hole.
+    \item If hole too large: split into two parts (one allocated, other returned to holes).
+    \item Process terminates: releases block, placed back in holes.
+    \item New hole adjacent to others: merged to form larger hole.
+    \item This procedure: instance of \textbf{dynamic storage-allocation problem}.
+    \item Common strategies to select free hole:
+    \begin{itemize}
+        \item \textbf{First-fit}: Allocate first hole big enough. Search from beginning or last search end. Stop when large enough hole found.
+        \item \textbf{Best-fit}: Allocate smallest hole big enough. Must search entire list (unless ordered by size). Produces smallest leftover hole.
+        \item \textbf{Worst-fit}: Allocate largest hole. Must search entire list (unless sorted by size). Produces largest leftover hole (may be more useful).
+    \end{itemize}
+    \item Simulations: first-fit and best-fit better than worst-fit (decreasing time, storage utilization).
+    \item Neither first-fit nor best-fit clearly better for storage utilization, but first-fit generally faster.
+\end{itemize}
+
+\subsubsection*{Fragmentation}
+\begin{itemize}
+    \item First-fit and best-fit suffer from \textbf{external fragmentation}.
+    \item Processes loaded/removed: free memory broken into small pieces.
+    \item External fragmentation: enough total memory, but spaces not contiguous (storage fragmented).
+    \item Problem can be severe: wasted memory between processes.
+    \item If small pieces were one big block: could run more processes.
+    \item Strategy (first-fit/best-fit) affects fragmentation amount.
+    \item Which end of free block allocated also a factor.
+    \item External fragmentation always a problem.
+    \item Statistical analysis (first fit): 0.5 N blocks lost to fragmentation for N allocated blocks.
+    \item \textbf{50-percent rule}: one-third of memory unusable.
+    \item Memory fragmentation: internal and external.
+    \item \textbf{Internal fragmentation}: unused memory internal to a partition.
+    \item Occurs when allocated memory slightly larger than requested (e.g., fixed-sized blocks).
+    \item Solution to external fragmentation: \textbf{compaction}.
+    \item Goal: shuffle memory contents, place all free memory together in one large block.
+    \item Compaction not always possible:
+    \begin{itemize}
+        \item If relocation static (assembly/load time): cannot compact.
+        \item Possible only if relocation dynamic (execution time).
+    \end{itemize}
+    \item If dynamic relocation: move program/data, change base register.
+    \item Compaction can be expensive (e.g., move all processes to one end).
+    \item Another solution to external fragmentation: permit noncontiguous logical address space.
+    \item Allows process to be allocated physical memory wherever available.
+    \item Strategy used in \textbf{paging} (most common memory-management technique).
+    \item Fragmentation: general problem in computing (storage management chapters).
+\end{itemize}
+
+\subsubsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{contiguous memory allocation} & Memory allocation method where each process is in a single contiguous memory section. \\
+    \textbf{variable-partition} & Memory-allocation scheme where each memory partition contains exactly one process. \\
+    \textbf{hole} & In variable partition memory allocation, a contiguous section of unused memory. \\
+    \textbf{dynamic storage-allocation problem} & Problem of satisfying a memory request of size n from a list of free holes. \\
+    \textbf{first-fit} & In memory allocation, selecting the first hole large enough for a request. \\
+    \textbf{best-fit} & In memory allocation, selecting the smallest hole large enough for a request. \\
+    \textbf{worst-fit} & In memory allocation, selecting the largest hole available. \\
+    \textbf{external fragmentation} & Fragmentation where available memory has holes that together are enough, but no single hole is large enough. \\
+    \textbf{50-percent rule} & Statistical finding that fragmentation may result in 50 percent space loss. \\
+    \textbf{internal fragmentation} & Unused memory internal to a partition. \\
+    \textbf{compaction} & Shuffling storage to consolidate used space and create one or more large holes. \\
+    \bottomrule
+\end{tabular}

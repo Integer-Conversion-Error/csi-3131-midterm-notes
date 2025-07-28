@@ -1,0 +1,60 @@
+\section{Transforming I/O requests to hardware operations}
+
+\subsection{Connecting Application Requests to Hardware}
+\begin{itemize}
+    \item How OS connects application request to network wires or disk sector.
+    \item Example: reading file from disk.
+    \item Application refers to data by file name.
+    \item File system maps file name through directories to space allocation.
+    \item MS-DOS for FAT: name maps to number, indicates entry in file-access table, tells which disk blocks allocated.
+    \item UNIX: name maps to inode number, inode contains space-allocation info.
+    \item How is connection made from file name to disk controller (hardware port address or memory-mapped registers)?
+\end{itemize}
+
+\subsection{Device Naming and Lookup}
+\begin{itemize}
+    \item MS-DOS for FAT: first part of file name (before colon) identifies hardware device (e.g., `C:` for primary hard disk).
+    \item `C:` mapped to specific port address via device table.
+    \item Device name space separate from file-system name space (due to colon separator).
+    \item Easy to associate extra functionality (e.g., spooling for printer files).
+    \item UNIX: device name space incorporated in regular file-system name space.
+    \item No clear separation of device portion in path name.
+    \item UNIX uses \textbf{mount table}: associates path name prefixes with specific device names.
+    \item Resolve path name: lookup in mount table for longest matching prefix.
+    \item Mount table entry gives device name (also in file-system name space).
+    \item Lookup device name: finds `<major, minor>` device number, not inode.
+    \item Major device number: identifies device driver to handle I/O.
+    \item Minor device number: passed to device driver to index into device table.
+    \item Device-table entry: gives port address or memory-mapped address of device controller.
+    \item Modern OS flexibility: multiple stages of lookup tables.
+    \item Mechanisms passing requests between applications/drivers are general.
+    \item New devices/drivers can be introduced without kernel recompilation.
+    \item Some OS load device drivers on demand.
+    \item Boot time: system probes buses, loads necessary drivers (immediately or on first request).
+    \item Devices added after boot: detected by error, kernel inspects, loads driver dynamically.
+    \item Dynamic loading/unloading: more complex kernel algorithms, device-structure locking, error handling.
+\end{itemize}
+
+\subsection{Life Cycle of a Blocking Read Request}
+\begin{enumerate}
+    \item Process issues blocking `read()` system call to file descriptor of opened file.
+    \item Kernel system-call code checks parameters. If data in buffer cache, data returned, I/O completed.
+    \item Else, physical I/O performed. Process removed from run queue, placed on wait queue for device. I/O request scheduled.
+    \item I/O subsystem sends request to device driver (subroutine call or in-kernel message).
+    \item Device driver allocates kernel buffer space, schedules I/O. Sends commands to device controller by writing to device-control registers.
+    \item Device controller operates device hardware for data transfer.
+    \item Driver may poll for status/data, or set up DMA transfer to kernel memory. DMA controller generates interrupt on transfer completion.
+    \item Correct interrupt handler receives interrupt via interrupt-vector table, stores data, signals device driver, returns.
+    \item Device driver receives signal, determines completed I/O request, status, signals kernel I/O subsystem.
+    \item Kernel transfers data/return codes to requesting process's address space. Moves process from wait queue to ready queue.
+    \item Moving process to ready queue unblocks it. Scheduler assigns CPU, process resumes at system call completion.
+\end{enumerate}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{mount table} & In-memory data structure with info about each mounted volume, tracks file systems and access. \\
+    \bottomrule
+\end{tabular}

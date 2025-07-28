@@ -1,0 +1,70 @@
+\section{ARMv8 architecture}
+
+\subsection*{Overview}
+\begin{itemize}
+    \item ARM processors: common for mobile devices (smartphones, tablets)
+    \item Intel: designs and manufactures chips
+    \item ARM: only designs, licenses architectural designs to manufacturers
+    \item Examples: Apple (iPhone, iPad), most Android devices use ARM
+    \item Also for real-time embedded systems
+    \item Over 100 billion ARM processors produced; most widely used architecture by quantity
+    \item Focus: 64-bit ARM v8 architecture
+\end{itemize}
+
+\subsection*{Translation Granules, Pages, and Regions}
+\begin{itemize}
+    \item ARM v8 has three \textbf{translation granules}: 4 KB, 16 KB, and 64 KB
+    \item Each granule provides different page sizes and larger contiguous memory sections called \textbf{regions}
+\end{itemize}
+
+\begin{tabular}{p{0.3\textwidth}p{0.35\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{Translation Granule Size} & \textbf{Page Size} & \textbf{Region Size} \\
+\midrule
+4 KB & 4 KB & 2 MB, 1 GB \\
+16 KB & 16 KB & 32 MB \\
+64 KB & 64 KB & 512 MB \\
+\bottomrule
+\end{tabular}
+
+\subsection*{Paging Structure}
+\begin{itemize}
+    \item 4-KB and 16-KB granules: up to four levels of paging
+    \item 64-KB granules: up to three levels of paging
+    \item ARM v8 is 64-bit architecture, but only 48 bits currently used
+    \item \textbf{TTBR register}: \textbf{translation table base register}, points to level 0 table for current thread
+    \item If all four levels used (4-KB granule): offset (bits 0-11) refers to offset within 4-KB page
+    \item Table entries for level 1 and level 2 may refer to another table or a region:
+    \begin{itemize}
+        \item Level-1 table refers to 1-GB region: low-order 30 bits (0-29) used as offset
+        \item Level-2 table refers to 2-MB region: low-order 21 bits (0-20) used as offset
+    \end{itemize}
+\end{itemize}
+
+\subsection*{TLBs (Translation Lookaside Buffers)}
+\begin{itemize}
+    \item ARM architecture supports two levels of TLBs:
+    \begin{itemize}
+        \item Inner level: two \textbf{micro TLBs} (one for data, one for instructions); support ASIDs
+        \item Outer level: single \textbf{main TLB}
+    \end{itemize}
+    \item Address translation process:
+    \begin{itemize}
+        \item Begins at micro-TLB level
+        \item Micro-TLB miss: main TLB checked
+        \item Both TLBs miss: page table walk performed in hardware
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{translation granules} & Features of ARM v8 CPUs defining page sizes and regions. \\
+\textbf{regions} & In ARM v8 CPUs, contiguous memory areas with separate privilege and access rules. \\
+\textbf{translation table base register} & ARM v8 CPU register pointing to the level 0 (outer) page table for the current thread. \\
+\textbf{micro TLB} & ARM CPU inner-level TLBs, one for instructions and one for data. \\
+\textbf{main TLB} & ARM CPU outer-level TLB; checked after micro TLB lookup and before page table walk. \\
+\bottomrule
+\end{tabular}

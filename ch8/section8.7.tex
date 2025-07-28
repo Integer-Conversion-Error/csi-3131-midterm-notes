@@ -1,0 +1,134 @@
+\subsection{Deadlock detection}
+\begin{itemize}
+    \item If system doesn't use deadlock-prevention or deadlock-avoidance:
+    \begin{itemize}
+        \item Algorithm to determine if deadlock occurred.
+        \item Algorithm to recover from deadlock.
+    \end{itemize}
+    \item Detection-and-recovery overhead: run-time costs, potential losses from recovery.
+\end{itemize}
+
+\subsubsection{Single instance of each resource type}
+\begin{itemize}
+    \item Use \textbf{wait-for graph}: variant of resource-allocation graph.
+    \item Obtained by removing resource nodes and collapsing edges.
+    \item Edge $T_i \to T_j$ in wait-for graph implies thread $T_i$ waiting for thread $T_j$ to release a resource $R_q$ that $T_i$ needs.
+    \item Deadlock exists if wait-for graph contains a cycle.
+    \item Detection: maintain wait-for graph; periodically invoke algorithm to search for cycles.
+    \item Cycle detection: $O(n^2)$ operations, where $n$ is number of vertices.
+    \item BCC toolkit: `deadlock\_detector` tool for Pthreads mutex locks on Linux.
+    \begin{itemize}
+        \item Inserts probes to trace `pthread\_mutex\_lock()` and `pthread\_mutex\_unlock()`.
+        \item Constructs wait-for graph, reports deadlock if cycle detected.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Several instances of a resource type}
+\begin{itemize}
+    \item Wait-for graph scheme not applicable.
+    \item Algorithm similar to banker's algorithm, uses:
+    \begin{itemize}
+        \item \textbf{Available}: vector of length $m$ (number of available resources of each type).
+        \item \textbf{Allocation}: $n \times m$ matrix (resources currently allocated to each thread).
+        \item \textbf{Request}: $n \times m$ matrix (current request of each thread).
+        \begin{itemize}
+            \item `Request[i][j] = k`: thread $T_i$ requests $k$ more instances of resource type $R_j$.
+        \end{itemize}
+    \end{itemize}
+    \item Detection algorithm steps:
+    \begin{enumerate}
+        \item Initialize \textbf{Work} = \textbf{Available}. For $i = 0, 1, \dots, n-1$:
+        \begin{itemize}
+            \item If \textbf{Allocation}$_i \neq 0$, then \textbf{Finish}[$i$] = \textbf{false}.
+            \item Otherwise, \textbf{Finish}[$i$] = \textbf{true}.
+        \end{itemize}
+        \item Find an index $i$ such that both:
+        \begin{itemize}
+            \item \textbf{Finish}[$i$] == \textbf{false}
+            \item \textbf{Request}$_i \leq$ \textbf{Work}
+        \end{itemize}
+        If no such $i$ exists, go to step 4.
+        \item \textbf{Work} = \textbf{Work} + \textbf{Allocation}$_i$; \textbf{Finish}[$i$] = \textbf{true}. Go to step 2.
+        \item If \textbf{Finish}[$i$] == \textbf{false} for some $i$, $0 \leq i < n$, then thread $T_i$ is deadlocked.
+    \end{enumerate}
+    \item Algorithm complexity: $O(m \times n^2)$ operations.
+    \item Optimistic attitude: if \textbf{Request}$_i \leq$ \textbf{Work}, assume $T_i$ will complete and return resources.
+    \item Example: 5 threads ($T_0$ to $T_4$), 3 resource types (A, B, C).
+    \begin{itemize}
+        \item A: 7 instances, B: 2 instances, C: 6 instances.
+        \item Initial state:
+        \begin{tabular}{p{0.1\textwidth}p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+            \toprule
+            & \textbf{Allocation} & \textbf{Request} & \textbf{Available} \\
+            & \textit{A B C} & \textit{A B C} & \textit{A B C} \\
+            \midrule
+            $T_0$ & 0 1 0 & 0 0 0 & 0 0 0 \\
+            $T_1$ & 2 0 0 & 2 0 2 & \\
+            $T_2$ & 3 0 3 & 0 0 0 & \\
+            $T_3$ & 2 1 1 & 1 0 0 & \\
+            $T_4$ & 0 0 2 & 0 0 2 & \\
+            \bottomrule
+        \end{tabular}
+        \item Initial claim: system not deadlocked. Sequence $<T_0, T_2, T_3, T_1, T_4>$ results in \textbf{Finish}[$i$] == \textbf{true} for all $i$.
+        \item If $T_2$ requests 1 additional instance of C:
+        \begin{tabular}{p{0.1\textwidth}p{0.9\textwidth}}
+            \toprule
+            & \textbf{Request} \\
+            & \textit{A B C} \\
+            \midrule
+            $T_0$ & 0 0 0 \\
+            $T_1$ & 2 0 2 \\
+            $T_2$ & 0 0 1 \\
+            $T_3$ & 1 0 0 \\
+            $T_4$ & 0 0 2 \\
+            \bottomrule
+        \end{tabular}
+        \item New claim: system is deadlocked. Can reclaim $T_0$'s resources, but not enough for others. Deadlock involves $T_1, T_2, T_3, T_4$.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Detection-algorithm usage}
+\begin{itemize}
+    \item When to invoke depends on:
+    \begin{enumerate}
+        \item How often is a deadlock likely to occur?
+        \item How many threads will be affected by deadlock when it happens?
+    \end{enumerate}
+    \item Frequent deadlocks $\implies$ frequent invocation.
+    \item Resources allocated to deadlocked threads become idle; number of threads in deadlock cycle may grow.
+    \item Extreme: invoke every time a resource request cannot be granted immediately.
+    \begin{itemize}
+        \item Identifies deadlocked threads and the specific thread that "caused" the deadlock.
+        \item High computational overhead.
+    \end{itemize}
+    \item Less expensive: invoke at defined intervals (e.g., hourly, when CPU utilization drops below 40\%).
+    \begin{itemize}
+        \item May not identify the "causing" thread.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Managing deadlock in databases}
+\begin{itemize}
+    \item Database systems manage deadlock using detection and recovery.
+    \item Updates as \textbf{transactions}; locks used for data integrity.
+    \item Deadlocks possible with multiple concurrent transactions.
+    \item Database server periodically searches for cycles in the wait-for graph.
+    \item When deadlock detected:
+    \begin{itemize}
+        \item A victim transaction is selected.
+        \item Victim transaction is aborted and rolled back, releasing its locks.
+        \item Remaining transactions are freed from deadlock.
+        \item Aborted transaction is reissued.
+    \end{itemize}
+    \item Victim choice: e.g., MySQL minimizes rows inserted, updated, or deleted.
+\end{itemize}
+
+\subsubsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{wait-for graph} & In deadlock detection, a variant of the resource-allocation graph with resource nodes removed; indicates a deadlock if the graph contains a cycle. \\
+    \textbf{thread dump} & In Java, a snapshot of the state of all threads in an application; a useful debugging tool for deadlocks. \\
+    \bottomrule
+\end{tabular}

@@ -1,0 +1,78 @@
+\section{10.1 Background}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item Virtual memory: technique allowing execution of processes not entirely in memory.
+    \item Major advantage: programs larger than physical memory.
+    \item Abstracts main memory into large, uniform storage array.
+    \item Separates logical memory (programmer's view) from physical memory.
+    \item Frees programmers from memory-storage limitations.
+    \item Allows processes to share files, libraries, and implement shared memory.
+    \item Efficient mechanism for process creation.
+    \item Implementation complex, can decrease performance if used carelessly.
+\end{itemize}
+
+\subsection{Things to learn}
+\begin{itemize}
+    \item Define virtual memory and describe its benefits.
+    \item Illustrate how pages are loaded into memory using demand paging.
+    \item Apply the FIFO, optimal, and LRU page-replacement algorithms.
+    \item Describe the working set of a process, and explain how it is related to program locality.
+    \item Describe how Linux, Windows 10, and Solaris manage virtual memory.
+    \item Design a virtual memory manager simulation in the C programming language.
+\end{itemize}
+
+\subsection{Background}
+\begin{itemize}
+    \item Traditional memory management: entire process in physical memory for execution.
+    \item Limitation: program size limited by physical memory.
+    \item Real programs often don't need entire code:
+    \begin{itemize}
+        \item Error handling code: seldom executed.
+        \item Arrays/lists: often allocated more memory than needed.
+        \item Rare program options/features: rarely used.
+    \end{itemize}
+    \item Benefits of partial program execution in memory:
+    \begin{itemize}
+        \item Programs not constrained by physical memory size; large \textbf{virtual} address space.
+        \item Less physical memory per program $\rightarrow$ more programs run concurrently $\rightarrow$ increased CPU utilization and throughput (no increase in response/turnaround time).
+        \item Less I/O for loading/swapping $\rightarrow$ faster program execution.
+    \end{itemize}
+    \item \textbf{Virtual memory}: separation of logical memory (programmer's view) from physical memory.
+    \item Allows large virtual memory with smaller physical memory.
+    \item Simplifies programming: no worry about physical memory limits.
+\end{itemize}
+
+\subsection{Virtual Address Space and Shared Memory}
+\begin{itemize}
+    \item \textbf{Virtual address space}: logical view of process storage in memory.
+    \item Typically: process starts at logical address 0, contiguous memory.
+    \item Physical memory: organized in page frames, not necessarily contiguous.
+    \item Memory-management unit (MMU): maps logical pages to physical page frames.
+    \item Heap grows upward, stack grows downward.
+    \item Large blank space between heap/stack: part of virtual address space, requires physical pages only if heap/stack grows.
+    \item \textbf{Sparse} address spaces: virtual address spaces with holes.
+    \item Benefits of sparse address spaces:
+    \begin{itemize}
+        \item Holes filled as stack/heap grow.
+        \item Dynamic linking of libraries/shared objects during execution.
+    \end{itemize}
+    \item Virtual memory allows file/memory sharing via page sharing:
+    \begin{itemize}
+        \item System libraries (e.g., standard C library) shared by mapping into virtual address space.
+        \item Libraries mapped read-only, physical pages shared by processes.
+        \item Processes share memory regions for communication.
+        \item Pages shared during process creation (\texttt{fork()}) $\rightarrow$ speeds up process creation.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{virtual memory} & Technique allowing execution of a process not completely in memory; separates logical from physical memory. \\
+    \textbf{virtual address space} & Logical view of how a process is stored in memory. \\
+    \textbf{sparse} & Describes a page table with noncontiguous, scattered entries; an address space with many holes. \\
+    \bottomrule
+\end{tabular}

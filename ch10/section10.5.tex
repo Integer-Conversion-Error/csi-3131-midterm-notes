@@ -1,0 +1,198 @@
+\section{Allocation of frames}
+\begin{itemize}
+    \item Allocation issue: how to allocate fixed free memory among processes?
+    \item Example: 128 frames, OS takes 35, 93 for user process.
+    \begin{itemize}
+        \item Pure demand paging: 93 frames on free-frame list.
+        \item Page faults get free frames.
+        \item List exhausted $\rightarrow$ page-replacement algorithm used.
+        \item Process terminates $\rightarrow$ frames back to free-frame list.
+    \end{itemize}
+    \item Variations:
+    \begin{itemize}
+        \item OS allocates buffer/table space from free-frame list (can be used for user paging when not in use).
+        \item Keep 3 free frames reserved: free frame for page fault, replacement selected during swap.
+        \item Basic strategy: user process allocated any free frame.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Minimum number of frames}
+\begin{itemize}
+    \item Constraints on frame allocation:
+    \begin{itemize}
+        \item Cannot exceed total available frames (unless page sharing).
+        \item Must allocate at least a minimum number of frames.
+    \end{itemize}
+    \item Minimum frames for performance:
+    \begin{itemize}
+        \item Fewer frames $\rightarrow$ higher page-fault rate, slower execution.
+        \item Page fault before instruction complete $\rightarrow$ instruction restart.
+        \item Need enough frames for all pages an instruction can reference.
+    \end{itemize}
+    \item Example:
+    \begin{itemize}
+        \item Single memory-reference instruction $\rightarrow$ 1 frame for instruction, 1 for memory reference.
+        \item One-level indirect addressing $\rightarrow$ at least 3 frames per process.
+    \end{itemize}
+    \item Minimum frames defined by computer architecture.
+    \begin{itemize}
+        \item Example: move instruction straddling two frames, two indirect operands $\rightarrow$ 6 frames.
+        \item Intel architectures: register-to-register/memory only, limits minimum frames.
+    \end{itemize}
+    \item Maximum frames: defined by available physical memory.
+\end{itemize}
+
+\subsection{Allocation algorithms}
+\begin{itemize}
+    \item Easiest way to split $m$ frames among $n$ processes: equal share, $m/n$ frames.
+    \begin{itemize}
+        \item Example: 93 frames, 5 processes $\rightarrow$ 18 frames each, 3 leftover for buffer.
+        \item Called \textbf{equal allocation}.
+    \end{itemize}
+    \item Alternative: processes need differing memory.
+    \begin{itemize}
+        \item Example: 10KB student, 127KB database, 62 frames.
+        \item Equal allocation (31 each) wastes frames for student process.
+    \end{itemize}
+    \item Solution: \textbf{proportional allocation}.
+    \begin{itemize}
+        \item Allocate memory by process size.
+        \item $p_i$ has virtual memory size $s_i$. Total size $S = \sum S_i$. Available frames $m$.
+        \item Allocate $a_i \approx (s_i/S) \times m$ frames to $p_i$.
+        \item $a_i$ must be integer, greater than minimum frames, sum $\le m$.
+        \item Example: 62 frames, 10 pages \& 127 pages. Total 137 pages.
+        \begin{itemize}
+            \item $(10/137) \times 62 \approx 4$ frames.
+            \item $(127/137) \times 62 \approx 57$ frames.
+        \end{itemize}
+        \item Processes share frames by "needs".
+    \end{itemize}
+    \item Allocation varies with multiprogramming level.
+    \begin{itemize}
+        \item Increased level $\rightarrow$ processes lose frames.
+        \item Decreased level $\rightarrow$ frames spread.
+    \end{itemize}
+    \item High/low priority processes treated same in equal/proportional allocation.
+    \begin{itemize}
+        \item Solution: proportional allocation based on process priority or size + priority.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Global versus local allocation}
+\begin{itemize}
+    \item Page replacement affects frame allocation.
+    \item Two categories of page-replacement algorithms:
+    \begin{itemize}
+        \item \textbf{Global replacement}: process selects from all frames (can take from others).
+        \item \textbf{Local replacement}: process selects only from its own allocated frames.
+    \end{itemize}
+    \item Example: high-priority process takes frames from low-priority.
+    \begin{itemize}
+        \item Local replacement: frames allocated to process don't change.
+        \item Global replacement: process can increase its frames by taking from others.
+    \end{itemize}
+    \item Global replacement problem: process performance depends on other processes' paging behavior (external circumstances).
+    \item Local replacement: performance depends only on its own paging behavior.
+    \item Global replacement: generally greater system throughput, more common.
+\end{itemize}
+
+\subsection{Major and minor page faults}
+\begin{itemize}
+    \item Page fault: page no valid mapping.
+    \item Two types: \textbf{major} and \textbf{minor} faults (Windows: \textbf{hard} and \textbf{soft} faults).
+    \item \textbf{Major page fault}: page referenced, not in memory.
+    \begin{itemize}
+        \item Requires reading from backing store, updating page table.
+        \item Demand paging $\rightarrow$ initially high major faults.
+    \end{itemize}
+    \item \textbf{Minor page faults}: process no logical mapping to page, but page in memory.
+    \begin{itemize}
+        \item Reasons:
+        \begin{itemize}
+            \item Shared library in memory, no mapping $\rightarrow$ update page table.
+            \item Page reclaimed to free-frame list, not zeroed/allocated $\rightarrow$ frame removed from list, reassigned.
+        \end{itemize}
+        \item Less time consuming than major faults.
+    \end{itemize}
+    \item Linux command to observe: \texttt{ps -eo min\_flt,maj\_flt,cmd}.
+    \item Observation: major faults low, minor faults high. Linux processes use shared libraries heavily.
+\end{itemize}
+
+\subsection{Reclaiming pages}
+\begin{itemize}
+    \item Global page-replacement strategy:
+    \begin{itemize}
+        \item Satisfy requests from free-frame list.
+        \item Trigger replacement when list below threshold, not at zero.
+        \item Ensures sufficient free memory.
+    \end{itemize}
+    \item Strategy depicted in Figure 10.5.1:
+    \begin{itemize}
+        \item Keep free memory above minimum threshold.
+        \item Below threshold $\rightarrow$ kernel routine (\textbf{reapers}) triggered.
+        \item Reclaims pages from all processes (excluding kernel). Uses page-replacement algorithms.
+        \item Reaches max threshold $\rightarrow$ reaper suspended. Resumes when free memory below min threshold.
+        \item Continuous process.
+    \end{itemize}
+    \item Reaper routine typically uses LRU approximation.
+    \item If unable to maintain free frames: reclaims more aggressively (e.g., pure FIFO).
+    \item Linux: \textbf{out-of-memory} (\textbf{OOM}) \textbf{killer} terminates processes at very low free memory.
+    \begin{itemize}
+        \item OOM score: higher score $\rightarrow$ higher termination likelihood.
+        \item Calculated by memory usage percentage.
+        \item View OOM scores: \texttt{/proc/<pid>/oom\_score}.
+    \end{itemize}
+    \item Reaper routines vary aggressiveness. Min/max thresholds configurable by system administrator.
+\end{itemize}
+
+\subsection{Non-uniform memory access}
+\begin{itemize}
+    \item Virtual memory assumption: uniform memory access.
+    \item Not true for \textbf{non-uniform memory access} (\textbf{NUMA}) systems (multiple CPUs).
+    \begin{itemize}
+        \item CPU accesses local memory faster than remote.
+        \item NUMA systems slower than uniform access, but allow more CPUs, greater throughput/parallelism.
+    \end{itemize}
+    \item NUMA performance: managing page frame location critical.
+    \item NUMA-aware allocation: frames allocated "as close as possible" to CPU (minimum latency, same system board).
+    \begin{itemize}
+        \item Page fault $\rightarrow$ NUMA-aware system allocates frame close to CPU.
+    \end{itemize}
+    \item NUMA consideration: scheduler tracks last CPU.
+    \begin{itemize}
+        \item Schedule process on previous CPU + allocate frames close to CPU $\rightarrow$ improved cache hits, decreased memory access.
+    \end{itemize}
+    \item Threads complicate NUMA: process threads on different system boards. Memory allocation challenge.
+    \item Linux solution:
+    \begin{itemize}
+        \item Kernel identifies scheduling domains.
+        \item CFS scheduler prevents thread migration across domains (avoids memory access penalties).
+        \item Separate free-frame list per NUMA node $\rightarrow$ thread allocated memory from its running node.
+    \end{itemize}
+    \item Solaris solution: \textbf{lgroups} (locality groups) in kernel.
+    \begin{itemize}
+        \item Each lgroup: CPUs + memory, CPU accesses memory in group within defined latency.
+        \item Hierarchy of lgroups.
+        \item Solaris schedules threads/allocates memory within lgroup; if not possible, uses nearby lgroups.
+        \item Minimizes memory latency, maximizes CPU cache hit rates.
+    \end{itemize}
+\end{itemize}
+
+\vspace{1em}
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{equal allocation} & Assigns equal amounts of a resource to all requestors; in virtual memory, equal frames to each process. \\
+    \textbf{proportional allocation} & Assigns a resource in proportion to some aspect of the requestor; in virtual memory, page frames in proportion to process size. \\
+    \textbf{global replacement} & Process selects replacement frame from all frames in system, even if allocated to another process. \\
+    \textbf{local replacement} & Process selects replacement frame only from its own allocated frames. \\
+    \textbf{major fault} & Page fault resolved by I/O to bring page from secondary storage. \\
+    \textbf{minor fault} & Page fault resolved without paging in data from secondary storage. \\
+    \textbf{reapers} & Routines that scan memory, freeing frames to maintain minimum free memory. \\
+    \textbf{out-of-memory (OOM) killer} & Linux routine that terminates processes to free memory when free memory is very low. \\
+    \textbf{non-uniform memory access (NUMA)} & Architecture where memory access time varies based on CPU core. \\
+    \textbf{lgroups} & Solaris locality groups in kernel; gather CPUs and memory for optimized access in NUMA. \\
+    \bottomrule
+\end{tabular}

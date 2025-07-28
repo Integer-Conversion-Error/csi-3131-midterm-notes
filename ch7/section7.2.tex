@@ -17,16 +17,16 @@
     \begin{itemize}
         \item Threads synchronize using: mutex locks, semaphores, events, timers.
         \item Mutex locks: protect shared data; thread gains ownership to access, releases when finished.
-        \item Semaphores: behave as described in Section \hyperref[sec:6.6]{6.6}.
+        \item Semaphores: behave as described in a previous chapter.
         \item \textit{Events}: similar to condition variables; notify waiting thread when condition occurs.
         \item Timers: notify one (or more) threads when specified time expires.
     \end{itemize}
-    \item Dispatcher objects states:
+    \item Dispatcher objects may be in one of two states:
     \begin{itemize}
-        \item \textit{Signaled state}: object available, thread will not block.
-        \item \textit{Nonsignaled state}: object not available, thread will block.
-        \item State transitions of mutex lock dispatcher object illustrated in Figure \ref{fig:7.2.1}.
+        \item A \textit{signaled state}, which indicates that the object is available and a thread acquiring it will not block.
+        \item A \textit{nonsignaled state}, which indicates that the object is not available and a thread attempting to acquire it will block.
     \end{itemize}
+    \item A mutex lock is acquired by a thread when it is in the signaled state, and it transitions to the nonsignaled state. When the thread releases the lock, it returns to the signaled state.
     \item Relationship between dispatcher object state and thread state:
     \begin{itemize}
         \item Thread blocks on nonsignaled object: state changes from ready to waiting, placed in waiting queue.
@@ -123,8 +123,15 @@ int value;
 \end{itemize}
 
 \subsection{Section glossary}
-\begin{itemize}
-    \item \textit{dispatcher objects}: Windows scheduler feature controlling dispatching and synchronization. Threads synchronize via mutex locks, semaphores, events, and timers.
-    \item \textit{event}: Windows OS scheduling feature, similar to a condition variable.
-    \item \textit{critical-section object}: User-mode mutex object in Windows OS, often acquired/released without kernel intervention.
-\end{itemize}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{dispatcher objects} & Windows scheduler feature controlling dispatching and synchronization. Threads synchronize via mutex locks, semaphores, events, and timers. \\
+\textbf{event} & Windows OS scheduling feature, similar to a condition variable. \\
+\textbf{critical-section object} & User-mode mutex object in Windows OS, often acquired/released without kernel intervention. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

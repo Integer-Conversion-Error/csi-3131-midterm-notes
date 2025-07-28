@@ -1,0 +1,40 @@
+\section{NVM scheduling}
+
+\begin{itemize}
+    \item Disk-scheduling algorithms (HDDs): minimize disk head movement.
+    \item NVM devices: no moving disk heads, commonly use simple FCFS policy.
+    \item Linux \textbf{NOOP} scheduler: FCFS policy, merges adjacent requests.
+    \item NVM device behavior: read service time uniform, write service time not uniform (due to flash memory properties).
+    \item Some SSD schedulers: merge only adjacent write requests, service all read requests in FCFS order.
+    \item I/O: sequential or random.
+    \item Sequential access: optimal for mechanical devices (HDD, tape); data near read/write head.
+    \item Random-access I/O: measured in \textbf{input/output operations per second} (\textit{IOPS}).
+    \item Random access I/O: causes HDD disk head movement.
+    \item Random access I/O: much faster on NVM (HDD hundreds IOPS, SSD hundreds of thousands IOPS).
+    \item NVM devices: less advantage for raw sequential throughput (HDD head seeks minimized).
+    \item Sequential reads: NVM performance equivalent to 10x advantage over HDD.
+    \item Writing to NVM: slower than reading, decreases advantage.
+    \item HDD write performance: consistent throughout device life.
+    \item NVM write performance: varies based on device fullness (garbage collection, over-provisioning) and "wear".
+    \item Worn NVM device: much worse performance than new device.
+    \item Improve NVM lifespan/performance: file system informs device when files deleted (device erases blocks).
+    \item Impact of garbage collection on performance:
+    \item NVM device under random read/write load, full but with free space.
+    \item \textbf{Garbage collection} must occur to reclaim space from invalid data.
+    \item One write might cause: read of pages, write of good data to overprovisioning space, erase of all-invalid-data block, placement of block into overprovisioning space.
+    \item Summary: one write request $\implies$ page write (data) + one or more page reads (by GC) + one or more page writes (good data from GC blocks).
+    \item Creation of I/O requests by NVM device (GC, space management): \textbf{write amplification}.
+    \item Write amplification: can greatly impact write performance.
+    \item Worst case: several extra I/Os triggered with each write request.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{NOOP} & Linux NVM scheduling algorithm: FCFS with adjacent requests merged. \\
+\textbf{input/output operations per second} & Measure of random access I/O performance: number of inputs + outputs per second. \\
+\textbf{write amplification} & Creation of I/O requests by NVM devices (GC, space management), impacting write performance. \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,20 @@
+\section{Summary}
+
+\begin{itemize}
+    \item File: abstract data type, sequence of logical records (byte, line, complex data). OS may support record types or leave to application.
+    \item OS task: map logical file concept to physical storage (hard disk, NVM). May order logical records into physical records.
+    \item Directories: organize files.
+    \begin{itemize}
+        \item Single-level directory: naming problems in multiuser systems (unique names required).
+        \item Two-level directory: separate directory for each user, solves naming problems. Lists file name, location, length, type, owner, times.
+        \item Tree-structured directory: generalization of two-level, allows subdirectories for organization.
+        \item Acyclic-graph directory: allows sharing of subdirectories/files, but complicates searching/deletion.
+        \item General graph structure: complete flexibility in sharing, but may require garbage collection for unused space.
+    \end{itemize}
+    \item Remote file systems: challenges in reliability, performance, security. Distributed information systems manage user, host, access info for shared state.
+    \item File protection: needed on multiuser systems.
+    \begin{itemize}
+        \item Access controlled by type: read, write, execute, append, delete, list directory.
+        \item Protection via access lists, passwords, other techniques.
+    \end{itemize}
+\end{itemize}

@@ -1,0 +1,87 @@
+\section{Deadlock avoidance}
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Deadlock-prevention limits how requests are made, ensuring no necessary condition occurs.
+    \item Side effects: low device utilization, reduced system throughput.
+    \item Alternative: require additional info on resource requests.
+    \item System needs to know max resources each thread may need (a priori information).
+    \item Deadlock-avoidance algorithm dynamically examines resource-allocation state to prevent circular-wait.
+    \item Resource-allocation \textbf{state}: defined by available/allocated resources and max demands.
+\end{itemize}
+
+\subsection*{Safe state}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item A state is \textbf{safe} if system can allocate resources to each thread (up to max) in some order and avoid deadlock.
+    \item System is safe if a \textbf{safe sequence} exists.
+    \item Safe sequence $<T_1, T_2, \dots, T_n>$: for each $T_i$, its resource requests can be met by currently available resources + resources held by all $T_j$ ($j < i$).
+    \item Safe state is not deadlocked; deadlocked state is unsafe.
+    \item Not all unsafe states are deadlocks, but unsafe states \textbf{may} lead to deadlock.
+    \item OS avoids unsafe states as long as state is safe.
+    \item In unsafe state, OS cannot prevent deadlocks; thread behavior controls unsafe states.
+\end{itemize}
+
+\subsection*{Resource-allocation-graph algorithm}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item For systems with only one instance of each resource type.
+    \item Introduces \textbf{claim edge} ($T_i \to R_j$ dashed line): indicates $T_i$ may request $R_j$ in future.
+    \item Claim edge $T_i \to R_j$ converted to request edge when $T_i$ requests $R_j$.
+    \item Request edge $T_i \to R_j$ converted to assignment edge when $R_j$ allocated to $T_i$.
+    \item Assignment edge $R_j \to T_i$ converted to claim edge when $R_j$ released by $T_i$.
+    \item Resources must be claimed a priori.
+    \item Request granted only if no cycle formed in graph (checked by cycle-detection algorithm).
+    \item Cycle indicates unsafe state.
+    \item Algorithm complexity: $O(n^2)$ operations, where $n$ is number of threads.
+\end{itemize}
+
+\subsection*{Banker's algorithm}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Applicable to systems with multiple instances of each resource type.
+    \item Less efficient than resource-allocation graph scheme.
+    \item When new thread enters, declares max instances of each resource type needed (cannot exceed total system resources).
+    \item Request granted only if allocation leaves system in safe state.
+    \item Data structures:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item \textbf{Available}: vector of length $m$, number of available resources of each type.
+        \item \textbf{Max}: $n \times m$ matrix, max demand of each thread.
+        \item \textbf{Allocation}: $n \times m$ matrix, resources currently allocated to each thread.
+        \item \textbf{Need}: $n \times m$ matrix, remaining resource need of each thread ($Need[i][j] = Max[i][j] - Allocation[i][j]$).
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Safety algorithm}
+\begin{enumerate}[noitemsep, topsep=0pt]
+    \item Initialize $Work = Available$, $Finish[i] = false$ for $i = 0, 1, \dots, n-1$.
+    \item Find index $i$ such that $Finish[i] == false$ and $Need_i \le Work$. If no such $i$, go to step 4.
+    \item $Work = Work + Allocation_i$; $Finish[i] = true$. Go to step 2.
+    \item If $Finish[i] == true$ for all $i$, system is in safe state.
+\end{enumerate}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Algorithm complexity: $O(m \times n^2)$ operations.
+\end{itemize}
+
+\subsubsection*{Resource-request algorithm}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Let $Request_i$ be request vector for thread $T_i$.
+    \begin{enumerate}[noitemsep, topsep=0pt]
+        \item If $Request_i \le Need_i$, go to step 2. Else, error (thread exceeded max claim).
+        \item If $Request_i \le Available$, go to step 3. Else, $T_i$ must wait (resources unavailable).
+        \item Pretend allocation:
+        \begin{itemize}[noitemsep, topsep=0pt]
+            \item $Available = Available - Request_i$
+            \item $Allocation_i = Allocation_i + Request_i$
+            \item $Need_i = Need_i - Request_i$
+        \end{itemize}
+        \item If resulting state is safe (using Safety Algorithm), grant request. Else, $T_i$ waits, restore old state.
+    \end{enumerate}
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{safe sequence} & Sequence of processes $<P_1, P_2, \dots, P_n>$ where each $P_i$'s requests can be met by available resources + resources held by $P_j$ ($j < i$). \\
+    \textbf{claim edge} & In resource-allocation graph, an edge indicating a process might claim a resource in the future. \\
+    \textbf{banker's algorithm} & Deadlock avoidance algorithm for multiple resource instances, less efficient than resource-allocation graph. \\
+    \bottomrule
+\end{tabular}

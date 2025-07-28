@@ -1,0 +1,60 @@
+\section{Deadlock prevention}
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Deadlock occurs if all four necessary conditions hold.
+    \item Prevent deadlock by ensuring at least one condition cannot hold.
+\end{itemize}
+
+\subsection*{Mutual exclusion}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Mutual-exclusion condition must hold for deadlock.
+    \item Sharable resources (e.g., read-only files) do not require mutual exclusion, thus cannot be involved in deadlock.
+    \item Cannot generally prevent deadlocks by denying mutual-exclusion, as some resources are intrinsically nonsharable (e.g., mutex locks).
+\end{itemize}
+
+\subsection*{Hold and wait}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item To prevent hold-and-wait:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Protocol 1: Thread requests/allocates all resources before execution. (Impractical for dynamic resources).
+        \item Protocol 2: Thread requests resources only when holding none. Must release all current resources before requesting more.
+    \end{itemize}
+    \item Disadvantages of both protocols:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Low resource utilization: resources allocated but unused for long periods.
+        \item Starvation possible: thread waits indefinitely for popular resources.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{No preemption}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item To prevent no-preemption:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Protocol 1: If thread requests resource and must wait, all currently held resources are preempted (implicitly released). Thread restarts when old and new resources are available.
+        \item Protocol 2: If resources are not available, check if held by waiting thread. If so, preempt from waiting thread and allocate to requesting thread. If not, requesting thread waits. Its resources may be preempted by other requests. Thread restarts when new resources allocated and preempted resources recovered.
+    \end{itemize}
+    \item Often applied to resources whose state can be saved/restored (e.g., CPU registers, database transactions).
+    \item Cannot generally apply to mutex locks and semaphores (where deadlocks commonly occur).
+\end{itemize}
+
+\subsection*{Circular wait}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Practical solution: impose total ordering of all resource types.
+    \item Require threads to request resources in increasing order of enumeration.
+    \item Example: $F(first\_mutex) = 1$, $F(second\_mutex) = 5$. Thread must request $first\_mutex$ then $second\_mutex$.
+    \item Alternatively, thread requesting $R_j$ must have released any $R_i$ such that $F(R_i) \ge F(R_j)$.
+    \item If multiple instances of same resource type needed, single request for all must be issued.
+    \item This protocol prevents circular wait (proof by contradiction).
+    \item Developing ordering can be difficult for many locks. Java uses `System.identityHashCode(Object)` for lock acquisition ordering.
+    \item Lock ordering does not guarantee deadlock prevention if locks acquired dynamically (e.g., `transaction()` function example).
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{deadlock prevention} & A set of methods intended to ensure that at least one of the necessary conditions for deadlock cannot hold. \\
+    \textbf{deadlock avoidance} & An operating system method in which processes inform the operating system of which resources they will use during their lifetimes so the system can approve or deny requests to avoid deadlock. \\
+    \bottomrule
+\end{tabular}

@@ -1,0 +1,91 @@
+\section{Storage attachment}
+
+\begin{itemize}
+    \item Computers access secondary storage in three ways: host-attached, network-attached, and cloud storage.
+\end{itemize}
+
+\subsection{Host-attached storage}
+\begin{itemize}
+    \item \textbf{Host-attached storage}: accessed through local I/O ports (most common: SATA).
+    \item Typical system: one or few SATA ports.
+    \item More storage access: individual storage device, device in chassis, or multiple drives in chassis connected via USB, FireWire, or Thunderbolt.
+    \item High-end workstations/servers: need more/shared storage, use sophisticated I/O architectures.
+    \item \textbf{Fibre channel} (\textit{FC}): high-speed serial architecture (optical fiber or copper cable).
+    \item FC benefits: large address space, switched communication, multiple hosts/storage devices attach to fabric (flexibility in I/O communication).
+    \item Wide variety of devices suitable for host-attached storage: HDDs, NVM devices, CD/DVD/Blu-ray/tape drives, storage-area networks (\textbf{SANs}).
+    \item I/O commands for host-attached storage: reads/writes of logical data blocks directed to specifically identified storage units (bus ID or target logical unit).
+\end{itemize}
+
+\subsection{Network-attached storage}
+\begin{itemize}
+    \item \textbf{Network-attached storage} (\textit{NAS}): provides access to storage across a network.
+    \item NAS device: special-purpose storage system or general computer system providing storage to other hosts.
+    \item Clients access NAS via remote-procedure-call (RPC) interface: NFS (UNIX/Linux), CIFS (Windows).
+    \item RPCs carried via TCP/UDP over IP network (usually same LAN).
+    \item NAS unit: usually implemented as storage array with RPC interface software.
+    \item CIFS and NFS: provide locking features, allowing file sharing between hosts accessing NAS.
+    \item NAS: convenient way for LAN computers to share storage pool (ease of naming/access).
+    \item Downside: less efficient, lower performance than some direct-attached storage.
+    \item \textbf{iSCSI}: latest network-attached storage protocol.
+    \item Uses IP network protocol to carry SCSI protocol.
+    \item Networks (not SCSI cables) used as interconnects between hosts and storage.
+    \item Hosts treat storage as directly attached, even if distant.
+    \item NFS/CIFS: present file system, send parts of files.
+    \item iSCSI: sends logical blocks across network, client uses blocks directly or creates file system.
+\end{itemize}
+
+\subsection{Cloud storage}
+\begin{itemize}
+    \item \textbf{Cloud storage}: similar to network-attached storage, access across network.
+    \item Unlike NAS: accessed over Internet/WAN to remote data center (storage for fee/free).
+    \item Difference from NAS: how storage accessed/presented.
+    \item NAS: accessed as another file system (CIFS/NFS) or raw block device (iSCSI). OS integrates these protocols.
+    \item Cloud storage: API based; programs use APIs to access.
+    \item Examples: Amazon S3, Dropbox, Microsoft OneDrive, Apple iCloud.
+    \item Reason for APIs vs. existing protocols: WAN latency and failure scenarios.
+    \item NAS protocols: designed for LANs (lower latency, less connectivity loss).
+    \item LAN connection failure (NFS/CIFS): system might hang.
+    \item Cloud storage: failures more likely, application pauses access until connectivity restored.
+\end{itemize}
+
+\subsection{Storage-area networks and storage arrays}
+\begin{itemize}
+    \item Drawback of NAS: storage I/O consumes data network bandwidth, increases network communication latency.
+    \item Acute in large client-server installations: server-client communication competes with server-storage communication.
+    \item \textbf{Storage-area network} (\textit{SAN}): private network (storage protocols, not networking protocols) connecting servers and storage units.
+    \item SAN power: flexibility.
+    \item Multiple hosts/storage arrays: attach to same SAN.
+    \item Storage: dynamically allocated to hosts.
+    \item Storage arrays: RAID protected or unprotected drives (\textbf{Just a Bunch of Disks} (\textbf{JBOD})).
+    \item SAN switch: allows/prohibits access between hosts and storage.
+    \item Example: host low on disk space, SAN configured to allocate more storage.
+    \item SANs: clusters of servers share same storage, storage arrays include multiple direct host connections.
+    \item SANs: typically more ports, higher cost than storage arrays.
+    \item SAN connectivity: short distances, typically no routing. NAS can have more connected hosts than SAN.
+    \item Storage array: purpose-built device (includes SAN/network ports or both).
+    \item Contains: drives to store data, controller(s) to manage storage/access.
+    \item Controllers: CPUs, memory, software (implement array features: network protocols, UIs, RAID, snapshots, replication, compression, deduplication, encryption).
+    \item Some storage arrays include SSDs.
+    \item Array with only SSDs: maximum performance, smaller capacity.
+    \item Mix of SSDs/HDDs: array software/administrator selects best medium, or SSDs as cache/HDDs as bulk storage.
+    \item FC: most common SAN interconnect.
+    \item iSCSI: increasing use due to simplicity.
+    \item Another SAN interconnect: \textbf{InfiniBand} (\textit{IB}).
+    \item IB: special-purpose bus architecture, hardware/software support for high-speed interconnection networks (servers, storage units).
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{host-attached storage} & Storage accessed through local I/O ports (directly attached to a computer). \\
+\textbf{fibre channel (FC)} & Storage I/O bus used in data centers to connect computers to storage arrays. \\
+\textbf{network-attached storage (NAS)} & Storage accessed from a computer over a network. \\
+\textbf{iSCSI} & Protocol using IP network to carry SCSI protocol for distant storage access. \\
+\textbf{cloud storage} & Storage accessed over Internet/WAN to a remote, shared data center. \\
+\textbf{storage-area network (SAN)} & Local-area storage network allowing multiple computers to connect to storage devices. \\
+\textbf{Just a Bunch of Disks (JBOD)} & Unprotected drives in a storage array. \\
+\textbf{InfiniBand (IB)} & High-speed network communications link for servers and storage units. \\
+\bottomrule
+\end{tabular}

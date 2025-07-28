@@ -1,0 +1,40 @@
+\section{Summary}
+\begin{itemize}
+    \item Virtual memory: abstracts physical memory into extremely large uniform array of storage.
+    \item Benefits of virtual memory:
+    \begin{itemize}
+        \item Program can be larger than physical memory.
+        \item Program does not need to be entirely in memory.
+        \item Processes can share memory.
+        \item Processes can be created more efficiently.
+    \end{itemize}
+    \item \textbf{Demand paging}: pages loaded only when demanded during program execution.
+    \item Pages never demanded are never loaded.
+    \item \textbf{Page fault}: occurs when page not in memory is accessed.
+    \item Page must be brought from backing store into available page frame.
+    \item \textbf{Copy-on-write}: child process shares same address space as parent.
+    \item If child or parent modifies page, copy of page is made.
+    \item When available memory low: page-replacement algorithm selects existing page to replace.
+    \item Page-replacement algorithms: FIFO, optimal, LRU.
+    \item Pure LRU: impractical to implement; most systems use LRU-approximation algorithms.
+    \item \textbf{Global page-replacement algorithms}: select page from any process for replacement.
+    \item \textbf{Local page-replacement algorithms}: select page from faulting process.
+    \item \textbf{Thrashing}: system spends more time paging than executing.
+    \item \textbf{Locality}: set of pages actively used together.
+    \item Process execution: moves from locality to locality.
+    \item \textbf{Working set}: based on locality, set of pages currently in use by a process.
+    \item \textbf{Memory compression}: compresses number of pages into single page.
+    \item Alternative to paging, used on mobile systems without paging support.
+    \item \textbf{Kernel memory}: allocated differently than user-mode processes.
+    \item Allocated in contiguous chunks of varying sizes.
+    \item Two common techniques for kernel memory allocation:
+    \begin{itemize}
+        \item Buddy system.
+        \item Slab allocation.
+    \end{itemize}
+    \item \textbf{TLB reach}: amount of memory accessible from TLB.
+    \item Equal to number of entries in TLB $\times$ page size.
+    \item Technique to increase TLB reach: increase page size.
+    \item Linux, Windows, Solaris: manage virtual memory similarly.
+    \item Use demand paging, copy-on-write, and variations of LRU approximation (clock algorithm).
+\end{itemize}

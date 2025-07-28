@@ -1,0 +1,235 @@
+\section{File concept}
+
+\subsection*{Things to learn}
+\begin{itemize}
+    \item Explain file system function.
+    \item Describe file system interfaces.
+    \item Discuss file system design tradeoffs: access methods, sharing, locking, directory structures.
+    \item Explore file system protection.
+\end{itemize}
+
+\subsection*{Introduction}
+\begin{itemize}
+    \item \textbf{File}: collection of related information defined by its creator.
+    \item OS maps files onto physical mass-storage devices.
+    \item File system: describes how files map to physical devices, how accessed/manipulated.
+    \item File systems designed for efficient access (physical storage can be slow).
+    \item Other requirements: file sharing support, remote access.
+    \item File system: most visible OS aspect for users.
+    \item Provides mechanism for on-line storage/access to OS data/programs and user data.
+    \item Consists of:
+    \begin{itemize}
+        \item Collection of files (storing related data).
+        \item Directory structure (organizes, provides info about files).
+    \end{itemize}
+    \item Most file systems live on storage devices (nonvolatile, persistent).
+\end{itemize}
+
+\subsection*{File Concept}
+\begin{itemize}
+    \item Computers store info on various media (NVM, HDDs, tapes, optical disks).
+    \item OS provides uniform logical view of stored info.
+    \item OS abstracts physical properties to define logical storage unit: the \textbf{file}.
+    \item Files mapped by OS onto physical devices.
+    \item Storage devices usually nonvolatile, so contents persistent.
+    \item File: named collection of related information recorded on secondary storage.
+    \item User perspective: smallest allotment of logical secondary storage (data written only within a file).
+    \item Commonly: files represent programs (source/object) and data.
+    \item Data files: numeric, alphabetic, alphanumeric, binary.
+    \item Files can be free form (text) or rigidly formatted.
+    \item Generally: file is sequence of bits, bytes, lines, or records; meaning defined by creator/user.
+    \item File concept is extremely general.
+    \item Use stretched beyond original confines (e.g., UNIX `proc` file system uses file-system interfaces for system info access).
+    \item Info in file defined by creator.
+    \item File has defined structure, depends on type.
+    \item \textbf{Text file}: sequence of characters organized into lines.
+    \item \textbf{Source file}: sequence of functions (declarations, executable statements).
+    \item \textbf{Executable file}: series of code sections loader can bring into memory and execute.
+\end{itemize}
+
+\subsection*{File Attributes}
+\begin{itemize}
+    \item File named for human users, referred by name (e.g., `example.c`).
+    \item Some systems differentiate case, others not.
+    \item File independent of creator process, user, system.
+    \item Example: `example.c` created by one user, edited by another, copied to USB/email/network, still `example.c`.
+    \item Second copy independent if no sharing/synchronization.
+    \item File attributes vary by OS, typically include:
+    \begin{itemize}
+        \item \textbf{Name}: symbolic, human-readable.
+        \item \textbf{Identifier}: unique tag (number), non-human-readable, identifies file within file system.
+        \item \textbf{Type}: for systems supporting different file types.
+        \item \textbf{Location}: pointer to device and file location on device.
+        \item \textbf{Size}: current size (bytes, words, blocks), possibly max allowed.
+        \item \textbf{Protection}: access-control info (read, write, execute).
+        \item \textbf{Timestamps and user identification}: creation, last modification, last use (useful for protection, security, monitoring).
+    \end{itemize}
+    \item Newer file systems support \textbf{extended file attributes}: character encoding, file checksum.
+    \item \textbf{File info window}: GUI view of file metadata (e.g., macOS).
+    \item Info about all files kept in directory structure, on same device as files.
+    \item Directory entry: file name, unique identifier (locates other attributes).
+    \item Directory size can be large (MBs/GBs).
+    \item Directories stored on device, brought into memory piecemeal.
+\end{itemize}
+
+\subsection*{File Operations}
+\begin{itemize}
+    \item File is an abstract data type.
+    \item OS provides system calls: create, write, read, reposition, delete, truncate files.
+    \item \textbf{Creating a file}:
+    \begin{enumerate}
+        \item Find space in file system.
+        \item Make entry for new file in directory.
+    \end{enumerate}
+    \item \textbf{Opening a file}:
+    \begin{itemize}
+        \item All operations except create/delete require `open()` first.
+        \item Returns file handle used as argument in other calls.
+    \end{itemize}
+    \item \textbf{Writing a file}:
+    \begin{itemize}
+        \item System call: open file handle, info to write.
+        \item System searches directory for file location.
+        \item System keeps \textbf{write pointer} to next write location (sequential).
+        \item Write pointer updated after each write.
+    \end{itemize}
+    \item \textbf{Reading a file}:
+    \begin{itemize}
+        \item System call: file handle, memory location for next block.
+        \item Directory searched for entry.
+        \item System keeps \textbf{read pointer} to next read location (sequential).
+        \item Read pointer updated after each read.
+        \item Current operation location: per-process \textbf{current-file-position pointer} (shared by read/write).
+    \end{itemize}
+    \item \textbf{Repositioning within a file}:
+    \begin{itemize}
+        \item Current-file-position pointer repositioned to given value.
+        \item No actual I/O involved.
+        \item Also known as file \textbf{seek}.
+    \end{itemize}
+    \item \textbf{Deleting a file}:
+    \begin{itemize}
+        \item Search directory for named file.
+        \item Release all file space for reuse.
+        \item Erase/mark directory entry as free.
+        \item \textbf{Hard links}: multiple names for same file; actual content deleted only when last link deleted.
+    \end{itemize}
+    \item \textbf{Truncating a file}:
+    \begin{itemize}
+        \item Erase contents but keep attributes.
+        \item Reset file length to zero, release file space.
+    \end{itemize}
+    \item These 7 are minimal set. Other common: appending, renaming.
+    \item Primitive operations combine for others (e.g., copy file).
+    \item Operations to get/set file attributes (e.g., length, owner).
+    \item To avoid constant directory searching: `open()` system call before first use.
+    \item OS keeps \textbf{open-file table}: info about all open files.
+    \item File specified by index into table (no searching).
+    \item File closed: OS removes entry from open-file table, releases locks.
+    \item `create()` and `delete()` work with closed files.
+    \item Some systems implicitly open/close files (job termination).
+    \item Most systems require explicit `open()`/`close()`.
+    \item `open()`: takes file name, searches directory, copies entry to open-file table.
+    \item `open()` accepts access-mode info (create, read-only, read-write, append-only).
+    \item Mode checked against file permissions. If allowed, file opened.
+    \item `open()` returns pointer to open-file table entry; used in all I/O ops.
+    \item `open()`/`close()` complicated with simultaneous opens by multiple processes.
+    \item OS uses two levels of internal tables:
+    \begin{itemize}
+        \item Per-process table: tracks files process has open, current file pointer, access rights, accounting.
+        \item System-wide open-file table: process-independent info (disk location, access dates, size).
+    \end{itemize}
+    \item File opened by another process: new entry in process's table points to system-wide entry.
+    \item Open-file table has \textbf{open count}: number of processes with file open.
+    \item `close()` decreases count; when zero, entry removed.
+    \item File locks: allow one process to lock file/sections, prevent others.
+    \item Useful for shared files (e.g., system log).
+    \item \textbf{Shared lock}: multiple processes acquire concurrently (like reader lock).
+    \item \textbf{Exclusive lock}: only one process at a time (like writer lock).
+    \item Not all OS provide both types.
+    \item \textbf{Mandatory} vs. \textbf{advisory} file-locking mechanisms.
+    \item Mandatory: OS prevents other processes from accessing locked file (e.g., Windows).
+    \item Advisory: OS does not prevent access; text editor must manually acquire lock (e.g., UNIX).
+    \item Mandatory: OS ensures locking integrity. Advisory: developers ensure locks.
+    \item File locks require same precautions as process synchronization (e.g., hold exclusive locks only during access, avoid deadlock).
+\end{itemize}
+
+\subsection*{File Types}
+\begin{itemize}
+    \item OS should recognize/support file types for reasonable operations.
+    \item Example: prevent outputting binary-object program as garbage.
+    \item Common technique: include type as part of file name (name.extension).
+    \item User/OS can tell type from name (e.g., `resume.docx`, `server.c`).
+    \item OS uses extension to indicate type and allowed operations (e.g., `.com`, `.exe`, `.sh` for execution).
+    \item `.sh` is a \textbf{shell script} (ASCII commands).
+    \item Application programs use extensions (e.g., Java compilers expect `.java`).
+    \item Extensions not always required; user can omit, app looks for expected extension.
+    \item Extensions are "hints" to applications, not OS-enforced.
+    \item macOS: each file has type (`.app`), creator attribute (program that created it).
+    \item Creator attribute set by OS during `create()` call, enforced.
+    \item Example: word processor file has word processor as creator; double-click opens app, loads file.
+    \item UNIX: \textbf{magic number} at beginning of some binary files indicates data type (e.g., image format).
+    \item Text magic number for text files (e.g., shell language).
+    \item Not all files have magic numbers; system features not solely based on this.
+    \item UNIX does not record creating program.
+    \item UNIX allows file-name-extension hints, but not enforced/depended on by OS; aid users.
+\item File types indicate internal structure.
+\item Source/object files: structures match expectations of programs reading them.
+\item Certain files must conform to OS-understood structure (e.g., executable file structure for loading/running).
+\item Some OS extend this: system-supported file structures with special operations.
+\item Disadvantage of OS supporting multiple file structures: large, cumbersome OS.
+\item OS needs code for each supported structure.
+\item Every file may need to be defined as one of supported types.
+\item New applications with unsupported structures: problems.
+\item Example: encrypted file not ASCII text, not executable binary. May need to circumvent/misuse OS file-type mechanism.
+\item Some OS impose minimal file structures (UNIX, Windows).
+\item UNIX: each file is sequence of 8-bit bytes; no OS interpretation.
+\item Provides maximum flexibility but little support; application must interpret structure.
+\item All OS must support at least one structure: executable file.
+\end{itemize}
+
+\subsection*{Internal File Structure}
+\begin{itemize}
+    \item Internally, locating offset within file can be complicated for OS.
+    \item Disk systems: well-defined block size (sector size).
+    \item All disk I/O in units of one block (physical record); all blocks same size.
+    \item Physical record size unlikely to match desired logical record length.
+    \item Logical records may vary in length.
+    \item Solution: packing logical records into physical blocks.
+    \item UNIX: all files are streams of bytes. Each byte individually addressable by offset.
+    \item File system automatically packs/unpacks bytes into physical disk blocks (e.g., 512 bytes/block).
+    \item Logical record size, physical block size, packing technique determine records per block.
+    \item Packing by user app or OS. File considered sequence of blocks.
+    \item Basic I/O functions operate in terms of blocks.
+    \item Conversion from logical records to physical blocks: simple software problem.
+    \item Disk space allocated in blocks: some portion of last block wasted (\textbf{internal fragmentation}).
+    \item Example: 512-byte blocks, 1,949-byte file $\rightarrow$ 4 blocks (2,048 bytes); 99 bytes wasted.
+    \item All file systems suffer internal fragmentation; larger block size $\rightarrow$ greater fragmentation.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{file} & Smallest logical storage unit; collection of related information. \\
+    \textbf{text file} & File containing text (alphanumeric characters). \\
+    \textbf{source file} & File containing program source code. \\
+    \textbf{executable file} & File containing program ready for loading/execution. \\
+    \textbf{extended file attributes} & Extended metadata (character encoding, checksums). \\
+    \textbf{file info window} & GUI view of file metadata. \\
+    \textbf{write pointer} & Location in file for next write. \\
+    \textbf{read pointer} & Location in file for next read. \\
+    \textbf{current-file-position pointer} & Per-process pointer to next read/write location. \\
+    \textbf{seek} & Operation of changing current file-position pointer. \\
+    \textbf{hard links} & File-system links where file has two+ names to same inode. \\
+    \textbf{open-file table} & OS data structure with details of every open file. \\
+    \textbf{open count} & Number of processes with an open file. \\
+    \textbf{shared lock} & File lock allowing concurrent acquisition by multiple processes. \\
+    \textbf{exclusive lock} & File lock allowing only one process to acquire at a time. \\
+    \textbf{advisory file-lock mechanism} & File-locking system where OS does not enforce locking. \\
+    \textbf{shell script} & File containing set series of commands specific to shell. \\
+    \textbf{magic number} & Number at start of file indicating data type. \\
+    \textbf{internal fragmentation} & Wasted disk space in last block of file due to block allocation. \\
+    \bottomrule
+\end{tabular}

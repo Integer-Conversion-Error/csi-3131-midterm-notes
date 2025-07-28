@@ -1,0 +1,140 @@
+\section{Allocating kernel memory}
+\begin{itemize}
+    \item User-mode process requests memory $\rightarrow$ pages allocated from kernel's free page frame list.
+    \begin{itemize}
+        \item List populated by page-replacement algorithms (e.g., Section 10.4).
+        \item Free pages scattered throughout physical memory.
+        \item Single byte request $\rightarrow$ entire page frame granted $\rightarrow$ internal fragmentation.
+    \end{itemize}
+    \item Kernel memory often allocated from a different free-memory pool. Reasons:
+    \begin{enumerate}
+        \item Kernel requests varying data structure sizes, some less than a page.
+        \begin{itemize}
+            \item Must use memory conservatively, minimize fragmentation waste.
+            \item Many OS do not subject kernel code/data to paging.
+        \end{itemize}
+        \item User-mode pages don't need contiguous physical memory.
+        \begin{itemize}
+            \item Hardware devices interact directly with physical memory (no virtual memory interface).
+            \item May require physically contiguous pages.
+        \end{itemize}
+    \end{enumerate}
+    \item Strategies for managing kernel free memory: "buddy system" and "slab allocation".
+\end{itemize}
+
+\subsection{Buddy system}
+\begin{itemize}
+    \item Allocates memory from fixed-size segment of physically contiguous pages.
+    \item Uses a \textbf{power-of-2 allocator}: satisfies requests in units sized as a power of 2 (4 KB, 8 KB, 16 KB, etc.).
+    \item Request not appropriately sized $\rightarrow$ rounded up to next highest power of 2.
+    \begin{itemize}
+        \item Example: 11 KB request $\rightarrow$ satisfied with 16-KB segment.
+    \end{itemize}
+    \item Example (Figure 10.8.1):
+    \begin{itemize}
+        \item Initial segment: 256 KB. Kernel requests 21 KB.
+        \item Segment divided into two \textbf{buddies} ($A_L$ and $A_R$), each 128 KB.
+        \item One buddy ($A_L$) divided into two 64-KB buddies ($B_L$ and $B_R$).
+        \item Next-highest power of 2 for 21 KB is 32 KB.
+        \item One 64-KB buddy ($B_L$) divided into two 32-KB buddies ($C_L$ and $C_R$).
+        \item One 32-KB buddy ($C_L$) used for 21-KB request.
+    \end{itemize}
+    \item Advantage: quickly combine adjacent buddies to form larger segments using \textbf{coalescing}.
+    \begin{itemize}
+        \item Example: kernel releases $C_L$ unit $\rightarrow$ coalesce $C_L$ and $C_R$ into 64-KB segment ($B_L$).
+        \item $B_L$ can coalesce with $B_R$ to form 128-KB segment ($A_L$).
+        \item Can eventually form original 256-KB segment.
+    \end{itemize}
+    \item Drawback: rounding up to next highest power of 2 causes internal fragmentation.
+    \begin{itemize}
+        \item Example: 33-KB request $\rightarrow$ 64-KB segment allocated.
+        \item Cannot guarantee less than 50\% of allocated unit wasted.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Slab allocation}
+\begin{itemize}
+    \item Second strategy for kernel memory allocation.
+    \item A \textbf{slab}: one or more physically contiguous pages.
+    \item A \textbf{cache}: one or more slabs.
+    \item Single cache for each unique kernel data structure (e.g., process descriptors, file objects, semaphores).
+    \item Each cache populated with \textbf{objects} (instantiations of kernel data structure).
+    \item Relationship (Figure 10.8.2):
+    \begin{itemize}
+        \item Two 3 KB kernel objects, three 7 KB objects, each in separate cache, linked to slab.
+    \end{itemize}
+    \item Algorithm uses caches to store kernel objects.
+    \begin{itemize}
+        \item Cache created $\rightarrow$ objects (initially \texttt{free}) allocated to cache.
+        \item Number of objects depends on slab size (e.g., 12-KB slab $\rightarrow$ six 2-KB objects).
+        \item New object needed $\rightarrow$ allocator assigns any \texttt{free} object from cache. Object marked \texttt{used}.
+    \end{itemize}
+    \item Scenario: kernel requests memory for process descriptor (\texttt{struct task\_struct}, ~1.7 KB).
+    \begin{itemize}
+        \item Cache fulfills request with pre-allocated, free \texttt{struct task\_struct} object.
+    \end{itemize}
+    \item Slab states in Linux:
+    \begin{enumerate}
+        \item \textbf{Full}: All objects in slab \texttt{used}.
+        \item \textbf{Empty}: All objects in slab \texttt{free}.
+        \item \textbf{Partial}: Slab has both \texttt{used} and \texttt{free} objects.
+    \end{enumerate}
+    \item Slab allocator request satisfaction:
+    \begin{itemize}
+        \item First: free object in a partial slab.
+        \item If none: free object from an empty slab.
+        \item If no empty slabs: new slab allocated from contiguous physical pages, assigned to cache; object memory allocated from new slab.
+    \end{itemize}
+    \item Two main benefits of slab allocator:
+    \begin{enumerate}
+        \item No memory wasted due to fragmentation.
+        \begin{itemize}
+            \item Each kernel data structure has associated cache.
+            \item Caches made of slabs divided into object-sized chunks.
+            \item Kernel requests memory $\rightarrow$ exact amount returned.
+        \end{itemize}
+        \item Memory requests satisfied quickly.
+        \begin{itemize}
+            \item Effective for frequent object allocation/deallocation (common in kernel).
+            \item Objects created in advance $\rightarrow$ quickly allocated from cache.
+            \item Released objects marked free, returned to cache $\rightarrow$ immediately available.
+        \end{itemize}
+    \end{enumerate}
+    \item History:
+    \begin{itemize}
+        \item First appeared in Solaris 2.4 kernel.
+        \item Now used for some user-mode requests in Solaris.
+        \item Linux (Version 2.2+): adopted slab allocator (referred to as SLAB).
+    \end{itemize}
+    \item Recent Linux kernel memory allocators: SLOB and SLUB.
+    \begin{itemize}
+        \item \textbf{SLOB allocator}: for systems with limited memory (e.g., embedded systems).
+        \begin{itemize}
+            \item Maintains three lists: \texttt{small} (<256 bytes), \texttt{medium} (<1,024 bytes), \texttt{large} (other objects < page size).
+            \item Allocates from appropriate list using first-fit policy.
+        \end{itemize}
+        \item \textbf{SLUB allocator}: default for Linux kernel (Version 2.6.24+), replaced SLAB.
+        \begin{itemize}
+            \item Reduced SLAB overhead.
+            \item Stores metadata in \texttt{page} structure (not with each slab).
+            \item No per-CPU queues for objects (significant memory saving on multi-processor systems).
+            \item Better performance with more processors.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\vspace{1em}
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{power-of-2 allocator} & Allocator in buddy system; satisfies memory requests in units sized as a power of 2. \\
+    \textbf{buddies} & Pairs of equal size in buddy memory allocation. \\
+    \textbf{coalescing} & Combining freed memory in adjacent buddies into larger segments. \\
+    \textbf{slab allocation} & Memory allocation method; slab split into object-sized chunks, eliminating fragmentation. \\
+    \textbf{slab} & Section of memory (one or more contiguous pages) used in slab allocation. \\
+    \textbf{cache} & Temporary data copy for performance; in slab allocator, consists of one or more slabs. \\
+    \textbf{object} & Instance of a class or data structure. \\
+    \bottomrule
+\end{tabular}

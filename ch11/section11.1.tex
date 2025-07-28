@@ -1,0 +1,256 @@
+\section{Overview of mass-storage structure}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item Computer systems must provide mass storage for permanently storing files and data.
+    \item Modern computers use secondary storage: hard disks (HDDs) and nonvolatile memory (NVM) devices.
+    \item Secondary storage devices vary:
+    \begin{itemize}
+        \item Transfer: character at a time vs. block of characters.
+        \item Access: sequentially vs. randomly.
+        \item Data transfer: synchronously vs. asynchronously.
+        \item Usage: dedicated vs. shared.
+        \item Read-only vs. read-write.
+        \item Speed: slowest major component of computer.
+    \end{itemize}
+    \item OS needs to provide wide range of functionality for device control.
+    \item Key OS I/O subsystem goals:
+    \begin{itemize}
+        \item Simplest interface possible to rest of system.
+        \item Optimize I/O for maximum concurrency (devices are performance bottleneck).
+    \end{itemize}
+    \item Mass storage: nonvolatile storage system of a computer.
+    \item Main mass-storage system: secondary storage (HDDs and NVM devices).
+    \item Some systems: slower, larger tertiary storage (magnetic tape, optical disks, cloud storage).
+    \item This chapter focuses on HDDs and NVM devices.
+    \item Discuss physical structure, scheduling algorithms (maximize performance), device formatting, boot blocks, damaged blocks, swap space, RAID systems.
+    \item General term: \textbf{non-volatile storage} (NVS) or "storage drives" for all types.
+\item Things to learn:
+    \begin{itemize}
+        \item Describe physical structures of various secondary storage devices and effect of structure on uses.
+        \item Explain performance characteristics of mass-storage devices.
+        \item Evaluate I/O scheduling algorithms.
+        \item Discuss operating-system services for mass storage, including RAID.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Hard disk drives}
+\begin{itemize}
+    \item Bulk of secondary storage: \textbf{hard disk drives} (\textit{HDDs}) and \textbf{nonvolatile memory} (\textit{NVM}) devices.
+    \item This section: basic mechanisms, OS translation of physical properties to logical storage via address mapping.
+    \item HDDs: conceptually simple.
+    \item Each disk \textbf{platter}: flat circular shape (like a CD).
+    \item Common platter diameters: 1.8 to 3.5 inches.
+    \item Two surfaces of platter: covered with magnetic material.
+    \item Information stored by recording magnetically, read by detecting magnetic pattern.
+    \item Read-write head: "flies" just above each surface of every platter.
+    \item Heads attached to a \textbf{disk arm}: moves all heads as a unit.
+    \item Platter surface: logically divided into circular \textbf{tracks}.
+    \item Tracks subdivided into \textbf{sectors}.
+    \item Set of tracks at given arm position: \textbf{cylinder}.
+    \item Thousands of concentric cylinders; hundreds of sectors per track.
+    \item Each sector: fixed size, smallest unit of transfer.
+    \item Sector size: commonly 512 bytes until ~2010, then migrating to 4KB.
+    \item Storage capacity: gigabytes and terabytes.
+    \item Disk drive motor: spins at high speed (60 to 250 times/sec, RPM).
+    \item Common RPM: 5,400, 7,200, 10,000, 15,000.
+    \item Some drives: power down when not in use, spin up on I/O request.
+    \item Rotation speed relates to \textbf{transfer rate}: rate data flows between drive and computer.
+    \item Another performance aspect: \textbf{positioning time} or \textbf{random-access time}.
+    \item Positioning time parts:
+    \begin{itemize}
+        \item \textbf{seek time}: move disk arm to desired cylinder.
+        \item \textbf{rotational latency}: desired sector rotates to disk head.
+    \end{itemize}
+    \item Typical disks: tens to hundreds of MB/sec transfer, several ms seek/rotational latency.
+    \item Performance increase: DRAM buffers in drive controller.
+    \item Disk head: flies on thin cushion (microns) of air/gas.
+    \item Danger: head contact with disk surface (\textbf{head crash}).
+    \item Head crash: normally irreparable, entire disk replaced, data lost (unless backed up/RAID protected).
+    \item HDDs: sealed units.
+    \item Some chassis: allow HDD removal without shutting down system (\textbf{removable}).
+    \item Other removable media: CDs, DVDs, Blu-ray discs.
+\end{itemize}
+
+\subsection{Disk transfer rates}
+\begin{itemize}
+    \item Published performance numbers for disks: not same as real-world.
+    \item Stated transfer rates: always higher than \textbf{effective transfer rates}.
+    \item Transfer rate (bits read from magnetic media) vs. rate blocks delivered to OS.
+\end{itemize}
+
+\subsection{Nonvolatile memory devices}
+\begin{itemize}
+    \item NVM devices: growing importance, electrical rather than mechanical.
+    \item Composed of: controller and flash NAND die semiconductor chips (store data).
+    \item Other NVM technologies (DRAM with battery, 3D XPoint): less common, not discussed.
+\end{itemize}
+
+\subsubsection{Overview of nonvolatile memory devices}
+\begin{itemize}
+    \item Flash-memory-based NVM: often in disk-drive-like container, called \textbf{solid-state disk} (\textit{SSD}).
+    \item Other forms: \textbf{USB drive} (thumb drive/flash drive), DRAM stick.
+    \item Surface-mounted on motherboards (smartphones).
+    \item All forms: act and treated similarly.
+    \item NVM devices: more reliable (no moving parts), faster (no seek/rotational latency), consume less power than HDDs.
+    \item Negative: more expensive per MB, less capacity than larger HDDs.
+    \item Trend: NVM capacity increased faster, price dropped quicker; increasing use.
+    \item SSDs: used in laptops for smaller, faster, energy-efficient systems.
+    \item NVM devices faster than HDDs: standard bus interfaces can limit throughput.
+    \item Some NVM devices: connect directly to system bus (PCIe).
+    \item NVM technology: changing computer design (direct disk replacement, new cache tier).
+    \item NAND semiconductors: storage/reliability challenges.
+    \item Read/write in "page" increment (similar to sector).
+    \item Data cannot be overwritten: NAND cells must be erased first.
+    \item Erasure: "block" increment (several pages), much slower than read/write.
+    \item NVM flash devices: many die, many datapaths; parallel operations possible.
+    \item NAND semiconductors: deteriorate with every erase cycle (~100,000 program-erase cycles).
+    \item NVM lifespan: measured in \textbf{Drive Writes Per Day} (\textbf{DWPD}).
+    \item DWPD: how many times drive capacity can be written per day before failure.
+    \item Example: 1 TB NAND drive, 5 DWPD rating $\implies$ 5 TB/day written for warranty period.
+    \item Limitations: led to ameliorating algorithms (usually in NVM device controller, transparent to OS).
+    \item OS reads/writes logical blocks; device manages.
+    \item NVM performance variations: based on operating algorithms.
+\end{itemize}
+
+\subsubsection{NAND flash controller algorithms}
+\begin{itemize}
+    \item NAND semiconductors cannot be overwritten: pages contain invalid data.
+    \item Example: file-system block written, then rewritten. Old data invalid, new data valid.
+    \item Controller maintains \textbf{flash translation layer} (\textit{FTL}): maps physical pages to currently valid logical blocks.
+    \item FTL tracks physical block state: which blocks contain only invalid pages (can be erased).
+    \item Full SSD, pending write:
+    \begin{itemize}
+        \item If block contains no valid data: write waits for erase, then occurs.
+        \item If no free blocks but individual pages hold invalid data: \textbf{garbage collection} occurs.
+        \item Good data copied to other locations, freeing blocks for erase/writes.
+    \end{itemize}
+    \item To solve problem and improve write performance: \textbf{over-provisioning}.
+    \item Over-provisioning: device sets aside pages (e.g., 20\% total) as always available write area.
+    \item Blocks totally invalid by garbage collection/write operations: erased, placed in over-provisioning space or returned to free pool.
+    \item Over-provisioning space: helps with \textbf{wear leveling}.
+    \item \textbf{Wear leveling}: effort to select all NAND cells over time as write targets.
+    \item Avoids premature media failure due to frequently erased blocks.
+    \item Controller: uses algorithms to place data on less-erased blocks to level wear.
+    \item Data protection: NVM devices provide error-correcting codes (calculated/stored with data, detect/correct errors).
+    \item If page frequently has correctible errors: marked bad, not used in subsequent writes.
+    \item Single NVM device: catastrophic failure possible (corrupts/fails read/write).
+    \item Data recoverable: RAID protection used.
+\end{itemize}
+
+\subsection{Volatile memory}
+\begin{itemize}
+    \item DRAM: frequently used as mass-storage device.
+    \item \textbf{RAM drives} (RAM disks): created by device drivers, carve out DRAM section, present as storage device.
+    \item Can be used as raw block devices or with file systems.
+    \item Purpose of RAM drives (despite volatility): allow user/programmer to place data in memory for temporary safekeeping using standard file operations.
+    \item Useful for temporary files, sharing data.
+    \item Found in all major OS: Linux (\texttt{/dev/ram}), MacOS (\texttt{diskutil}), Windows (third-party tools), Solaris/Linux (\texttt{/tmp} as "tmpfs" RAM drive at boot).
+\end{itemize}
+
+\subsection{Magnetic tapes}
+\begin{itemize}
+    \item Early secondary-storage medium.
+    \item Nonvolatile, holds large data quantities.
+    \item Access time: slow compared to main memory/drives.
+    \item Random access: ~1000x slower than HDDs, ~100,000x slower than SSDs.
+    \item Main uses: backup, infrequently used info, transferring info between systems.
+    \item Tape: kept in spool, wound/rewound past read-write head.
+    \item Moving to correct spot: can take minutes.
+    \item Once positioned: tape drives read/write at speeds comparable to HDDs.
+    \item Capacities: exceed several terabytes.
+    \item Some tapes: built-in compression (double effective storage).
+    \item Categorized by width (4, 8, 19mm; 1/4, 1/2 inch) or technology (LTO-6, SDLT).
+\end{itemize}
+
+\subsection{Secondary storage connection methods}
+\begin{itemize}
+    \item Secondary storage device: attached to computer by system bus or \textbf{I/O bus}.
+    \item Bus types: \textbf{advanced technology attachment} (\textit{ATA}), \textbf{serial ATA} (\textbf{SATA}), \textbf{eSATA}, \textbf{serial attached SCSI} (\textit{SAS}), \textbf{universal serial bus} (\textit{USB}), \textbf{fibre channel} (\textit{FC}).
+    \item Most common: SATA.
+    \item NVM devices faster than HDDs: special fast interface \textbf{NVM express} (\textit{NVMe}).
+    \item NVMe: directly connects device to system PCI bus (increases throughput, decreases latency).
+    \item Data transfers on bus: by special electronic processors (\textbf{controllers} or \textbf{host-bus adapters} (\textit{HBA})).
+    \item \textbf{Host controller}: controller at computer end of bus.
+    \item \textbf{Device controller}: built into each storage device.
+    \item Mass storage I/O operation: computer places command into host controller (memory-mapped I/O ports).
+    \item Host controller sends command via messages to device controller.
+    \item Device controller operates drive hardware.
+    \item Device controllers: usually have built-in cache.
+    \item Data transfer at drive: between cache and storage media.
+    \item Data transfer to host: fast electronic speeds, between cache host DRAM via DMA.
+\end{itemize}
+
+\subsection{Address mapping}
+\begin{itemize}
+    \item Storage devices: addressed as large one-dimensional arrays of \textbf{logical blocks}.
+    \item \textbf{Logical block}: smallest unit of transfer.
+    \item Each logical block: maps to physical sector or semiconductor page.
+    \item One-dimensional array of logical blocks: mapped onto sectors/pages of device.
+    \item HDD mapping example: Sector 0 = first sector of first track on outermost cylinder. Proceeds through track, then rest of tracks on cylinder, then rest of cylinders (outermost to innermost).
+    \item NVM mapping: tuple (chip, block, page) to array of logical blocks.
+    \item \textbf{Logical block address} (\textbf{LBA}): easier for algorithms than sector, cylinder, head tuple or chip, block, page tuple.
+    \item Converting LBA to old-style disk address (cylinder, track, sector): difficult in practice. Reasons:
+    \begin{itemize}
+        \item Defective sectors: mapping hides by substituting spare sectors (LBA sequential, physical changes).
+        \item Number of sectors per track: not constant on some drives.
+        \item Disk manufacturers manage LBA to physical address mapping internally (little relationship between LBA and physical sectors).
+    \end{itemize}
+    \item Algorithms dealing with HDDs: assume logical addresses relatively related to physical addresses (ascending logical $\implies$ ascending physical).
+    \item \textbf{Constant linear velocity} (\textit{CLV}): bit density uniform per track.
+    \item Farther track from center: greater length, more sectors.
+    \item Outer zones to inner zones: sectors per track decreases.
+    \item Outer zone tracks: typically 40\% more sectors than innermost.
+    \item Drive increases rotation speed: head moves outer to inner tracks (keep same data rate under head).
+    \item Used in CD-ROM and DVD-ROM drives.
+    \item Alternatively: disk rotation speed constant.
+    \item Bit density decreases inner to outer tracks (keep data rate constant, performance same).
+    \item Used in hard disks: \textbf{constant angular velocity} (\textit{CAV}).
+    \item Sectors per track and cylinders per disk: increasing with technology.
+    \item Large disks: tens of thousands of cylinders.
+    \item Other storage devices exist (shingled magnetic recording HDDs, combination NVM/HDD devices, volume managers).
+    \item These devices: different characteristics, may need different caching/scheduling algorithms.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{hard disk drive (HDD)} & Secondary storage device based on mechanical components (spinning magnetic media platters, moving read-write heads). \\
+\textbf{nonvolatile memory (NVM)} & Persistent storage based on circuits and electric charges. \\
+\textbf{platter} & HDD component with magnetic media layer for holding charges. \\
+\textbf{disk arm} & HDD component holding read-write head, moves over cylinders of platters. \\
+\textbf{track} & On HDD platter, medium under read-write head during platter rotation. \\
+\textbf{sectors} & On HDD platter, fixed-size section of a track. \\
+\textbf{cylinder} & On HDD, set of tracks under read-write heads on all platters in device. \\
+\textbf{transfer rate} & Rate at which data flows. \\
+\textbf{positioning time} & On HDD, time for read-write head to position over desired track. \\
+\textbf{seek time} & On HDD, time for read-write head to position over desired cylinder. \\
+\textbf{rotational latency} & On HDD, time for read-write head (once over desired cylinder) to access desired track. \\
+\textbf{head crash} & On HDD, mechanical problem: read-write head touching platter. \\
+\textbf{effective transfer rate} & Actual, measured transfer rate of data between two devices. \\
+\textbf{solid-state disk} & Disk-drive-like storage device using flash-memory-based nonvolatile memory. \\
+\textbf{USB drive} & Nonvolatile memory in form of device plugging into USB port. \\
+\textbf{flash translation layer (FTL)} & For nonvolatile memory, table tracking currently valid blocks. \\
+\textbf{garbage collection} & Recovery of space containing no-longer-valid data. \\
+\textbf{over-provisioning} & In non-volatile memory, space set aside for data writes not counted in device free space. \\
+\textbf{wear leveling} & In nonvolatile memory, effort to select all NAND cells over time as write targets to avoid premature media failure. \\
+\textbf{RAM drives} & Sections of system's DRAM presented as secondary storage devices. \\
+\textbf{magnetic tape} & Magnetic media storage device (tape spooled on reels, passing over read-write head); mostly for backups. \\
+\textbf{I/O bus} & Physical connection of I/O device to computer system. \\
+\textbf{advanced technology attachment (ATA)} & Older-generation I/O bus. \\
+\textbf{eSATA} & Type of I/O bus. \\
+\textbf{serial-attached SCSI (SAS)} & Common type of I/O bus. \\
+\textbf{universal serial bus (USB)} & Type of I/O bus. \\
+\textbf{fibre channel (FC)} & Type of storage I/O bus used in data centers to connect computers to storage arrays. \\
+\textbf{NVM express (NVMe)} & High-speed I/O bus for NVM storage. \\
+\textbf{controller} & Special processor managing I/O devices. \\
+\textbf{host bus adapter (HBA)} & Device controller installed in host bus port to allow device connection to host. \\
+\textbf{host controller} & I/O-managing processors within a computer (e.g., inside HBA). \\
+\textbf{device controller} & I/O managing processor within a device. \\
+\textbf{logical blocks} & Logical addresses used to access blocks on storage devices. \\
+\textbf{constant linear velocity (CLV)} & Device-recording method: constant bit density per track by varying rotational speed. \\
+\textbf{constant angular velocity (CAV)} & Device-recording method: medium spins at constant velocity, bit density decreases inner to outer tracks. \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,71 @@
+\section{System model}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item \textbf{Multiprogramming Environment}: Multiple threads compete for finite resources.
+    \item \textbf{Resource Request}: Threads request resources. If unavailable, thread enters a waiting state.
+    \item \textbf{Deadlock}: A situation where a waiting thread can never change state because its requested resources are held by other waiting threads.
+    \item \textbf{Formal Definition}: Every process in a set is waiting for an event that can only be caused by another process in the set.
+\end{itemize}
+
+\subsection{Things to learn}
+\begin{itemize}
+    \item Illustrate how deadlock can occur when mutex locks are used.
+    \item Define the four necessary conditions that characterize deadlock.
+    \item Identify a deadlock situation in a resource allocation graph.
+    \item Evaluate the four different approaches for preventing deadlocks.
+    \item Apply the banker's algorithm for deadlock avoidance.
+    \item Apply the deadlock detection algorithm.
+    \item Evaluate approaches for recovering from deadlock.
+\end{itemize}
+
+\subsection{System model}
+\begin{itemize}
+    \item \textbf{System Composition}: Finite number of resources distributed among competing threads.
+    \item \textbf{Resource Types}:
+    \begin{itemize}
+        \item Resources partitioned into types (classes), each with identical instances.
+        \item Examples: CPU cycles, files, I/O devices.
+        \item If a system has 4 CPUs, resource type \textit{CPU} has 4 instances.
+        \item Any instance of a resource type should satisfy a request.
+    \end{itemize}
+    \item \textbf{Synchronization Tools as Resources}:
+    \begin{itemize}
+        \item Mutex locks and semaphores are common sources of deadlock.
+        \item Each lock instance is typically its own resource class (e.g., one lock for a queue, another for a linked list).
+    \end{itemize}
+    \item \textbf{Resource Utilization Sequence}:
+    \begin{enumerate}
+        \item \textbf{Request}: Thread requests a resource. Waits if not immediately available.
+        \item \textbf{Use}: Thread operates on the resource.
+        \item \textbf{Release}: Thread releases the resource.
+    \end{enumerate}
+    \item \textbf{System Management}:
+    \begin{itemize}
+        \item Request/release can be system calls (\texttt{request()}, \texttt{release()}, \texttt{open()}, \texttt{close()}, \texttt{allocate()}, \texttt{free()}).
+        \item Or via semaphore operations (\texttt{wait()}, \texttt{signal()}) and mutex locks (\texttt{acquire()}, \texttt{release()}).
+        \item OS checks for resource allocation via a system table.
+        \item Table tracks free/allocated resources and the owning thread.
+        \item Waiting threads are queued for requested resources.
+    \end{itemize}
+    \item \textbf{Deadlocked State}:
+    \begin{itemize}
+        \item Every thread in a set is waiting for an event that can only be caused by another thread in the set.
+        \item Main events: resource acquisition and release.
+        \item Example: Dining-philosophers problem. Each philosopher holds one chopstick and waits for another, creating a circular wait.
+    \end{itemize}
+    \item \textbf{Developer Responsibility}:
+    \begin{itemize}
+        \item Must be aware of deadlock possibilities.
+        \item Locking tools prevent race conditions but require careful management of lock acquisition/release to avoid deadlocks.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.2\textwidth}p{0.8\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    deadlock & The state in which two processes or threads are stuck waiting for an event that can only be caused by one of the processes or threads. \\
+    \bottomrule
+\end{tabular}

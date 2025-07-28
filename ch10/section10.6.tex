@@ -1,0 +1,137 @@
+\section{Thrashing}
+\begin{itemize}
+    \item Process without "enough" frames (minimum needed for working set) $\rightarrow$ quickly page-faults.
+    \item Replaces page needed immediately $\rightarrow$ faults again and again.
+    \item High paging activity called \textbf{thrashing}.
+    \item Thrashing: spending more time paging than executing.
+    \item Results in severe performance problems.
+\end{itemize}
+
+\subsection{Cause of thrashing}
+\begin{itemize}
+    \item Scenario: OS monitors CPU utilization. Low CPU utilization $\rightarrow$ increase multiprogramming (new process).
+    \item Global page-replacement algorithm used (replaces pages without regard to process).
+    \item Process needs more frames $\rightarrow$ starts faulting, takes frames from other processes.
+    \item Other processes fault $\rightarrow$ take frames from others.
+    \item Faulting processes use paging device $\rightarrow$ ready queue empties.
+    \item Processes wait for paging device $\rightarrow$ CPU utilization decreases.
+    \item CPU scheduler sees decreasing CPU utilization $\rightarrow$ \textbf{increases} multiprogramming.
+    \item New process takes frames $\rightarrow$ more page faults, longer paging device queue.
+    \item CPU utilization drops further $\rightarrow$ CPU scheduler increases multiprogramming more.
+    \item Thrashing occurs $\rightarrow$ system throughput plunges.
+    \item Page-fault rate increases tremendously $\rightarrow$ effective memory-access time increases.
+    \item No work done, processes spend all time paging.
+    \item Illustrated in Figure 10.6.1: CPU utilization vs. degree of multiprogramming.
+    \begin{itemize}
+        \item Multiprogramming increases $\rightarrow$ CPU utilization increases (slower) until max.
+        \item Further increase $\rightarrow$ thrashing, CPU utilization drops sharply.
+        \item To stop thrashing: \textbf{decrease} degree of multiprogramming.
+    \end{itemize}
+    \item Limit thrashing effects: use \textbf{local replacement algorithm} (or \textbf{priority replacement algorithm}).
+    \begin{itemize}
+        \item Local replacement: process selects only from its own frames.
+        \item Thrashing process cannot steal frames from others.
+        \item Problem not entirely solved: thrashing processes queue for paging device $\rightarrow$ increased average service time for page fault $\rightarrow$ increased effective access time for all processes.
+    \end{itemize}
+    \item To prevent thrashing: provide process with enough frames.
+    \item How many frames needed? Look at frames actually used $\rightarrow$ \textbf{locality model}.
+    \item \textbf{Locality model}: process moves from locality to locality during execution.
+    \begin{itemize}
+        \item Locality: set of pages actively used together.
+        \item Running program: several overlapping localities.
+        \item Example: function call $\rightarrow$ new locality (function instructions, local variables, global variables subset).
+        \item Exit function $\rightarrow$ leave locality.
+        \item Localities defined by program structure and data structures.
+        \item Principle behind caching: accesses are patterned, not random.
+    \end{itemize}
+    \item Allocate enough frames for current locality: faults until pages in memory, then no faults until locality changes.
+    \item Not enough frames for locality $\rightarrow$ thrashing.
+\end{itemize}
+
+\subsection{Working-set model}
+\begin{itemize}
+    \item Based on locality assumption.
+    \item Uses parameter $\Delta$ to define \textbf{working-set window}.
+    \item Examine most recent $\Delta$ page references.
+    \item Set of pages in most recent $\Delta$ references = \textbf{working set} (Figure 10.6.3).
+    \item Page in active use $\rightarrow$ in working set.
+    \item No longer used $\rightarrow$ drops from working set $\Delta$ time units after last reference.
+    \item Working set: approximation of program's locality.
+    \item Example (Figure 10.6.3): $\Delta = 10$ references.
+    \begin{itemize}
+        \item Working set at $t_1$: \{1, 2, 5, 6, 7\}.
+        \item Working set at $t_2$: \{3, 4\}.
+    \end{itemize}
+    \item Accuracy of working set depends on $\Delta$ selection.
+    \begin{itemize}
+        \item $\Delta$ too small: won't encompass entire locality.
+        \item $\Delta$ too large: may overlap several localities.
+        \item Extreme: $\Delta$ infinite $\rightarrow$ working set is all pages touched during execution.
+    \end{itemize}
+    \item Most important property: working-set size.
+    \item Compute working-set size, $WSS_i$, for each process.
+    \item Total demand for frames: $D = \sum WSS_i$.
+    \item If $D > m$ (total available frames) $\rightarrow$ thrashing (some processes lack frames).
+    \item Working-set model usage:
+    \begin{itemize}
+        \item OS monitors working set of each process.
+        \item Allocates enough frames for its working-set size.
+        \item Enough extra frames $\rightarrow$ new process initiated.
+        \item Sum of working-set sizes exceeds available frames $\rightarrow$ OS suspends a process.
+        \item Suspended process's pages swapped out, frames reallocated. Restarted later.
+    \end{itemize}
+    \item Prevents thrashing, keeps multiprogramming high, optimizes CPU utilization.
+    \item Difficulty: tracking moving working-set window.
+    \item Approximation: fixed-interval timer interrupt + reference bit.
+    \begin{itemize}
+        \item Example: $\Delta = 10,000$ references, interrupt every 5,000 references.
+        \item Timer interrupt: copy and clear reference bits.
+        \item Page fault: examine current reference bit and two in-memory bits.
+        \item Used within last 10,000-15,000 references $\rightarrow$ at least one bit on $\rightarrow$ in working set.
+        \item Not entirely accurate (cannot tell exact reference time within interval).
+        \item Reduce uncertainty: increase history bits, interrupt frequency (higher cost).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Page-fault frequency}
+\begin{itemize}
+    \item Working-set model successful, useful for prepaging, but clumsy for thrashing control.
+    \item \textbf{Page-fault frequency} (\textbf{PFF}) strategy: more direct.
+    \item Problem: prevent thrashing (high page-fault rate).
+    \item Control page-fault rate:
+    \begin{itemize}
+        \item Too high $\rightarrow$ process needs more frames.
+        \item Too low $\rightarrow$ process may have too many frames.
+    \end{itemize}
+    \item Establish upper and lower bounds on desired page-fault rate (Figure 10.6.4).
+    \begin{itemize}
+        \item Actual PFF exceeds upper limit $\rightarrow$ allocate another frame.
+        \item Actual PFF falls below lower limit $\rightarrow$ remove a frame.
+    \end{itemize}
+    \item Directly measure and control PFF to prevent thrashing.
+    \item If PFF increases and no free frames: select process, swap out to backing store. Freed frames distributed to high-PFF processes.
+\end{itemize}
+
+\subsection{Current practice}
+\begin{itemize}
+    \item Thrashing and swapping: high performance impact.
+    \item Best practice: include enough physical memory to avoid thrashing/swapping.
+    \item Provides best user experience (smartphones to large servers).
+\end{itemize}
+
+\vspace{1em}
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{thrashing} & High rate of paging memory; occurs when insufficient physical memory to meet virtual memory demand. \\
+    \textbf{local replacement algorithm} & Page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes. \\
+    \textbf{priority replacement algorithm} & Page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes. \\
+    \textbf{locality model} & Model for page replacement based on the working-set strategy. \\
+    \textbf{working-set model} & Memory access model based on tracking the set of most recently accessed pages. \\
+    \textbf{working-set window} & Limited set of most recently accessed pages (a "window" view of the entire set of accessed pages). \\
+    \textbf{working set} & The set of pages in the most recent page references. \\
+    \textbf{page-fault frequency} & The frequency of page faults. \\
+    \bottomrule
+\end{tabular}

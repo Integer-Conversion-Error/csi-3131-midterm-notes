@@ -1,0 +1,91 @@
+\section{Swap-space management}
+
+\begin{itemize}
+    \item Swapping: moving entire processes between secondary storage and main memory (Section 9.5).
+    \item Occurs when physical memory critically low, processes moved to swap space to free memory.
+    \item Modern OS: very few implement swapping this way.
+    \item Systems now combine swapping with virtual memory (Chapter Virtual Memory), swap pages, not entire processes.
+    \item Terms "swapping" and "paging" used interchangeably.
+    \item \textbf{Swap-space management}: low-level OS task.
+    \item Virtual memory uses secondary storage as extension of main memory.
+    \item Drive access much slower than memory access $\implies$ swap space significantly decreases system performance.
+    \item Main goal for swap space design/implementation: provide best throughput for virtual memory system.
+    \item Discuss: swap space use, location, management.
+\end{itemize}
+
+\subsection{Swap-space use}
+\begin{itemize}
+    \item Swap space used differently by OS, depending on memory-management algorithms.
+    \item Swapping systems: may hold entire process image (code, data segments).
+    \item Paging systems: store pages pushed out of main memory.
+    \item Amount of swap space needed: varies (few MB to GB).
+    \item Depends on: physical memory, virtual memory backing, virtual memory usage.
+    \item Safer to overestimate than underestimate swap space.
+    \item Running out of swap space: may abort processes or crash.
+    \item Overestimation: wastes secondary storage space (no other harm).
+    \item Some systems recommend swap space amount.
+    \item Solaris: swap space = virtual memory exceeding pageable physical memory.
+    \item Past Linux: swap space = double physical memory.
+    \item Today's Linux: paging algorithms changed, considerably less swap space used.
+    \item Some OS (Linux): allow multiple swap spaces (files, dedicated partitions).
+    \item Multiple swap spaces: usually on separate storage devices.
+    \item Purpose: spread I/O load from paging/swapping over system's I/O bandwidth.
+\end{itemize}
+
+\subsection{Swap-space location}
+\begin{itemize}
+    \item Swap space can reside in two places:
+    \begin{itemize}
+        \item Carved out of normal file system (large file).
+        \item In a separate \textbf{raw partition}.
+    \end{itemize}
+    \item Swap space as file: normal file-system routines create, name, allocate space.
+    \item Swap space in raw partition:
+    \begin{itemize}
+        \item No file system or directory structure.
+        \item Separate swap-space storage manager allocates/deallocates blocks.
+        \item Manager uses algorithms optimized for speed (not storage efficiency).
+        \item Swap space accessed more frequently than file systems.
+        \item Internal fragmentation may increase (acceptable trade-off, data life shorter).
+        \item Fragmentation short-lived (reinitialized at boot time).
+        \item Raw-partition approach: fixed amount of swap space during disk partitioning.
+        \item Adding more swap space: repartitioning device (moving/destroying other partitions) or adding another swap space elsewhere.
+    \end{itemize}
+    \item Some OS: flexible, can swap in raw partitions and file-system space (e.g., Linux).
+    \item Trade-off: convenience of file system allocation/management vs. performance of raw partitions.
+\end{itemize}
+
+\subsection{Swap-space management: an example}
+\begin{itemize}
+    \item Evolution of swapping/paging in UNIX systems:
+    \item Traditional UNIX kernel: copied entire processes between contiguous disk regions and memory.
+    \item Later UNIX: evolved to combination of swapping and paging (as paging hardware available).
+    \item Solaris 1 (SunOS): changed standard UNIX methods for efficiency/tech developments.
+    \item Process executes: text-segment pages (code) brought from file system, accessed in memory, thrown away if selected for pageout.
+    \item More efficient to reread page from file system than write to swap and reread.
+    \item Swap space used only as backing store for pages of \textbf{anonymous} memory.
+    \item \textbf{Anonymous} memory: not backed by any file (stack, heap, uninitialized data of process).
+    \item Later Solaris versions: biggest change $\implies$ allocates swap space only when page forced out of physical memory (not when virtual memory page first created).
+    \item Scheme: better performance on modern computers (more physical memory, page less).
+    \item Linux: similar to Solaris, swap space only for anonymous memory.
+    \item Linux: allows one or more swap areas (swap file on regular file system or dedicated swap partition).
+    \item Each swap area: series of 4-KB \textbf{page slots} (hold swapped pages).
+    \item Associated with each swap area: \textbf{swap map} (array of integer counters).
+    \item Each counter: corresponds to page slot.
+    \item Counter value 0: page slot available.
+    \item Counter value $>$ 0: page slot occupied by swapped page.
+    \item Counter value: indicates number of mappings to swapped page (e.g., 3 $\implies$ mapped to 3 processes if shared memory).
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{swap-space management} & Low-level OS task of managing space on secondary storage for swapping and paging. \\
+\textbf{raw partition} & Partition within a storage device not containing a file system. \\
+\textbf{anonymous memory} & Memory not associated with a file; dirty pages paged out are stored in swap space. \\
+\textbf{page slot} & In Linux swap-space management, part of data structure tracking swap-space use. \\
+\textbf{swap map} & In Linux swap-space management, part of data structure tracking swap-space use. \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,102 @@
+\section{Operating-system examples}
+
+\subsection{Linux}
+\begin{itemize}
+    \item Linux manages virtual memory using demand paging.
+    \item Allocates pages from a list of free frames.
+    \item Global page-replacement policy: similar to LRU-approximation clock algorithm (second-chance).
+    \item Maintains two page lists:
+    \begin{itemize}
+        \item \texttt{active\_list}: pages considered in use.
+        \item \texttt{inactive\_list}: pages not recently referenced, eligible for reclamation.
+    \end{itemize}
+    \item Each page has an \textbf{accessed} bit (set when referenced).
+    \item Page first allocated: accessed bit set, added to rear of \texttt{active\_list}.
+    \item Page in \texttt{active\_list} referenced: accessed bit set, moves to rear of list.
+    \item Periodically: accessed bits for pages in \texttt{active\_list} reset.
+    \item Least recently used page: at front of \texttt{active\_list}, may migrate to rear of \texttt{inactive\_list}.
+    \item Page in \texttt{inactive\_list} referenced: moves back to rear of \texttt{active\_list}.
+    \item Lists kept in relative balance.
+    \item \texttt{active\_list} grows larger than \texttt{inactive\_list}: pages from front of \texttt{active\_list} move to \texttt{inactive\_list} (eligible for reclamation).
+    \item Linux kernel: page-out daemon process \texttt{kswapd}.
+    \item \texttt{kswapd} periodically awakens, checks free memory.
+    \item If free memory falls below threshold: \texttt{kswapd} scans \texttt{inactive\_list}, reclaims pages for free list.
+\end{itemize}
+
+\subsection{Windows}
+\begin{itemize}
+    \item Windows 10: supports 32- and 64-bit systems (Intel, ARM).
+    \item 32-bit systems: default 2 GB virtual address space (extendable to 3 GB), 4 GB physical memory.
+    \item 64-bit systems: 128-TB virtual address space, up to 24 TB physical memory (Windows Server up to 128 TB).
+    \item Implements: shared libraries, demand paging, copy-on-write, paging, memory compression.
+    \item Virtual memory: demand paging with \textbf{clustering}.
+    \item \textbf{Clustering}: handles page faults by bringing in faulting page + several immediately preceding/following pages.
+    \item Cluster size varies by page type:
+    \begin{itemize}
+        \item Data page: 3 pages (faulting + one before + one after).
+        \item Other page faults: 7 pages.
+    \end{itemize}
+    \item Key component: working-set management.
+    \item Process creation: assigned \textbf{working-set minimum} (50 pages) and \textbf{working-set maximum} (345 pages).
+    \item \textbf{Working-set minimum}: minimum pages guaranteed in memory.
+    \item \textbf{Working-set maximum}: maximum pages allowed if sufficient memory.
+    \item \textbf{Hard working-set limits}: if configured, values may be ignored.
+    \item Process can grow beyond maximum if memory available.
+    \item Memory allocated to process can shrink below minimum during high demand.
+    \item Page replacement: LRU-approximation clock algorithm (second-chance) with local and global policies.
+    \item Virtual memory manager: maintains free page frames list with threshold.
+    \item Page fault for process below working-set maximum: allocates page from free list.
+    \item Process at working-set maximum, page fault, sufficient memory: allocated free page (grows beyond maximum).
+    \item Insufficient free memory: kernel selects page from process's working set for replacement (local LRU policy).
+    \item Free memory falls below threshold: global replacement tactic \textbf{automatic working-set trimming}.
+    \item \textbf{Automatic working-set trimming}: evaluates pages allocated to processes.
+    \item If process has more pages than working-set minimum: removes pages until sufficient memory or process reaches minimum.
+    \item Larger, idle processes targeted before smaller, active processes.
+    \item Trimming continues until sufficient free memory, even if below working-set minimum.
+    \item Windows performs trimming on user-mode and system processes.
+\end{itemize}
+
+\subsection{Solaris}
+\begin{itemize}
+    \item Thread incurs page fault: kernel assigns page from free list.
+    \item Imperative: kernel keeps sufficient free memory.
+    \item \texttt{lotsfree} parameter: threshold to begin paging (typically 1/64 physical memory).
+    \item Kernel checks free memory vs. \texttt{lotsfree} four times per second.
+    \item If free pages $<$ \texttt{lotsfree}: \textbf{pageout} process starts.
+    \item Pageout process: similar to second-chance algorithm, uses two hands.
+    \item Pageout process steps:
+    \begin{itemize}
+        \item Front hand: scans all pages, sets reference bit to 0.
+        \item Back hand: examines reference bit; if still 0, appends page to free list, writes to secondary storage if modified.
+    \end{itemize}
+    \item Solaris manages minor page faults: process reclaims page from free list if accessed before reassigned.
+    \item Pageout algorithm: uses parameters to control \texttt{scanrate} (pages per second).
+    \item \texttt{scanrate} ranges from \texttt{slowscan} to \texttt{fastscan}.
+    \item Free memory falls below \texttt{lotsfree}: scanning at \texttt{slowscan} (default 100 pages/sec).
+    \item Progresses to \texttt{fastscan} (total physical pages/2, max 8,192 pages/sec) depending on free memory.
+    \item Distance between hands: determined by \texttt{handspread} system parameter.
+    \item Time between clearing and checking bit: depends on \texttt{scanrate} and \texttt{handspread}.
+    \item Pageout process checks memory four times per second.
+    \item If free memory falls below \texttt{desfree} (desired free memory): pageout runs 100 times per second.
+    \item Goal: keep at least \texttt{desfree} memory available.
+    \item If unable to maintain \texttt{desfree} for 30-second average: kernel swaps processes (freeing all pages).
+    \item Kernel looks for idle processes.
+    \item If system unable to maintain \texttt{minfree}: pageout process called for every new page request.
+    \item Page-scanning algorithm skips shared library pages (even if eligible).
+    \item Distinguishes between pages for processes and regular data files.
+    \item Known as \textbf{priority paging}.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{clustering} & Paging in a group of contiguous pages when a single page is requested via a page fault. \\
+\textbf{working-set minimum} & Minimum number of frames guaranteed to a process in Windows. \\
+\textbf{working-set maximum} & Maximum number of frames allowed to a process in Windows. \\
+\textbf{hard working-set limit} & Maximum amount of physical memory a process is allowed to use in Windows. \\
+\textbf{automatic working-set trimming} & In Windows, decreasing working-set frames for processes if minimum free memory threshold is reached. \\
+\textbf{priority paging} & Prioritizing selection of victim frames based on criteria, e.g., avoiding shared library pages. \\
+\bottomrule
+\end{tabular}

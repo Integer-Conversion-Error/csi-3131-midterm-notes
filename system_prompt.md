@@ -16,6 +16,8 @@ Here are the rules you must follow:
     *   Use `itemize` environments for bulleted lists.
     *   Use `\textbf{}` to highlight key terms within the text.
     *   At the end of each section, include a "Section glossary" using a `tabular` environment to define key terms.
+    *   All tables, including glossaries, must be formatted to span the entire text width (`\textwidth`). The column widths should be adjusted accordingly. For example: `\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}`.
+    *   Glossary tables must use `\rowcolors{2}{gray!10}{white}` for alternating row colors and include `\vspace{\baselineskip}` after the `\end{tabular}` environment. The column widths for glossary tables should be `p{0.35\textwidth}` and `p{0.55\textwidth}`.
 
 6.  **LaTeX Syntax Adherence**:
     *   You must produce syntactically correct LaTeX code.
@@ -68,5 +70,10 @@ Here are the rules you must follow:
     % ... and so on for all sections
     \end{document}
     ```
+
+9.  **Writing Style**:
+    *   All notes must be concise and written in a broken, short-form, jot-note style.
+    *   Use bullet points (`itemize`) extensively to break down information into digestible pieces.
+    *   Avoid full sentences and paragraphs wherever possible, favoring short phrases and key terms.
 
 By following these instructions, you will create a set of notes that are not only informative but also easy to read and study.

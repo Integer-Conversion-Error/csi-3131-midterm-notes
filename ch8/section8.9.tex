@@ -1,0 +1,23 @@
+\section{Summary}
+
+\begin{itemize}
+    \item Deadlock: set of processes, each waiting for event caused by another process in set.
+    \item Four necessary conditions for deadlock:
+    \begin{itemize}
+        \item Mutual exclusion.
+        \item Hold and wait.
+        \item No preemption.
+        \item Circular wait.
+    \end{itemize}
+    \item Deadlock only possible if all four conditions present.
+    \item Deadlocks modeled with resource-allocation graphs; cycle indicates deadlock.
+    \item Deadlock prevention: ensure one of four conditions cannot occur.
+    \item Practical prevention: eliminate circular wait.
+    \item Deadlock avoidance: use banker's algorithm; don't grant resources if leads to unsafe state.
+    \item Deadlock detection: algorithm evaluates processes/resources on running system to find deadlocked state.
+    \item Deadlock recovery:
+    \begin{itemize}
+        \item Abort one process in circular wait.
+        \item Preempt resources assigned to deadlocked process.
+    \end{itemize}
+\end{itemize}

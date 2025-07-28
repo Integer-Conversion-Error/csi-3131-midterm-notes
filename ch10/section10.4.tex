@@ -1,0 +1,194 @@
+\section{10.4 Page replacement}
+
+\subsection{Over-allocating Memory}
+\begin{itemize}
+    \item Demand paging saves I/O by loading only used pages.
+    \item Can increase degree of multiprogramming by \textbf{over-allocating} memory.
+    \item Example: 6 processes (10 pages each, use 5) on 40 frames $\rightarrow$ higher CPU utilization/throughput.
+    \item Problem: Processes may suddenly need all pages (e.g., 60 frames needed, only 40 available).
+    \item System memory also used for I/O buffers, increasing strain on memory-placement.
+    \item Over-allocation manifests as page fault with no free frames.
+\end{itemize}
+
+\subsection{Basic Page Replacement}
+\begin{itemize}
+    \item If no free frame, find one not in use and free it.
+    \item Freeing a frame: write contents to swap space, change page table (page no longer in memory).
+    \item Use freed frame for faulted page.
+    \item Modified page-fault service routine:
+    \begin{enumerate}
+        \item Find desired page on secondary storage.
+        \item Find a free frame:
+        \begin{enumerate}
+            \item If free frame, use it.
+            \item If no free frame, use page-replacement algorithm to select \textbf{victim frame}.
+            \item Write victim frame to secondary storage (if modified); update page/frame tables.
+        \end{enumerate}
+        \item Read desired page into newly freed frame; update page/frame tables.
+        \item Continue process from page fault.
+    \end{enumerate}
+    \item No free frames $\rightarrow$ two page transfers (page-out, page-in) $\rightarrow$ doubles page-fault service time.
+    \item Reduce overhead with \textbf{modify bit} (or \textbf{dirty bit}).
+    \begin{itemize}
+        \item Hardware sets modify bit if page written to.
+        \item If modify bit set: write page to storage before replacement.
+        \item If modify bit not set: no need to write to storage (page unchanged).
+        \item Applies to read-only pages (discardable).
+        \item Significantly reduces page-fault service time if page not modified.
+    \end{itemize}
+    \item Page replacement separates logical and physical memory.
+    \item Enormous virtual memory on smaller physical memory.
+    \item Two major problems for demand paging:
+    \begin{itemize}
+        \item \textbf{Frame-allocation algorithm}: how many frames to allocate to each process.
+        \item \textbf{Page-replacement algorithm}: which frames to replace.
+    \end{itemize}
+    \item Goal: lowest page-fault rate.
+    \item Evaluate algorithms using \textbf{reference string} (trace of memory accesses).
+    \item Reference string simplification: only page number, ignore immediate repeated references.
+    \item More frames $\rightarrow$ fewer page faults (generally).
+\end{itemize}
+
+\subsection{FIFO Page Replacement}
+\begin{itemize}
+    \item First-in, first-out (FIFO) algorithm.
+    \item Replaces the oldest page (first one brought into memory).
+    \item Can use a FIFO queue: replace head, insert new page at tail.
+    \item Easy to understand and program.
+    \item Performance not always good: may replace actively used pages.
+    \item Bad replacement choice $\rightarrow$ increased page-fault rate, slowed execution (not incorrect).
+    \item Suffers from \textbf{Belady's anomaly}: page-fault rate may \textbf{increase} as allocated frames increase.
+\end{itemize}
+
+\subsection{Optimal Page Replacement}
+\begin{itemize}
+    \item \textbf{Optimal page-replacement algorithm} (OPT or MIN).
+    \item Lowest page-fault rate, never suffers from Belady's anomaly.
+    \item Rule: Replace the page that will not be used for the longest period of time.
+    \item Guarantees lowest possible page-fault rate.
+    \item Difficult to implement: requires future knowledge of reference string.
+    \item Used mainly for comparison studies.
+\end{itemize}
+
+\subsection{LRU Page Replacement}
+\begin{itemize}
+    \item \textbf{Least recently used (LRU) algorithm}: approximation of optimal.
+    \item Replaces the page that \textbf{has not been used} for the longest period of time.
+    \item Optimal algorithm looking backward in time.
+    \item Does not suffer from Belady's anomaly (is a \textbf{stack algorithm}).
+    \item Implementation requires substantial hardware assistance.
+    \begin{itemize}
+        \item \textbf{Counters}: associate time-of-use field with page-table entry; CPU logical clock increments; copy clock to field on reference. Replace page with smallest time value.
+        \item \textbf{Stack}: keep stack of page numbers; on reference, remove page and put on top. Most recently used at top, least recently used at bottom. Best with doubly linked list.
+    \end{itemize}
+    \item True LRU implementation is expensive due to per-memory-reference updates.
+\end{itemize}
+
+\subsection{LRU-approximation Page Replacement}
+\begin{itemize}
+    \item Many systems lack hardware for true LRU.
+    \item Use \textbf{reference bit}: hardware sets bit when page referenced.
+    \item OS clears bits periodically. Can determine which pages used, but not order.
+    \item Basis for LRU approximation algorithms.
+    \item \textbf{Additional-reference-bits algorithm}:
+    \begin{itemize}
+        \item Keep 8-bit byte for each page.
+        \item Timer interrupt (e.g., every 100ms): OS shifts reference bit into high-order bit of byte, shifts others right.
+        \item 8-bit shift registers show history of page use.
+        \item Page with lowest number (interpreted as unsigned int) is LRU.
+        \item Can replace all with smallest value or use FIFO among them.
+    \end{itemize}
+    \item \textbf{Second-chance page-replacement algorithm} (\textbf{clock} algorithm):
+    \begin{itemize}
+        \item Basic FIFO.
+        \item If selected page's reference bit is 0, replace it.
+        \item If reference bit is 1, give second chance: clear bit, reset arrival time to current time.
+        \item Page with second chance not replaced until others replaced/given second chances.
+        \item Implemented as circular queue with pointer.
+        \item Pointer advances, clearing reference bits, until 0-bit page found.
+        \item Degenerates to FIFO if all bits set.
+    \end{itemize}
+    \item \textbf{Enhanced second-chance algorithm}:
+    \begin{itemize}
+        \item Considers (reference bit, modify bit) as ordered pair.
+        \item Four classes:
+        \begin{enumerate}
+            \item (0, 0): neither recently used nor modified (best to replace).
+            \item (0, 1): not recently used but modified (needs write-out).
+            \item (1, 0): recently used but clean (likely used again soon).
+            \item (1, 1): recently used and modified (likely used again soon, needs write-out).
+        \end{enumerate}
+        \item Replace first page in lowest nonempty class.
+        \item Prefers clean pages to reduce I/Os.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Counting-based Page Replacement}
+\begin{itemize}
+    \item Keep counter of references for each page.
+    \item \textbf{Least frequently used (LFU)}: replace page with smallest count.
+    \begin{itemize}
+        \item Problem: heavily used page initially, then unused, keeps high count.
+        \item Solution: shift counts right periodically (exponentially decaying average).
+    \end{itemize}
+    \item \textbf{Most frequently used (MFU)}: replace page with smallest count (assumes just brought in).
+    \item Neither LFU nor MFU common: expensive, don't approximate OPT well.
+\end{itemize}
+
+\subsection{Page-buffering Algorithms}
+\begin{itemize}
+    \item Used in addition to replacement algorithms.
+    \item Pool of free frames:
+    \begin{itemize}
+        \item On page fault, desired page read into free frame from pool before victim written out.
+        \item Process restarts faster. Victim frame added to pool after write-out.
+    \end{itemize}
+    \item List of modified pages:
+    \begin{itemize}
+        \item When paging device idle, modified page written to secondary storage; modify bit reset.
+        \item Increases probability of clean page for replacement (no write-out needed).
+    \end{itemize}
+    \item Pool of free frames remembering old page:
+    \begin{itemize}
+        \item If old page needed before frame reused, can be reused directly from pool (no I/O).
+        \item Check free-frame pool first on page fault.
+    \end{itemize}
+    \item UNIX uses this with second-chance algorithm.
+\end{itemize}
+
+\subsection{Applications and Page Replacement}
+\begin{itemize}
+    \item Some applications (e.g., databases) perform worse with OS virtual memory buffering.
+    \item Applications understand their memory/storage use better than general-purpose OS algorithms.
+    \item Double buffering if OS and application both buffer I/O.
+    \item Data warehouses: sequential reads, then computations/writes. LRU removes old pages, but older pages might be read again. MFU could be more efficient.
+    \item Some OS allow special programs to use secondary storage as large sequential array of logical blocks $\rightarrow$ \textbf{raw disk}.
+    \item \textbf{Raw I/O}: bypasses file-system services (demand paging, locking, prefetching, allocation, names, directories).
+    \item Raw partitions efficient for specific apps, but most apps better with regular file-system services.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{over-allocating} & Providing access to more resources than physically available; allocating more virtual memory than physical memory. \\
+    \textbf{page replacement} & Selection of a physical memory frame to be replaced when a new page is allocated. \\
+    \textbf{victim frame} & Frame selected by page-replacement algorithm to be replaced. \\
+    \textbf{modify bit} & MMU bit indicating a frame has been modified (must be saved before replacement). \\
+    \textbf{dirty bit} & MMU bit indicating a frame has been modified (must be saved before replacement). \\
+    \textbf{frame-allocation algorithm} & OS algorithm for allocating frames among all demands. \\
+    \textbf{page-replacement algorithm} & Algorithm choosing which victim frame will be replaced by a new data frame. \\
+    \textbf{reference string} & Trace of accesses to a resource; list of pages accessed over time. \\
+    \textbf{Belady's anomaly} & Page-fault rate may increase as allocated frames increase for some algorithms. \\
+    \textbf{optimal page-replacement algorithm} & Algorithm with lowest page-fault rate, never suffers Belady's anomaly. \\
+    \textbf{least recently used (LRU)} & Selects item used least recently; in memory, page not accessed in longest time. \\
+    \textbf{stack algorithm} & Class of page-replacement algorithms that do not suffer from Belady's anomaly. \\
+    \textbf{reference bit} & MMU bit indicating a page has been referenced. \\
+    \textbf{second-chance page-replacement algorithm} & FIFO algorithm; if reference bit set, clear bit and don't replace. \\
+    \textbf{clock} & Circular queue in second-chance algorithm containing possible victim frames. \\
+    \textbf{least frequently used (LFU)} & Selects item used least frequently; in virtual memory, page with lowest access count. \\
+    \textbf{most frequently used (MFU)} & Selects item used most frequently; in virtual memory, page with highest access count. \\
+    \textbf{raw disk} & Direct access to secondary storage as array of blocks, no file system. \\
+    \bottomrule
+\end{tabular}

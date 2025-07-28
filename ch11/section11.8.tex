@@ -1,0 +1,319 @@
+\section{RAID structure}
+
+\begin{itemize}
+    \item Economically feasible to attach many drives to a computer.
+    \item Large number of drives: opportunities for improving data read/write rate (parallel operation).
+    \item Potential for improving data storage reliability: redundant information on multiple drives.
+    \item Failure of one drive: does not lead to data loss.
+    \item \textbf{Redundant arrays of independent disks} (\textit{RAIDs}): disk-organization techniques for performance and reliability.
+    \item Past: RAIDs of small, cheap disks as cost-effective alternative to large, expensive disks.
+    \item Today: RAIDs used for higher reliability and data-transfer rate.
+    \item "I" in RAID: now stands for "independent" (was "inexpensive").
+\end{itemize}
+
+\subsection{Improvement of reliability via redundancy}
+\begin{itemize}
+    \item Reliability of HDD RAID:
+    \item Chance of some disk failing in $N$ disks $>$ chance of single disk failing.
+    \item Example: \textbf{mean time between failures} (\textit{MTBF}) of single disk = 100,000 hours.
+    \item MTBF of some disk in 100-disk array = 1,000 hours (41.66 days).
+    \item Storing only one copy: each disk failure $\implies$ significant data loss (unacceptable).
+    \item Solution: introduce \textbf{redundancy} (store extra info not normally needed, used to rebuild lost info).
+    \item Even if disk fails, data not lost.
+    \item RAID applicable to NVM devices (less likely to fail than HDDs, no moving parts).
+    \item Simplest (most expensive) redundancy: duplicate every drive (\textbf{mirroring}).
+    \item Mirroring: logical disk = two physical drives; every write on both drives.
+    \item Result: \textbf{mirrored volume}.
+    \item One drive fails: data read from other. Data lost only if second drive fails before first replaced.
+    \item MTBF of mirrored volume (failure = data loss) depends on:
+    \begin{itemize}
+        \item MTBF of individual drives.
+        \item \textbf{mean time to repair}: average time to replace failed drive and restore data.
+    \end{itemize}
+    \item Example: single drive MTBF = 100,000 hours, mean time to repair = 10 hours.
+    \item \textbf{Mean time to data loss} of mirrored system: $(100,000^2) / (2 \times 10) = 500 \times 10^6$ hours (57,000 years).
+    \item Cannot assume independent drive failures: power failures, natural disasters, manufacturing defects can cause correlated failures.
+    \item Drives age: probability of failure grows, increasing chance of second failure during repair.
+    \item Despite considerations: mirrored-drive systems offer much higher reliability.
+    \item Power failures: particular concern (more frequent than natural disasters).
+    \item Writes in progress to same block in both drives, power fails before both written: inconsistent state.
+    \item Solution: write one copy first, then next; or add solid-state nonvolatile cache to RAID array.
+    \item Write-back cache: protected from data loss during power failures (write considered complete).
+    \item Assumes cache has error protection/correction (ECC, mirroring).
+\end{itemize}
+
+\subsection{Improvement in performance via parallelism}
+\begin{itemize}
+    \item Parallel access to multiple drives: improves performance.
+    \item Mirroring: read request rate doubled (reads sent to either drive).
+    \item Transfer rate per read: same as single drive; but reads per unit time doubled.
+    \item Multiple drives: improve transfer rate by \textbf{striping data}.
+    \item \textbf{Data striping}: splitting data across drives.
+    \item Simplest form: \textbf{bit-level striping} (splitting bits of each byte).
+    \item Example: 8-drive array, bit $i$ of each byte to drive $i$.
+    \item Array of 8 drives: treated as single drive with 8x normal sector size, 8x access rate.
+    \item Every drive participates in every access (read/write).
+    \item Number of accesses per second: same as single drive.
+    \item Each access: reads 8x data in same time.
+    \item Bit-level striping generalized: number of drives multiple of 8 or divides 8.
+    \item Example: 4-drive array, bits $i$ and $4+i$ to drive $i$.
+    \item Striping not just bit level: \textbf{block-level striping} (blocks of file striped across multiple drives).
+    \item With $n$ drives, block $i$ of file goes to drive $(i \pmod n) + 1$.
+    \item Other striping levels possible (bytes of sector, sectors of block).
+    \item Block-level striping: only commonly available striping.
+    \item Parallelism in storage system (via striping) goals:
+    \begin{enumerate}
+        \item Increase throughput of multiple small accesses (page accesses) by load balancing.
+        \item Reduce response time of large accesses.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{RAID levels}
+\begin{itemize}
+    \item Mirroring: high reliability, expensive.
+    \item Striping: high data-transfer rates, no reliability improvement.
+    \item Schemes for redundancy at lower cost: disk striping + "parity" bits.
+    \item Different cost-performance trade-offs, classified as \textbf{RAID levels}.
+    \item Figure 11.8.1: $P$ indicates error-correcting bits, $C$ indicates second copy of data.
+    \item All cases in figure: 4 drives' worth of data stored; extra drives for redundant info.
+    \item \textbf{RAID level 0}: drive arrays with block-level striping, no redundancy.
+    \item \textbf{RAID level 1}: drive mirroring.
+    \item \textbf{RAID level 4}: memory-style error-correcting-code (ECC) organization. Also in RAID 5 and 6.
+    \begin{itemize}
+        \item Idea of ECC used directly in storage arrays via striping blocks across drives.
+        \item Example: 1st data block to drive 1, 2nd to drive 2, ..., $N$th to drive $N$.
+        \item ECC calculation result stored on drive $N+1$ (error-correction block).
+        \item One drive fails: ECC recalculation detects, prevents data pass, throws error.
+        \item RAID 4 corrects errors with one ECC block (drive controllers detect correct read).
+        \item If one sector damaged: know which sector, disregard data, use parity to recalculate.
+        \item For every bit: determine 1 or 0 by computing parity of corresponding bits from other drives.
+        \item Block read: accesses only one drive, others process requests.
+        \item Large reads: high transfer rates (all disks read in parallel).
+        \item Large writes: high transfer rates (data and parity written in parallel).
+        \item Small independent writes: not parallel.
+        \item OS write smaller than block: requires read-modify-write cycle.
+        \item \textbf{Read-modify-write cycle}: block read, modified, written back; parity block updated.
+        \item Single write: 4 drive accesses (2 read old, 2 write new).
+        \item WAFL uses RAID 4: allows seamless drive addition (added drives with zeros $\implies$ parity unchanged).
+        \item RAID 4 advantages over RAID 1 (equal data protection):
+        \begin{itemize}
+            \item Storage overhead reduced: one parity drive for several regular drives (vs. one mirror for every drive).
+            \item Reads/writes of series of blocks spread over multiple drives ($N$-way striping): transfer rate $N$ times faster than level 1.
+        \end{itemize}
+        \item Performance problem with RAID 4 (and parity-based RAIDs): expense of computing/writing XOR parity (slower writes).
+        \item Modern CPUs fast vs. drive I/O: minimal performance hit.
+        \item Many RAID storage arrays/HBAs: hardware controller with dedicated parity hardware (offloads computation).
+        \item Array has NVRAM cache: stores blocks while parity computed, buffers writes.
+        \item Buffering: avoids most read-modify-write cycles (gathers data into full stripe, writes concurrently).
+        \item Hardware acceleration + buffering: parity RAID almost as fast as non-parity RAID, often outperforms non-caching non-parity RAID.
+    \end{itemize}
+    \item \textbf{RAID level 5}: block-interleaved distributed parity.
+    \begin{itemize}
+        \item Spreads data and parity among all $N+1$ drives (not parity in one drive).
+        \item For each set of $N$ blocks: one drive stores parity, others store data.
+        \item Example: 5-drive array, parity for $n$th block stored in drive $(n \pmod 5) + 1$.
+        \item Parity block cannot store parity for blocks in same drive (failure $\implies$ data + parity loss).
+        \item Spreading parity: avoids overuse of single parity drive (RAID 4 problem).
+        \item RAID 5: most common parity RAID.
+    \end{itemize}
+    \item \textbf{RAID level 6}: \textbf{P + Q redundancy scheme}.
+    \begin{itemize}
+        \item Like RAID 5, but stores extra redundant info for multiple drive failures.
+        \item XOR parity not used on both parity blocks (would be identical).
+        \item Uses error-correcting codes (e.g., \textbf{Galois field math}) to calculate Q.
+        \item Example: 2 blocks redundant data for every 4 blocks data (vs. 1 parity block in level 5).
+        \item System tolerates two drive failures.
+    \end{itemize}
+    \item \textbf{Multidimensional RAID level 6}: amplifies RAID level 6.
+    \begin{itemize}
+        \item Array with hundreds of drives: RAID 6 stripe $\implies$ many data drives, two logical parity drives.
+        \item Logically arranges drives into rows and columns (2+ dimensional arrays).
+        \item Implements RAID 6 horizontally (rows) and vertically (columns).
+        \item System recovers from any/multiple failures using parity blocks in any location.
+        \item Figure 11.8.1(f): shows dedicated parity drives (in reality, scattered).
+    \end{itemize}
+    \item \textbf{RAID levels 0 + 1 and 1 + 0}: combinations.
+    \begin{itemize}
+        \item RAID 0 + 1: RAID 0 (performance) + RAID 1 (reliability).
+        \item Better performance than RAID 5, common where both important.
+        \item Doubles drives needed (expensive).
+        \item Set of drives striped, then stripe mirrored to equivalent stripe.
+        \item RAID 1 + 0: drives mirrored in pairs, then mirrored pairs striped.
+        \item Theoretical advantages over RAID 0 + 1.
+        \item RAID 0 + 1 single drive failure: entire stripe inaccessible, only other stripe left.
+        \item RAID 1 + 0 single drive failure: single drive unavailable, but mirror available, rest of drives available.
+    \end{itemize}
+    \item Numerous variations to basic RAID schemes exist.
+    \item Confusion about exact definitions of RAID levels.
+    \item Implementation of RAID:
+    \begin{itemize}
+        \item Volume-management software: implements RAID in kernel or system software layer. Storage hardware minimal features.
+        \item HBA hardware: implements RAID. Only directly connected drives part of RAID set. Low cost, not flexible.
+        \item Storage array hardware: creates RAID sets, slices into volumes. OS only implements file system on volumes. Arrays can have multiple connections/part of SAN.
+        \item SAN interconnect layer: implements RAID via drive virtualization devices. Device sits between hosts/storage, manages access. Provides mirroring by writing to two devices.
+    \end{itemize}
+    \item Other features (snapshots, replication) implemented at these levels.
+    \item \textbf{Snapshot}: view of file system before last update.
+    \item \textbf{Replication}: automatic duplication of writes between separate sites (redundancy, disaster recovery).
+    \item Replication: synchronous (block written locally/remotely before complete) or asynchronous (writes grouped, written periodically).
+    \item Asynchronous replication: data loss if primary site fails, but faster, no distance limitations.
+    \item Replication increasingly used within data center/host.
+    \item Alternative to RAID: protects against data loss, increases read performance (reads from replicas). Uses more storage than most RAID.
+    \item Implementation differences: software RAID $\implies$ each host manages replication; storage array/SAN interconnect $\implies$ host data replicated regardless of OS.
+    \item Hot spare drive(s): \textbf{hot spare} not used for data, configured as replacement for drive failure.
+    \item Example: rebuild mirrored pair if one drive fails.
+    \item RAID level reestablished automatically, without waiting for replacement.
+    \item More than one hot spare: more than one failure repaired without human intervention.
+\end{itemize}
+
+\subsection{Selecting a RAID level}
+\begin{itemize}
+    \item System designers/administrators choose RAID level based on considerations.
+    \item Rebuild performance: time to rebuild data if drive fails.
+    \item Important if continuous data supply needed (high-performance/interactive databases).
+    \item Rebuild performance influences MTBF.
+    \item Rebuild performance varies with RAID level.
+    \item Easiest for RAID 1 (data copied from another drive).
+    \item Other levels: need to access all other drives to rebuild.
+    \item Rebuild times: hours for large RAID 5 sets.
+    \item RAID level 0: used in high-performance apps where data loss not critical (e.g., scientific computing).
+    \item RAID level 1: popular for high reliability with fast recovery (e.g., small databases).
+    \item RAID 0 + 1 and 1 + 0: used where both performance and reliability important (e.g., small databases).
+    \item RAID 1: high space overhead.
+    \item RAID 5: often preferred for moderate data volumes.
+    \item RAID 6 and multidimensional RAID 6: most common in storage arrays (good performance/protection, no large space overhead).
+\end{itemize}
+
+\subsection{The InServ storage array}
+\begin{itemize}
+    \item Innovation blurs lines between technologies.
+    \item InServ storage array (HP 3Par):
+    \item Does not require drives configured at specific RAID level.
+    \item Each drive broken into 256-MB "chunklets".
+    \item RAID applied at chunklet level.
+    \item Drive participates in multiple/various RAID levels (chunklets used for multiple volumes).
+    \item Provides snapshots (similar to WAFL file system).
+    \item InServ snapshots: read-write and read-only.
+    \item Allows multiple hosts to mount copies of file system without own copies.
+    \item Host changes in own copy: copy-on-write, not reflected in other copies.
+    \item Further innovation: \textbf{utility storage}.
+    \item Some file systems: do not expand/shrink (original size only, changes require copying data).
+    \item Administrator configures InServ: provide host with large logical storage, initially small physical storage.
+    \item Host uses storage: unused drives allocated up to original logical level.
+    \item Host believes large fixed storage space, creates file systems.
+    \item Drives added/removed by InServ without file system noticing.
+    \item Feature: reduces drives needed by hosts, delays drive purchase.
+\end{itemize}
+
+\subsection{Extensions}
+\begin{itemize}
+    \item RAID concepts generalized to other storage devices: arrays of tapes, broadcast data over wireless.
+    \item Arrays of tapes: recover data even if one tape damaged.
+    \item Broadcast data: block split into short units, broadcast with parity unit.
+    \item If unit not received: reconstructed from other units.
+    \item Tape-drive robots: stripe data across drives (increase throughput, decrease backup time).
+\end{itemize}
+
+\subsection{Problems with RAID}
+\begin{itemize}
+    \item RAID does not always assure data availability.
+    \item Problems not protected by RAID: wrong file pointer, wrong pointers within file structure, incomplete writes ("torn writes"), accidental overwrite of file system structures.
+    \item RAID protects against physical media errors, not other hardware/software errors.
+    \item Hardware RAID controller failure or software RAID bug: total data loss.
+    \item Numerous potential perils for data due to software/hardware bugs.
+    \item \textbf{Solaris ZFS} file system: innovative approach using checksums.
+    \item ZFS: maintains internal checksums of all blocks (data, metadata).
+    \item Checksums: not kept with checksummed block, stored with pointer to block.
+    \item Example: \textbf{inode} (data structure for file system metadata) with pointers to data.
+    \item Inode contains checksum of each data block.
+    \item Problem with data: checksum incorrect, file system knows.
+    \item Data mirrored, one block correct checksum, one incorrect: ZFS automatically updates bad block with good one.
+    \item Directory entry pointing to inode: has checksum for inode.
+    \item Problem in inode: detected when directory accessed.
+    \item Checksumming throughout ZFS structures: higher consistency, error detection, error correction than RAID/standard file systems.
+    \item Extra overhead (checksum calculation, extra block read-modify-write): not noticeable (ZFS overall performance very fast).
+    \item Similar checksum feature: Linux BTRFS file system.
+    \item Another issue with most RAID implementations: lack of flexibility.
+    \item Example: 20 drives, four 5-drive RAID 5 sets $\implies$ four separate volumes.
+    \item Problem: file system too large for 5-drive set? Another needs little space?
+    \item If not known ahead: drive use/requirements change over time.
+    \item Even if 20 drives as one large RAID set: other issues.
+    \item Several volumes of various sizes built on set.
+    \item Some volume managers: do not allow changing volume size.
+    \item Mismatched file-system sizes.
+    \item Some volume managers allow size changes, but some file systems don't allow growth/shrinkage.
+    \item Volumes change size, but file systems need recreation.
+    \item ZFS: combines file-system management and volume management.
+    \item Drives/partitions of drives: gathered via RAID sets into \textbf{pools} of storage.
+    \item Pool: holds one or more ZFS file systems.
+    \item Entire pool's free space: available to all file systems within that pool.
+    \item ZFS uses memory model of \texttt{malloc()} and \texttt{free()} to allocate/release storage.
+    \item No artificial limits on storage use, no need to relocate/resize.
+    \item ZFS provides quotas (limit size) and reservations (assure growth).
+    \item Variables changed by file-system owner at any time.
+    \item Other systems (Linux): volume managers allow logical joining of multiple disks for larger volumes.
+\end{itemize}
+
+\subsection{Object storage}
+\begin{itemize}
+    \item General-purpose computers: typically use file systems.
+    \item Another approach: start with storage pool, place objects in pool.
+    \item Differs from file systems: no way to navigate pool and find objects.
+    \item Object storage: computer-oriented, designed for programs.
+    \item Typical sequence:
+    \begin{enumerate}
+        \item Create object in storage pool, receive object ID.
+        \item Access object via object ID.
+        \item Delete object via object ID.
+    \end{enumerate}
+    \item Object storage management software (\textbf{Hadoop file system} (\textit{HDFS}), \textbf{Ceph}): determines where to store objects, manages protection.
+    \item Typically on commodity hardware, not RAID arrays.
+    \item Example: HDFS stores copies of object on different computers.
+    \item Lower cost than storage arrays, fast access to object (on systems with copy).
+    \item All systems in Hadoop cluster access object, but only systems with copy have fast access.
+    \item Computations on data occur on those systems, results sent across network.
+    \item Other systems: need network connectivity to read/write object.
+    \item Object storage: usually for bulk storage, not high-speed random access.
+    \item Advantage: \textbf{horizontal scalability}.
+    \item Storage array: fixed max capacity.
+    \item Object store: add capacity by adding more computers with internal/external disks to pool.
+    \item Object storage pools: can be petabytes.
+    \item Key feature: each object self-describing (includes content description).
+    \item Also known as \textbf{content-addressable storage}: objects retrieved based on contents.
+    \item No set format for contents: \textbf{unstructured data}.
+    \item Not common on general-purpose computers, but huge amounts of data stored in object stores.
+    \item Examples: Google search contents, Dropbox, Spotify songs, Facebook photos.
+    \item Cloud computing (Amazon AWS): generally uses object stores (S3) to hold file systems/data objects for customer apps.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{redundant arrays of independent disks (RAID)} & Disk organization technique: two or more storage devices work together, usually with protection from device failure. \\
+\textbf{mean time between failure (MTBF)} & Statistical mean time a device is expected to work correctly before failing. \\
+\textbf{mirroring} & Storage RAID protection: two physical devices contain same content; if one fails, read from other. \\
+\textbf{mirrored volume} & Volume in which two devices are mirrored. \\
+\textbf{mean time to repair} & Statistical mean of time to repair a device. \\
+\textbf{mean time to data loss} & Statistical mean of time until data is lost. \\
+\textbf{data striping} & Splitting of data across multiple devices. \\
+\textbf{bit-level striping} & Splitting of data at bit level, each bit stored on separate device. \\
+\textbf{block-level striping} & Splitting of data at block level, each block stored on separate device. \\
+\textbf{RAID levels} & Various types of RAID protection. \\
+\textbf{read-modify-write cycle} & Write of data smaller than block requires entire block to be read, modified, and written back. \\
+\textbf{Galois field math} & Advanced error-correcting calculation in some RAID forms. \\
+\textbf{snapshot} & In file systems, a read-only view of a file system at a particular point in time. \\
+\textbf{replication} & In file systems, duplication and synchronization of data over network to another system. \\
+\textbf{hot spare} & Unused storage device ready to be used to recover data (e.g., in RAID set). \\
+\textbf{utility storage} & InServ feature: storage space can be increased as needed. \\
+\textbf{Solaris ZFS} & Advanced file system, first included as part of Solaris. \\
+\textbf{inode} & In many file systems, a per-file data structure holding most of the metadata of the file. \\
+\textbf{pool} & In ZFS, drives, partitions, or RAID sets that can contain one or more file systems. \\
+\textbf{Hadoop file system} & Example of object storage management software. \\
+\textbf{Ceph} & Brand of object storage management software. \\
+\textbf{horizontal scalability} & Ability to scale capacity by adding more items (computers) rather than expanding one. \\
+\textbf{content addressable storage} & Another term for object storage; objects retrieved based on their contents. \\
+\textbf{unstructured data} & Data not in a fixed format but rather free-form. \\
+\bottomrule
+\end{tabular}

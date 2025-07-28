@@ -125,8 +125,8 @@ sem_post(&sem);
 
 \subsection{POSIX condition variables}
 \begin{itemize}
-    \item Pthreads condition variables similar to those in Section \hyperref[sec:6.7]{6.7}.
-    \item Difference: Section \hyperref[sec:6.7]{6.7} uses monitors for locking; C (used with Pthreads) lacks monitors.
+    \item Pthreads condition variables are similar to those described in a previous chapter.
+    \item The difference is that the aforementioned chapter uses monitors for locking, whereas the C language, which is used with Pthreads, does not provide monitors.
     \item Locking accomplished by associating condition variable with a mutex lock.
     \item Data type: \texttt{pthread\_cond\_t}.
     \item Initialization: \texttt{pthread\_cond\_init()} function.
@@ -167,7 +167,14 @@ pthread_mutex_unlock(&mutex);
 \end{itemize}
 
 \subsection{Section glossary}
-\begin{itemize}
-    \item \textit{named semaphore}: POSIX scheduling construct, exists in file system, shareable by unrelated processes.
-    \item \textit{unnamed semaphore}: POSIX scheduling construct, usable only by threads in the same process.
-\end{itemize}
+\rowcolors{2}{gray!10}{white}
+\centering
+\begin{tabular}{>{\raggedright}p{0.35\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{named semaphore} & POSIX scheduling construct, exists in file system, shareable by unrelated processes. \\
+\textbf{unnamed semaphore} & POSIX scheduling construct, usable only by threads in the same process. \\
+\bottomrule
+\end{tabular}
+\vspace{\baselineskip}

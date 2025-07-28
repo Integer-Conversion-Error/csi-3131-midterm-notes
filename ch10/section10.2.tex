@@ -1,0 +1,126 @@
+\section{10.2 Demand paging}
+
+\subsection{Introduction to Demand Paging}
+\begin{itemize}
+    \item Program loading:
+    \begin{itemize}
+        \item Option 1: Load entire program into physical memory at execution.
+        \item Problem: May not need entire program initially (e.g., unselected options).
+    \end{itemize}
+    \item Alternative: Load pages only as needed $\rightarrow$ \textbf{demand paging}.
+    \item Pages loaded only when \textbf{demanded} during execution.
+    \item Unaccessed pages never loaded into physical memory.
+    \item Similar to paging with swapping.
+    \item Benefit: More efficient memory use by loading only needed portions.
+\end{itemize}
+
+\subsection{Basic Concepts of Demand Paging}
+\begin{itemize}
+    \item Load page into memory only when needed.
+    \item Process execution: some pages in memory, some in secondary storage.
+    \item Hardware support needed to distinguish: valid-invalid bit scheme.
+    \item Valid bit: page legal and in memory.
+    \item Invalid bit: page not valid (not in logical address space) or valid but in secondary storage.
+    \item Page-table entry for non-memory-resident page marked invalid.
+    \item Access to invalid page $\rightarrow$ \textbf{page fault}.
+    \item Page fault causes trap to OS.
+    \item Page fault handling procedure:
+    \begin{enumerate}
+        \item Check internal table (process control block) for valid/invalid memory access.
+        \item If invalid, terminate process. If valid but not in memory, page it in.
+        \item Find a free frame.
+        \item Schedule secondary storage operation to read page into new frame.
+        \item Storage read complete: modify internal table and page table (page now in memory).
+        \item Restart interrupted instruction; process accesses page as if always in memory.
+    \end{enumerate}
+    \item \textbf{Pure demand paging}: start process with no pages in memory; fault for pages as needed.
+    \item Programs tend to have \textbf{locality of reference} $\rightarrow$ reasonable demand paging performance.
+    \item Hardware for demand paging:
+    \begin{itemize}
+        \item \textbf{Page table}: marks entries invalid (valid-invalid bit or protection bits).
+        \item \textbf{Secondary memory}: holds non-main-memory pages (swap device, \textbf{swap space}).
+    \end{itemize}
+    \item Crucial requirement: ability to restart any instruction after page fault.
+    \item Save process state (registers, condition code, instruction counter) on page fault.
+    \item Restart process in exact same place/state, with desired page in memory.
+    \item Difficulty: instructions modifying multiple locations (e.g., IBM System 360/370 MVC).
+    \begin{itemize}
+        \item Solution 1: Microcode accesses both ends of blocks before modification; if fault, happens before modification.
+        \item Solution 2: Use temporary registers for overwritten values; restore old values on fault before trap.
+    \end{itemize}
+    \item Paging should be transparent to process.
+\end{itemize}
+
+\subsection{Free-frame List}
+\begin{itemize}
+    \item OS maintains \textbf{free-frame list}: pool of free frames for page faults.
+    \item Free frames also allocated for stack/heap segment expansion.
+    \item Most OS use \textbf{zero-fill-on-demand}: frames "zeroed-out" before allocation (security).
+    \item System startup: all available memory on free-frame list.
+    \item Free-frame list shrinks with requests; must be repopulated when low.
+\end{itemize}
+
+\subsection{Performance of Demand Paging}
+\begin{itemize}
+    \item Demand paging significantly affects performance.
+    \item \textbf{Effective access time} for demand-paged memory:
+    \begin{itemize}
+        \item Memory-access time ($ma$): 10 nanoseconds.
+        \item No page faults: effective access time = memory access time.
+        \item Page fault: read page from secondary storage, then access word.
+    \end{itemize}
+    \item Let $p$ = probability of page fault ($0 \le p \le 1$).
+    \item Effective access time = $(1 - p) \times ma + p \times \text{page fault time}$.
+    \item Page fault service time components:
+    \begin{enumerate}
+        \item Service page-fault interrupt.
+        \item Read in the page.
+        \item Restart the process.
+    \end{enumerate}
+    \item First and third tasks: 1 to 100 microseconds.
+    \item HDD page-switch time: ~8 milliseconds (3ms latency, 5ms seek, 0.05ms transfer).
+    \item Total paging time: ~8 milliseconds (hardware + software).
+    \item Add queuing time if device busy.
+    \item Example: $ma = 200$ ns, page-fault service time = 8 ms.
+    \begin{itemize}
+        \item Effective access time (ns) = $(1 - p) \times 200 + p \times 8,000,000$
+        \item $= 200 + 7,999,800 \times p$.
+    \end{itemize}
+    \item Effective access time directly proportional to \textbf{page-fault rate}.
+    \item If $p = 1/1000$, effective access time = 8.2 microseconds (40x slowdown).
+    \item To keep slowdown < 10\% (e.g., 220 ns effective access time):
+    \begin{itemize}
+        \item $220 > 200 + 7,999,800 \times p$
+        \item $20 > 7,999,800 \times p$
+        \item $p < 0.0000025$ (fewer than 1 fault per 399,990 accesses).
+    \end{itemize}
+    \item Low page-fault rate crucial for demand-paging performance.
+    \item Swap space I/O generally faster than file system I/O (larger blocks, no file lookups).
+    \item Swap space usage strategies:
+    \begin{itemize}
+        \item Copy entire file image to swap space at startup, then demand-page from swap space (disadvantage: initial copy).
+        \item Demand-page from file system initially, write pages to swap space when replaced (Linux, Windows).
+        \item Demand-page binary executables directly from file system; overwrite frames when replaced (never modified); file system acts as backing store (Linux, BSD UNIX).
+        \item \textbf{Anonymous memory} (stack, heap) still uses swap space.
+    \end{itemize}
+    \item Mobile OS (e.g., iOS) typically no swapping: demand-page from file system, reclaim read-only pages if memory constrained. Anonymous memory pages not reclaimed unless app terminated/releases memory.
+    \item Compressed memory is an alternative to swapping in mobile systems.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{demand paging} & Bringing in pages from storage as needed rather than entirely at process load time. \\
+    \textbf{page fault} & Fault from reference to a non-memory-resident page. \\
+    \textbf{pure demand paging} & Demand paging where no page is brought into memory until referenced. \\
+    \textbf{locality of reference} & Tendency of processes to reference memory in patterns, not randomly. \\
+    \textbf{swap space} & Secondary storage backing-store space for paged-out memory. \\
+    \textbf{free-frame list} & Kernel-maintained list of available free physical memory frames. \\
+    \textbf{zero-fill-on-demand} & Writing zeros into a page before making it available to a process. \\
+    \textbf{effective access time} & Measured/calculated time to access something (e.g., memory). \\
+    \textbf{page-fault rate} & Measure of how often a page fault occurs per memory access attempt. \\
+    \textbf{anonymous memory} & Memory not associated with a file; stored in swap space if dirty and paged out. \\
+    \bottomrule
+\end{tabular}

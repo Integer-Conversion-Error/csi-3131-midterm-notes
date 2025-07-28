@@ -1,0 +1,82 @@
+\section{Swapping}
+
+\begin{itemize}
+    \item Process instructions and data must be in memory for execution.
+    \item Process or portion can be \textbf{swapped} temporarily out of memory to a \textbf{backing store}.
+    \item Then brought back into memory for continued execution (Figure 9.5.1).
+    \item Swapping allows total physical address space of all processes to exceed real physical memory.
+    \item Increases degree of multiprogramming.
+\end{itemize}
+
+\subsection{Standard swapping}
+\begin{itemize}
+    \item Involves moving entire processes between main memory and backing store.
+    \item Backing store: fast secondary storage, large enough for process parts, direct access to memory images.
+    \item When process/part swapped to backing store, associated data structures (including per-thread data for multithreaded processes) must be written.
+    \item OS maintains metadata for swapped-out processes for restoration.
+    \item Advantage: allows physical memory to be oversubscribed, accommodates more processes than physical memory.
+    \item Idle/mostly idle processes good candidates for swapping.
+    \item Memory allocated to inactive processes can be dedicated to active processes.
+    \item If inactive swapped-out process becomes active, must be swapped back in (Figure 9.5.1).
+\end{itemize}
+
+\subsection{Swapping with paging}
+\begin{itemize}
+    \item Standard swapping generally no longer used in contemporary OS (exception: Solaris under dire circumstances).
+    \item Reason: time to move entire processes prohibitive.
+    \item Most systems (Linux, Windows) use variation: pages of a process swapped, not entire process.
+    \item Still allows physical memory oversubscription.
+    \item Does not incur cost of swapping entire processes (only small number of pages involved).
+    \item Term \textbf{swapping} now generally refers to standard swapping.
+    \item \textbf{Paging} refers to swapping with paging.
+    \item \textbf{Page out}: moves page from memory to backing store.
+    \item \textbf{Page in}: reverse process.
+    \item Illustrated in Figure 9.5.2 (subset of pages for processes A and B paged-out/paged-in).
+    \item Works well with virtual memory (Chapter Virtual Memory).
+\end{itemize}
+
+\subsection{Swapping on mobile systems}
+\begin{itemize}
+    \item Mobile systems typically do not support swapping.
+    \item Reasons:
+    \begin{itemize}
+        \item Flash memory (not hard disks) for nonvolatile storage $\rightarrow$ space constraint.
+        \item Limited number of writes flash memory tolerates before unreliability.
+        \item Poor throughput between main memory and flash memory.
+    \end{itemize}
+    \item Instead of swapping:
+    \begin{itemize}
+        \item Apple's iOS: asks applications to voluntarily relinquish allocated memory when free memory low.
+        \begin{itemize}
+            \item Read-only data (code) removed from main memory, reloaded from flash if needed.
+            \item Modified data (stack) never removed.
+            \item Applications failing to free memory may be terminated by OS.
+        \end{itemize}
+        \item Android: similar strategy, may terminate process if insufficient free memory.
+        \begin{itemize}
+            \item Before termination, writes \textbf{application state} to flash memory for quick restart.
+        \end{itemize}
+    \end{itemize}
+    \item Developers for mobile systems must carefully allocate/release memory to avoid excessive use or leaks.
+\end{itemize}
+
+\subsection*{System performance under swapping}
+\begin{itemize}
+    \item Swapping (any form) often sign of more active processes than available physical memory.
+    \item Two approaches:
+    \begin{itemize}
+        \item Terminate some processes.
+        \item Get more physical memory.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{swapped} & Moved between main memory and a backing store. Process swapped out to free main memory, then swapped back in to continue execution. \\
+    \textbf{backing store} & Secondary storage area used for process swapping. \\
+    \textbf{application state} & Software construct for data storage. \\
+    \bottomrule
+\end{tabular}

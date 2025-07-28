@@ -1,0 +1,210 @@
+\section{Other considerations}
+
+\subsection{Prepaging}
+\begin{itemize}
+    \item Pure demand paging: large number of page faults when process starts (initial locality).
+    \item \textbf{Prepaging}: attempt to prevent high initial paging.
+    \item Strategy: bring some/all needed pages into memory at once.
+    \item Example: working-set model, remember working set for suspended process.
+    \item Resume process: automatically bring entire working set back before restarting.
+    \item Advantage: cost of prepaging vs. cost of servicing page faults.
+    \item Risk: many prepaged pages may not be used.
+    \item Cost analysis:
+    \begin{itemize}
+        \item $s$ pages prepaged.
+        \item $\alpha$ fraction of $s$ pages actually used ($0 \le \alpha \le 1$).
+        \item Question: cost of $s \cdot (1 - \alpha)$ unnecessary pages vs. $s \cdot \alpha$ saved page faults.
+        \item If $\alpha \approx 0$, prepaging loses.
+        \item If $\alpha \approx 1$, prepaging wins.
+    \end{itemize}
+    \item Prepaging executable programs: difficult, unclear what pages to bring in.
+    \item Prepaging files: more predictable, often accessed sequentially.
+    \item Linux \texttt{readahead()} system call: prefetches file contents into memory.
+\end{itemize}
+
+\subsection{Page size}
+\begin{itemize}
+    \item New machine design: decision on best page size.
+    \item No single best page size; factors support various sizes.
+    \item Page sizes: invariably powers of 2, typically 4,096 ($2^{12}$) to 4,194,304 ($2^{22}$) bytes.
+    \item \textbf{Page table size}:
+    \begin{itemize}
+        \item Decreasing page size increases number of pages, thus page table size.
+        \item Example: 4 MB virtual memory.
+        \item 4,096 pages of 1,024 bytes vs. 512 pages of 8,192 bytes.
+        \item Large page size desirable for page table size (each active process has own copy).
+    \end{itemize}
+    \item \textbf{Memory utilization / Internal fragmentation}:
+    \begin{itemize}
+        \item Better utilized with smaller pages.
+        \item Process likely won't end exactly on page boundary.
+        \item Part of final page allocated but unused (internal fragmentation).
+        \item Average waste: half of final page.
+        \item 256 bytes waste for 512-byte page; 4,096 bytes for 8,192-byte page.
+        \item Minimize internal fragmentation: small page size needed.
+    \end{itemize}
+    \item \textbf{I/O time}:
+    \begin{itemize}
+        \item Read/write page time: seek, latency, transfer times.
+        \item Transfer time: proportional to page size (argues for small page size).
+        \item Latency/seek time: dwarf transfer time (e.g., 3ms latency, 5ms seek vs. 0.01ms transfer for 512 bytes).
+        \item Doubling page size: minimal increase in total I/O time.
+        \item Reading 1,024 bytes: 8.02ms for one 1,024-byte page vs. 16.02ms for two 512-byte pages.
+        \item Minimize I/O time: argues for larger page size.
+    \end{itemize}
+    \item \textbf{Locality / Resolution}:
+    \begin{itemize}
+        \item Smaller page size: total I/O reduced, improved locality.
+        \item Each page matches program locality more accurately.
+        \item Better \textbf{resolution}: isolate only memory actually needed.
+        \item Larger page size: allocate/transfer needed + unneeded data in same page.
+        \item Smaller page size: less I/O, less total allocated memory.
+    \end{itemize}
+    \item \textbf{Number of page faults}:
+    \begin{itemize}
+        \item Page size of 1 byte: page fault for each byte.
+        \item 200 KB process, half used: 1 page fault (200 KB page) vs. 102,400 page faults (1 byte page).
+        \item Each page fault: large overhead (interrupt, saving registers, replacing page, queuing, updating tables).
+        \item Minimize page faults: large page size needed.
+    \end{itemize}
+    \item Historical trend: toward larger page sizes, even for mobile systems.
+    \item Modern systems: much larger page sizes (e.g., Linux huge pages).
+\end{itemize}
+
+\subsection{TLB reach}
+\begin{itemize}
+    \item \textbf{Hit ratio} of TLB: percentage of virtual address translations resolved in TLB.
+    \item Increase hit ratio: increase number of entries (expensive, power hungry associative memory).
+    \item \textbf{TLB reach}: amount of memory accessible from TLB.
+    \item Calculation: number of entries $\times$ page size.
+    \item Ideally: working set for process stored in TLB.
+    \item Insufficient TLB reach: process spends time resolving memory references in page table.
+    \item Doubling TLB entries: doubles TLB reach.
+    \item Another approach: increase page size or provide multiple page sizes.
+    \item Increase page size (e.g., 4 KB to 16 KB): quadruples TLB reach.
+    \item Downside of larger page size: increased fragmentation for some applications.
+    \item Most architectures: support for multiple page sizes.
+    \item Linux example: default 4 KB, also \textbf{huge pages} (e.g., 2 MB).
+    \item ARM v8 architecture: support for different page/region sizes.
+    \item ARM v8 TLB entry: \textbf{contiguous bit}.
+    \item Contiguous bit set: entry maps contiguous (adjacent) blocks of memory.
+    \item Three arrangements for contiguous blocks in single TLB entry:
+    \begin{itemize}
+        \item 64-KB TLB entry: 16 $\times$ 4 KB adjacent blocks.
+        \item 1-GB TLB entry: 32 $\times$ 32 MB adjacent blocks.
+        \item 2-MB TLB entry: 32 $\times$ 64 KB adjacent blocks, or 128 $\times$ 16 KB adjacent blocks.
+    \end{itemize}
+    \item Multiple page sizes: OS (not hardware) may manage TLB.
+    \item TLB entry field: indicates page frame size or contiguous block.
+    \item Software TLB management: performance cost, but offset by increased hit ratio and TLB reach.
+\end{itemize}
+
+\subsection{Inverted page tables}
+\begin{itemize}
+    \item Purpose: reduce physical memory needed for virtual-to-physical address translations.
+    \item Method: one entry per page of physical memory, indexed by $<$process-id, page-number$>$.
+    \item Benefit: reduces physical memory for translation info.
+    \item Downside: no longer contains complete info about logical address space of a process.
+    \item Demand paging requires this info for page faults.
+    \item Solution: external page table (one per process) kept.
+    \item External page table: looks like traditional per-process page table, contains virtual page location.
+    \item Utility of inverted page tables: external tables referenced only on page fault, don't need to be quickly available.
+    \item External tables: themselves paged in/out as necessary.
+    \item Special case: page fault may cause another page fault (paging in external page table).
+    \item Requires careful kernel handling, delay in page-lookup processing.
+\end{itemize}
+
+\subsection{Program structure}
+\begin{itemize}
+    \item Demand paging: designed to be transparent to user program.
+    \item System performance improved if user/compiler aware of demand paging.
+    \item Example: Initializing 128x128 array, 128-word pages.
+    \item Row major order (\texttt{data[i][j]} with outer loop \texttt{j}, inner loop \texttt{i}):
+    \begin{itemize}
+        \item Zeros one word in each page, then another word in each page.
+        \item If $<$128 frames allocated: 128 $\times$ 128 = 16,384 page faults.
+    \end{itemize}
+    \item Column major order (\texttt{data[i][j]} with outer loop \texttt{i}, inner loop \texttt{j}):
+    \begin{itemize}
+        \item Zeros all words on one page before next.
+        \item Reduces page faults to 128.
+    \end{itemize}
+    \item Careful selection of data structures/programming structures: increase locality, lower page-fault rate, smaller working set.
+    \item Good locality: stack (access always to top).
+    \item Bad locality: hash table (scatters references).
+    \item Locality of reference: one measure of data structure efficiency.
+    \item Other factors: search speed, total memory references, total pages touched.
+    \item Compiler and loader effects on paging:
+    \begin{itemize}
+        \item Separating code and data, reentrant code: code pages read-only, never modified.
+        \item Clean pages: don't need to be paged out.
+        \item Loader: avoid placing routines across page boundaries (keep routine in one page).
+        \item Pack frequently calling routines into same page.
+        \item Variant of bin-packing problem: pack variable-sized load segments into fixed-sized pages, minimize interpage references.
+        \item Useful for large page sizes.
+    \end{itemize}
+\end{itemize}
+
+\subsection{I/O interlock and page locking}
+\begin{itemize}
+    \item Demand paging: sometimes need to allow pages to be \textbf{locked} in memory.
+    \item Situation: I/O to/from user (virtual) memory.
+    \item I/O often by separate I/O processor (e.g., USB storage controller given bytes/buffer address).
+    \item Problem scenario:
+    \begin{itemize}
+        \item Process issues I/O, put in queue.
+        \item CPU given to other processes.
+        \item Other processes cause page faults, replace page with I/O buffer (global replacement).
+        \item Pages paged out.
+        \item I/O request advances, I/O occurs to specified address.
+        \item Frame now used for different page of another process.
+    \end{itemize}
+    \item Solutions:
+    \begin{itemize}
+        \item Never execute I/O to user memory: data copied between system memory and user memory.
+        \item I/O only between system memory and device.
+        \item Extra copying: potentially high overhead.
+        \item Allow pages to be locked into memory: \textbf{lock bit} associated with every frame.
+        \item Locked frame: cannot be selected for replacement.
+        \item To write block to disk: lock pages containing block into memory.
+        \item When I/O complete: pages unlocked.
+    \end{itemize}
+    \item Lock bits used in various situations:
+    \begin{itemize}
+        \item OS kernel: some/all locked into memory (many OS cannot tolerate kernel page fault).
+        \item User processes: may need to lock pages (\textbf{pinning}).
+        \item Database process: manage memory chunk, move blocks between secondary storage/memory.
+        \item Pinning: common, most OS have system call for application to request.
+        \item Feature abuse: could stress memory-management algorithms.
+        \item Application often requires special privileges for pinning.
+    \end{itemize}
+    \item Lock bit for normal page replacement:
+    \begin{itemize}
+        \item Low-priority process faults, page read into memory.
+        \item High-priority process faults, needs replacement.
+        \item Sees newly brought-in page (clean, not referenced/modified).
+        \item Looks like perfect replacement.
+        \item Policy decision: allow replacement or not.
+        \item Preventing replacement of newly brought-in page until used once: use lock bit.
+        \item Page selected for replacement: lock bit on.
+        \item Remains on until faulting process dispatched again.
+    \end{itemize}
+    \item Danger of lock bit: may get turned on but never off (bug).
+    \item Locked frame becomes unusable.
+    \item Solaris: allows locking "hints", but can disregard if free-frame pool too small or process requests too many locked pages.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{prepaging} & Bringing pages into memory before they are requested. \\
+\textbf{hit ratio} & Percentage of times a cache provides a valid lookup (e.g., TLB effectiveness). \\
+\textbf{TLB reach} & Amount of memory addressable by the translation look-aside buffer. \\
+\textbf{huge pages} & Feature designating a region of physical memory for especially large pages. \\
+\textbf{contiguous bit} & In ARM v8 CPUs, a TLB bit indicating mapping to contiguous memory blocks. \\
+\textbf{locked} & Fixed in place; pages locked in memory to prevent paging out. \\
+\textbf{pinning} & Locking pages into memory to prevent them from being paged out. \\
+\bottomrule
+\end{tabular}

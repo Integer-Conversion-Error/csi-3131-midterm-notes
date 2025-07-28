@@ -1,0 +1,106 @@
+\section{HDD scheduling}
+
+\begin{itemize}
+    \item OS responsibility: use hardware efficiently.
+    \item For HDDs: minimize access time, maximize data transfer bandwidth.
+    \item Access time (for HDDs/mechanical storage):
+    \begin{itemize}
+        \item \textbf{seek time}: time for device arm to move heads to desired cylinder.
+        \item \textbf{rotational latency}: additional time for platter to rotate desired sector to head.
+    \end{itemize}
+    \item Device \textbf{bandwidth}: total bytes transferred / total time (first request to last transfer completion).
+    \item Improve access time and bandwidth: manage order of storage I/O requests.
+    \item Process needs I/O: issues system call to OS.
+    \item Request specifies: input/output, open file handle, memory address, amount of data.
+    \item Drive/controller available: request serviced immediately.
+    \item Drive/controller busy: new requests placed in queue.
+    \item Multiprogramming system: device queue often has pending requests.
+    \item Queue of requests: allows device drivers to improve performance via ordering (avoiding head seeks).
+    \item Past HDD interfaces: host specified track/head; much effort on disk scheduling.
+    \item Modern drives: do not expose these controls, map LBA to physical addresses internally.
+    \item Current disk scheduling goals: fairness, timeliness, optimizations (e.g., bunching sequential reads/writes).
+    \item Drives perform best with sequential I/O.
+    \item Absolute knowledge of head/physical block/cylinder locations: generally not possible on modern drives.
+    \item Approximation: increasing LBAs mean increasing physical addresses; close LBAs equate to physical proximity.
+\end{itemize}
+
+\subsection{FCFS scheduling}
+\begin{itemize}
+    \item Simplest disk scheduling: First-Come, First-Served (FCFS) or FIFO.
+    \item Intrinsically fair.
+    \item Generally does not provide fastest service.
+    \item Example: queue requests for cylinders 98, 183, 37, 122, 14, 124, 65, 67.
+    \item Initial head at 53.
+    \item Movement: 53 $\to$ 98 $\to$ 183 $\to$ 37 $\to$ 122 $\to$ 14 $\to$ 124 $\to$ 65 $\to$ 67.
+    \item Total head movement: 640 cylinders.
+    \item Problem: wild swing (e.g., 122 to 14 then back to 124).
+    \item Servicing requests for 37 and 14 together (before/after 122/124) would decrease head movement, improve performance.
+\end{itemize}
+
+\subsection{SCAN scheduling}
+\begin{itemize}
+    \item \textbf{SCAN algorithm}: disk arm starts at one end, moves to other, servicing requests.
+    \item Reaches other end: direction reversed, servicing continues.
+    \item Head continuously scans back and forth.
+    \item Also called \textbf{elevator algorithm}.
+    \item Example: requests 98, 183, 37, 122, 14, 124, 65, 67.
+    \item Initial head at 53, moving toward 0.
+    \item Servicing order: 53 $\to$ 37 $\to$ 14 $\to$ 0 (reverse) $\to$ 65 $\to$ 67 $\to$ 98 $\to$ 122 $\to$ 124 $\to$ 183.
+    \item Request just in front of head: serviced almost immediately.
+    \item Request just behind head: waits until arm moves to end, reverses, comes back.
+    \item Uniform distribution of requests: few requests immediately in front of head after reversal (recently serviced).
+    \item Heaviest density of requests: at other end of disk (waited longest).
+\end{itemize}
+
+\subsection{C-SCAN scheduling}
+\begin{itemize}
+    \item \textbf{Circular SCAN (C-SCAN) scheduling}: variant of SCAN for more uniform wait time.
+    \item Moves head from one end to other, servicing requests.
+    \item Reaches other end: immediately returns to beginning of disk, no servicing on return trip.
+    \item Essentially treats cylinders as circular list.
+    \item Example: requests 98, 183, 37, 122, 14, 124, 65, 67.
+    \item Initial head at 53, moving from 0 to 199.
+    \item Servicing order: 53 $\to$ 65 $\to$ 67 $\to$ 98 $\to$ 122 $\to$ 124 $\to$ 183 $\to$ 199 (return to 0) $\to$ 14 $\to$ 37.
+\end{itemize}
+
+\subsection{Selection of a disk-scheduling algorithm}
+\begin{itemize}
+    \item Many disk-scheduling algorithms exist, rarely used.
+    \item Optimal order: can be defined for any request list, but computation may not justify savings over SCAN.
+    \item Performance depends heavily on number and types of requests.
+    \item Example: queue with one outstanding request $\implies$ all algorithms behave like FCFS.
+    \item SCAN and C-SCAN: better for heavy disk load, less likely to cause starvation.
+    \item Starvation still possible: Linux created \textbf{deadline} scheduler.
+    \item Deadline scheduler:
+    \begin{itemize}
+        \item Maintains separate read and write queues.
+        \item Gives reads priority (processes more likely to block on read).
+        \item Queues sorted in LBA order (implements C-SCAN).
+        \item All I/O requests sent in batch in LBA order.
+        \item Keeps four queues: two read, two write (one sorted by LBA, other by FCFS).
+        \item Checks after each batch: FCFS requests older than configured age (default 500 ms)?
+        \item If so: LBA queue (read/write) with old request selected for next batch.
+    \end{itemize}
+    \item Deadline I/O scheduler: default in Linux RedHat 7.
+    \item RHEL 7 also includes:
+    \begin{itemize}
+        \item NOOP: preferred for CPU-bound systems using fast storage (NVM devices).
+        \item \textbf{Completely Fair Queueing scheduler} (\textit{CFQ}): default for SATA drives.
+        \item CFQ maintains three queues (insertion sort, LBA order): real time, best effort (default), idle.
+        \item Each has exclusive priority (real time $>$ best effort $>$ idle); starvation possible.
+        \item Uses historical data: anticipates if process will issue more I/O requests soon.
+        \item If so: idles waiting for new I/O, ignores other queued requests (minimizes seek time, assumes locality of reference per process).
+    \end{itemize}
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{bandwidth} & Total amount of data transferred divided by total time between first request for service and completion of last transfer. \\
+\textbf{SCAN algorithm} & HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then reverses. \\
+\textbf{Circular SCAN (CSCAN) scheduling} & HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then returns to beginning without servicing. \\
+\textbf{Completely Fair Queueing (CFQ)} & In Linux, default I/O scheduler in kernel 2.6 and later. \\
+\bottomrule
+\end{tabular}

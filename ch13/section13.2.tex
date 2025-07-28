@@ -1,0 +1,82 @@
+\section{Access methods}
+
+\subsection*{Accessing File Information}
+\begin{itemize}
+    \item Files store information; must be accessed and read into memory.
+    \item Information accessed in several ways.
+    \item Some systems provide only one access method; others many.
+    \item Choosing right method: major design problem.
+\end{itemize}
+
+\subsection*{Sequential Access}
+\begin{itemize}
+    \item Simplest access method: \textbf{sequential access}.
+    \item Information processed in order, one record after another.
+    \item Most common (editors, compilers).
+    \item \texttt{read\_next()}: reads next portion, automatically advances file pointer.
+    \item \texttt{write\_next()}: appends to end, advances to end of newly written material.
+    \item File can be reset to beginning.
+    \item Some systems: skip forward/backward \texttt{n} records.
+    \item Based on tape model of file.
+    \item Works on sequential-access devices and random-access ones.
+\end{itemize}
+
+\subsection*{Direct Access}
+\begin{itemize}
+    \item Another method: \textbf{direct access} (or \textbf{relative access}).
+    \item File: fixed-length \textbf{logical records}.
+    \item Programs read/write records rapidly in no particular order.
+    \item Based on disk model of file (disks allow random access).
+    \item File viewed as numbered sequence of blocks/records.
+    \item No restrictions on read/write order.
+    \item Great use for immediate access to large info amounts (e.g., databases).
+    \item Example: airline reservation system, flight info in block identified by flight number.
+    \item Direct-access file operations: include block number as parameter.
+    \item \texttt{read(n)}, \texttt{write(n)} instead of \texttt{read\_next()}, \texttt{write\_next()}.
+    \item Alternative: retain \texttt{read\_next()}, \texttt{write\_next()}, add \texttt{position\_file(n)}.
+    \item Block number provided by user: \textbf{relative block number}.
+    \item Relative block number: index relative to beginning of file (first is 0, next 1, etc.).
+    \item OS decides file placement (\textbf{allocation problem}).
+    \item Prevents user from accessing non-file portions of file system.
+    \item Some systems start relative block numbers at 0, others at 1.
+    \item Satisfying request for record \texttt{N}: turned into I/O request for \texttt{N} bytes starting at \texttt{N} * (logical record length).
+    \item Logical records fixed size: easy to read, write, delete a record.
+    \item Not all OS support both sequential and direct access.
+    \item Some require file defined as sequential/direct at creation.
+    \item Simulate sequential access on direct-access file: keep \texttt{cp} variable for current position.
+    \item Simulating direct-access on sequential-access: extremely inefficient and clumsy.
+\end{itemize}
+
+\subsection*{Other Access Methods}
+\begin{itemize}
+    \item Built on top of direct-access method.
+    \item Involve constructing an \textbf{index} for the file.
+    \item Index: contains pointers to various blocks (like book index).
+    \item Find record: search index, use pointer to access file directly.
+    \item Example: retail-price file (UPCs, prices). Sorted by UPC.
+    \item Index: first UPC in each block. Can be kept in memory.
+    \item Binary search index $\rightarrow$ find block $\rightarrow$ access block.
+    \item Large files: index file too large for memory.
+    \item Solution: index for the index file (primary index $\rightarrow$ secondary index $\rightarrow$ data).
+    \item Example: IBM ISAM (indexed sequential-access method).
+    \item Small main index points to disk blocks of secondary index.
+    \item Secondary index blocks point to actual file blocks.
+    \item File sorted on key.
+    \item Find item: binary search main index $\rightarrow$ get secondary index block $\rightarrow$ binary search secondary index $\rightarrow$ find block with record $\rightarrow$ sequential search block.
+    \item Any record located by at most two direct-access reads.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{sequential access} & File-access method: contents read in order, beginning to end. \\
+    \textbf{direct access} & File-access method: contents read in random order. \\
+    \textbf{relative access} & File-access method: contents read in random order. \\
+    \textbf{logical records} & File contents logically designated as fixed-length structured data. \\
+    \textbf{relative block number} & Index relative to beginning of file (first is block 0). \\
+    \textbf{allocation problem} & OS determination of where to store file blocks. \\
+    \textbf{index} & Access method built on direct access; file contains index with pointers to contents. \\
+    \bottomrule
+\end{tabular}

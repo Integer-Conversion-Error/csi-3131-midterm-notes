@@ -1,0 +1,154 @@
+\section{Directory structure}
+
+Directory: symbol table translating file names to file control blocks.
+Organization must allow:
+\begin{itemize}
+    \item Insert entries
+    \item Delete entries
+    \item Search for named entry
+    \item List all entries
+\end{itemize}
+
+Operations on a directory:
+\begin{itemize}
+    \item \textbf{Search for a file}: Find entry for particular file; find files matching pattern.
+    \item \textbf{Create a file}: Add new files to directory.
+    \item \textbf{Delete a file}: Remove file from directory; may leave hole, defragmentation needed.
+    \item \textbf{List a directory}: List files and their entry contents.
+    \item \textbf{Rename a file}: Change file name when contents/use changes; may change position.
+    \item \textbf{Traverse the file system}: Access every directory/file; for backup or space release.
+\end{itemize}
+
+\subsection{Single-level directory}
+\begin{itemize}
+    \item Simplest structure: all files in same directory.
+    \item Easy to support and understand.
+    \item Limitations:
+    \begin{itemize}
+        \item Files must have unique names (name collision problem for multiple users).
+        \item Difficult for single user to remember many file names.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Two-level directory}
+\begin{itemize}
+    \item Separate directory for each user.
+    \item Each user has own \textbf{user file directory (UFD)}.
+    \item System's \textbf{main file directory (MFD)} indexed by user name/account, points to UFD.
+    \item When user refers to file, only their UFD searched.
+    \item Different users can have same file names (unique within each UFD).
+    \item OS searches only user's UFD for create/delete.
+    \item UFDs created/deleted by special system program (restricted to administrators).
+    \item Disadvantages:
+    \begin{itemize}
+        \item Isolates users; disadvantage for cooperation.
+        \item To access another user's file, must specify user name and file name.
+        \item Two-level directory as a tree (MFD root, UFDs descendants, files leaves).
+        \item User name + file name = \textbf{path name}.
+        \item Example: \texttt{/userb/test.txt} or \texttt{C:\textbackslash{}userb\textbackslash{}test}.
+    \end{itemize}
+    \item System files:
+    \begin{itemize}
+        \item Copying system files to each UFD wastes space.
+        \item Solution: special user directory for system files (e.g., user 0).
+        \item OS first searches local UFD, then special system directory.
+        \item Sequence of directories searched: \textbf{search path}.
+        \item Search path can be extended; users can have own search paths.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Tree-structured directories}
+\begin{itemize}
+    \item Generalization of two-level directory to arbitrary height.
+    \item Most common directory structure.
+    \item Root directory; every file has unique path name.
+    \item Directory (or subdirectory) contains files or subdirectories.
+    \item Directory often treated as special file; one bit defines entry as file (0) or subdirectory (1).
+    \item Special system calls to create/delete directories.
+    \item Each process has a \textbf{current directory}.
+    \item Reference to file: current directory searched.
+    \item If not in current directory: specify path name or change current directory.
+    \item Initial current directory from accounting file.
+    \item Path names:
+    \begin{itemize}
+        \item \textbf{Absolute path name}: begins at root (e.g., "/"), follows path down.
+        \item \textbf{Relative path name}: defines path from current directory.
+        \item Example: if current is \texttt{/spell/mail}, \texttt{prt/first} is same as \texttt{/spell/mail/prt/first}.
+    \end{itemize}
+    \item User defines subdirectories for organization (e.g., by topic, info type).
+    \item Deletion of a directory:
+    \begin{itemize}
+        \item If empty: entry simply deleted.
+        \item If not empty:
+        \begin{itemize}
+            \item Some systems: only delete if empty (user must delete contents recursively first).
+            \item Others (e.g., UNIX \texttt{rm -r}): delete directory and all its files/subdirectories recursively. More convenient, but dangerous.
+        \end{itemize}
+    \end{itemize}
+    \item Users can access other users' files by specifying path name or changing current directory.
+\end{itemize}
+
+\subsection{Acyclic-graph directories}
+\begin{itemize}
+    \item Allows directories to share subdirectories and files.
+    \item No cycles (loops) in the graph.
+    \item Shared file: one actual file exists, changes visible to all.
+    \item Shared subdirectory: new files appear in all shared subdirectories.
+    \item Implementation:
+    \begin{itemize}
+        \item \textbf{Link}: pointer to another file/subdirectory (e.g., absolute/relative path name).
+        \item \textbf{Resolve}: use path name in link to locate real file.
+        \item OS ignores links during directory traversal to preserve acyclic structure.
+        \item Duplicate all info in both sharing directories: entries identical, but consistency issues on modification.
+    \end{itemize}
+    \item Problems:
+    \begin{itemize}
+        \item Multiple absolute path names for same file (aliasing).
+        \item Traversing entire file system: avoid traversing shared structures more than once.
+        \item Deletion: when can space be deallocated?
+        \begin{itemize}
+            \item Deleting file leaves dangling pointers if other links exist.
+            \item Symbolic links: deletion of link doesn't affect original file. If original deleted, links dangle.
+            \item Preserve file until all references deleted: use \textbf{reference count}.
+            \item Increment count on new link/entry, decrement on deletion. Delete when count is 0.
+            \item UNIX uses for \textbf{hard links}.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{General graph directory}
+\begin{itemize}
+    \item Allows cycles in the directory structure.
+    \item Primary advantage of acyclic graph: simpler traversal and deletion algorithms.
+    \item Problems with cycles:
+    \begin{itemize}
+        \item Infinite loops during search/traversal.
+        \item Reference count may not be 0 even if file/directory is inaccessible.
+        \item Requires \textbf{garbage collection} to determine when space can be reallocated (time consuming for disk-based systems).
+    \end{itemize}
+    \item Avoiding cycles: computationally expensive to detect.
+    \item Simpler: bypass links during directory traversal.
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Section glossary}
+\label{tab:section_glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{gray!20} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{user file directory (UFD)} & Per-user directory of files in two-level directory implementation. \\
+\textbf{main file directory (MFD)} & Index pointing to each UFD in two-level directory implementation. \\
+\textbf{path name} & File-system name for a file, containing mount-point and directory-entry info to locate it (e.g., "C:/foo/bar.txt"). \\
+\textbf{search path} & Sequence of directories searched for an executable file when a command is executed. \\
+\textbf{absolute path name} & Path name starting at the top of the file system hierarchy. \\
+\textbf{relative path name} & Path name starting at a relative location (e.g., current directory). \\
+\textbf{acyclic graph} & Directory structure implementation that contains no cycles (loops). \\
+\textbf{link} & File that has no contents but points to another file. \\
+\textbf{resolve} & To follow a link and find the target file. \\
+\textbf{hard links} & File-system links where a file has two or more names pointing to the same inode. \\
+\textbf{garbage collection} & Recovery of space containing no-longer-valid data. \\
+\bottomrule
+\end{tabular}
+\end{table}

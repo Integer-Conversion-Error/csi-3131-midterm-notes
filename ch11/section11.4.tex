@@ -1,0 +1,47 @@
+\section{Error detection and correction}
+
+\begin{itemize}
+    \item Error detection and correction: fundamental to memory, networking, storage.
+    \item \textbf{Error detection}: determines if problem occurred (e.g., bit change in DRAM, network packet change, data block change).
+    \item By detecting issue: system can halt operation, report error, warn of failing/failed device.
+    \item Memory systems: detect errors using parity bits.
+    \item Each byte: associated parity bit (records even/odd number of 1s).
+    \item Single-bit error: parity changes, does not match stored parity $\implies$ detected.
+    \item Stored parity bit damaged: does not match computed parity $\implies$ detected.
+    \item All single-bit errors detected.
+    \item Double-bit error: might go undetected.
+    \item Parity: calculated by XORing bits.
+    \item Requires extra bit of memory per byte.
+    \item Parity: one form of \textbf{checksums}.
+    \item \textbf{Checksums}: use modular arithmetic to compute, store, compare values on fixed-length words.
+    \item Another error-detection method: \textbf{cyclic redundancy check} (\textbf{CRCs}).
+    \item CRCs: use hash function to detect multiple-bit errors.
+    \item \textbf{Error-correction code} (\textit{ECC}): detects and corrects problems.
+    \item Correction: uses algorithms and extra storage.
+    \item Codes vary: based on extra storage needed, number of errors correctable.
+    \item Disk drives: use per-sector ECC.
+    \item Flash drives: use per-page ECC.
+    \item Controller writes sector/page: ECC written with value calculated from data.
+    \item Sector/page read: ECC recalculated, compared with stored value.
+    \item Mismatch: data corrupted, storage media may be bad.
+    \item ECC is error correcting: contains enough info to identify changed bits and calculate correct values (if few bits corrupted).
+    \item Reports recoverable \textbf{soft error}.
+    \item Too many changes, ECC cannot correct: non-correctable \textbf{hard error} signaled.
+    \item Controller automatically performs ECC processing on read/write.
+    \item Error detection/correction: frequently differentiators between consumer and enterprise products.
+    \item ECC: used in some systems for DRAM error correction and data path protection.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{error detection} & Determining if a problem has occurred (e.g., data corruption). \\
+\textbf{checksum} & General term for an error detection and correction code. \\
+\textbf{cyclic redundancy check (CRCs)} & Error-detection method using a hash function to detect multiple-bit errors. \\
+\textbf{error-correcting code (ECC)} & Value calculated from data bytes, recalculated later to check for changes, and can correct errors. \\
+\textbf{soft error} & Recoverable error by retrying the operation. \\
+\textbf{hard error} & Unrecoverable error, possibly resulting in data loss. \\
+\bottomrule
+\end{tabular}

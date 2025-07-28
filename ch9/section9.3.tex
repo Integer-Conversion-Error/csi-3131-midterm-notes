@@ -1,0 +1,212 @@
+\subsection{9.3 Paging}
+
+\begin{itemize}
+    \item Memory management previously required contiguous physical address space.
+    \item \textbf{Paging}: memory-management scheme allowing noncontiguous physical address space.
+    \item Avoids external fragmentation and compaction issues.
+    \item Used in most operating systems (servers to mobile devices) due to advantages.
+    \item Implemented through OS and hardware cooperation.
+\end{itemize}
+
+\subsubsection*{Basic method}
+\begin{itemize}
+    \item Breaking physical memory into fixed-sized blocks: \textbf{frames}.
+    \item Breaking logical memory into same-sized blocks: \textbf{pages}.
+    \item Process execution: pages loaded into any available memory frames (from file system or backing store).
+    \item Backing store divided into fixed-sized blocks (same size as frames or clusters).
+    \item Logical address space totally separate from physical address space.
+    \item CPU-generated address divided into two parts:
+    \begin{itemize}
+        \item \textbf{page number} (\textbf{p})
+        \item \textbf{page offset} (\textbf{d})
+    \end{itemize}
+    \item Page number: index into per-process \textbf{page table}.
+    \item Page table: contains base address of each frame in physical memory.
+    \item Offset: location in the referenced frame.
+    \item Base address of frame + page offset = physical memory address.
+    \item MMU steps to translate logical to physical address:
+    \begin{enumerate}
+        \item Extract page number \textit{p}, use as index into page table.
+        \item Extract corresponding frame number \textit{f} from page table.
+        \item Replace page number \textit{p} with frame number \textit{f}.
+    \end{enumerate}
+    \item Offset \textit{d} does not change; frame number and offset comprise physical address.
+    \item Page size (like frame size) defined by hardware.
+    \item Page size: power of 2 (typically 4 KB to 1 GB).
+    \item Power of 2 page size: easy translation of logical address to page number/offset.
+    \item Logical address space $2^m$, page size $2^n$ bytes:
+    \begin{itemize}
+        \item High-order $m-n$ bits: page number.
+        \item Low-order $n$ bits: page offset.
+    \end{itemize}
+    \item Paging: form of dynamic relocation.
+    \item Every logical address bound by paging hardware to physical address.
+    \item No external fragmentation with paging (any free frame allocated).
+    \item May have internal fragmentation: last frame allocated may not be full.
+    \item Average internal fragmentation: one-half page per process.
+    \item Small page sizes desirable (less internal fragmentation).
+    \item Overhead per page-table entry reduced with larger page sizes.
+    \item Disk I/O more efficient with larger data transfers.
+    \item Page sizes grown over time (processes, data sets, main memory larger).
+    \item Typical page sizes: 4 KB or 8 KB. Some systems support multiple sizes (e.g., Windows 10: 4 KB, 2 MB; Linux: default 4 KB, \textbf{huge pages}).
+    \item 32-bit CPU: page-table entry typically 4 bytes.
+    \item 32-bit entry can point to $2^{32}$ physical page frames.
+    \item Frame size 4 KB ($2^{12}$): system with 4-byte entries can address $2^{44}$ bytes (16 TB) physical memory.
+    \item Physical memory size typically different from max logical size of process.
+    \item Page-table entries contain other info, reducing bits for frame addresses.
+    \item Process arrives: size in pages examined. Each page needs one frame.
+    \item If $n$ pages needed, $n$ frames must be available.
+    \item First page loaded into allocated frame, frame number in page table.
+    \item Next page into another frame, its frame number in page table, etc.
+    \item Clear separation: programmer's view of memory vs. actual physical memory.
+    \item Programmer views memory as single space for one program.
+    \item User program scattered throughout physical memory (holds other programs).
+    \item Address-translation hardware reconciles views.
+    \item Logical addresses translated to physical addresses (hidden from programmer, controlled by OS).
+    \item User process cannot access unowned memory (no way to address outside its page table).
+    \item OS manages physical memory: aware of allocation details (allocated/available frames, total frames).
+    \item Information kept in system-wide data structure: \textbf{frame table}.
+    \item Frame table: one entry per physical page frame (free/allocated, to which process/page).
+    \item OS aware user processes operate in user space; logical addresses mapped to physical.
+    \item System calls with address parameters: address mapped to correct physical address.
+    \item OS maintains copy of page table for each process (like instruction counter, registers).
+    \item Used for manual logical-to-physical translation by OS.
+    \item Used by CPU dispatcher to define hardware page table when process allocated CPU.
+    \item Paging increases context-switch time.
+\end{itemize}
+
+\subsubsection*{Hardware support}
+\begin{itemize}
+    \item Page tables are per-process data structures.
+    \item Pointer to page table stored in process control block (with other registers).
+    \item CPU scheduler selects process: reloads user registers and hardware page-table values from stored user page table.
+    \item Hardware implementation of page table:
+    \begin{itemize}
+        \item Simplest: dedicated high-speed hardware registers (efficient translation).
+        \item Increases context-switch time (registers exchanged).
+        \item Feasible for small page tables (e.g., 256 entries).
+    \end{itemize}
+    \item Contemporary CPUs: much larger page tables (e.g., $2^{20}$ entries).
+    \item Registers not feasible for large page tables.
+    \item Page table kept in main memory.
+    \item \textbf{Page-table base register} (\textbf{PTBR}) points to page table.
+    \item Changing page tables: only change PTBR (reduces context-switch time).
+\end{itemize}
+
+\subsubsection*{Translation look-aside buffer}
+\begin{itemize}
+    \item Storing page table in main memory: slower memory access times.
+    \item Accessing data: two memory accesses needed (one for page-table entry, one for actual data).
+    \item Memory access slowed by factor of 2 (intolerable).
+    \item Standard solution: special, small, fast-lookup hardware cache: \textbf{translation look-aside buffer} (\textbf{TLB}).
+    \item TLB: associative, high-speed memory.
+    \item Each TLB entry: key (tag) and value.
+    \item Item presented to associative memory: compared with all keys simultaneously.
+    \item Item found: corresponding value returned (fast search).
+    \item TLB lookup: part of instruction pipeline (no performance penalty).
+    \item TLB must be small (32 to 1,024 entries).
+    \item Some CPUs: separate instruction and data address TLBs (doubles entries).
+    \item TLB used with page tables:
+    \begin{itemize}
+        \item CPU generates logical address: MMU checks if page number in TLB.
+        \item Page number found (\textbf{TLB hit}): frame number immediately available, used to access memory.
+        \item Page number not in TLB (\textbf{TLB miss}): memory reference to page table made.
+        \item Frame number obtained: used to access memory.
+        \item Page number and frame number added to TLB for future quick reference.
+    \end{itemize}
+    \item TLB full: existing entry replaced (LRU, round-robin, random policies).
+    \item Some CPUs allow OS participation in LRU replacement.
+    \item Some TLBs allow entries to be \textbf{wired down} (cannot be removed, e.g., kernel code).
+    \item Some TLBs store \textbf{address-space identifiers} (\textbf{ASIDs}) in each entry.
+    \item ASID: uniquely identifies process, provides address-space protection.
+    \item TLB resolves virtual page numbers: ensures current process ASID matches virtual page ASID.
+    \item ASIDs don't match: treated as TLB miss.
+    \item ASID allows TLB to contain entries for multiple processes simultaneously.
+    \item TLB without ASIDs: must be \textbf{flushed} (erased) on each context switch.
+    \item Prevents next process from using wrong translation info (old entries with invalid physical addresses).
+    \item \textbf{Hit ratio}: percentage of times page number found in TLB.
+    \item Example: 80\% hit ratio, 10 ns memory access.
+    \begin{itemize}
+        \item Effective memory-access time = (0.80 * 10 ns) + (0.20 * 20 ns) = 8 ns + 4 ns = 12 ns.
+    \end{itemize}
+    \item 99\% hit ratio: (0.99 * 10 ns) + (0.01 * 20 ns) = 9.9 ns + 0.2 ns = 10.1 ns.
+    \item Modern CPUs: multiple TLB levels (e.g., Intel Core i7: L1 instruction TLB, L1 data TLB, L2 TLB).
+    \item Miss at L1: check L2. Miss at L2: walk page-table entries in memory (hundreds of cycles) or interrupt OS.
+    \item Hardware features significantly affect memory performance.
+    \item OS improvements (paging) affect and are affected by hardware changes (TLBs).
+    \item TLBs are hardware feature, but OS designers must understand their function/features.
+    \item Optimal OS design for platform: implement paging according to TLB design.
+    \item TLB design changes may necessitate OS paging implementation changes.
+\end{itemize}
+
+\subsubsection*{Protection}
+\begin{itemize}
+    \item Memory protection in paged environment: protection bits with each frame (in page table).
+    \item One bit: read-write or read-only page.
+    \item Every memory reference through page table: computes physical address, checks protection bits.
+    \item Attempt to write to read-only page: hardware trap to OS (memory-protection violation).
+    \item Finer protection: read-only, read-write, execute-only (separate bits for each access type).
+    \item Illegal attempts trapped to OS.
+    \item Additional bit in page table entry: \textbf{valid-invalid} bit.
+    \item Valid: page in process's logical address space (legal page).
+    \item Invalid: page not in process's logical address space.
+    \item Illegal addresses trapped by valid-invalid bit.
+    \item OS sets this bit for each page to allow/disallow access.
+    \item Example: 14-bit address space (0-16383), program uses 0-10468, page size 2 KB.
+    \item Pages 0-5 mapped normally. Pages 6-7: valid-invalid bit set to invalid $\rightarrow$ trap to OS.
+    \item Problem: program extends to 10468, but references to page 5 (up to 12287) are valid.
+    \item This reflects internal fragmentation of paging.
+    \item Rarely does process use all address range (many use small fraction).
+    \item Wasteful to create page table for every page in address range if unused.
+    \item Some systems: \textbf{page-table length register} (\textbf{PTLR}) indicates page table size.
+    \item PTLR value checked against every logical address (verify in valid range).
+    \item Test failure: error trap to OS.
+\end{itemize}
+
+\subsubsection*{Shared pages}
+\begin{itemize}
+    \item Advantage of paging: possibility of \textbf{sharing} common code.
+    \item Important in multi-process environment (e.g., standard C library \texttt{libc}).
+    \item Option: each process loads own copy of \texttt{libc} (e.g., 40 processes, 2 MB \texttt{libc} $\rightarrow$ 80 MB memory).
+    \item If code is \textbf{reentrant code}: can be shared.
+    \item Reentrant code: non-self-modifying code (never changes during execution).
+    \item Two or more processes can execute same code simultaneously.
+    \item Each process: own copy of registers and data storage.
+    \item Only one copy of \texttt{libc} in physical memory.
+    \item Page table for each user process maps to same physical copy of \texttt{libc}.
+    \item Significant memory saving (e.g., 2 MB instead of 80 MB for 40 processes).
+    \item Other shared programs: compilers, window systems, database systems.
+    \item Shared libraries (from Dynamic linking section) typically implemented with shared pages.
+    \item Code must be reentrant to be sharable.
+    \item OS should enforce read-only nature of shared code.
+    \item Sharing memory among processes similar to sharing address space by threads.
+    \item Shared memory (interprocess communication) implemented using shared pages.
+    \item Paging provides numerous benefits beyond sharing (covered in Virtual Memory chapter).
+\end{itemize}
+
+\subsubsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{paging} & Memory management scheme avoiding external fragmentation by splitting physical memory into fixed-sized frames and logical memory into pages. \\
+    \textbf{frames} & Fixed-sized blocks of physical memory. \\
+    \textbf{page} & Fixed-sized block of logical memory. \\
+    \textbf{page number (p)} & Part of CPU-generated memory address in paged system; index into page table. \\
+    \textbf{page offset (d)} & Part of CPU-generated memory address in paged system; offset of location within page. \\
+    \textbf{page table} & Table in paged memory containing base address of each physical memory frame, indexed by logical page number. \\
+    \textbf{huge pages} & Feature designating region of physical memory for especially large pages. \\
+    \textbf{frame table} & Table in paged memory containing frame details (allocated/free, total frames). \\
+    \textbf{page-table base register (PTBR)} & CPU register pointing to the in-memory page table. \\
+    \textbf{translation look-aside buffer (TLB)} & Small, fast-lookup hardware cache in paged memory address translation for fast access to subset of addresses. \\
+    \textbf{TLB miss} & TLB lookup failing to provide address translation because it's not in TLB. \\
+    \textbf{wired down} & TLB entry locked into TLB, not replaceable by usual algorithm. \\
+    \textbf{address-space identifier (ASIDs)} & Part of TLB entry identifying associated process; causes TLB miss if requesting process ID doesn't match. \\
+    \textbf{flush} & Erasure of entries in TLB or other cache to remove invalid data. \\
+    \textbf{hit ratio} & Percentage of times a cache provides a valid lookup (e.g., TLB effectiveness measure). \\
+    \textbf{effective memory-access time} & Statistical or real measure of CPU time to read/write to memory. \\
+    \textbf{valid-invalid} & Page-table bit indicating if entry points to page within process's logical address space. \\
+    \textbf{page-table length register (PTLR)} & CPU register indicating size of the page table. \\
+    \textbf{reentrant code} & Code supporting multiple concurrent threads (can be shared). \\
+    \bottomrule
+\end{tabular}

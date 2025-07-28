@@ -1,0 +1,187 @@
+\section{Application I/O interface}
+
+\subsection{Structuring Techniques and Interfaces}
+\begin{itemize}
+    \item Goal: treat I/O devices uniformly.
+    \item Example: open file on disk without knowing disk type.
+    \item Add new devices without OS disruption.
+    \item Approach: abstraction, encapsulation, software layering.
+    \item Abstract away device differences by identifying general kinds.
+    \item Each kind accessed via standardized functions (\textbf{interface}).
+    \item Differences encapsulated in kernel modules (\textbf{device drivers}).
+    \item Device drivers: custom-tailored to specific devices, export standard interfaces.
+    \item Purpose of device-driver layer: hide differences among device controllers from kernel I/O subsystem.
+    \item I/O system calls encapsulate device behavior in generic classes, hiding hardware differences from applications.
+    \item Benefits: simplifies OS development, allows hardware manufacturers to design compatible devices or write drivers for popular OS.
+    \item Device may ship with multiple drivers (Windows, Linux, Mac).
+\end{itemize}
+
+\subsection{Device Characteristics}
+\begin{itemize}
+    \item Devices vary on many dimensions:
+    \begin{itemize}
+        \item \textbf{Character-stream or block}:
+        \begin{itemize}
+            \item Character-stream: transfers bytes one by one.
+            \item Block: transfers a block of bytes as a unit.
+        \end{itemize}
+        \item \textbf{Sequential or random access}:
+        \begin{itemize}
+            \item Sequential: fixed order determined by device.
+            \item Random-access: user seeks to any storage location.
+        \end{itemize}
+        \item \textbf{Synchronous or asynchronous}:
+        \begin{itemize}
+            \item Synchronous: predictable response times, coordinated.
+            \item Asynchronous: irregular/unpredictable response times, not coordinated.
+        \end{itemize}
+        \item \textbf{Sharable or dedicated}:
+        \begin{itemize}
+            \item Sharable: used concurrently by several processes/threads.
+            \item Dedicated: cannot be used concurrently.
+        \end{itemize}
+        \item \textbf{Speed of operation}: few bytes/sec to GB/sec.
+        \item \textbf{Read-write, read only, write once}:
+        \begin{itemize}
+            \item Read-write: both input/output.
+            \item Read only: only one data transfer direction.
+            \item Write once: written once, then read-only.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{Application Access Conventions}
+\begin{itemize}
+    \item OS hides many differences, groups devices into conventional types.
+    \item Major access conventions:
+    \begin{itemize}
+        \item Block I/O
+        \item Character-stream I/O
+        \item Memory-mapped file access
+        \item Network sockets
+    \end{itemize}
+    \item Special system calls for devices like time-of-day clock, timer, graphical display, video, audio.
+    \item Most OS have an \textbf{escape} or \textbf{back door}: transparently passes arbitrary commands to device driver.
+    \item UNIX: `ioctl()` system call.
+    \begin{itemize}
+        \item Enables application to access any driver functionality without new system call.
+        \item Three arguments: device identifier (major/minor numbers), command integer, pointer to data structure.
+        \item Major number: device type, routes I/O requests to driver.
+        \item Minor number: device instance.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Block and Character Devices}
+\begin{itemize}
+    \item \textbf{Block-device interface}: for disk drives and block-oriented devices.
+    \item Commands: `read()`, `write()`, `seek()` (for random-access).
+    \item Applications usually access via file-system interface.
+    \item OS/special applications (e.g., DBMS) may prefer \textbf{raw I/O}: direct access as linear array of blocks, no file system.
+    \item Raw I/O avoids extra buffering and redundant locking.
+    \item Compromise: OS allows mode on file that disables buffering/locking (UNIX: \textbf{direct I/O}).
+    \item Memory-mapped file access: layered on block-device drivers.
+    \item Access disk storage via byte array in main memory.
+    \item System call maps file to memory, returns virtual address.
+    \item Data transfers only when needed (demand-paged virtual memory access), efficient.
+    \item Convenient for programmers: simple read/write to memory.
+    \item Used for kernel services (e.g., executing program, swap space access).
+    \item \textbf{Character-stream interface}: for keyboards, mice, modems, printers, audio boards.
+    \item Basic system calls: `get()`, `put()` one character.
+    \item Libraries built on top: line-at-a-time access, buffering, editing.
+    \item Convenient for spontaneous input/linear output streams.
+\end{itemize}
+
+\subsection{Network Devices}
+\begin{itemize}
+    \item Network I/O interface differs from disk I/O (`read()`-`write()`-`seek()`).
+    \item Common interface: network \textbf{socket} (UNIX, Windows).
+    \item Socket interface system calls:
+    \begin{itemize}
+        \item Create socket.
+        \item Connect local socket to remote address.
+        \item Listen for remote application connection.
+        \item Send/receive packets.
+        \item `select()`: manages set of sockets, returns info on ready sockets (packet waiting, room to send).
+    \end{itemize}
+    \item `select()` eliminates polling/busy waiting for network I/O.
+    \item Facilitates distributed applications using any network hardware/protocol.
+    \item Other IPC/network communication approaches: half-duplex pipes, full-duplex FIFOs, full-duplex STREAMS, message queues, sockets (UNIX).
+\end{itemize}
+
+\subsection{Clocks and Timers}
+\begin{itemize}
+    \item Hardware clocks/timers provide: current time, elapsed time, set timer for operation X at time T.
+    \item Used heavily by OS and time-sensitive applications.
+    \item System calls not standardized.
+    \item \textbf{Programmable interval timer}: hardware to measure elapsed time, trigger operations.
+    \item Set to wait, then generate interrupt (once or periodically).
+    \item Used by scheduler (preempt process), disk I/O (flush dirty cache), network (cancel slow operations).
+    \item OS provides user process interface for timers.
+    \item Supports more timer requests than hardware channels by simulating virtual clocks.
+    \item Kernel maintains sorted list of wanted interrupts, sets timer for earliest.
+    \item Hardware clock: high-frequency counter.
+    \item Can be read from device register (high-resolution clock), offers accurate time intervals.
+    \item \textbf{High-performance event timer (HPET)}: modern PCs, 10-megahertz range.
+    \item Comparators trigger interrupts when value matches HPET.
+    \item Precision limited by timer resolution + virtual clock overhead.
+    \item System clock drift corrected by protocols (e.g., \textbf{network time protocol (NTP)}).
+\end{itemize}
+
+\subsection{Nonblocking and Asynchronous I/O}
+\begin{itemize}
+    \item \textbf{Blocking} system call: calling thread suspended, moved to wait queue. Resumes after completion.
+    \item Physical I/O actions: generally asynchronous (varying/unpredictable time).
+    \item OS provides blocking calls for application interface (easier to write).
+    \item \textbf{Nonblocking} I/O needed for some user processes (e.g., UI, video app).
+    \item Overlap execution with I/O: multithreaded application (some threads block, others execute).
+    \item Nonblocking I/O system calls: return quickly, indicate bytes transferred, don't halt thread.
+    \item Asynchronous system call: returns immediately, doesn't wait for I/O. Thread continues.
+    \item I/O completion communicated via variable setting, signal/software interrupt, or callback.
+    \item Difference: nonblocking `read()` returns available data immediately (full, fewer, none); asynchronous `read()` requests full transfer to complete later.
+    \item Asynchronous activities throughout modern OS (secondary storage, network I/O).
+    \item OS buffers I/O, returns to application, completes request later (optimizes performance).
+    \item Limit on buffer time (e.g., UNIX flushes every 30 seconds).
+    \item Applications can request buffer flush.
+    \item Data consistency: kernel reads from buffers before I/O, ensures data returned to reader.
+    \item Multiple threads to same file may need locking protocols for consistency.
+    \item I/O system calls can indicate synchronous execution for immediate requests.
+    \item `select()` for network sockets: nonblocking behavior, specifies max waiting time (0 for polling).
+    \item `select()` overhead: only checks if I/O possible, needs `read()`/`write()` after.
+    \item Mach: blocking multiple-read call, returns on first completion.
+\end{itemize}
+
+\subsection{Vectored I/O}
+\begin{itemize}
+    \item \textbf{Vectored I/O}: one system call performs multiple I/O operations involving multiple locations.
+    \item UNIX `readv`: accepts vector of multiple buffers, reads to/writes from vector.
+    \item Also called \textbf{scatter-gather}.
+    \item Benefits:
+    \begin{itemize}
+        \item Avoids context-switching and system-call overhead.
+        \item No need to transfer data to larger buffer first.
+        \item Some versions provide atomicity (all I/O done without interruption, avoids data corruption).
+    \end{itemize}
+    \item Programmers use scatter-gather for increased throughput, decreased overhead.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{escape} & Method of passing arbitrary commands when interface lacks standard method. \\
+    \textbf{back door} & Method of passing arbitrary commands when interface lacks standard method. \\
+    \textbf{block-device interface} & Interface for I/O to block devices. \\
+    \textbf{raw I/O} & Direct access to secondary storage as array of blocks, no file system. \\
+    \textbf{direct I/O} & Block I/O bypassing OS block features (buffering, locking). \\
+    \textbf{character-stream interface} & Interface for I/O to character devices (e.g., keyboards). \\
+    \textbf{socket} & Endpoint for communication; interface for network I/O. \\
+    \textbf{programmable interval timer} & Hardware timer provided by many CPUs. \\
+    \textbf{high-performance event timer (HPET)} & Hardware timer provided by some CPUs. \\
+    \textbf{network time protocol (NTP)} & Network protocol for synchronizing system clocks. \\
+    \textbf{blocking} & I/O request that suspends calling thread until I/O completes. \\
+    \textbf{nonblocking} & I/O request that returns immediately with available data, allowing thread to continue. \\
+    \textbf{Vectored I/O} & One system call performs multiple I/O operations involving multiple locations. \\
+    \textbf{scatter-gather} & I/O method specifying multiple sources/destinations in one command structure. \\
+    \bottomrule
+\end{tabular}

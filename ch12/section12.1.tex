@@ -1,0 +1,50 @@
+\section{Overview}
+
+\subsection{Things to learn}
+\begin{itemize}
+    \item Explore OS I/O subsystem structure.
+    \item Discuss I/O hardware principles and complexities.
+    \item Explain I/O hardware and software performance aspects.
+\end{itemize}
+
+\subsection{Introduction}
+\begin{itemize}
+    \item Computer's main jobs: I/O and computing.
+    \item Often, I/O is primary, computing incidental (e.g., browsing, editing).
+    \item OS role in I/O: manage and control I/O operations and devices.
+    \item Topics covered:
+    \begin{itemize}
+        \item I/O hardware basics: constraints on OS internal facilities.
+        \item OS I/O services and application I/O interface.
+        \item Bridging gap between hardware and application interfaces.
+        \item UNIX System V STREAMS mechanism: dynamic driver code pipelines.
+        \item I/O performance and OS design principles for improvement.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Overview}
+\begin{itemize}
+    \item Device control is major OS design concern.
+    \item Wide variation in I/O device function/speed (mouse, hard disk, flash drive, tape robot) requires varied control methods.
+    \item These methods form kernel's I/O subsystem, separating kernel from device management complexities.
+    \item I/O device technology trends:
+    \begin{itemize}
+        \item Increasing standardization of software/hardware interfaces: helps incorporate new device generations.
+        \item Increasingly broad variety of I/O devices: challenge to incorporate new, unlike devices.
+    \end{itemize}
+    \item Challenge met by hardware/software techniques:
+    \begin{itemize}
+        \item Basic I/O hardware elements (ports, buses, device controllers) accommodate diverse devices.
+        \item Kernel structured with \textbf{device-driver} modules to encapsulate device details.
+        \item Device drivers provide uniform device-access interface to I/O subsystem, similar to system calls for applications.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{device driver} & OS component providing uniform access and managing I/O to various devices. \\
+    \bottomrule
+\end{tabular}

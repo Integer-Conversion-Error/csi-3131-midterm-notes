@@ -1,0 +1,135 @@
+\section{Deadlock in multithreaded applications}
+
+\begin{itemize}
+    \item \textbf{Pthreads Example}: Illustrates deadlock with POSIX mutex locks.
+    \begin{itemize}
+        \item \texttt{pthread\_mutex\_init()}: Initializes an unlocked mutex.
+        \item \texttt{pthread\_mutex\_lock()}: Acquires a lock; blocks if the lock is held.
+        \item \texttt{pthread\_mutex\_unlock()}: Releases a lock.
+    \end{itemize}
+    \item \textbf{Deadlock Scenario}:
+    \begin{itemize}
+        \item Two mutex locks created: \texttt{first\_mutex}, \texttt{second\_mutex}.
+        \item Two threads, \texttt{thread\_one} and \texttt{thread\_two}, access both locks.
+        \item \texttt{thread\_one} locks in order: (1) \texttt{first\_mutex}, (2) \texttt{second\_mutex}.
+        \item \texttt{thread\_two} locks in order: (1) \texttt{second\_mutex}, (2) \texttt{first\_mutex}.
+        \item \textbf{Deadlock possible}: If \texttt{thread\_one} acquires \texttt{first\_mutex} and \texttt{thread\_two} acquires \texttt{second\_mutex}, both threads will block waiting for the other's lock.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Deadlock Example Code}
+\begin{verbatim}
+/* thread_one runs in this function */
+void *do_work_one(void *param)
+{
+   pthread_mutex_lock(&first_mutex);
+   pthread_mutex_lock(&second_mutex);
+   /**
+     * Do some work
+     */
+   pthread_mutex_unlock(&second_mutex);
+   pthread_mutex_unlock(&first_mutex);
+ 
+   pthread_exit(0);
+}
+ 
+/* thread_two runs in this function */
+void *do_work_two(void *param)
+{
+   pthread_mutex_lock(&second_mutex);
+   pthread_mutex_lock(&first_mutex);
+   /**
+    * Do some work
+    */
+   pthread_mutex_unlock(&first_mutex);
+   pthread_mutex_unlock(&second_mutex);
+ 
+   pthread_exit(0);
+}
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{Intermittent Nature}:
+    \begin{itemize}
+        \item Deadlock might not occur if one thread acquires and releases both locks before the other thread starts.
+        \item Occurrence depends on the CPU scheduler.
+        \item Makes identifying and testing for deadlocks difficult.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Livelock}
+\begin{itemize}
+    \item \textbf{Liveness Failure}: Similar to deadlock, but threads are not blocked.
+    \item \textbf{Condition}: A thread continuously attempts an action that fails.
+    \item \textbf{Analogy}: Two people trying to pass in a hallway, repeatedly moving into each other's way. They are active but make no progress.
+    \item \textbf{Pthreads Example with \texttt{pthread\_mutex\_trylock()}}:
+    \begin{itemize}
+        \item \texttt{pthread\_mutex\_trylock()} attempts to acquire a lock without blocking.
+        \item \textbf{Livelock Scenario}: \texttt{thread\_one} acquires \texttt{first\_mutex}, \texttt{thread\_two} acquires \texttt{second\_mutex}. Both then call \texttt{trylock} on the other mutex, which fails. They release their locks and repeat indefinitely.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Livelock Example Code}
+\begin{verbatim}
+/* thread_one runs in this function */
+void *do_work_one(void *param)
+{
+   int done = 0;
+ 
+   while (!done) {
+      pthread_mutex_lock(&first_mutex);
+      if (pthread_mutex_trylock(&second_mutex)) {
+         /**
+          * Do some work
+          */
+         pthread_mutex_unlock(&second_mutex);
+         pthread_mutex_unlock(&first_mutex);
+         done = 1;
+     }
+     else
+         pthread_mutex_unlock(&first_mutex);
+   }
+   pthread_exit(0);
+}
+ 
+/* thread_two runs in this function */
+void *do_work_two(void *param)
+{
+   int done = 0;
+ 
+   while (!done) {
+     pthread_mutex_lock(&second_mutex);
+     if (pthread_mutex_trylock(&first_mutex)) {
+         /**
+          * Do some work
+          */
+         pthread_mutex_unlock(&first_mutex);
+         pthread_mutex_unlock(&second_mutex);
+         done = 1;
+     }
+     else
+         pthread_mutex_unlock(&second_mutex);
+   }
+ 
+   pthread_exit(0);
+}
+\end{verbatim}
+
+\begin{itemize}
+    \item \textbf{Avoidance}:
+    \begin{itemize}
+        \item Livelock often occurs when threads retry failing operations at the same time.
+        \item Can be avoided by having threads retry at random times.
+        \item \textbf{Ethernet Example}: Hosts involved in a network collision \textbf{backoff} for a random period before retransmitting.
+    \end{itemize}
+    \item \textbf{Rarity}: Less common than deadlock, but still a challenge in concurrent application design.
+\end{itemize}
+
+\subsection{Section glossary}
+\begin{tabular}{p{0.2\textwidth}p{0.8\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    livelock & A condition in which a thread continuously attempts an action that fails. \\
+    \bottomrule
+\end{tabular}

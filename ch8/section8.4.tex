@@ -1,0 +1,51 @@
+\section{Methods for handling deadlocks}
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Three ways to deal with deadlock:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Ignore problem: pretend deadlocks never occur (most OS, e.g., Linux, Windows).
+        \item Prevent/Avoid: use protocol to ensure system \textbf{never} enters deadlocked state.
+        \item Detect/Recover: allow system to enter deadlocked state, then detect and recover (some systems, e.g., databases).
+    \end{itemize}
+    \item First solution (ignoring) common due to infrequency of deadlocks and cost of other methods.
+    \item Basic approaches can be combined for optimal solution per resource class.
+\end{itemize}
+
+\subsection*{Deadlock Prevention}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Provides methods to ensure at least one necessary condition for deadlock cannot hold.
+    \item Prevents deadlocks by constraining resource request methods.
+\end{itemize}
+
+\subsection*{Deadlock Avoidance}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item OS given advance info on resources a thread will request/use.
+    \item OS decides if request can be satisfied or delayed based on:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Currently available resources.
+        \item Resources allocated to each thread.
+        \item Future requests/releases of each thread.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Deadlock Detection and Recovery}
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item If no prevention/avoidance, deadlock may arise.
+    \item System provides algorithms to:
+    \begin{itemize}[noitemsep, topsep=0pt]
+        \item Examine system state to determine if deadlock occurred.
+        \item Recover from deadlock.
+    \end{itemize}
+    \item Undetected deadlock: system performance deteriorates, resources held, more threads deadlock. Eventually, manual restart needed.
+    \item Manual recovery for other liveness failures (e.g., livelock) may be used for deadlock recovery.
+\end{itemize}
+
+\subsection*{Section glossary}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+    \toprule
+    \textbf{Term} & \textbf{Definition} \\
+    \midrule
+    \textbf{deadlock prevention} & Methods to ensure at least one necessary condition for deadlock cannot hold. \\
+    \textbf{deadlock avoidance} & OS method where processes inform OS of resource use; system approves/denies requests to avoid deadlock. \\
+    \bottomrule
+\end{tabular}

@@ -1,0 +1,158 @@
+\section{Storage device management}
+
+\begin{itemize}
+    \item OS responsible for several aspects of storage device management.
+    \item Discuss: drive initialization, booting from drive, bad-block recovery.
+\end{itemize}
+
+\subsection{Drive formatting, partitions, and volumes}
+\begin{itemize}
+    \item New storage device: blank slate (platter of magnetic material, uninitialized semiconductor cells).
+    \item Before storing data: device must be divided into sectors (controller can read/write).
+    \item NVM pages: must be initialized, FTL created.
+    \item Process: \textbf{low-level formatting} or \textbf{physical formatting}.
+    \item Low-level formatting: fills device with special data structure for each storage location.
+    \item Data structure (sector/page): header, data area, trailer.
+    \item Header/trailer: controller info (sector/page number, error detection/correction code).
+    \item Most drives: low-level formatted at factory (manufacturing process).
+    \item Enables manufacturer: test device, initialize mapping from logical block numbers to defect-free sectors/pages.
+    \item Choice of sector sizes: 512 bytes, 4KB.
+    \item Larger sector size: fewer sectors per track, fewer headers/trailers, more space for user data.
+    \item Some OS: handle only one specific sector size.
+    \item OS needs to record own data structures on device (3 steps):
+    \item \textbf{Step 1: Partitioning}
+    \begin{itemize}
+        \item Divide device into one or more groups of blocks/pages.
+        \item OS can treat each partition as separate device.
+        \item Example: one partition for OS executable code (file system), another for swap space, another for user files.
+        \item Some OS/file systems: partition automatically when entire device managed by file system.
+        \item Partition info: written in fixed format at fixed location on storage device.
+        \item Linux: \texttt{fdisk} command manages partitions.
+        \item Device recognized by OS: partition info read, OS creates device entries (\texttt{/dev} in Linux).
+        \item Configuration file (\texttt{/etc/fstab}): tells OS to \textbf{mount} each partition (containing file system) at specified location, with mount options (e.g., read-only).
+        \item \textbf{Mounting} a file system: making it available for use.
+    \end{itemize}
+    \item \textbf{Step 2: Volume creation and management}
+    \begin{itemize}
+        \item Implicit: file system placed directly within a partition $\implies$ \textbf{volume} ready to be mounted.
+        \item Explicit: multiple partitions/devices used as RAID set (one or more file systems spread across devices).
+        \item Linux volume manager \texttt{lvm2} provides features; commercial third-party tools.
+        \item ZFS: volume management and file system integrated.
+        \item "Volume" can also mean any mountable file system (e.g., CD image file).
+    \end{itemize}
+    \item \textbf{Step 3: Logical formatting} or creation of a file system.
+    \begin{itemize}
+        \item OS stores initial file-system data structures onto device.
+        \item Data structures: maps of free/allocated space, initial empty directory.
+    \end{itemize}
+    \item Partition info: indicates if partition contains bootable file system (OS).
+    \item Partition labeled for boot: used to establish root of file system.
+    \item Once mounted: device links for all other devices/partitions created.
+    \item Computer's "file system": consists of all mounted volumes.
+    \item Windows: separately named via letter (C:, D:, E:).
+    \item Linux: boot file system mounted at boot, other file systems mounted within tree structure.
+    \item Windows: file system interface clear when device used.
+    \item Linux: single file access might traverse many devices.
+    \item File systems group blocks into larger chunks: \textbf{clusters}.
+    \item Device I/O: via blocks; file system I/O: via clusters.
+    \item Assures: more sequential-access, fewer random-access characteristics.
+    \item File systems: group file contents near metadata (reduces HDD head seeks).
+    \item Some OS: allow special programs to use partition as large sequential array of logical blocks (no file-system data structures).
+    \item Array: \textbf{raw disk}; I/O: \textbf{raw I/O}.
+    \item Used for swap space, some database systems (control exact record location).
+    \item Raw I/O: bypasses file-system services (buffer cache, file locking, prefetching, space allocation, file names, directories).
+    \item Allows applications to implement own special-purpose storage services on raw partition.
+    \item Most applications: use provided file system.
+    \item Linux: generally no raw I/O, but similar access via \texttt{DIRECT} flag to \texttt{open()} system call.
+\end{itemize}
+
+\subsection{Boot block}
+\begin{itemize}
+    \item Computer starts (powered up/rebooted): must have initial program to run.
+    \item Initial \textbf{bootstrap} loader: tends to be simple.
+    \item Bootstrap: stored in NVM flash memory firmware on motherboard, mapped to known memory location.
+    \item Can be updated by manufacturers, but also written to by viruses.
+    \item Initializes: CPU registers, device controllers, main memory contents.
+    \item Tiny bootstrap loader: brings in full bootstrap program from secondary storage.
+    \item Full bootstrap program: stored in "boot blocks" at fixed location on device.
+    \item Device with boot partition: \textbf{boot disk} or \textbf{system disk}.
+    \item Bootstrap NVM code: instructs storage controller to read boot blocks into memory (no device drivers loaded), then executes code.
+    \item Full bootstrap program: more sophisticated, loads entire OS from non-fixed location, starts OS.
+    \item Windows boot process example:
+    \begin{itemize}
+        \item Drive divided into partitions.
+        \item One partition: \textbf{boot partition} (contains OS, device drivers).
+        \item Windows boot code: first logical block on hard disk/first page of NVM device.
+        \item Termed: \textbf{master boot record} (\textit{MBR}).
+        \item Booting begins: runs code in system's firmware.
+        \item Firmware code: directs system to read boot code from MBR (understands enough about controller/device to load sector).
+        \item MBR: contains boot code, table listing partitions, flag for boot partition.
+        \item System identifies boot partition: reads first sector/page (\textbf{boot sector}).
+        \item Boot sector: directs to kernel.
+        \item Continues boot process: loads subsystems, system services.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Bad blocks}
+\begin{itemize}
+    \item Disks: prone to failure (moving parts, small tolerances).
+    \item Complete failure: disk replaced, contents restored from backup.
+    \item More frequent: one or more sectors become defective.
+    \item Most disks: come from factory with \textbf{bad blocks}.
+    \item Bad blocks handled in various ways (depending on disk/controller).
+    \item Older disks (e.g., IDE controllers): bad blocks handled manually.
+    \item Strategy: scan disk for bad blocks during formatting.
+    \item Discovered bad blocks: flagged as unusable (file system doesn't allocate).
+    \item Blocks go bad during operation: special program (Linux \texttt{badblocks}) run manually to search/lock away.
+    \item Data on bad blocks: usually lost.
+    \item More sophisticated disks: smarter about bad-block recovery.
+    \item Controller maintains list of bad blocks (initialized at factory, updated over life).
+    \item Low-level formatting: sets aside spare sectors (not visible to OS).
+    \item Controller: replaces each bad sector logically with spare sector.
+    \item Scheme: \textbf{sector sparing} or \textbf{forwarding}.
+    \item Typical bad-sector transaction:
+    \begin{itemize}
+        \item OS tries to read logical block 87.
+        \item Controller calculates ECC, finds sector bad, reports I/O error to OS.
+        \item Device controller replaces bad sector with spare.
+        \item After that: system requests logical block 87 $\implies$ translated to replacement sector's address by controller.
+    \end{itemize}
+    \item Redirection by controller: could invalidate OS disk-scheduling optimization.
+    \item Most disks: formatted with few spare sectors in each cylinder, and a spare cylinder.
+    \item Bad block remapped: controller uses spare sector from same cylinder if possible.
+    \item Alternative to sector sparing: \textbf{sector slipping}.
+    \item Example: logical block 17 defective, first spare after sector 202.
+    \item Sector slipping: remaps all sectors from 17 to 202, moving them down one spot.
+    \item Frees up space of sector 18, sector 17 mapped to it.
+    \item Recoverable soft errors: may trigger device activity (copy block data, spare/slip block).
+    \item Unrecoverable hard error: lost data. File using block must be repaired (e.g., from backup), requires manual intervention.
+    \item NVM devices: bits, bytes, pages nonfunctional/go bad.
+    \item Management simpler than HDDs (no seek time performance loss).
+    \item Multiple pages set aside as replacement locations, or space from over-provisioning area used.
+    \item Controller maintains table of bad pages, never sets them as available to write to.
+\end{itemize}
+
+\vspace{1em}
+\begin{tabular}{p{0.3\textwidth}p{0.7\textwidth}}
+\toprule
+\rowcolor{lightgray} \textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{low-level formatting} & Initialization of a storage medium for computer storage. \\
+\textbf{physical formatting} & Initialization of a storage medium for computer storage. \\
+\textbf{partition} & Logical segregation of storage space into multiple areas. \\
+\textbf{mounting} & Making a file system available for use by logically attaching it to the root file system. \\
+\textbf{volume} & Container of storage; often a device with a mountable file system. \\
+\textbf{logical formatting} & Creation of a file system in a volume to ready it for use. \\
+\textbf{cluster} & In Windows storage, a power-of-2 number of disk sectors collected for I/O optimization. \\
+\textbf{raw disk} & Direct access to a secondary storage device as an array of blocks with no file system. \\
+\textbf{bootstrap} & Steps taken at computer power-on to bring system to full operation. \\
+\textbf{boot disk} & Disk with a boot partition and kernel to load for booting. \\
+\textbf{system disk} & Storage device with a boot partition, can store OS for booting. \\
+\textbf{boot partition} & Storage device partition containing an executable operating system. \\
+\textbf{master boot record (MBR)} & Windows boot code, stored in the first sector of a boot partition. \\
+\textbf{boot sector} & First sector of a Windows boot device, containing bootstrap code. \\
+\textbf{bad block} & Unusable sector on an HDD. \\
+\textbf{sector sparing} & Replacement of unusable HDD sector with another sector elsewhere on device. \\
+\textbf{sector slipping} & Renaming of sectors to avoid using a bad sector. \\
+\bottomrule
+\end{tabular}

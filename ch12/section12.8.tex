@@ -1,0 +1,22 @@
+\section{Summary}
+
+\subsection{Key Points}
+\begin{itemize}
+    \item Basic I/O hardware elements: buses, device controllers, devices.
+    \item Data movement: CPU (programmed I/O) or DMA controller.
+    \item Device driver: kernel module controlling a device.
+    \item System-call interface handles basic hardware categories: block devices, character-stream devices, memory-mapped files, network sockets, programmed interval timers.
+    \item System calls usually block processes, but nonblocking/asynchronous calls used by kernel/applications that must not sleep.
+    \item Kernel's I/O subsystem provides services: I/O scheduling, buffering, caching, spooling, device reservation, error handling.
+    \item Name translation: connects hardware devices to symbolic file names.
+    \item Involves multiple mapping levels: character-string names $\rightarrow$ device drivers/addresses $\rightarrow$ physical addresses (I/O ports/bus controllers).
+    \item Mapping can be within file-system name space (UNIX) or separate device name space (MS-DOS).
+    \item STREAMS: UNIX mechanism for dynamic assembly of driver code pipelines.
+    \item Drivers can be stacked, data passes sequentially and bidirectionally.
+    \item I/O system calls are costly:
+    \begin{itemize}
+        \item Context switching (kernel protection boundary).
+        \item Signal/interrupt handling.
+        \item CPU/memory load for data copying (kernel buffers $\leftrightarrow$ application space).
+    \end{itemize}
+\end{itemize}
