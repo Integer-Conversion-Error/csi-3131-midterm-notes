@@ -1,0 +1,17 @@
+Front,Back,Reversible
+What are the three main ways to deal with deadlocks?,"Ignore the problem, Prevent/Avoid, and Detect/Recover.",y
+Which operating systems commonly ignore the deadlock problem?,"Most OS, such as Linux and Windows.",y
+Why is ignoring the deadlock problem a common solution in many operating systems?,Due to the infrequency of deadlocks and the high cost of implementing other methods.,y
+What is the core principle of the 'Prevent/Avoid' approach to deadlocks?,To use a protocol to ensure the system never enters a deadlocked state.,y
+What is the core principle of the 'Detect/Recover' approach to deadlocks?,"To allow the system to enter a deadlocked state, then detect it and recover.",y
+Which systems commonly use the 'Detect/Recover' approach for deadlocks?,"Some systems, such as databases.",y
+Can different deadlock handling approaches be combined?,"Yes, basic approaches can be combined for an optimal solution per resource class.",y
+deadlock prevention,Methods to ensure at least one necessary condition for deadlock cannot hold.,y
+How does Deadlock Prevention prevent deadlocks?,By constraining resource request methods.,y
+deadlock avoidance,"An OS method where processes inform the OS of resource use, and the system approves or denies requests to avoid deadlock.",y
+What advance information does the OS need for Deadlock Avoidance?,Information on resources a thread will request/use.,y
+What factors does the OS consider when deciding to satisfy or delay a resource request in Deadlock Avoidance?,"Currently available resources, resources allocated to each thread, and future requests/releases of each thread.",y
+When might Deadlock Detection and Recovery be necessary?,If no prevention or avoidance mechanisms are in place.,y
+What two main algorithms does a system provide for Deadlock Detection and Recovery?,Algorithms to examine the system state to determine if deadlock occurred and to recover from deadlock.,y
+What are the consequences of an undetected deadlock?,"System performance deteriorates, resources are held, more threads deadlock, and eventually, a manual restart is needed.",y
+"Besides specific deadlock recovery algorithms, what other method might be used for deadlock recovery?","Manual recovery for other liveness failures (e.g., livelock).",y

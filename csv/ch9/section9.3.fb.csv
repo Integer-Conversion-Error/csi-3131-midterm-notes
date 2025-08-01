@@ -1,0 +1,114 @@
+Front,Back
+What memory management challenge did paging address?,The requirement for contiguous physical address space.
+What is Paging?,A memory-management scheme allowing noncontiguous physical address space.
+What issues does Paging avoid?,External fragmentation and compaction issues.
+Why is Paging widely used?,"Due to its advantages, it is used in most operating systems, from servers to mobile devices."
+How is Paging implemented?,Through OS and hardware cooperation.
+What are fixed-sized blocks of physical memory called in paging?,Frames.
+What are fixed-sized blocks of logical memory called in paging?,Pages.
+How are pages loaded during process execution in a paging system?,"Pages are loaded into any available memory frames, either from the file system or backing store."
+How is the backing store divided in a paging system?,"Into fixed-sized blocks, typically the same size as frames or clusters."
+What is the relationship between logical address space and physical address space in paging?,They are totally separate.
+What are the two parts of a CPU-generated address in a paging system?,Page number (p) and page offset (d).
+What is the page number (p) in a CPU-generated address?,It is an index into the per-process page table.
+What is the page offset (d) in a CPU-generated address?,It is the location within the referenced frame.
+What does a page table contain?,The base address of each frame in physical memory.
+How is the physical memory address calculated in a paging system?,Base address of frame + page offset.
+List the MMU steps to translate a logical address to a physical address in a paging system.,"1. Extract page number 'p', use as index into page table. 2. Extract corresponding frame number 'f' from page table. 3. Replace page number 'p' with frame number 'f'."
+Does the page offset 'd' change during logical to physical address translation?,"No, the offset 'd' does not change."
+Who defines the page size (and thus frame size) in a paging system?,Hardware.
+"What characteristic do page sizes typically have, and what is their typical range?","They are a power of 2, typically ranging from 4 KB to 1 GB."
+Why is a power of 2 page size beneficial?,It allows for easy translation of a logical address into its page number and offset.
+"Given a logical address space of 2^m bytes and a page size of 2^n bytes, how are the page number and page offset determined?","The high-order m-n bits represent the page number, and the low-order n bits represent the page offset."
+What form of relocation is paging considered?,Dynamic relocation.
+How are logical addresses bound to physical addresses in a paging system?,Every logical address is bound by paging hardware to a physical address.
+Does paging suffer from external fragmentation?,"No, because any free frame can be allocated."
+Does paging suffer from internal fragmentation?,"Yes, the last frame allocated for a process may not be completely full."
+What is the average internal fragmentation per process in a paging system?,One-half page.
+What is the effect of using smaller page sizes?,Less internal fragmentation.
+What is the effect of using larger page sizes?,"The overhead per page-table entry is reduced, and disk I/O is more efficient with larger data transfers."
+How have page sizes changed over time?,"Page sizes have generally grown over time as processes, data sets, and main memory have become larger."
+What are typical modern page sizes?,4 KB or 8 KB.
+Give examples of systems that support multiple page sizes.,"Windows 10 (4 KB, 2 MB) and Linux (default 4 KB, huge pages)."
+What is the typical size of a 32-bit CPU's page-table entry?,4 bytes.
+How much physical memory can a system address if it uses 4 KB frames and 4-byte page-table entries that can point to 2^32 physical page frames?,2^44 bytes (16 TB).
+Is the physical memory size typically the same as the maximum logical size of a process?,"No, physical memory size is typically different from the maximum logical size of a process."
+What information do page-table entries contain in addition to frame addresses?,Other information that reduces the bits available for frame addresses.
+"When a process arrives and needs 'n' pages, how many frames must be available?",'n' frames must be available.
+How does the programmer's view of memory differ from the actual physical memory in a paged system?,"The programmer views memory as a single contiguous space for one program, while the user program is actually scattered throughout physical memory, which also holds other programs."
+What reconciles the programmer's view of memory with the actual physical memory layout?,Address-translation hardware.
+Can a user process access memory it doesn't own in a paging system? Why or why not?,"No, because it has no way to address memory outside of its own page table."
+What information does the OS manage regarding physical memory allocation?,Details about allocated/available frames and total frames.
+What is the system-wide data structure that keeps information about physical memory frames?,The frame table.
+What information does the frame table contain?,"One entry per physical page frame, indicating whether it's free or allocated, and to which process/page it belongs."
+How does the OS handle address parameters in system calls in a paged environment?,"The OS is aware that user processes operate in user space and their logical addresses are mapped to physical addresses, so it maps the given address to the correct physical address."
+What does the OS maintain for each process related to paging?,"A copy of the page table, similar to an instruction counter or registers."
+When is the OS's copy of the page table used?,For manual logical-to-physical translation by the OS and by the CPU dispatcher to define the hardware page table when a process is allocated the CPU.
+How does paging affect context-switch time?,Paging increases context-switch time.
+Are page tables per-process or system-wide data structures?,Page tables are per-process data structures.
+Where is the pointer to a process's page table stored?,"In the process control block (PCB), along with other registers."
+"What happens when the CPU scheduler selects a process, regarding hardware page-table values?",It reloads user registers and hardware page-table values from the stored user page table.
+What is the simplest hardware implementation for a page table?,Using dedicated high-speed hardware registers.
+What are the pros and cons of using dedicated hardware registers for page tables?,"Pro: Efficient translation. Con: Increases context-switch time (due to register exchange). Feasible only for small page tables (e.g., 256 entries)."
+Why are dedicated hardware registers not feasible for page tables in contemporary CPUs?,"Contemporary CPUs have much larger page tables (e.g., 2^20 entries), making registers impractical."
+Where are large page tables typically kept?,In main memory.
+What register points to the page table when it's kept in main memory?,The Page-Table Base Register (PTBR).
+How does using a PTBR for in-memory page tables affect context-switch time?,It reduces context-switch time because only the PTBR needs to be changed to switch page tables.
+What is the main problem with storing page tables in main memory?,"It results in slower memory access times, effectively doubling the number of memory accesses needed for data."
+How many memory accesses are typically needed to access data if the page table is stored in main memory?,"Two memory accesses: one for the page-table entry, and one for the actual data."
+What is the standard solution to mitigate the performance overhead of in-memory page tables?,"A special, small, fast-lookup hardware cache called a Translation Look-aside Buffer (TLB)."
+What kind of memory is a TLB?,"Associative, high-speed memory."
+What does each TLB entry consist of?,A key (tag) and a value.
+How does associative memory perform a search?,"An item presented to associative memory is compared with all keys simultaneously, returning the corresponding value quickly if found."
+Why does TLB lookup not typically incur a performance penalty?,It is part of the instruction pipeline.
+What is the typical size range for a TLB?,"32 to 1,024 entries."
+What is the purpose of separate instruction and data address TLBs in some CPUs?,"It effectively doubles the number of entries, providing more cache for translations."
+Describe the process of using a TLB with page tables when the CPU generates a logical address.,"The MMU first checks if the page number is in the TLB (TLB hit). If found, the frame number is immediately available and used. If not found (TLB miss), a memory reference to the page table is made to get the frame number, which is then used to access memory. The page number and frame number are then added to the TLB."
+What happens when a TLB is full and a new entry needs to be added?,"An existing entry must be replaced, using policies like LRU, round-robin, or random."
+What does it mean for a TLB entry to be 'wired down'?,"It means the entry cannot be removed by the usual replacement algorithms, typically used for critical kernel code."
+What are Address-Space Identifiers (ASIDs) in TLB entries?,"ASIDs uniquely identify a process and provide address-space protection. If the current process's ASID does not match the virtual page's ASID in a TLB entry, it's treated as a TLB miss."
+What is an advantage of TLBs that store ASIDs?,They allow the TLB to contain entries for multiple processes simultaneously without needing to be flushed on every context switch.
+"What is required for a TLB without ASIDs on each context switch, and why?",It must be 'flushed' (erased) on each context switch to prevent the next process from using incorrect translation information from old entries.
+What is the hit ratio in the context of a TLB?,The percentage of times a page number is found in the TLB (a measure of TLB effectiveness).
+Calculate the effective memory-access time given an 80% TLB hit ratio and a 10 ns memory access time.,Effective memory-access time = (0.80 * 10 ns) + (0.20 * 20 ns) = 8 ns + 4 ns = 12 ns.
+Calculate the effective memory-access time given a 99% TLB hit ratio and a 10 ns memory access time.,Effective memory-access time = (0.99 * 10 ns) + (0.01 * 20 ns) = 9.9 ns + 0.2 ns = 10.1 ns.
+Describe the multi-level TLB architecture in modern CPUs like Intel Core i7.,"Modern CPUs can have multiple TLB levels, such as L1 instruction TLB, L1 data TLB, and L2 TLB. A miss at L1 checks L2; a miss at L2 requires walking page-table entries in memory or an OS interrupt."
+How is memory protection implemented in a paged environment?,Through protection bits associated with each frame in the page table.
+What can a single protection bit in a page table indicate?,Whether a page is read-write or read-only.
+What happens if a process attempts to write to a read-only page?,"The hardware generates a trap to the OS, indicating a memory-protection violation."
+What types of finer protection can be implemented with page-table bits?,"Read-only, read-write, execute-only (separate bits for each access type)."
+What is the purpose of the 'valid-invalid' bit in a page table entry?,It indicates whether the page is part of the process's logical address space (valid) or not (invalid).
+Who sets the valid-invalid bit for each page?,The operating system.
+How does the valid-invalid bit help in handling illegal addresses?,"If a process tries to access a page marked invalid, the system traps to the OS, indicating an illegal address."
+What is a potential issue with relying solely on the valid-invalid bit for protection with programs that don't use their full logical address range?,"It may allow access to valid, allocated pages beyond the program's actual used range (e.g., if a program uses up to address 10468, but its page 5 extends to 12287, all addresses in page 5 are valid, reflecting internal fragmentation)."
+What register is used in some systems to indicate the size of the page table?,The Page-Table Length Register (PTLR).
+How does the PTLR provide protection?,Its value is checked against every logical address to verify it is within the valid range of the page table. A test failure results in an error trap to the OS.
+"What is a significant advantage of paging, especially in a multi-process environment?","The possibility of sharing common code, such as the standard C library (libc)."
+What is the problem if each process loads its own copy of a common library like libc?,"It leads to significant memory waste. For example, 40 processes each loading a 2 MB libc would consume 80 MB of memory."
+What characteristic must code have to be shared among multiple processes?,It must be reentrant code.
+What is reentrant code?,"Non-self-modifying code that never changes during execution, allowing two or more processes to execute the same code simultaneously."
+How do processes use shared reentrant code in a paged system?,"Only one copy of the reentrant code (e.g., libc) exists in physical memory. Each user process's page table maps to this same physical copy, while each process has its own copy of registers and data storage."
+What are examples of other programs besides libc that can be shared via paging?,"Compilers, window systems, and database systems."
+How are shared libraries (from dynamic linking) typically implemented?,Using shared pages.
+What must the OS enforce regarding shared code?,The read-only nature of the shared code.
+How is sharing memory among processes similar to sharing address space by threads?,"Both involve multiple entities accessing the same underlying memory resources, facilitated by mechanisms like shared pages."
+How is shared memory for interprocess communication (IPC) implemented using paging?,"Through shared pages, where different processes can map the same physical pages into their respective logical address spaces."
+paging,Memory management scheme avoiding external fragmentation by splitting physical memory into fixed-sized frames and logical memory into pages.
+frames,Fixed-sized blocks of physical memory.
+page,Fixed-sized block of logical memory.
+page number (p),Part of CPU-generated memory address in paged system; index into page table.
+page offset (d),Part of CPU-generated memory address in paged system; offset of location within page.
+page table,"Table in paged memory containing base address of each physical memory frame, indexed by logical page number."
+huge pages,Feature designating a region of physical memory for especially large pages.
+frame table,"Table in paged memory containing frame details (allocated/free, total frames)."
+page-table base register (PTBR),CPU register pointing to the in-memory page table.
+translation look-aside buffer (TLB),"Small, fast-lookup hardware cache in paged memory address translation for fast access to a subset of addresses."
+TLB miss,TLB lookup failing to provide address translation because it's not in TLB.
+wired down,"TLB entry locked into TLB, not replaceable by usual algorithm."
+address-space identifier (ASIDs),Part of TLB entry identifying the associated process; causes a TLB miss if the requesting process ID doesn't match.
+flush (TLB),Erasure of entries in TLB or other cache to remove invalid data.
+hit ratio,"Percentage of times a cache provides a valid lookup (e.g., TLB effectiveness measure)."
+effective memory-access time,Statistical or real measure of CPU time to read/write to memory.
+valid-invalid bit,Page-table bit indicating if an entry points to a page within a process's logical address space.
+page-table length register (PTLR),CPU register indicating the size of the page table.
+reentrant code,Code supporting multiple concurrent threads (can be shared) because it is non-self-modifying.

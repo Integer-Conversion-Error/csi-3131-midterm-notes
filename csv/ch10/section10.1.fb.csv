@@ -1,0 +1,26 @@
+Front,Back
+What is virtual memory?,A technique allowing execution of a process not completely in memory; it separates logical memory from physical memory.
+What is a major advantage of virtual memory?,It allows programs to be larger than the physical memory available.
+How does virtual memory abstract main memory?,"It abstracts main memory into a large, uniform storage array."
+What is the relationship between logical and physical memory in virtual memory systems?,Virtual memory separates logical memory (the programmer's view) from physical memory.
+How does virtual memory benefit programmers?,It frees programmers from memory-storage limitations and simplifies programming by removing worries about physical memory limits.
+What sharing capabilities does virtual memory enable for processes?,"It allows processes to share files, libraries, and implement shared memory."
+How does virtual memory impact process creation?,"It provides an efficient mechanism for process creation, including sharing pages during process creation (fork())."
+What are potential drawbacks or considerations for virtual memory implementation?,Its implementation is complex and can decrease performance if used carelessly.
+How did traditional memory management differ from virtual memory regarding process execution?,Traditional memory management required the entire process to be in physical memory for execution.
+What was a limitation of traditional memory management regarding program size?,Program size was limited by the physical memory available.
+Why do real programs often not need their entire code in memory?,"They may contain error handling code (seldom executed), arrays/lists allocated more memory than needed, or rare program options/features that are rarely used."
+What are the benefits of executing only partial programs in memory?,"1. Programs are not constrained by physical memory size, allowing for a large virtual address space.
+2. Less physical memory is needed per program, allowing more programs to run concurrently, increasing CPU utilization and throughput (without increasing response/turnaround time).
+3. Less I/O is required for loading/swapping, leading to faster program execution."
+What is a virtual address space?,It is the logical view of how a process is stored in memory.
+How is a process's storage typically viewed in its virtual address space?,It typically starts at logical address 0 with contiguous memory.
+How is physical memory organized in relation to logical pages?,"Physical memory is organized in page frames, which are not necessarily contiguous."
+What is the function of the Memory-Management Unit (MMU) in virtual memory?,It maps logical pages to physical page frames.
+How do the heap and stack grow within a virtual address space?,"The heap grows upward, and the stack grows downward."
+What is the purpose of the large blank space typically found between the heap and stack in a virtual address space?,This space is part of the virtual address space but only requires physical pages if the heap or stack grows into it.
+"What are ""sparse"" address spaces?","Virtual address spaces with holes; describes a page table with noncontiguous, scattered entries or an address space with many holes."
+What are the benefits of sparse address spaces?,"1. Holes can be filled as the stack or heap grows.
+2. They facilitate dynamic linking of libraries/shared objects during execution."
+How does virtual memory enable sharing of system libraries?,"System libraries (e.g., standard C library) are shared by mapping them into the virtual address space, typically as read-only, with physical pages shared by multiple processes."
+How do processes use virtual memory for communication?,Processes can share memory regions for communication.

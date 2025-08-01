@@ -1,0 +1,46 @@
+Front,Back
+How are pages allocated for user-mode processes?,Pages are allocated from the kernel's free page frame list.
+How is the kernel's free page frame list populated for user-mode processes?,"By page-replacement algorithms (e.g., Section 10.4)."
+What is a characteristic of free pages for user-mode processes in physical memory?,They are scattered throughout physical memory.
+What happens when a user-mode process requests a single byte of memory?,"An entire page frame is granted, leading to internal fragmentation."
+What is one reason kernel memory is often allocated from a different free-memory pool than user-mode memory?,"Kernel requests varying data structure sizes, some less than a page, requiring conservative memory use and minimized fragmentation. Many OS do not subject kernel code/data to paging."
+What is another reason kernel memory is often allocated from a different free-memory pool than user-mode memory?,"Hardware devices interact directly with physical memory (no virtual memory interface) and may require physically contiguous pages, which user-mode pages don't need."
+What are two strategies for managing kernel free memory?,"The ""buddy system"" and ""slab allocation""."
+How does the buddy system allocate memory?,From a fixed-size segment of physically contiguous pages.
+What type of allocator does the buddy system use?,A power-of-2 allocator.
+What happens if a memory request in the buddy system is not appropriately sized?,It is rounded up to the next highest power of 2.
+Example: How is an 11 KB memory request satisfied by the buddy system?,With a 16-KB segment.
+Describe the division process in the buddy system for a 21 KB request from an initial 256 KB segment.,"The 256 KB segment is divided into two buddies ($A_L$ and $A_R$), each 128 KB. One buddy ($A_L$) is divided into two 64-KB buddies ($B_L$ and $B_R$). The next-highest power of 2 for 21 KB is 32 KB. One 64-KB buddy ($B_L$) is divided into two 32-KB buddies ($C_L$ and $C_R$). One 32-KB buddy ($C_L$) is then used for the 21-KB request."
+What is an advantage of the buddy system?,It can quickly combine adjacent buddies to form larger segments using coalescing.
+Example: How does coalescing work in the buddy system when the kernel releases a $C_L$ unit?,"When the kernel releases a $C_L$ unit, $C_L$ and $C_R$ coalesce into a 64-KB segment ($B_L$). $B_L$ can then coalesce with $B_R$ to form a 128-KB segment ($A_L$), which can eventually form the original 256-KB segment."
+What is a drawback of the buddy system?,Rounding up to the next highest power of 2 causes internal fragmentation.
+Example: How does internal fragmentation occur in the buddy system for a 33-KB request?,"A 64-KB segment is allocated, meaning cannot guarantee less than 50% of the allocated unit is wasted."
+What is the purpose of a single cache in slab allocation?,"A single cache is maintained for each unique kernel data structure (e.g., process descriptors, file objects, semaphores)."
+What are caches populated with in slab allocation?,Objects (instantiations of kernel data structures).
+Describe the initial state of objects when a cache is created in slab allocation.,Objects are initially marked as `free` and allocated to the cache.
+How is the number of objects determined in a slab?,"It depends on the slab size (e.g., a 12-KB slab can hold six 2-KB objects)."
+How does the slab allocator fulfill a request for a new object?,"The allocator assigns any `free` object from the cache, and the object is then marked `used`."
+"Scenario: How does the slab allocator fulfill a kernel request for a process descriptor (`struct task_struct`, ~1.7 KB)?","The cache fulfills the request with a pre-allocated, free `struct task_struct` object."
+What are the three states of slabs in Linux?,"Full, Empty, and Partial."
+Define a 'Full' slab state in Linux.,All objects in the slab are `used`.
+Define an 'Empty' slab state in Linux.,All objects in the slab are `free`.
+Define a 'Partial' slab state in Linux.,The slab has both `used` and `free` objects.
+In what order does the slab allocator attempt to satisfy a request?,"1. From a free object in a partial slab. 2. If none, from a free object from an empty slab. 3. If no empty slabs, a new slab is allocated from contiguous physical pages, assigned to the cache; object memory is allocated from the new slab."
+What are the two main benefits of the slab allocator?,1. No memory wasted due to fragmentation. 2. Memory requests satisfied quickly.
+Explain why the slab allocator prevents memory fragmentation.,"Each kernel data structure has an associated cache, which is made of slabs divided into object-sized chunks. When the kernel requests memory, the exact amount is returned."
+Explain why the slab allocator satisfies memory requests quickly.,"It is effective for frequent object allocation/deallocation (common in the kernel). Objects are created in advance and quickly allocated from the cache. Released objects are marked free and returned to the cache, making them immediately available."
+Where did the slab allocator first appear?,In the Solaris 2.4 kernel.
+Which Linux kernel version adopted the slab allocator (referred to as SLAB)?,Linux Version 2.2+.
+What are the recent Linux kernel memory allocators?,SLOB and SLUB.
+What is the SLOB allocator designed for?,"Systems with limited memory (e.g., embedded systems)."
+How does the SLOB allocator manage memory?,"It maintains three lists: `small` (<256 bytes), `medium` (<1,024 bytes), and `large` (other objects < page size), allocating from the appropriate list using a first-fit policy."
+Which Linux kernel allocator is the default for Linux kernel (Version 2.6.24+)?,The SLUB allocator.
+What did the SLUB allocator replace?,SLAB.
+What are the improvements of SLUB over SLAB?,"Reduced SLAB overhead, stores metadata in the `page` structure (not with each slab), and has no per-CPU queues for objects (significant memory saving on multi-processor systems), leading to better performance with more processors."
+Define 'power-of-2 allocator'.,Allocator in buddy system; satisfies memory requests in units sized as a power of 2.
+Define 'buddies' in the context of the buddy system.,Pairs of equal size in buddy memory allocation.
+Define 'coalescing'.,Combining freed memory in adjacent buddies into larger segments.
+Define 'slab allocation'.,"Memory allocation method; slab split into object-sized chunks, eliminating fragmentation."
+Define 'slab' in the context of slab allocation.,Section of memory (one or more contiguous pages) used in slab allocation.
+Define 'cache' in the context of the slab allocator.,"In slab allocator, consists of one or more slabs."
+Define 'object' in the context of the slab allocator.,Instance of a class or data structure.

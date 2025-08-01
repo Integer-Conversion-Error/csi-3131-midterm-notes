@@ -1,0 +1,21 @@
+Front,Back,Reversible
+Why are applications compiled on one operating system generally not executable on others?,Due to unique system calls and other barriers.,y
+Can some applications run on multiple operating systems?,"Yes, through specific techniques.",y
+How do interpreted languages like Python or Ruby enable cross-platform compatibility?,"They use an interpreter available for multiple operating systems, which executes equivalent native instructions and calls native OS functions.",y
+What are the potential disadvantages of using interpreted languages for cross-platform compatibility?,"Performance may suffer, and features might be limited.",y
+"How do virtual machines (e.g., for Java) enable cross-platform compatibility?","Languages like Java include a virtual machine as part of their runtime environment (RTE). The RTE, ported to various operating systems, loads the application into the virtual machine.",y
+What are the potential disadvantages of using virtual machines for cross-platform compatibility?,"Similar disadvantages to interpreters, such as potential performance suffering and limited features.",y
+How does using a standard language or API with porting enable cross-platform compatibility?,"Application developers use a standard language or API where the compiler generates machine- and OS-specific binaries, requiring the application to be ported to each OS.",y
+What is a disadvantage of the standard language/API with porting approach?,"The application must be ported to each OS, which is time-consuming.",y
+Provide an example of a standard API used for UNIX-like systems that facilitates porting.,POSIX API.,y
+What is a challenge for cross-platform application development related to binary formats?,"Each OS has a unique binary format (header, instructions, variables layout) that dictates how the OS loads and executes the file.",y
+What is the ELF format?,A common standard for binary executable files adopted by Linux and UNIX systems.,y
+Does the ELF format guarantee cross-hardware platform compatibility?,"No, it provides a common standard across Linux and UNIX systems but does not guarantee cross-hardware platform compatibility.",y
+What is a challenge for cross-platform application development related to CPU instruction sets?,"CPUs have varying instruction sets, requiring applications to contain appropriate instructions for correct execution.",y
+What is a challenge for cross-platform application development related to system calls?,"OS system calls vary significantly in operands, ordering, invocation methods, numbering, meanings, and result returns.",y
+"Define ""port"" (as a verb in software development).","To move code from its current platform to another platform (e.g., between operating systems or hardware systems).",y
+"Define ""application binary interface (ABI)"".",Defines how different components of binary code can interface for a given operating system on a given architecture.,y
+What low-level details does an Application Binary Interface (ABI) specify?,"Address width, parameter passing methods for system calls, runtime stack organization, binary format of system libraries, and data type sizes.",y
+Does an ABI provide cross-platform compatibility?,"No, an ABI ensures compatibility on systems supporting that specific ABI but does not provide cross-platform compatibility as it is defined for a specific OS and architecture.",y
+Why are applications typically written for and compiled on a specific operating system and CPU type?,"Due to architectural differences such as unique binary formats, varying CPU instruction sets, and significant differences in OS system calls, unless an interpreter or Runtime Environment (RTE) is used.",y
+What is an example of a program that demonstrates the extensive work required for cross-platform compatibility?,"Firefox, which runs across various platforms (Windows, macOS, Linux, iOS, Android) and CPU architectures.",y

@@ -1,0 +1,39 @@
+Front,Back,Reversible
+How is information safety addressed against physical damage?,"Through reliability, which involves duplicate copies and backups.",y
+How is information safety addressed against improper access?,Through protection mechanisms.,y
+List common protection mechanisms.,"User name/password authentication, encrypting secondary storage, firewalling network access, and advanced mechanisms for valid data access in multiuser systems.",y
+Define the 'Read' file access operation.,To read from a file.,y
+Define the 'Write' file access operation.,To write or rewrite a file.,y
+Define the 'Execute' file access operation.,To load and execute a file.,y
+Define the 'Append' file access operation.,To write new information at the end of a file.,y
+Define the 'Delete' file access operation.,To delete a file and free its space.,y
+Define the 'List' file access operation.,To list a file's name and attributes.,y
+Define the 'Attribute change' file access operation.,To change a file's attributes.,y
+"How are higher-level file functions (e.g., rename, copy, edit) typically implemented, and at what level is protection applied?","They are often implemented by system programs using lower-level calls, with protection applied at the lower level.",y
+On what is file access typically dependent?,User identity.,y
+What is the most general scheme for access control?,Access-control list (ACL).,y
+What information does an Access-Control List (ACL) specify?,User names and their allowed access types.,y
+How does an Operating System (OS) use an ACL to grant or deny access?,"The OS checks the ACL; if a user is listed with the requested access type, it allows access, otherwise it denies.",y
+What is an advantage of using Access-Control Lists (ACLs)?,They support complex access methodologies.,y
+What are the disadvantages of Access-Control Lists (ACLs)?,"Lengthy lists (tedious to construct, especially if users are unknown) and variable-size directory entries (leading to complicated space management).",y
+"In condensed ACLs, define 'Owner'.",The user who created the file.,y
+"In condensed ACLs, define 'Group'.",A set of users sharing a file who need similar access.,y
+"In condensed ACLs, define 'Other'.",All other users (not owner or in the group).,y
+What is a common approach for access control that combines different schemes?,"Combining Access-Control Lists (ACLs) with an owner, group, and universe scheme (e.g., as seen in Solaris).",y
+Describe the structure of UNIX permissions.,"UNIX permissions consist of three fields: owner, group, and universe. Each field uses three bits (`rwx`) to represent read, write, and execute permissions respectively.",y
+"In UNIX permissions, what do 'r', 'w', and 'x' stand for?","'r' stands for read, 'w' for write, and 'x' for execution.",y
+What does 'd' as the first character in a UNIX permission string indicate?,It indicates a subdirectory.,y
+What does a UNIX permission string like `rwxrwxr--` signify?,"It signifies `rwx` permissions (read, write, execute) for the owner, `rw-` permissions (read, write, no execute) for the group, and `r--` permissions (read-only) for others.",y
+What user interface challenge arises when combining ACLs with regular permissions?,How to visibly indicate the presence of optional ACLs.,y
+How does Solaris indicate the presence of ACLs alongside regular permissions?,"By appending a `+` symbol to the regular permission string (e.g., `-rw-r--r--+`).",y
+What commands are used to manage ACLs in systems like Solaris?,Commands such as `setfacl` and `getfacl`.,y
+How does Windows manage ACLs?,Through a Graphical User Interface (GUI).,y
+"When ACLs and group permissions conflict, which typically takes precedence?",ACLs typically take precedence over group permissions due to specificity priority.,y
+What is a potential advantage of using a password with each file for protection?,It can be effective if passwords are random and changed often.,y
+What are the disadvantages of using a password with each file for protection?,"Users would have too many passwords to remember, and if a single password is used for all files, it results in all-or-none protection.",y
+How do some systems implement password protection for groups of files?,By associating a password with a subdirectory.,y
+What is a more common approach to file protection involving passwords today?,"Encryption of partitions or files, managed with key passwords.",y
+What aspects does directory protection control in multilevel structures?,"It controls the creation and deletion of files within the directory, and a user's ability to determine file existence (by listing directory contents).",y
+What access is required if a path name refers to a file in a multilevel directory structure?,The user needs access to both the directory and the file itself.,y
+"How might access rights vary in multilevel directory structures, particularly with acyclic or general graphs?",Access rights can vary depending on the specific path name used to refer to a file.,y
+"Define ""access-control list"" (ACL).",A list of user names allowed to access a file.,y

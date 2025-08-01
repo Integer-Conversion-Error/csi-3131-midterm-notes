@@ -1,0 +1,62 @@
+Front,Back,Reversible
+What is one traditional method for program loading?,Loading the entire program into physical memory at execution.,y
+What is a problem with loading an entire program into physical memory at execution?,"The entire program may not be needed initially (e.g., unselected options), leading to inefficient memory use.",y
+What is an alternative to loading an entire program into physical memory at execution?,"Loading pages only as needed, which is called demand paging.",y
+When are pages loaded into physical memory in a demand paging system?,Only when they are 'demanded' during execution.,y
+What happens to unaccessed pages in a demand paging system?,They are never loaded into physical memory.,y
+What is demand paging similar to?,Paging with swapping.,y
+What is a key benefit of demand paging?,More efficient memory use by loading only the needed portions of a program.,y
+What hardware support is needed to distinguish between pages in memory and pages in secondary storage?,A valid-invalid bit scheme for page table entries.,y
+"In a valid-invalid bit scheme, what does a 'valid' bit indicate?",That the associated page is legal and currently in memory.,y
+"In a valid-invalid bit scheme, what does an 'invalid' bit indicate?",That the associated page is either not valid (not in the logical address space) or is valid but currently located in secondary storage.,y
+What happens if a process attempts to access a page marked as 'invalid' in the page table?,A 'page fault' occurs.,y
+What does a page fault cause?,A trap to the operating system (OS).,y
+What is the first step in the page fault handling procedure?,Check an internal table (like the process control block) to determine if the memory access is valid or invalid.,y
+"In page fault handling, what happens if the memory access is determined to be invalid?",The process is terminated.,y
+"In page fault handling, what happens if the memory access is valid but the page is not in memory?",The operating system initiates the process to bring the page into memory.,y
+"After determining a valid but non-resident page, what is the next step in page fault handling?",Find a free frame in physical memory.,y
+What happens after a free frame is found during page fault handling?,A secondary storage operation is scheduled to read the required page into the new free frame.,y
+What happens after the storage read is complete during page fault handling?,The internal table and the page table are modified to indicate that the page is now in memory.,y
+What is the final step in the page fault handling procedure?,"The interrupted instruction is restarted, allowing the process to access the page as if it had always been in memory.",y
+What is 'pure demand paging'?,"A form of demand paging where a process starts with no pages in memory, and pages are brought in only as they are faulted for.",y
+Why does demand paging generally have reasonable performance?,Because programs tend to exhibit 'locality of reference'.,y
+What two main hardware components are crucial for demand paging?,The page table and secondary memory (swap device/swap space).,y
+What is the role of the page table in demand paging hardware support?,It marks entries as invalid using valid-invalid bits or protection bits.,y
+What is the role of secondary memory in demand paging hardware support?,"It holds pages that are not currently in main memory, often referred to as swap space or a swap device.",y
+What is a crucial requirement for an operating system supporting demand paging related to instructions?,The ability to restart any instruction after a page fault occurs.,y
+What process state information must be saved on a page fault to allow instruction restart?,"Registers, condition code, and the instruction counter.",y
+"What is a difficulty encountered with restarting instructions after a page fault, especially for older architectures?","Instructions that modify multiple locations, like the IBM System 360/370 MVC instruction.",y
+What is one solution for restarting instructions that modify multiple locations after a page fault?,"Microcode accessing both ends of blocks before modification, ensuring a fault happens before any modification.",y
+What is another solution for restarting instructions that modify multiple locations after a page fault?,Using temporary registers to store overwritten values and restoring old values on a fault before the trap.,y
+How should paging appear to a running process?,It should be transparent to the process.,y
+What does the operating system maintain to handle page faults and memory allocation?,A free-frame list.,y
+"Besides page faults, for what other purposes are free frames allocated from the free-frame list?",For stack and heap segment expansion.,y
+What is 'zero-fill-on-demand'?,A technique used by most operating systems where frames are 'zeroed-out' (filled with zeros) before being allocated to a process.,y
+What is the purpose of 'zero-fill-on-demand'?,To ensure security by preventing a process from accessing the previous contents of a frame.,y
+What is the state of the free-frame list at system startup?,All available memory is placed on the free-frame list.,y
+What happens to the free-frame list as requests for memory frames are made?,It shrinks and must be repopulated when its size becomes low.,y
+What is the formula for calculating the effective access time for demand-paged memory?,"Effective Access Time = (1 - p) * ma + p * page fault time, where 'p' is the probability of a page fault and 'ma' is the memory access time.",y
+What are the three main components of page fault service time?,"Servicing the page-fault interrupt, reading in the page from secondary storage, and restarting the process.",y
+What is the typical time range for servicing a page-fault interrupt and restarting the process?,1 to 100 microseconds.,y
+What is the approximate HDD page-switch time?,"Around 8 milliseconds (composed of ~3ms latency, ~5ms seek, and ~0.05ms transfer).",y
+How does the effective access time relate to the page-fault rate?,It is directly proportional to the page-fault rate.,y
+"What is the impact on performance if the page-fault rate is 1/1000, given a memory access time of 200 ns and a page-fault service time of 8 ms?","The effective access time would be 8.2 microseconds, representing a 40x slowdown.",y
+What condition is crucial for good demand-paging performance?,A very low page-fault rate.,y
+How does swap space I/O generally compare to file system I/O?,Swap space I/O is generally faster than file system I/O because it typically uses larger blocks and avoids file lookups.,y
+Describe one strategy for swap space usage where the entire file image is copied.,"The entire file image is copied to swap space at startup, and then pages are demand-paged from this swap space. (Disadvantage: initial copy time).",y
+Describe a common swap space usage strategy used by Linux and Windows.,"Pages are initially demand-paged directly from the file system, but if they are modified and later replaced, they are written to swap space.",y
+How do Linux and BSD UNIX handle demand paging for binary executables?,"They demand-page binary executables directly from the file system. If frames holding these pages are replaced, they are simply overwritten (as they are never modified), with the file system acting as the backing store.",y
+"What type of memory still typically uses swap space, regardless of the executable paging strategy?",Anonymous memory (such as stack and heap).,y
+How do mobile operating systems like iOS typically handle memory and swapping?,"They typically do not use swapping. Instead, they demand-page from the file system and reclaim read-only pages if memory becomes constrained.",y
+"How are anonymous memory pages handled in mobile OS like iOS, given they typically don't swap?",They are not reclaimed unless the application is terminated or explicitly releases the memory.,y
+What is an alternative to swapping in mobile systems?,Compressed memory.,y
+Define 'demand paging'.,Bringing in pages from storage as needed rather than entirely at process load time.,y
+Define 'page fault'.,A fault that occurs when a reference is made to a non-memory-resident page.,y
+Define 'pure demand paging'.,A specific type of demand paging where no page is brought into memory until it is referenced.,y
+Define 'locality of reference'.,The tendency of processes to reference memory in predictable patterns rather than randomly.,y
+Define 'swap space'.,The secondary storage backing-store space used for memory pages that have been paged out of physical memory.,y
+Define 'free-frame list'.,A kernel-maintained list of available free physical memory frames.,y
+Define 'zero-fill-on-demand'.,"The process of writing zeros into a page before making it available to a process, typically for security reasons.",y
+Define 'effective access time'.,"The measured or calculated time required to access a resource, such as memory.",y
+Define 'page-fault rate'.,A measure of how often a page fault occurs per memory access attempt.,y
+Define 'anonymous memory'.,"Memory that is not associated with a file; if it becomes dirty and needs to be paged out, it is stored in swap space.",y

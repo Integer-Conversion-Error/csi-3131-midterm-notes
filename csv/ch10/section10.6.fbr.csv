@@ -1,0 +1,46 @@
+Front,Back,Reversible
+"What is ""thrashing"" in an operating system context?","A state where a process does not have enough physical memory frames (minimum needed for its working set), leading to quickly recurring page faults. It is characterized by high paging activity, where the system spends more time paging than executing.",y
+What is a primary performance consequence of thrashing?,"Severe performance problems, including a plunge in system throughput and a tremendous increase in page-fault rate, leading to increased effective memory-access time.",y
+Describe the common scenario that can trigger thrashing.,"The OS monitors low CPU utilization and, in an attempt to improve it, increases the degree of multiprogramming by initiating new processes.",y
+Which type of page-replacement algorithm can contribute to thrashing in a multiprogramming environment?,"A global page-replacement algorithm, which replaces pages without regard to the process that owns them.",y
+"How does a global page-replacement algorithm, combined with low CPU utilization, lead to thrashing?","A process needing more frames starts faulting and takes frames from other processes. This causes other processes to fault, taking frames from others. Faulting processes use the paging device, emptying the ready queue, which decreases CPU utilization. The CPU scheduler then increases multiprogramming further, taking more frames and leading to more page faults and longer paging device queues, causing CPU utilization to drop even more, thus perpetuating the cycle.",y
+"How does CPU utilization generally change as the degree of multiprogramming increases, before thrashing occurs?",CPU utilization increases (though at a slower rate) until it reaches a maximum.,y
+What happens to CPU utilization when the degree of multiprogramming is increased beyond the point where thrashing begins?,CPU utilization drops sharply.,y
+What is the most direct way to stop thrashing once it has begun?,Decrease the degree of multiprogramming.,y
+What types of page-replacement algorithms can limit the effects of thrashing?,Local replacement algorithms or priority replacement algorithms.,y
+"Define a ""local replacement algorithm"".",A page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes; a process selects pages only from its own allocated frames.,y
+"Define a ""priority replacement algorithm"".",A page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes.,y
+What is a limitation of using local or priority replacement algorithms to limit thrashing?,"While a thrashing process cannot steal frames from others, it still queues for the paging device, increasing the average service time for page faults and, consequently, the effective access time for all processes.",y
+What is the fundamental way to prevent thrashing?,Provide each process with enough physical memory frames.,y
+"Define the ""locality model"".","A model for page replacement based on the working-set strategy, which states that during execution, a process moves from one 'locality' of memory references to another.",y
+"In the context of the locality model, what is a ""locality""?",A set of pages that are actively used together by a program.,y
+Describe the characteristics of localities in a running program.,"A running program typically consists of several overlapping localities, which are defined by its program structure and data structures.",y
+"What fundamental principle, relevant to memory access patterns, is behind caching?","Accesses are patterned, not random (i.e., exhibiting locality).",y
+"What is the ""working-set model"" based on?",The locality assumption.,y
+What key parameter is used in the working-set model?,"Δ (delta), which defines the working-set window.",y
+"Define ""working-set window"".",A limited set of most recently accessed pages (a 'window' view of the entire set of accessed pages). It specifically refers to the most recent Δ page references.,y
+"Define ""working set"".","The set of pages that are contained within the working-set window (i.e., the pages in the most recent Δ references).",y
+How long does a page remain in a working set?,"If a page is in active use, it remains in the working set. If it's no longer used, it drops from the working set Δ time units after its last reference.",y
+What does a working set approximate?,A program's locality.,y
+What determines the accuracy of the working set in approximating a program's locality?,The selection of the Δ (working-set window) parameter.,y
+What is the consequence if the Δ parameter in the working-set model is too small?,The working set will not encompass the entire locality.,y
+What is the consequence if the Δ parameter in the working-set model is too large?,The working set may overlap several localities.,y
+What does the working set represent if Δ is infinite?,The working set would be all pages touched by the process during its entire execution.,y
+What is the most important property derived from the working-set model?,The working-set size (WSSi) for each process.,y
+"In the working-set model, how is the total demand for frames (D) calculated?","D = sum of WSSi, where WSSi is the working-set size for each process i.",y
+"According to the working-set model, when does thrashing occur?","If the total demand for frames (D) exceeds the total available frames (m), meaning some processes lack sufficient frames for their working sets.",y
+How does an OS use the working-set model to manage processes and memory?,"It monitors the working set of each process, allocates enough frames for its working-set size, initiates new processes if there are enough extra frames, and suspends processes (swapping their pages out) if the sum of working-set sizes exceeds available frames.",y
+What are the main benefits of using the working-set model for memory management?,"It prevents thrashing, helps keep the degree of multiprogramming high, and optimizes CPU utilization.",y
+What is the main difficulty in implementing the working-set model?,Accurately tracking the moving working-set window.,y
+What is a common approximation method used to implement the working-set model?,Using a fixed-interval timer interrupt in conjunction with reference bits.,y
+How does the fixed-interval timer interrupt and reference bit approximation work for working sets?,"At each timer interrupt, the OS copies and clears the reference bits. On a page fault, it examines the current reference bit and a few in-memory history bits. If at least one bit is on within the Δ window (e.g., last 10,000-15,000 references), the page is considered part of the working set.",y
+What is a key limitation of the working-set approximation using timer interrupts and reference bits?,It cannot tell the exact reference time within an interval.,y
+How can the accuracy of the working-set approximation be improved?,By increasing the number of history bits or increasing the interrupt frequency (though this comes at a higher cost).,y
+"Define ""Page-Fault Frequency"" (PFF).",The frequency at which page faults occur.,y
+What is the primary goal of the Page-Fault Frequency (PFF) strategy?,To prevent thrashing by directly controlling the page-fault rate.,y
+How does the PFF strategy compare to the working-set model regarding thrashing control?,The working-set model is successful and useful for prepaging but can be clumsy for thrashing control; the PFF strategy is more direct.,y
+How does the PFF strategy decide whether a process needs more or fewer frames?,"If the page-fault rate is too high, the process needs more frames. If it's too low, the process may have too many frames.",y
+How does the PFF strategy operationalize its control over page-fault rates?,"It establishes upper and lower bounds for the desired page-fault rate. If the actual PFF exceeds the upper limit, another frame is allocated. If it falls below the lower limit, a frame is removed.",y
+What action does the PFF strategy take if a process's page-fault rate increases but no free frames are available?,"The OS selects a process to swap out to backing store, and the freed frames are then distributed to the processes with high page-fault frequencies.",y
+What is the current best practice for memory management to avoid thrashing and swapping?,Include enough physical memory in the system to avoid the occurrence of thrashing and excessive swapping.,y
+What is the primary benefit of the current best practice in memory management (having enough physical memory)?,"It provides the best user experience across various devices, from smartphones to large servers.",y

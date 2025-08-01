@@ -1,0 +1,14 @@
+Front,Back,Reversible
+What are the basic I/O hardware elements?,"Buses, device controllers, and devices.",y
+How is data typically moved in an I/O system?,By the CPU (programmed I/O) or by a DMA (Direct Memory Access) controller.,y
+Define a device driver.,A kernel module responsible for controlling a specific hardware device.,y
+List the basic hardware categories handled by the system-call interface.,"Block devices, character-stream devices, memory-mapped files, network sockets, and programmed interval timers.",y
+What is the default behavior of system calls regarding process execution?,"They usually block processes, causing the calling process to sleep until the I/O operation completes.",y
+When are nonblocking or asynchronous system calls utilized?,"By the kernel or applications that must not be blocked (i.e., cannot sleep) while waiting for an I/O operation.",y
+Name the services provided by the kernel's I/O subsystem.,"I/O scheduling, buffering, caching, spooling, device reservation, and error handling.",y
+"What is the purpose of ""name translation"" in the context of I/O?",To connect hardware devices to their symbolic file names.,y
+Describe the multiple mapping levels involved in I/O name translation.,"Character-string names map to device drivers/addresses, which then map to physical addresses (I/O ports/bus controllers).",y
+How is I/O name mapping handled in UNIX versus MS-DOS?,"In UNIX, mapping is typically within the file-system name space. In MS-DOS, it's in a separate device name space.",y
+What is STREAMS in UNIX?,A UNIX mechanism for the dynamic assembly of driver code pipelines.,y
+How do drivers function within a STREAMS pipeline?,"Drivers can be stacked, and data passes sequentially and bidirectionally through the pipeline.",y
+List the reasons why I/O system calls are costly.,"Context switching across the kernel protection boundary, signal/interrupt handling, and CPU/memory load for data copying between kernel buffers and application space.",y

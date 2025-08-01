@@ -1,0 +1,69 @@
+Front,Back
+What is the primary role of mass storage in computer systems?,To permanently store files and data.
+What types of secondary storage do modern computers primarily use?,Hard disk drives (HDDs) and nonvolatile memory (NVM) devices.
+List common variations among secondary storage devices.,"Transfer (character at a time vs. block), Access (sequentially vs. randomly), Data transfer (synchronously vs. asynchronously), Usage (dedicated vs. shared), Read-only vs. read-write, Speed (slowest major component)."
+What are the key goals of an OS I/O subsystem?,"Provide the simplest interface possible to the rest of the system, and optimize I/O for maximum concurrency (devices are performance bottleneck)."
+What is 'mass storage'?,The nonvolatile storage system of a computer.
+What is the main mass-storage system?,Secondary storage (HDDs and NVM devices).
+What types of tertiary storage exist for some systems?,"Slower, larger storage like magnetic tape, optical disks, and cloud storage."
+What is the general term for all types of non-volatile storage?,"Non-volatile storage (NVS) or ""storage drives""."
+hard disk drive (HDD),"Secondary storage device based on mechanical components (spinning magnetic media platters, moving read-write heads)."
+nonvolatile memory (NVM),Persistent storage based on circuits and electric charges.
+How is information stored and read on an HDD platter?,Information is stored by recording magnetically and read by detecting magnetic patterns.
+platter,HDD component with a magnetic media layer for holding charges; flat circular shape (like a CD).
+disk arm,"HDD component holding read-write heads, which moves all heads as a unit over cylinders of platters."
+track,"On an HDD platter, the medium under the read-write head during platter rotation; logically a circular division of the platter surface."
+sectors,"On an HDD platter, fixed-size sections that subdivide tracks."
+cylinder,"On an HDD, the set of tracks under read-write heads on all platters in the device at a given arm position."
+What is the smallest unit of transfer on an HDD?,A sector.
+"What was the common sector size for HDDs until around 2010, and what is it migrating to?","Commonly 512 bytes until ~2010, then migrating to 4KB."
+What are common rotation speeds (RPM) for HDD motors?,"5,400, 7,200, 10,000, 15,000 RPM."
+transfer rate,The rate at which data flows between the drive and the computer.
+positioning time,"On an HDD, the time for the read-write head to position over the desired track; also known as random-access time."
+What are the two parts of positioning time (random-access time) for an HDD?,Seek time and rotational latency.
+seek time,"On an HDD, the time for the disk arm to move the read-write head to the desired cylinder."
+rotational latency,"On an HDD, the time for the desired sector to rotate to the disk head once the head is over the desired cylinder."
+What are typical performance figures for modern disks in terms of transfer rate and latency?,"Tens to hundreds of MB/sec transfer, several milliseconds seek/rotational latency."
+How do drive controllers improve HDD performance?,By using DRAM buffers.
+head crash,"On an HDD, a mechanical problem where the read-write head touches the platter surface."
+What is the consequence of a head crash on an HDD?,"It's normally irreparable, the entire disk is replaced, and data is lost unless backed up or RAID protected."
+effective transfer rate,"The actual, measured transfer rate of data between two devices, which is typically lower than published rates."
+What are NVM devices composed of?,A controller and flash NAND die semiconductor chips that store data.
+solid-state disk (SSD),A disk-drive-like storage device using flash-memory-based nonvolatile memory.
+USB drive,Nonvolatile memory in the form of a device that plugs into a USB port (also known as thumb drive/flash drive).
+What are the advantages of NVM devices over HDDs?,"They are more reliable (no moving parts), faster (no seek/rotational latency), and consume less power."
+What are the disadvantages of NVM devices compared to larger HDDs?,They are more expensive per MB and have less capacity.
+What are the storage and reliability challenges with NAND semiconductors?,"Data cannot be overwritten directly (NAND cells must be erased first), and they deteriorate with every erase cycle (~100,000 program-erase cycles)."
+"In what increments are NAND flash devices read/written, and in what increments are they erased?","Read/write in ""page"" increments (similar to a sector), and erasure occurs in ""block"" increments (several pages), which is much slower."
+How is NVM lifespan measured?,In Drive Writes Per Day (DWPD).
+flash translation layer (FTL),"For nonvolatile memory, a table maintained by the controller that maps physical pages to currently valid logical blocks."
+What happens when a full SSD has a pending write and no free blocks?,"If no free blocks but individual pages hold invalid data, garbage collection occurs, where good data is copied to other locations, freeing blocks for erase/writes."
+garbage collection,"The recovery of space containing no-longer-valid data, typically by copying valid data to new locations and then erasing the old block."
+over-provisioning,"In non-volatile memory, space (e.g., 20% of total) set aside by the device as always available write area, not counted in device free space."
+wear leveling,"In nonvolatile memory, an effort by the controller to select all NAND cells over time as write targets to avoid premature media failure due to frequently erased blocks."
+How do NVM devices provide data protection?,They include error-correcting codes (ECC) calculated and stored with the data to detect and correct errors.
+RAM drives,"Sections of a system's DRAM presented as secondary storage devices, created by device drivers."
+What is a practical use of RAM drives despite their volatility?,"To allow users/programmers to place data in memory for temporary safekeeping using standard file operations, useful for temporary files or sharing data."
+magnetic tape,"A nonvolatile magnetic media storage device (tape spooled on reels, passing over a read-write head); mostly used for backups, infrequently used info, or transferring info between systems."
+How do magnetic tapes compare to main memory and drives in terms of random access time?,"Random access is very slow: ~1000x slower than HDDs, ~100,000x slower than SSDs."
+"Once positioned correctly, how fast do tape drives read/write?",At speeds comparable to HDDs.
+I/O bus,Physical connection of an I/O device to a computer system.
+List some common bus types for connecting secondary storage.,"Advanced Technology Attachment (ATA), Serial ATA (SATA), eSATA, Serial Attached SCSI (SAS), Universal Serial Bus (USB), Fibre Channel (FC)."
+Which bus type is most common for secondary storage?,SATA.
+NVM express (NVMe),"A high-speed I/O bus specifically for NVM storage, which directly connects the device to the system PCI bus to increase throughput and decrease latency."
+controller,A special processor managing I/O devices.
+host bus adapter (HBA),A device controller installed in a host bus port to allow a device connection to the host.
+host controller,"I/O-managing processors within a computer (e.g., inside an HBA)."
+device controller,An I/O managing processor built into each storage device.
+How does a mass storage I/O operation typically proceed?,"The computer places a command into the host controller (via memory-mapped I/O ports), which then sends the command via messages to the device controller. The device controller operates the drive hardware."
+"Where does data transfer occur at the drive, and then to the host?","At the drive, data transfers between the device controller's built-in cache and the storage media. Data then transfers to the host between the cache and host DRAM via DMA at fast electronic speeds."
+logical blocks,Logical addresses used to access blocks on storage devices; also the smallest unit of transfer.
+How are storage devices logically addressed?,As large one-dimensional arrays of logical blocks.
+What does a logical block map to physically on a device?,A physical sector or a semiconductor page.
+"Why is converting LBA to old-style disk addresses (cylinder, track, sector) difficult in practice?","Because of defective sector substitution with spares, non-constant sectors per track on some drives, and internal management by disk manufacturers that hides the true physical mapping."
+What assumption do algorithms dealing with HDDs make about logical and physical addresses?,That ascending logical addresses correspond to ascending physical addresses.
+constant linear velocity (CLV),A device-recording method where bit density is uniform per track by varying the rotational speed of the medium.
+Why do outer tracks in CLV have more sectors?,Because they are longer and bit density is uniform.
+Where is CLV commonly used?,In CD-ROM and DVD-ROM drives.
+constant angular velocity (CAV),"A device-recording method where the medium spins at a constant velocity, and bit density decreases from inner to outer tracks to maintain a constant data rate."
+Where is CAV commonly used?,In hard disks.

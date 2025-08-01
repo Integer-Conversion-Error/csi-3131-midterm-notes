@@ -1,0 +1,58 @@
+Front,Back
+What is the primary issue addressed by frame allocation?,How to allocate fixed free memory among processes.
+"In a pure demand paging system, where are initial frames placed for user processes?",On the free-frame list.
+"In pure demand paging, what happens when a page fault occurs?",Free frames are obtained from the free-frame list.
+"In pure demand paging, what happens if the free-frame list is exhausted during a page fault?",A page-replacement algorithm is used.
+"In pure demand paging, what happens to frames when a process terminates?",Frames are returned to the free-frame list.
+How can OS-allocated buffer/table space contribute to user paging in frame allocation variations?,It can be used for user paging when not in use.
+What is a common practice for reserving free frames in some allocation strategies?,"Keeping 3 free frames reserved: one for a page fault, and a replacement selected during a swap."
+What is the basic strategy for allocating frames to a user process?,The user process is allocated any free frame.
+What are the two main constraints on frame allocation?,"Cannot exceed total available frames (unless page sharing), and must allocate at least a minimum number of frames."
+What is the impact of allocating fewer frames to a process on performance?,Higher page-fault rate and slower execution.
+When might an instruction require a restart due to page faults?,If a page fault occurs before the instruction is complete.
+What is the general rule for the minimum number of frames required for an instruction?,Enough frames for all pages an instruction can reference.
+What is the minimum number of frames for a single memory-reference instruction?,1 frame for the instruction and 1 frame for the memory reference.
+What is the minimum number of frames for a process with one-level indirect addressing?,At least 3 frames per process.
+What primarily defines the minimum number of frames required for a system?,Computer architecture.
+"For a ""move"" instruction straddling two frames with two indirect operands, how many frames might be needed?",6 frames.
+What defines the maximum number of frames that can be allocated?,The total available physical memory.
+"Define ""equal allocation"" in the context of virtual memory.","Assigns equal amounts of a resource to all requestors; in virtual memory, equal frames to each process."
+"How are frames divided among 'n' processes using equal allocation, given 'm' frames?",Each process receives 'm/n' frames.
+"Define ""proportional allocation"" in the context of virtual memory.","Assigns a resource in proportion to some aspect of the requestor; in virtual memory, page frames in proportion to process size."
+When is proportional allocation used over equal allocation?,When processes need differing amounts of memory.
+"How are frames allocated to process p_i with virtual memory size s_i using proportional allocation, given total size S and available frames m?","a_i ≈ (s_i/S) × m frames, ensuring a_i is an integer, greater than minimum, and sum ≤ m."
+How does an increased multiprogramming level affect frame allocation to processes?,Processes lose frames.
+How are high- and low-priority processes typically treated in standard equal or proportional allocation?,They are treated the same.
+How can proportional allocation be adjusted to account for process priority?,"Allocate based on process priority, or a combination of size and priority."
+"Define ""global replacement"" in page replacement algorithms.","Process selects replacement frame from all frames in system, even if allocated to another process."
+What is a potential problem with global replacement regarding process performance?,Process performance depends on other processes' paging behavior (external circumstances).
+What is the general impact of global replacement on system throughput compared to local replacement?,"Generally greater system throughput, and it is more common."
+"Define ""local replacement"" in page replacement algorithms.",Process selects replacement frame only from its own allocated frames.
+What is the impact of local replacement on a process's performance?,Performance depends only on its own paging behavior.
+What is a page fault?,A condition where a referenced page has no valid mapping in memory.
+"Define ""major fault"" (also known as ""hard fault"").",Page fault resolved by I/O to bring page from secondary storage.
+What is required to resolve a major page fault?,Reading from backing store and updating the page table.
+"Define ""minor fault"" (also known as ""soft fault"").",Page fault resolved without paging in data from secondary storage.
+What is one reason for a minor page fault involving a shared library?,"A shared library is in memory but has no logical mapping for the process, requiring only a page table update."
+What is another reason for a minor page fault involving a reclaimed page?,"A page was reclaimed to the free-frame list but not zeroed or reallocated, requiring the frame to be removed from the list and reassigned."
+Which type of page fault is generally less time-consuming?,Minor page faults.
+What Linux command can be used to observe minor and major page faults?,"`ps -eo min_flt,maj_flt,cmd`"
+"Define ""reapers"" in the context of memory management.","Routines that scan memory, freeing frames to maintain minimum free memory."
+"In a global page-replacement strategy, when are replacement routines triggered for the free-frame list?","When the list falls below a certain threshold, not necessarily at zero, to ensure sufficient free memory."
+"When are kernel reaper routines triggered, and what do they do?","They are triggered when free memory falls below a minimum threshold, reclaiming pages from all processes (excluding the kernel) using page-replacement algorithms."
+When is a reaper routine suspended and resumed?,"Suspended when free memory reaches a maximum threshold, and resumed when free memory falls below the minimum threshold."
+Which page-replacement algorithm do reaper routines typically use?,LRU approximation.
+What happens if a reaper routine is unable to maintain free frames effectively?,"It reclaims more aggressively, potentially using an algorithm like pure FIFO."
+"Define ""out-of-memory (OOM) killer.""",Linux routine that terminates processes to free memory when free memory is very low.
+"What is an OOM score, and how does it relate to process termination likelihood?",A score calculated by memory usage percentage; a higher score indicates a higher termination likelihood by the OOM killer.
+How can OOM scores be viewed in Linux?,By checking `/proc/<pid>/oom_score` for a given process ID.
+"Define ""non-uniform memory access (NUMA).""",Architecture where memory access time varies based on the CPU core.
+Describe key characteristics of NUMA systems in terms of CPU access and performance.,"CPUs access local memory faster than remote memory; they are slower than uniform access systems but allow more CPUs, greater throughput, and parallelism."
+What is critical for performance management in NUMA systems?,Managing page frame location.
+How do NUMA-aware systems allocate frames during a page fault?,"Frames are allocated ""as close as possible"" to the CPU (minimum latency, same system board)."
+How does the scheduler contribute to performance optimization in NUMA systems?,"It tracks the last CPU a process ran on and schedules the process on that CPU, then allocates frames close to it, improving cache hits and decreasing memory access latency."
+Why do threads complicate memory allocation in NUMA systems?,"Process threads can run on different system boards, making memory allocation challenging."
+How does Linux's CFS scheduler address thread migration in NUMA environments?,"The kernel identifies scheduling domains, and the CFS scheduler prevents thread migration across these domains to avoid memory access penalties."
+How does Linux manage memory allocation for threads in NUMA environments?,"It maintains a separate free-frame list per NUMA node, ensuring threads are allocated memory from their running node."
+"Define ""lgroups"" in the context of Solaris.",Solaris locality groups in the kernel that gather CPUs and memory for optimized access in NUMA systems.
+How do Solaris lgroups function to optimize memory access?,"Each lgroup contains CPUs and memory where CPU access to memory within the group is within a defined latency; Solaris schedules threads and allocates memory within the lgroup, or nearby lgroups if not possible, to minimize latency and maximize cache hits."

@@ -1,0 +1,65 @@
+Front,Back,Reversible
+What is the primary characteristic of a monolithic operating system structure?,"All kernel functionality is in a single, static binary file within one address space.",y
+Which operating system is an example of the original monolithic structure?,Original UNIX OS.,y
+How does Linux's kernel structure relate to the monolithic design?,"Linux uses a monolithic kernel, but with a modular design for runtime modification.",y
+What are the advantages of a monolithic kernel structure?,High performance due to minimal overhead and fast internal communication.,y
+What are the disadvantages of a monolithic kernel structure?,Difficult to implement and extend.,y
+Define 'monolithic' in the context of kernel structure.,"Kernel without structure, where all functionality resides in a single, static binary file.",y
+What is the concept behind the layered approach to kernel structure?,"The OS is broken into layers (e.g., Layer 0: hardware, Layer N: user interface), where each layer uses functions only from lower layers.",y
+How does a layered kernel compare to a monolithic one in terms of component coupling?,"Layered kernels divide into separate, smaller, loosely coupled components, unlike tightly coupled monolithic kernels.",y
+What are the advantages of the layered approach in OS design?,Simplicity in construction and debugging.,y
+What are the disadvantages of the layered approach in OS design?,Challenges in defining layers and potential poor performance due to multiple layer traversals.,y
+Are pure layered systems common today?,"Pure layered systems are rare; however, some layering with fewer, more functional layers is common.",y
+Define 'layered approach' in OS structure.,"OS separated into layers, from hardware to user interface.",y
+Define 'tightly coupled systems'.,"Processors in close communication, sharing resources.",y
+Define 'loosely coupled' in the context of kernel components.,"Kernel composed of components with specific, limited functions.",y
+What defines a microkernel structure?,"It removes nonessential components from the kernel, implementing them as user-level programs in separate address spaces, resulting in a smaller kernel.",y
+What core functions are typically included in a microkernel?,Minimal process/memory management and a communication facility.,y
+How do components communicate in a microkernel system?,"Indirectly, via message passing through the microkernel.",y
+What are the benefits of a microkernel architecture?,"Easier OS extension/modification, easier portability, and enhanced security/reliability.",y
+Name two examples of operating systems that use a microkernel.,Mach (kernel of Darwin) and QNX.,y
+What are the disadvantages of a microkernel architecture?,Performance can suffer due to message copying and process switching overhead.,y
+Define 'microkernel'.,"A kernel structure that removes nonessential components from the kernel, implementing them as user-level programs.",y
+Define 'Mach'.,A microkernel OS with threading developed at Carnegie Mellon.,y
+What are Loadable Kernel Modules (LKMs)?,Components that allow dynamic linking of additional services to the kernel.,y
+What is the design principle behind using Modules/LKMs?,"The kernel provides core services, while other services are dynamic, avoiding kernel recompilation for changes.",y
+How do Modules/LKMs compare to layered and microkernel approaches in terms of flexibility and efficiency?,They are more flexible than layered systems and more efficient than microkernels.,y
+How does Linux utilize Loadable Kernel Modules?,"Linux uses LKMs for device drivers and file systems, allowing dynamic insertion and removal.",y
+Define 'loadable kernel module (LKM)'.,A kernel component that allows additional services to be linked dynamically.,y
+What is a hybrid operating system structure?,"A structure that combines different OS architectures (e.g., monolithic, microkernel, modular) to balance performance, security, and usability.",y
+Describe the hybrid structure of Linux.,Linux combines monolithic and modular approaches.,y
+Describe the hybrid structure of Windows.,Windows is largely monolithic but incorporates microkernel-like behavior (user-mode subsystems/OS personalities) and dynamically loadable kernel modules.,y
+What is the overall structure of Apple's macOS and iOS?,They share a layered structure.,y
+List the four main layers of macOS and iOS.,"1. User experience layer, 2. Application frameworks layer, 3. Core frameworks, 4. Kernel environment.",y
+What is the 'user experience layer' in macOS and iOS?,"The software interface for user interaction, such as Aqua (macOS) and Springboard (iOS).",y
+What is the 'application frameworks layer' in macOS and iOS?,It includes Cocoa (macOS) and Cocoa Touch (iOS) for Objective-C/Swift APIs.,y
+What functionality is provided by the 'core frameworks' layer in macOS and iOS?,"Graphics and media support (e.g., Quicktime, OpenGL).",y
+What constitutes the 'kernel environment' layer in macOS and iOS?,"Darwin, which is a hybrid of the Mach microkernel and the BSD UNIX kernel.",y
+Define 'user experience layer'.,The software interface for user interaction in macOS/iOS.,y
+Define 'application frameworks layer'.,The layer in macOS/iOS that includes Cocoa/Cocoa Touch for APIs.,y
+Define 'core frameworks'.,Graphics/media support components in macOS/iOS.,y
+Define 'kernel environment' in the context of macOS/iOS.,"The Darwin layer, consisting of the Mach microkernel and BSD UNIX kernel.",y
+What is Darwin?,"Apple's open-source kernel, which has a hybrid structure (Mach microkernel + BSD UNIX kernel).",y
+What two system-call interfaces does Darwin provide?,Mach (via traps) and BSD (via POSIX).,y
+Define 'trap' in the context of OS system calls.,"A software interrupt, which can signify an error or a request for an OS service.",y
+List the 'kernel abstractions' provided by Mach services in Darwin.,"Tasks, threads, memory objects, and ports.",y
+Define 'kernel abstractions'.,"Components that add functionality to Mach, such as tasks, threads, memory objects, and ports.",y
+What are 'kernel extensions' (kexts) in macOS?,Dynamic modules or third-party components that can be added to the kernel.,y
+How does Darwin mitigate performance issues often associated with microkernels?,It combines components in a single address space to reduce message copying overhead.,y
+"What is Android, and how is its software structured?",Android is an open-source mobile OS (Google-led) structured as a layered software stack.,y
+"How are applications developed for Android, and how are they compiled?",Applications are developed in Java with the Android API and compiled to '.dex' files for the Android RunTime (ART) VM.,y
+What is Ahead-of-Time (AOT) compilation in Android?,"ART compiles Java applications to native code upon installation, improving execution speed.",y
+Define 'ahead-of-time (AOT) compilation' in Android.,ART's process of compiling Java apps to native code on installation.,y
+What is JNI in Android?,"Java Native Interface, used for direct hardware access, though it makes applications less portable.",y
+Name some native libraries used in Android.,"WebKit, SQLite, and SSLs.",y
+What is the purpose of the Hardware Abstraction Layer (HAL) in Android?,It abstracts hardware for portability across different devices.,y
+What is Bionic in Android?,"Android's standard C library, designed to be smaller and more efficient for mobile CPUs.",y
+Define 'Bionic'.,"Android's standard C library, which is smaller and efficient on mobile CPUs.",y
+How is the Linux kernel utilized and modified in Android?,"A modified Linux kernel serves as the base, adapted for mobile needs like power/memory management and interprocess communication (IPC) via Binder.",y
+What is the Windows Subsystem for Linux (WSL)?,A Windows 10 component that allows native Linux applications (ELF binaries) to run on Windows.,y
+Define 'Windows Subsystem for Linux (WSL)'.,A Windows 10 component for running native Linux apps.,y
+How does WSL operate when a Linux app is launched?,"Executing `bash.exe` starts a Linux instance (init, bash shell) within a Windows Pico process.",y
+What are 'Pico processes' in the context of WSL?,WSL processes that load Linux binaries and translate Linux system calls.,y
+Define 'Pico' in the context of WSL.,A WSL process responsible for translating Linux system calls.,y
+What is a 'Linux instance' in WSL?,A set of Pico processes created in Windows by WSL to run Linux applications.,y
+How are Linux system calls handled by WSL?,"LXCore/LXSS translate Linux calls, either providing direct functionality or combining them with Windows calls.",y

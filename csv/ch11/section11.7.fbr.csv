@@ -1,0 +1,51 @@
+Front,Back,Reversible
+What are the three ways computers access secondary storage?,"Host-attached, network-attached, and cloud storage.",y
+Define host-attached storage.,Storage accessed through local I/O ports (directly attached to a computer).,y
+What is the most common local I/O port for host-attached storage?,SATA.,y
+How can a system gain more storage access beyond its typical few SATA ports?,"By connecting individual storage devices, devices in a chassis, or multiple drives in a chassis via USB, FireWire, or Thunderbolt.",y
+What kind of I/O architectures are used by high-end workstations and servers that need more/shared storage?,Sophisticated I/O architectures.,y
+What is Fibre Channel (FC)?,A high-speed serial architecture (optical fiber or copper cable) used in data centers to connect computers to storage arrays.,y
+What are the benefits of Fibre Channel (FC)?,"Large address space, switched communication, and the ability to attach multiple hosts/storage devices to the fabric, providing flexibility in I/O communication.",y
+Name some devices suitable for host-attached storage.,"HDDs, NVM devices, CD/DVD/Blu-ray/tape drives, and storage-area networks (SANs).",y
+How are I/O commands for host-attached storage directed?,Reads/writes of logical data blocks are directed to specifically identified storage units (via bus ID or target logical unit).,y
+Define Network-Attached Storage (NAS).,Storage accessed from a computer across a network.,y
+What types of systems can a NAS device be?,A special-purpose storage system or a general computer system providing storage to other hosts.,y
+How do clients typically access NAS?,Via a remote-procedure-call (RPC) interface.,y
+Name common RPC interfaces used for NAS.,NFS (for UNIX/Linux) and CIFS (for Windows).,y
+How are RPCs for NAS typically carried?,"Via TCP/UDP over an IP network, usually within the same LAN.",y
+How is a NAS unit usually implemented?,As a storage array with RPC interface software.,y
+What features do CIFS and NFS provide for NAS?,"Locking features, allowing file sharing between hosts accessing the NAS.",y
+What is a key convenience of NAS for LAN computers?,"It provides a convenient way to share a storage pool, offering ease of naming and access.",y
+What is a downside of NAS compared to some direct-attached storage?,It is less efficient and has lower performance.,y
+What is iSCSI?,The latest network-attached storage protocol that uses the IP network protocol to carry the SCSI protocol.,y
+What does iSCSI use instead of SCSI cables for interconnects between hosts and storage?,IP networks.,y
+How do hosts treat storage accessed via iSCSI?,"As if it were directly attached, even if it is distant.",y
+What is the difference in data transfer between NFS/CIFS and iSCSI?,"NFS/CIFS present a file system and send parts of files, whereas iSCSI sends logical blocks across the network, allowing the client to use blocks directly or create a file system.",y
+Define Cloud storage.,"Storage accessed over the Internet/WAN to a remote, shared data center, often provided for a fee or free. It is similar to network-attached storage but accessed differently.",y
+How does cloud storage differ from NAS in terms of access and presentation?,"NAS is accessed as another file system (CIFS/NFS) or raw block device (iSCSI), with the OS integrating these protocols. Cloud storage is API based, meaning programs use APIs to access it.",y
+Name some examples of cloud storage services.,"Amazon S3, Dropbox, Microsoft OneDrive, Apple iCloud.",y
+Why do cloud storage services typically use APIs instead of existing protocols like NFS/CIFS?,Due to WAN latency and the higher likelihood of failure scenarios.,y
+For what type of networks are NAS protocols (NFS/CIFS) designed?,"LANs, which have lower latency and less connectivity loss.",y
+What can happen if a LAN connection fails when using NFS/CIFS?,The system might hang.,y
+How do applications handle failures with cloud storage?,"Failures are more likely, and the application typically pauses access until connectivity is restored.",y
+"What is a drawback of NAS, especially in large client-server installations?","Storage I/O consumes data network bandwidth, increasing network communication latency, and server-client communication competes with server-storage communication.",y
+What is a Storage-Area Network (SAN)?,"A private network connecting servers and storage units, using storage protocols rather than networking protocols. It is a local-area storage network allowing multiple computers to connect to storage devices.",y
+What is the primary strength of a SAN?,Flexibility.,y
+What can attach to the same SAN fabric?,Multiple hosts and storage arrays.,y
+How is storage allocated to hosts in a SAN?,It is dynamically allocated.,y
+What types of drives are found in storage arrays?,RAID protected or unprotected drives (Just a Bunch of Disks - JBOD).,y
+What is Just a Bunch of Disks (JBOD)?,Unprotected drives in a storage array.,y
+What is the function of a SAN switch?,It allows or prohibits access between hosts and storage.,y
+Provide an example of how a SAN can be configured to help a host.,"If a host is low on disk space, the SAN can be configured to allocate more storage to it.",y
+How do SANs facilitate sharing for server clusters?,Clusters of servers can share the same storage.,y
+How do SANs typically compare to storage arrays in terms of ports and cost?,SANs typically have more ports and higher cost.,y
+"What are the typical characteristics of SAN connectivity regarding distance, routing, and number of connected hosts?","Short distances, typically no routing, and NAS can have more connected hosts than SAN.",y
+What is a storage array?,"A purpose-built device that includes SAN/network ports (or both) and contains drives to store data, along with controller(s) to manage storage and access.",y
+What components are found within storage array controllers?,"CPUs, memory, and software.",y
+Name some features implemented by storage array controllers' software.,"Network protocols, UIs (user interfaces), RAID, snapshots, replication, compression, deduplication, and encryption.",y
+What types of drives can some storage arrays include?,SSDs.,y
+What are the characteristics of a storage array with only SSDs?,Maximum performance but smaller capacity.,y
+How is a mix of SSDs and HDDs typically managed in a storage array?,"Array software or the administrator selects the best medium for data, or SSDs are used as cache and HDDs as bulk storage.",y
+What is the most common SAN interconnect?,Fibre Channel (FC).,y
+Which SAN interconnect is increasing in use due to its simplicity?,iSCSI.,y
+What is InfiniBand (IB)?,A special-purpose bus architecture that provides hardware and software support for high-speed interconnection networks between servers and storage units.,y

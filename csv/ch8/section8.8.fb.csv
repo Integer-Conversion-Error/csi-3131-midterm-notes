@@ -1,0 +1,24 @@
+Front,Back
+"When deadlock is detected, what are the two main options for recovery?","1. Inform operator (manual recovery).
+2. System recovers automatically."
+What are the two primary options for breaking a deadlock once detected?,"1. Abort one or more threads (to break circular wait).
+2. Preempt resources from deadlocked threads."
+How does 'process and thread termination' contribute to eliminating deadlocks?,"By aborting processes/threads, which allows the system to reclaim all resources held by them."
+Describe the 'Abort all deadlocked processes' method for deadlock recovery.,"This method immediately breaks the deadlock cycle. However, it is expensive because it discards all computations by the involved processes, necessitating recomputation."
+What is the 'Abort one process at a time until deadlock eliminated' method for deadlock recovery?,This method involves aborting processes sequentially until the deadlock is resolved. It incurs high overhead because deadlock detection must be performed after each individual abort.
+What are some issues that can arise when aborting a process for deadlock recovery?,"1. Files might be left in an incorrect state if they were being updated.
+2. Shared data integrity issues can occur if the process was updating data while holding a mutex lock (the lock status must be restored)."
+"If partial termination is chosen for deadlock recovery, how is the 'victim' process typically determined?","It is a policy decision, often based on economic factors to minimize cost."
+What factors are considered when choosing a 'victim' process to terminate (to minimize cost) during deadlock recovery?,"1. Process priority.
+2. Computation time (how long computed, how much longer it needs).
+3. Resources used (types, ease of preemption).
+4. Resources needed to complete.
+5. Number of processes to terminate."
+What is 'resource preemption' in the context of deadlock recovery?,It involves successively preempting resources from processes and allocating them to other processes until the deadlock is broken.
+What is the 'Selecting a victim' issue in resource preemption for deadlock recovery?,"It involves determining which specific resources or processes to preempt, with the goal of minimizing the cost (e.g., considering resources held or time consumed by the process)."
+Explain the 'Rollback' issue concerning resource preemption for deadlock recovery.,"When a resource is preempted, the process that held it cannot continue normal execution. The 'Rollback' issue addresses what to do with this preempted process, typically requiring it to roll back to a safe state and restart."
+What is the simplest method for 'rollback' in resource preemption?,"Total rollback, which means aborting the process and restarting it from the beginning."
+What is a more effective (but complex) method for 'rollback' in resource preemption?,"Rolling back only as necessary, which requires more detailed state information about the process."
+"What is the 'Starvation' issue in resource preemption, and why is it a concern?","Starvation occurs when resources are always preempted from the same process, preventing it from ever completing its execution. It's a concern because it means a process never makes progress."
+How is the 'starvation' issue commonly addressed in resource preemption?,"A common solution is to include the number of times a process has been rolled back (or picked as a victim) in the cost factor used for victim selection, ensuring it is picked a finite number of times."
+Define 'recovery mode'.,A system boot state that provides limited services and is designed to enable the system administrator to repair system problems and debug system startup.

@@ -1,0 +1,171 @@
+Question,Option A,Option B,Option C,Option D,Option E,Correct Answer,Explanation
+A deadlock occurs when ____.,a process is waiting for I/O to a device that does not exist,the system has no available free resources,every process in a set is waiting for an event that can only be caused by another process in the set,,,C,"If all processes in the set are blocked from proceeding, then it is not possible for any process in the set to trigger the event (such as releasing a resource) that would break the deadlock."
+Processes can wait while _______ a resource.,requesting,using,releasing,,,A,A process will wait requesting to acquire a resource that is currently in use by another process.
+"The code example below _________ lead to deadlock between two threads.
+/* thread_one runs in this function */
+void *do_work_one(void *param)
+{
+   pthread_mutex_lock(&first_mutex);
+   pthread_mutex_lock(&second_mutex);
+   /**
+     * Do some work
+     */
+   pthread_mutex_unlock(&second_mutex);
+   pthread_mutex_unlock(&first_mutex);
+ 
+   pthread_exit(0);
+}
+ 
+/* thread_two runs in this function */
+void *do_work_two(void *param)
+{
+   pthread_mutex_lock(&second_mutex);
+   pthread_mutex_lock(&first_mutex);
+   /**
+    * Do some work
+    */
+   pthread_mutex_unlock(&first_mutex);
+   pthread_mutex_unlock(&second_mutex);
+ 
+   pthread_exit(0);
+}",will not,can,will,,,B,"Deadlock can, for example, occur in that ordering: (1) thread one acquires first_mutex, (2) thread_two acquires second_mutex."
+The four necessary conditions of deadlock must be present for deadlock to occur.,True,False,,,,A,"If any one of the four necessary conditions is not present in a system, deadlock cannot occur."
+"One necessary condition for deadlock is ____, which states that a process must be holding one resource and waiting to acquire additional resources.",hold and wait,mutual exclusion,no preemption,,,A,The hold and wait condition is necessary for deadlock as a waiting thread can make no further progress to eventually break the deadlock condition.
+The presence of a cycle in a resource-allocation graph is ____.,a necessary and sufficient condition for deadlock in the case that each resource has more than one instance,a necessary and sufficient condition for a deadlock in the case that each resource has exactly one instance,is neither necessary nor sufficient for indicating deadlock in the case that each resource has exactly one instance,,,B,"In a system where each resource has exactly one resource, a cycle in the resource allocation graph indicates deadlock as there is a circular wait among the set of deadlocked processes which does not allow any process to release a resource and thereby break the cycle."
+"If a resource-allocation graph has a cycle, the system must be in a deadlock.",True,False,,,,B,The presence of a cycle indicates deadlock only when there is a single instance of each resource type.
+"To handle deadlocks, operating systems most often ____.",ignore the problem of deadlocks,use protocols to prevent or avoid deadlocks,detect and recover from deadlocks,,,A,Operating systems generally do not handle deadlocks and instead leave it up to application developers to design applications that handle deadlocks.
+Deadlock _______ handles deadlocks by ensuring that one of their necessary conditions cannot hold.,avoidance,prevention,recovery,,,B,Deadlock prevention manages deadlock by invalidating one of the necessary conditions required for deadlock to be present in a system.
+Deadlock prevention by denying the _________ condition is the simplest way to prevent deadlocks.,mutual exclusion,no preemption,circular wait,,,C,This is the most straight-forward way of preventing deadlocks as it simply requires processes to acquire resources in a defined order.
+"Assume there are three resources,
+R
+1
+,
+R
+2
+, and
+R
+3
+, that are each assigned unique integer values 15, 10, and 25, respectively. What is a resource ordering which prevents a circular wait?","R
+1
+,
+R
+2
+,
+R
+3","R
+2
+,
+R
+1
+,
+R
+3","R
+3
+,
+R
+1
+,
+R
+2",,,B,"These three resources represent acquiring resources in order with the values of 10, 15, and 25."
+Only an unsafe state can lead to deadlock.,True,False,,,,A,It is impossible to reach deadlock from a safe state. It is possible to do so from an unsafe state.
+"Suppose that there are ten resources available to three processes. At time 0, the following data is collected. The table indicates the process, the maximum number of resources needed by the process, and the number of resources currently owned by each process. Which of the following correctly characterizes this state?
+Process Maximum Needs Currently Owned
+10 4
+3 1
+6 4",It is safe.,It is not safe.,The state cannot be determined.,,,B,"There is currently only one resource available and process
+P
+0
+could request 6 additional resources and processes
+P
+1
+and
+P
+2
+could request 2 additional resources. With only 1 resource available, deadlock will result if any process requests more than 1 additional resource."
+"Suppose that there are 12 resources available to three processes. At time 0, the following data is collected. The table indicates the process, the maximum number of resources needed by the process, and the number of resources currently owned by each process. Which of the following correctly characterizes this state?
+Process Maximum Needs Currently Owned
+P
+0
+10 4
+P
+1
+3 2
+P
+2
+7 4",It is safe.,It is not safe.,The state cannot be determined.,,,A,"The Banker's Algorithm indicates there are sufficient resources available where processes can be assigned resources up to their maximum needs in a safe sequence of
+P
+1
+,
+P
+2
+, and
+P
+0
+."
+A wait-for graph scheme is not applicable to a resource allocation system with multiple instances of each resource type.,True,False,,,,A,A wait-for graph can only be used to detect deadlock where there are single instances of a resource type.
+Which of the following techniques is not appropriate for recovery from deadlock?,terminating one process at a time until the deadlock cycle is eliminated.,terminating all deadlocked processes.,taking the appropriate resources from one or more of the deadlocked processes and terminating these processes.,,,C,Any process that has had resources preempted must be restarted as the resource preemption may leave the process in an inconsistent state.
+"To recover from a deadlock using resource preemption,",any ordering of resources and processes may be used.,a process whose resources have been preempted may continue from the point of preemption.,ensure that starvation does not occur from always preempting resources from the same process.,,,C,"If resources are always taken from the same process, that process may be unable to make progress (i.e., starve)."
+Absolute code can be generated for ____.,compile-time binding,load-time binding,execution-time binding,,,A,A compiler that is aware of where code will be loaded into memory can generate absolute code when the program is compiled.
+Most operating systems bind addresses during ______ time.,compile,load,execution,,,C,Binding addresses during execution time is the most flexible option.
+The mapping of a logical address to a physical address is done in hardware by the ________.,memory-management-unit (MMU),CPU,,,,A,The memory management unit (MMU) translates logical addresses from the CPU into physical addresses .
+_____ is the dynamic storage-allocation algorithm which results in the smallest leftover hole in memory.,First fit,Best fit,Worst fit,,,B,Best-fit leaves the smallest leftover hole as the algorithm finds the memory hole that is the closest in size to the memory request.
+_____ is the dynamic storage-allocation algorithm which results in the largest leftover hole in memory.,First fit,Best fit,Worst fit,,,C,Worst fit will leave the largest leftover hole as the algorithm finds the largest available memory hole to satisfy the memory request.
+Which of the following is true of compaction?,It is used to solve the problem of external fragmentation.,It is used to solve the problem of internal fragmentation.,It cannot rearrange memory contents.,,,A,External fragmentation occurs when the available memory is not contiguous. Compaction coalesces available memory into a single partition large enough to satisfy a memory request.
+A page number is represented by 10 bits. How many entries are in the page table?,10,210,,,,B,"If 10 bits are used to represent an entry in the page table, there are 210 total entries in the page table."
+A 32-bit address is divided into 20 bits for the page number and 12 bits for the offset. ______ is the page number and ______ is the offset for the logical address 0x139A4BD7.,"0x139, 0xA4BD7","0x139A, 0x4BD7","0x139A4, 0xBD7",,,C,"A hexadecimal digit encodes four bits. Therefore, the first five digits, 0x139A4, correspond to the page number and the next three digits, 0xBD7, to the offset."
+A logical address space of size 2^32 with a page size of 2^12 requires ____ bits for the page number and _____ bits for the page offset.,"12, 20","20, 12","10, 22",,,B,A logical address space of 2^32 and page size of 2^12 requires 32-12 = 20 bits for the page number and 12 bits for the page offset.
+How many bits must be used to represent the page offset for a page size of 8 KB?,10,8,13,,,Not found,Not found
+Paging can have _______ fragmentation but not ______ fragmentation.,"internal, external","external, internal",Paging has neither internal or external fragmentation.,,,A,Paging results only in internal fragmentation.
+Which statement best describes how a TLB hit is handled?,The page table must be updated to reflect the page frame associated with the page number.,The corresponding page frame can be obtained from the TLB without having to reference the page table.,The page number in the TLB is used as an index into the page table.,,,B,The TLB is a cache of the page table and a TLB hit indicates a page number's corresponding page frame can be obtained from the TLB without having to access the page table.
+What is the effective memory access time with a TLB hit ratio of 85% and 15 ns memory access time?,17.25 ns,15 ns,30 ns,,,A,Effective memory access time is (TLB hit ratio x memory access time) + ((1-TLB hit ratio) x (2 x memory access time)) = .85 x 15 ns + .15 * 30 ns = 17.25 ns
+What is the page offset of the logical address 0xAEF9 with a page size of 256 bytes?,0xAE,0xF9,0xA,,,B,"A page offset of 256 bytes requires 8 bits of storage. As the rightmost portion of a logical address refers to the page offset, 0xF9 is the page offset for the logical address 0xAEF9."
+A 32-bit single-level paging system with an 8 KB page size has ______ entries in the page table.,"2
+19","2
+32","2
+13",,,A,"An 8 KB page size requires 13 bits for the page offset, leaving 19 bits for the page number and resulting in
+2
+19
+entries in the page table."
+A(n) ____ page table has one page entry for each memory frame.,inverted,hashed,forward-mapped,,,A,An inverted page table maps physical frames into logical pages.
+Consider a 32-bit address for a two-level paging system with an 8 KB page size. The outer page table has 1024 entries. How many bits are used to represent the second-level page table?,10,8,9,,,Not found,Not found
+A two-level paging system with 32 bit addresses has 512 entries for the outer page table and 2048 entries for the inner page table. What is the size of a page?,2048 bytes,4096 bytes,8192 bytes,,,B,"The outer page table requires 9 bits and the second-level page table requires 11 bits, leaving 32 - 9 - 11 = 12 bits for the page offset. 2^12 = 4096 bytes."
+Standard swapping refers to swapping _______ .,selected pages of a process instead of the entire process,entire processes,either entire processes or a subset of pages belonging to a process,,,B,Standard swapping involves moving entire processes between main memory and swap space.
+Which of the following is not a reason explaining why mobile devices generally do not support swapping?,"Because mobile applications are small in size, they do not require use of swap space.",Limited number of writes of flash memory.,Limited space constraints of flash memory.,,,A,Swapping allows an operating system to oversubscribe physical memory so that the system can have more processes than physical memory can hold. The oversubscription of memory can still occur if there are enough small applications than available physical memory.
+"Standard swapping is generally not used in contemporary operating systems, because",memory in contemporary systems is large enough to store all processes.,the amount of time required to move entire processes between memory and the backing store is prohibitive.,contemporary operating systems do not oversubscribe memory.,,,B,Moving entire processes between main memory and the backing store can take a significant amount of time whereas swapping a smaller number of pages will be faster and may leave enough physical memory to be allocated to other processes.
+The x86-64 bit architecture _________ for representing virtual address space.,only uses 48 of the 64 bits,uses all 64 bits,uses 32 bits,,,A,"2
+48
+still allows a physical address space of 281,474,976,710,656 bytes!"
+A page address extension (PAE) in IA-32,introduces two-level paging scheme.,increases address size to 64 bits.,allows 32-bit processors to access a physical address space larger than 4 GB.,,,C,32-bit systems only support an address space of 4 GB and PAE increased the address space to 36 bits which supports up to 64 GB of physical memory.
+"In ARM architecture, address translation",begins at the micro-TLB level.,begins at the main TLB-level.,begins at the page table.,,,A,"The ARM architecture has two levels of TLB and address translation begins at the micro-TLB level. If there is a TLB miss at this level, the main-TLB is checked next."
+The ARMv8 architecture provides a _______ which is a larger section of contiguous memory.,translation granule,page,region,,,C,Regions are large sections of contiguous memory that are as small as 2 MB or as large as 1 GB.
+Virtual memory _________ .,assumes a process resides entirely in physical memory,allows only portions of a process be in physical memory,limits the amount of physical memory allocated to a process,,,B,Virtual memory allows a process to only load data and instructions that are needed into physical memory.
+"In systems that support virtual memory, ____.",virtual memory is separated from logical memory.,physical memory is separated from secondary storage.,physical memory is separated from logical memory.,,,C,Virtual memory provides the separation of logical memory and physical memory which allows programmers to not have to think about any limitations of available physical memory.
+"In general, using virtual memory technology decreases the degree of multiprogramming in a system.",True,False,,,,B,"With virtual memory technology, a process does not need to use all of its physical memory at any given time, which frees up memory that can be allocated to other processes."
+Referencing a page that is not yet loaded in main memory is known as __________ .,demand paging,a page fault,a trap,,,B,A page fault occurs when a page that is absent in memory is referenced.
+Handling a page fault requires __________ .,setting the valid/invalid bit to valid,requires checking the value of the valid/invalid bit,bringing the page from the backing store and storing it in a frame in physical memory,,,C,A page fault indicates a referenced page is absent in physical memory. The operating system handles the page fault by loading the page into a free frame in physical memory.
+"On a system with demand-paging, a process will experience a high page fault rate when the process begins execution.",True,False,,,,A,"With demand paging, each page is loaded into physical memory when it is first referenced. When a process begins running, it is referencing most pages for the first time and therefore will initially have a high page fault rate."
+"If a memory access requires 100 ns and servicing a page fault requires 6 ms, what is the effective access time with page fault rate of p = 0.25?","4,500,025 ns","1,500,075 ns","1,500,025 ns",,,B,"Effective Access Time = (1 − p) × memory access time + p × page fault time = .75 × 100 + .25 × 600000 = 1,500,075 ns"
+"________ allows the parent and child processes to initially share the same pages, but when either process modifies a page, a copy of the shared page is created.",copy-on-write,zero-fill-on-demand,vfork(),,,A,"With the copy-on-write, the child and the parent processes initially share the same pages. Pages that are not modified continue to be shared, but once a page is modified, a copy of the page is created for the process modifying the page."
+"Using FIFO page replacement with demand paging, how many page faults occur with the reference string 1 2 3 4 2 3 4 1 2 1 1 3 1 4 with three page frames?",14,8,10,,,Not found,Not found
+"Using LRU page replacement with demand paging, what is the number of page faults for the reference string 6 5 3 2 1 3 3 1 5 1 3 4 7 1 with three page frames?",8,14,9,,,Not found,Not found
+"In the enhanced second chance algorithm, which of the following ordered pairs represents a page that would be the best choice for replacement?","(0,0)","(0,1)","(1,0)",,,A,"This page has not been recently accessed or modified, and thus represents the best page for replacement."
+Belady's anomaly states that ____.,"for all page replacement algorithms, the page-fault rate may increase as the number of allocated frames increases","for some page replacement algorithms, the page-fault rate may increase as the number of allocated frames increases","for some page replacement algorithms, the page-fault rate may decrease as the number of allocated frames increases",,,B,FIFO is one page replacement algorithm that may suffer from Belady's anomaly whereby assigning more page frames may actually increase the page fault rate.
+Most operating systems implement _______ page replacement.,Pure LRU,LRU approximation,,,,B,"Because most systems do not provide the necessary hardware to implement pure LRU, most operating systems use an LRU approximation algorithm such as the second-chance algorithm."
+"________ allocation reclaims pages from any process in memory, not just the process incurring a page fault.",local,global,,,,B,"With the global allocation policy, any page present in memory can be evicted."
+Non-uniform memory access (NUMA) _____ .,exists when memory access times can vary,refers to the hierarchy of memory from registers through main memory to secondary storage.,occurs when page references are resolved in the TLB without having to access the page table.,,,A,"NUMA refers to systems with multiple CPUs and each CPU has its own local memory, but can access memory local to another CPU. Memory access will be faster when a CPU accesses its local memory instead of memory local to another CPU."
+The _________ refers to the set of pages a process references over a period of time.,reference string,working set,page fault rate,,,B,"The working set is based upon the idea of locality - that over a given period of time, a process will reference a set of specific pages. A process's locality can change which means the working set will also change over time."
+What best describes the relationship between the working set and page fault rate of a process?,The page fault rate is independent of the working set.,"Once the working set of a process is in memory, the page fault rate will be low.",The larger the working set the higher the page fault rate.,,,B,"When a process moves from one working set to another (the process has changed its locality), the page fault rate will initially increase as the new page references must first be brought into memory. Once the working set of a process is in memory, the page fault rate of the process will decrease until the process moves to another working set."
+What must occur if a compressed frame is referenced?,The contents of the compressed frame must be accessed.,The frame must be decompressed and moved to a free frame.,,,,B,Accessing a compressed frame is treated as a page fault and the compressed frame must first be decompressed and moved to a free frame before it can be accessed.
+What size segment will be allocated for a 39 KB request on a system using the Buddy system for kernel memory allocation?,39 KB,128 KB,64 KB,,,C,64 KB is the closest power of 2 to a 39 KB request.
+Which of the following is considered a benefit when using the slab allocator?,Memory is allocated using a simple power-of-2 allocator.,It allows larger segments to be combined using coalescing.,Memory requests can be satisfied quickly.,,,C,"Rather than having to wait for kernel memory to be allocated, kernel objects are created in advance and are quickly allocated from a cache."
+Which kernel memory allocator suffers from internal fragmentation?,Buddy System,Slab allocation,Both the Buddy System and Slab Allocation,,,A,"The Buddy System allocates memory in powers of 2 and the difference between the amount of memory being requested and the next highest power of 2 represents internal fragmentation. For example, a 17 KB request will be allocated 32 KB of memory, resulting in 15 KB of internal fragmentation."
+What is the TLB reach for a system with 128 TLB entries and a 4 KB page size?,4 KB,128 KB,512 KB,,,C,The TLB reach is the number of entries in the TLB multiplied by the page size.
+Which of the following is considered a typical page size?,2 KB,4 KB,6 KB,,,B,"4 KB is a power of 2 and is generally considered a typical page size. On systems that support larger page sizes, the 4 KB page size is the smallest possible page size."
+"If free memory falls below a certain threshold, Linux reclaims pages from the ______ list.",active,inactive,free,,,B,Pages on the inactive list haven't been referenced for some time and therefore eligible to be reclaimed if available memory falls below a certain threshold.
+Windows uses a local page replacement policy _____.,when a process is below its working set maximum,when a process exceeds its working set maximum,when the system undergoes automatic working set trimming,,,B,"If a process exceeds its working set maximum and incurs a page fault, the kernel will select a page for replacement from the working set of the process that had the page fault using a local page replacement policy."
+Which of the following statements is false with regard to Solaris memory management?,The speed at which pages are examined (the scanrate) is constant.,The pageout process only runs if the number of free pages is less than lotsfree.,An LRU approximation algorithm is employed.,,,A,"The speed of the scanrate varies proportionally to the amount of free memory, scanning at a higher rate when available memory is low and a lower rate when available memory is high."
+Which of the following is not considered an advantage of NVM devices over HDD?,NVM is more reliable than HDD.,NVM is less expensive than HDD.,NVM is faster than HDD.,,,B,The NVM storage per megabyte is more expensive than that of HDDs.
+"Consider a disk queue holding requests to the following cylinders in the listed order: 116, 22, 3, 11, 75, 185, 100, 87. Using the FCFS scheduling algorithm, what is the order that the requests are serviced, assuming the disk head is at cylinder 88 and moving upward through the cylinders?",116 - 22 - 3 - 11 - 75 - 185 - 100 - 87,100 - 116 - 185 - 87 - 75 - 22 - 11 - 3,87 - 75 - 100 - 116 - 185 - 22 - 11 - 3,,,A,FCFS scheduling will service the cylinders in the same order the cylinders are requested.
+"Consider a disk queue holding requests to the following cylinders in the listed order: 116, 22, 3, 11, 75, 185, 100, 87. Using the SCAN scheduling algorithm, what is the order that the requests are serviced, assuming the disk head is at cylinder 88 and moving upward through the cylinders?",116 - 22 - 3 - 11 - 75 - 185 - 100 - 87,100 - 116 - 185 - 87 - 75 - 22 - 11 - 3,100 - 116 - 185 - 3 - 11 - 22 - 75 - 87,,,B,"With the SCAN scheduling, the disk arm moves from one end of the disk to the other, serving scheduled requests as the disk arm reaches respective cylinders. As the disk head is currently at cylinder 88 and moving upwards, the requests will be serviced in the order 100 - 116 - 185. When the disk arm reaches the end of the disk, it will begin servicing requests in the opposite order, 87 - 75 - 22 - 11 - 3."
+"Consider a disk queue holding requests to the following cylinders in the listed order: 116, 22, 3, 11, 75, 185, 100, 87. Using the C-SCAN scheduling algorithm, what is the order that the requests are serviced, assuming the disk head is at cylinder 88 and moving upward through the cylinders?",116 - 22 - 3 - 11 - 75 - 185 - 100 - 87,100 - 116 - 185 - 87 - 75 - 22 - 11 - 3,100 - 116 - 185 - 3 - 11 - 22 - 75 - 87,,,C,"The difference between C-SCAN and SCAN scheduling is that, upon reaching the end of the disk, C-SCAN first moves back to the beginning cylinder of the disk before servicing additional requests. As the disk head is currently at cylinder 88 and moving upwards, C-SCAN will service 100 - 116 - 85, but then move to the beginning of the disk and service remaining requests in ascending order."
+FCFS scheduling is used in NVMs because ___________.,SCAN and C-SCAN are more complex algorithms than FCFS.,FCFS can merge adjacent cylinder requests.,NVMs do not contain moving disk heads.,,,C,"HDDs have moving heads. Because NVMs do not involve moving physical hardware, the FCFS policy is sufficient for NVM devices."

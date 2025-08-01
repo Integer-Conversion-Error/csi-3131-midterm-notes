@@ -1,0 +1,69 @@
+Front,Back
+What is the primary goal when designing the Application I/O interface?,To treat I/O devices uniformly.
+What are the key approaches used to achieve uniform treatment of I/O devices?,"Abstraction, encapsulation, and software layering."
+How are device differences abstracted away in the I/O system?,"By identifying general kinds of devices, each accessed via standardized functions."
+What is an 'interface' in the context of I/O device access?,Standardized functions through which each kind of device is accessed.
+What encapsulates device differences in the kernel?,Device drivers.
+What are 'device drivers'?,Kernel modules custom-tailored to specific devices that export standard interfaces.
+What is the purpose of the device-driver layer?,To hide differences among device controllers from the kernel I/O subsystem.
+How do I/O system calls relate to hardware differences?,"They encapsulate device behavior in generic classes, hiding hardware differences from applications."
+"What are the benefits of the I/O structuring techniques (abstraction, encapsulation, layering)?",Simplifies OS development and allows hardware manufacturers to design compatible devices or write drivers for popular OS.
+List the dimensions along which I/O devices vary.,"Character-stream or block; sequential or random access; synchronous or asynchronous; sharable or dedicated; speed of operation; read-write, read only, or write once."
+Define 'Character-stream' device.,A device that transfers bytes one by one.
+Define 'Block' device.,A device that transfers a block of bytes as a unit.
+Define 'Sequential access' for devices.,Data access in a fixed order determined by the device.
+Define 'Random-access' for devices.,User can seek to any storage location directly.
+Define 'Synchronous' I/O operation.,"Predictable response times, coordinated with the caller."
+Define 'Asynchronous' I/O operation.,"Irregular/unpredictable response times, not coordinated with the caller."
+Define 'Sharable' device.,A device that can be used concurrently by several processes/threads.
+Define 'Dedicated' device.,A device that cannot be used concurrently by multiple processes/threads.
+What are the different data transfer directions for I/O devices?,"Read-write (both input/output), Read only (only one data transfer direction), Write once (written once, then read-only)."
+How does the OS simplify device access for applications?,"It hides many differences and groups devices into conventional types, providing major access conventions."
+What are the major application access conventions for I/O?,"Block I/O, Character-stream I/O, Memory-mapped file access, Network sockets."
+What is an 'escape' or 'back door' in the context of device interfaces?,A method of transparently passing arbitrary commands to a device driver when the interface lacks a standard method for specific functionality.
+What UNIX system call serves as an 'escape' or 'back door'?,`ioctl()`.
+What are the three arguments of the UNIX `ioctl()` system call?,"Device identifier (major/minor numbers), command integer, and a pointer to a data structure."
+"What does the 'major number' signify in a device identifier (e.g., for `ioctl()`)?","The device type, which routes I/O requests to the appropriate driver."
+"What does the 'minor number' signify in a device identifier (e.g., for `ioctl()`)?",The device instance (which specific device of that type).
+What is a 'block-device interface'?,An interface for I/O to disk drives and other block-oriented devices.
+What are common commands for a block-device interface?,"`read()`, `write()`, and `seek()` (for random-access devices)."
+How do applications usually access block devices?,Via the file-system interface.
+What is 'raw I/O'?,"Direct access to secondary storage as a linear array of blocks, bypassing the file system."
+When might raw I/O be preferred?,By the OS or special applications like Database Management Systems (DBMS) to avoid extra buffering and redundant locking.
+What is 'direct I/O'?,"A compromise mode on a file (e.g., in UNIX) that allows block I/O bypassing OS block features like buffering and locking."
+How does memory-mapped file access work?,"It layers on block-device drivers, allowing access to disk storage via a byte array in main memory. A system call maps a file to memory and returns a virtual address."
+What is a key efficiency of memory-mapped file access?,Data transfers only occur when needed (demand-paged virtual memory access).
+What are the benefits of memory-mapped file access for programmers?,"It is convenient, allowing simple read/write operations to memory instead of using explicit I/O calls."
+How is memory-mapped file access used by the kernel?,For kernel services such as executing programs and accessing swap space.
+What is a 'character-stream interface'?,"An interface for I/O to character devices such as keyboards, mice, modems, printers, and audio boards."
+What are the basic system calls for a character-stream interface?,`get()` and `put()` (one character at a time).
+How is network I/O different from disk I/O?,It typically uses a different interface than `read()`-`write()`-`seek()`.
+What is a 'network socket'?,"A common interface for network I/O, serving as an endpoint for communication (used in UNIX, Windows)."
+List common system calls associated with the socket interface.,"Create socket, connect local socket to remote address, listen for remote application connection, send/receive packets, and `select()`."
+What is the purpose of the `select()` system call in network I/O?,"It manages a set of sockets, returning information on which sockets are ready (e.g., packet waiting, room to send), eliminating polling/busy waiting."
+What are the benefits of the socket interface?,It facilitates distributed applications using any network hardware/protocol.
+"Besides sockets, what are other approaches for Inter-Process Communication (IPC) and network communication?","Half-duplex pipes, full-duplex FIFOs, full-duplex STREAMS, and message queues."
+What functionalities do hardware clocks and timers provide?,"Current time, elapsed time, and the ability to set a timer for operation X at time T."
+What is a 'programmable interval timer'?,"Hardware (often provided by CPUs) used to measure elapsed time and trigger operations, typically by generating an interrupt (once or periodically)."
+How is a programmable interval timer used by the OS?,"By the scheduler to preempt processes, by disk I/O to flush dirty caches, and by the network to cancel slow operations."
+How does the OS manage more timer requests than available hardware channels?,It simulates virtual clocks by maintaining a sorted list of wanted interrupts and setting the hardware timer for the earliest pending request.
+What is a 'high-performance event timer (HPET)'?,"A modern hardware timer (provided by some CPUs on PCs) often operating in the 10-megahertz range, with comparators that trigger interrupts when a value matches the HPET."
+What limits precision in timer operations?,Timer resolution and virtual clock overhead.
+What is 'network time protocol (NTP)'?,A network protocol used for synchronizing system clocks.
+Define a 'blocking' system call.,"An I/O request that suspends the calling thread, moving it to a wait queue, until the I/O operation completes."
+What is the nature of physical I/O actions in terms of timing?,"They are generally asynchronous, with varying and unpredictable completion times."
+Why does the OS typically provide blocking I/O calls for applications?,Because they are easier for application developers to write and manage.
+When is nonblocking I/O needed by user processes?,"For applications that cannot afford to halt, such as user interfaces or video applications, to overlap execution with I/O."
+How can multithreaded applications overlap execution with I/O?,Some threads can block on I/O while others continue to execute.
+What is a 'nonblocking' I/O system call?,"An I/O request that returns quickly, indicating the bytes transferred (full, fewer, or none), and does not halt the calling thread."
+What is an 'asynchronous' system call?,"An I/O request that returns immediately without waiting for the I/O to complete, allowing the calling thread to continue execution."
+How is I/O completion communicated for asynchronous system calls?,"Via variable setting, a signal/software interrupt, or a callback mechanism."
+What is the key difference between a nonblocking `read()` and an asynchronous `read()`?,"A nonblocking `read()` returns immediately with any available data (full, fewer, or none), while an asynchronous `read()` requests the full transfer to complete later, returning immediately without data."
+How does OS buffering optimize I/O performance?,"The OS buffers I/O and returns control to the application, completing the request later, which can hide I/O latency."
+How is data consistency ensured when the OS buffers I/O?,"The kernel reads from its buffers before performing I/O, ensuring that the correct data is returned to the reader."
+What mechanism can be used with `select()` for nonblocking behavior in network sockets?,"Specifying a maximum waiting time, with '0' indicating polling behavior (returning immediately if no I/O is possible)."
+What is the overhead associated with using `select()`?,`select()` only checks if I/O is possible; subsequent `read()`/`write()` calls are still needed to perform the actual data transfer.
+What is 'Vectored I/O'?,One system call that performs multiple I/O operations involving multiple memory locations.
+What UNIX system call implements Vectored I/O?,"`readv` (and `writev`), which accepts a vector of multiple buffers to read to or write from."
+What is another name for Vectored I/O?,Scatter-gather.
+What are the benefits of Vectored I/O?,"Avoids context-switching and system-call overhead, eliminates the need to transfer data to a larger contiguous buffer first, and can provide atomicity (all I/O done without interruption, avoiding data corruption)."

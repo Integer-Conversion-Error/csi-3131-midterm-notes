@@ -1,0 +1,25 @@
+Front,Back,Reversible
+What is the typical state of a program on disk before execution?,"A binary executable file (e.g., a.out, prog.exe).",y
+What must happen to a program before it can execute?,It must be loaded into memory within a process's context.,y
+What are the main stages in the compilation-to-execution procedure?,"Compiling, linking, and loading.",y
+What is the first step in preparing a source program for execution?,"A source program (e.g., main.c) is processed by a compiler (e.g., gcc), producing object code.",y
+What is the role of a linker in preparing a program for execution?,"A linker combines object files, along with any necessary libraries (e.g., standard C or math libraries), into a single executable file.",y
+What is the role of a loader in preparing a program for execution?,"At runtime, a loader brings the executable file into memory.",y
+"What are ""relocatable object files""?",The output of a compiler in which the contents can be loaded into any location in physical memory.,y
+"Define ""linker"".",A system service that combines relocatable object files into a single binary executable file.,y
+"Define ""executable file"".",A file containing a program that is ready to be loaded into memory and executed.,y
+"Define ""loader"".","A system service that loads a binary executable file into memory, where it is eligible to run on a CPU core.",y
+"Define ""relocation"".",An activity associated with linking and loading that assigns final addresses to program parts and adjusts code and data in the program to match those addresses.,y
+What is the purpose of relocation during program loading?,To adjust addresses for proper execution by assigning final addresses to program parts and adjusting code/data to match.,y
+"What are ""dynamically linked libraries (DLLs)""?","System libraries that are linked to user programs when the processes are run, with linking postponed until execution time.",y
+What are the advantages of using dynamically linked libraries (DLLs)?,"They avoid loading unused libraries and allow multiple processes to share common libraries, saving memory.",y
+"Describe the process when a program (e.g., ./main) is invoked on UNIX systems.",The shell creates a new process via fork() and then uses exec() to invoke the loader.,y
+What does ELF stand for and what is its primary use?,"Executable and Linkable Format, the UNIX standard format for relocatable and executable files.",y
+What is PE used for?,"Portable Executable, the Windows format for executable files.",y
+What is Mach-O used for?,The macOS format of executable files.,y
+What key components are typically included in an ELF file?,"Compiled machine code, a symbol table, and the program's entry point.",y
+"Which command on Linux systems can determine a file's type, especially for ELF files?",The 'file' command.,y
+How would the 'file' command identify an object file like main.o on Linux?,It would report that main.o is an ELF relocatable file.,y
+How would the 'file' command identify an executable file like main on Linux?,It would report that main is an ELF executable.,y
+How are ELF files structured?,They are divided into a number of sections.,y
+Which command on Linux systems can evaluate ELF files by examining their sections?,The 'readelf' command.,y

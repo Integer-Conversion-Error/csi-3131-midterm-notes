@@ -1,0 +1,41 @@
+Front,Back
+What is the primary characteristic of deadlock-prevention?,"It limits how resource requests are made, ensuring no necessary condition for deadlock occurs."
+What are the side effects of deadlock-prevention?,Low device utilization and reduced system throughput.
+What information is required by deadlock avoidance algorithms regarding resource requests?,"Additional information on resource requests, specifically the maximum resources each thread may need (a priori information)."
+How does a deadlock-avoidance algorithm prevent deadlocks?,By dynamically examining the resource-allocation state to prevent the occurrence of a circular-wait condition.
+"How is the ""resource-allocation state"" defined in the context of deadlock avoidance?","It is defined by the available resources, allocated resources, and maximum demands of the threads."
+"What defines a ""safe state"" in a system?",A state is safe if the system can allocate resources to each thread (up to its maximum declared need) in some specific order and thus avoid deadlock.
+When is a system considered to be in a safe state?,"A system is considered safe if a ""safe sequence"" exists."
+"Define ""safe sequence"".","A sequence of threads <T_1, T_2, …, T_n> where for each thread T_i, its resource requests can be met by the currently available resources plus the resources held by all preceding threads T_j (j < i)."
+What is the relationship between a safe state and a deadlocked state?,"A safe state is not deadlocked, while a deadlocked state is inherently unsafe."
+Are all unsafe states considered deadlocks?,"No, not all unsafe states are deadlocks, but they **may** lead to deadlock."
+What is the operating system's strategy regarding unsafe states?,The OS avoids unsafe states as long as the system state is safe.
+What is the OS's capability in an unsafe state regarding deadlock prevention?,"In an unsafe state, the OS cannot prevent deadlocks; thread behavior controls the outcome of unsafe states."
+What type of systems is the Resource-allocation-graph algorithm suitable for?,Systems with only one instance of each resource type.
+"Define ""claim edge"" in a resource-allocation graph.",A dashed line (T_i → R_j) indicating that thread T_i may request resource R_j in the future.
+When is a claim edge (T_i → R_j) converted to a request edge in the Resource-allocation-graph algorithm?,When thread T_i actually requests resource R_j.
+When is a request edge (T_i → R_j) converted to an assignment edge in the Resource-allocation-graph algorithm?,When resource R_j is successfully allocated to thread T_i.
+When is an assignment edge (R_j → T_i) converted back to a claim edge in the Resource-allocation-graph algorithm?,When resource R_j is released by thread T_i.
+What is the requirement for claiming resources in the Resource-allocation-graph algorithm?,Resources must be claimed a priori (in advance).
+Under what condition is a resource request granted in the Resource-allocation-graph algorithm?,A request is granted only if no cycle is formed in the graph (which is checked by a cycle-detection algorithm).
+What does the formation of a cycle in a resource-allocation graph indicate?,It indicates an unsafe state.
+What is the time complexity of the Resource-allocation-graph algorithm?,"O(n^2) operations, where n is the number of threads."
+What type of systems is the Banker's algorithm applicable to?,Systems with multiple instances of each resource type.
+How does the efficiency of the Banker's algorithm compare to the Resource-allocation graph scheme?,The Banker's algorithm is less efficient.
+What must a new thread declare when it enters the system under the Banker's algorithm?,"The maximum instances of each resource type it may need, which cannot exceed the total system resources."
+Under what condition is a resource request granted by the Banker's algorithm?,Only if the allocation of the requested resources leaves the system in a safe state.
+"Describe the ""Available"" data structure in the Banker's algorithm.",A vector of length m (number of resource types) indicating the number of available resources of each type.
+"Describe the ""Max"" data structure in the Banker's algorithm.","An n × m matrix (n threads, m resource types) defining the maximum demand of each thread for each resource type."
+"Describe the ""Allocation"" data structure in the Banker's algorithm.","An n × m matrix (n threads, m resource types) indicating the number of resources of each type currently allocated to each thread."
+"Describe the ""Need"" data structure in the Banker's algorithm and its calculation.","An n × m matrix (n threads, m resource types) representing the remaining resource need of each thread. It is calculated as Need[i][j] = Max[i][j] - Allocation[i][j]."
+What are the initial steps for the Banker's Safety Algorithm?,"Initialize Work = Available and set Finish[i] = false for all threads i = 0, 1, …, n-1."
+What is the iterative step (Step 2) in the Banker's Safety Algorithm?,"Find an index i such that Finish[i] == false and the thread's Need_i is less than or equal to Work. If no such i exists, proceed to Step 4."
+What updates are performed (Step 3) in the Banker's Safety Algorithm when a suitable thread T_i is found?,"Work = Work + Allocation_i and Finish[i] = true. Then, return to Step 2."
+What is the final condition (Step 4) for a system to be in a safe state according to the Banker's Safety Algorithm?,"If Finish[i] == true for all threads i, the system is in a safe state."
+What is the time complexity of the Banker's Safety Algorithm?,"O(m × n^2) operations, where m is the number of resource types and n is the number of threads."
+What is Request_i in the Banker's Resource-request algorithm?,A vector representing the current resource request for thread T_i.
+What is the first check performed in the Banker's Resource-request algorithm when T_i makes a request?,"Check if Request_i ≤ Need_i. If not, it means the thread has exceeded its maximum claimed resources, resulting in an error."
+What is the second check performed in the Banker's Resource-request algorithm if Request_i ≤ Need_i?,"Check if Request_i ≤ Available. If not, thread T_i must wait because the requested resources are not currently available."
+"What ""pretend allocation"" steps are taken in the Banker's Resource-request algorithm before checking for safety?","Available = Available - Request_i, Allocation_i = Allocation_i + Request_i, and Need_i = Need_i - Request_i."
+"What is the final decision process after a ""pretend allocation"" in the Banker's Resource-request algorithm?","If the resulting state is safe (verified using the Safety Algorithm), the request is granted. Otherwise, thread T_i waits, and the system's state is restored to its original configuration."
+"Define ""Banker's algorithm"".","A deadlock avoidance algorithm applicable to systems with multiple instances of each resource type, which is less efficient than the resource-allocation graph scheme."

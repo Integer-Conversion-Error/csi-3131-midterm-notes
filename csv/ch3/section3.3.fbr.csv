@@ -1,0 +1,43 @@
+Front,Back,Reversible
+How do processes execute and what are their creation/deletion characteristics?,Processes can execute concurrently; they are created and deleted dynamically.,y
+What mechanisms does the OS provide for processes?,The OS provides mechanisms for process creation and termination.,y
+How are parent and child processes structured in an OS?,"A parent process creates child processes, forming a tree structure.",y
+"What is a ""process identifier (pid)""?",A unique value for each process in the system that can be used as an index to access various attributes of a process within the kernel.,y
+"What is a ""tree"" in the context of process hierarchy?",A data structure that can be used to represent data hierarchically; data values in a tree structure are linked through parent-child relationships.,y
+How are resources managed for child processes upon creation?,Child process resources can be obtained from the OS directly or as a subset of the parent's resources. The parent may partition or share its resources with the child.,y
+What kind of data can a parent pass to a child process during creation?,A parent may pass initialization data to a child.,y
+What are the two execution possibilities for a parent process after creating children?,"1. Parent executes concurrently with children.
+2. Parent waits until children terminate.",y
+What are the two address-space possibilities for a child process upon creation?,"1. The child is a duplicate of the parent (inheriting the same program and data).
+2. The child has a new program loaded into its address space.",y
+What is the purpose of the `fork()` system call in UNIX/Linux?,`fork()` creates a new process (child) as a copy of the parent's address space.,y
+What is the execution flow for parent and child processes immediately after a `fork()` call in UNIX/Linux?,Both the parent and the child processes continue execution after the `fork()` call.,y
+What values does `fork()` return for the child and parent processes in UNIX/Linux?,`fork()` returns 0 for the child process and the child's process ID (pid) for the parent process.,y
+What is the purpose of the `exec()` system call in UNIX/Linux?,`exec()` replaces a process's memory space with a new program (loads a new binary).,y
+What is the return behavior of `exec()` on success?,"`exec()` does not return on success, as the process's memory space has been entirely replaced.",y
+What is the purpose of the `wait()` system call in UNIX/Linux?,`wait()` causes the parent process to wait for its child's termination.,y
+What attributes does a child process inherit from its parent in UNIX/Linux?,"A child inherits privileges, scheduling attributes, and open files from its parent.",y
+What is the primary function of `CreateProcess()` in Windows process creation?,"`CreateProcess()` is similar to `fork()`, but it loads a specified program directly into the child's address space at the time of creation.",y
+What structures are used by `CreateProcess()` in Windows?,`CreateProcess()` uses `STARTUPINFO` and `PROCESS_INFORMATION` structures.,y
+What is the purpose of `WaitForSingleObject()` in Windows process management?,`WaitForSingleObject()` causes the parent process to wait for its child's completion in Windows.,y
+How does a process initiate its own termination?,A process finishes its execution and uses `exit()` to request the OS to delete it.,y
+What happens to the status value when a process terminates?,The terminating process returns a status value to its waiting parent (via `wait()`).,y
+What happens to a process's resources upon termination?,All resources allocated to the process are deallocated upon its termination.,y
+"Can one process terminate another, and if so, who typically performs this?","Yes, another process can terminate a process (e.g., `TerminateProcess()` in Windows), although this is usually done only by the parent process.",y
+What are common reasons for a parent process to terminate a child process?,"1. The child exceeded its allocated resource usage.
+2. The child's task is no longer required.
+3. The parent process is exiting (some OSes do not allow children to continue if their parent exits).",y
+"What is ""cascading termination""?","A technique in which, when a process is ended, all of its children are ended as well.",y
+What is the purpose of `exit(status)` in UNIX/Linux termination?,`exit(status)` terminates the current process and provides an exit status value.,y
+What is the purpose of `wait(&status)` in UNIX/Linux termination?,"`wait(&status)` causes the parent to wait for a child's termination, retrieves the child's exit status, and returns the child's process ID (pid).",y
+"What is a ""zombie process""?",A process that has terminated but whose parent has not yet called `wait()` to collect its state and accounting information. Its entry remains in the process table briefly.,y
+"What is an ""orphan process""?",The child of a parent process that terminates in a system that does not require a terminating parent to cause its children to be terminated.,y
+What process manages orphan processes in UNIX/Linux?,The `init` process (or `systemd`) becomes the new parent for orphan processes and periodically calls `wait()` to clean them up.,y
+"What is the ""Android Process Hierarchy"" used for?",The Android Process Hierarchy is used for resource constraints and termination management.,y
+"Define ""Foreground process"" in Android.","A Foreground process is visible and the user is currently interacting with it, making it the most important type of process.",y
+"Define ""Visible process"" in Android.",A Visible process is not directly visible to the user but is performing an activity that a foreground process refers to.,y
+"Define ""Service process"" in Android.","A Service process is similar to a background process but is apparent to the user (e.g., streaming music).",y
+"Define ""Background process"" in Android.",A Background process is performing activity but is not apparent to the user.,y
+"Define ""Empty process"" in Android.",An Empty process has no active components and is considered the least important process type.,y
+How does Android terminate processes to reclaim resources?,Android terminates processes from the least important (Empty process) to the most important (Foreground process) to reclaim resources.,y
+What happens to the state of an Android process before termination due to resource reclamation?,"The process state is saved before termination, and it can be resumed if the user navigates back to it.",y

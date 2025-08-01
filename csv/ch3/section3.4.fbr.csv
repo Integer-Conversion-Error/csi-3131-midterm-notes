@@ -1,0 +1,21 @@
+Front,Back,Reversible
+What are independent processes?,Processes that have no shared data.,y
+What are cooperating processes?,Processes that share data and affect each other.,y
+List reasons for process cooperation.,"Information sharing, computation speedup, and modularity.",y
+Explain 'Information sharing' as a reason for process cooperation.,"Concurrent access to shared information (e.g., copy/paste).",y
+Explain 'Computation speedup' as a reason for process cooperation.,"Breaking a task into subtasks for parallel execution, which requires multiple cores.",y
+Explain 'Modularity' as a reason for process cooperation.,Dividing system functions into separate processes/threads.,y
+What mechanism do cooperating processes need to exchange data?,An IPC (Interprocess Communication) mechanism.,y
+What are the two fundamental Interprocess Communication (IPC) models?,Shared Memory and Message Passing.,y
+Describe the Shared Memory IPC model.,"A region of memory shared by cooperating processes, where information is exchanged by reading/writing to the shared region.",y
+What are the advantages of Shared Memory IPC?,It is faster than message passing (after setup) and requires no kernel intervention for access.,y
+Describe the Message Passing IPC model.,Communication via messages exchanged between processes.,y
+When is Message Passing IPC useful?,"For smaller data amounts, when no conflicts are desired, and it is easier in distributed systems.",y
+What is a disadvantage of Message Passing IPC?,"It typically uses system calls (kernel intervention), making it slower than shared memory.",y
+Define Interprocess Communication (IPC).,Communication between processes.,y
+Define Shared Memory (in the context of IPC).,"In interprocess communication, a section of memory shared by multiple processes and used for message passing.",y
+Define Message Passing (in the context of IPC).,"In interprocess communication, a method of sharing data in which messages are sent and received by processes. Packets of information in predefined formats are moved between processes or between computers.",y
+Define Browser (as a process).,"A process that accepts input in the form of a URL (Uniform Resource Locator), or web address, and displays its contents on a screen.",y
+Define Renderer (as a process).,A process that contains logic for rendering contents (such as web pages) onto a display.,y
+Define Plug-in.,"An add-on functionality that expands the primary functionality of a process (e.g., a web browser plug-in that displays a type of content different from what the browser can natively handle).",y
+Define Sandbox.,"A contained environment (e.g., a virtual machine).",y

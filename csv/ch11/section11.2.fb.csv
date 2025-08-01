@@ -1,0 +1,53 @@
+Front,Back
+"What is the OS's responsibility regarding hardware efficiency, especially for HDDs?","For HDDs, the OS is responsible for minimizing access time and maximizing data transfer bandwidth."
+What is access time for HDDs/mechanical storage?,"It is the total time required to read or write data, consisting of seek time and rotational latency."
+"Define ""seek time"" in the context of HDD access time.",The time for the device arm to move heads to the desired cylinder.
+"Define ""rotational latency"" in the context of HDD access time.",The additional time for the platter to rotate the desired sector to the head.
+"Define ""device bandwidth"" for HDDs.",Total bytes transferred divided by total time (from the first request to the last transfer completion).
+How can access time and bandwidth be improved for HDDs?,By managing the order of storage I/O requests.
+How does a process initiate an I/O request?,It issues a system call to the OS.
+What information does an I/O request typically specify?,"Input/output direction, open file handle, memory address, and amount of data."
+What happens if the drive/controller is available when an I/O request is made?,The request is serviced immediately.
+What happens if the drive/controller is busy when a new I/O request is made?,New requests are placed in a queue.
+What is common about device queues in a multiprogramming system?,They often have pending requests.
+What is the benefit of having a queue of I/O requests for device drivers?,"It allows device drivers to improve performance by ordering requests (e.g., avoiding head seeks)."
+How did past HDD interfaces differ from modern drives regarding control over physical locations?,"Past HDD interfaces allowed the host to specify track/head, leading to much effort on disk scheduling; modern drives do not expose these controls and map LBA to physical addresses internally."
+What are the current goals of disk scheduling?,"Fairness, timeliness, and optimizations (e.g., bunching sequential reads/writes)."
+When do drives perform best?,With sequential I/O.
+Is absolute knowledge of head/physical block/cylinder locations possible on modern drives?,Generally not possible.
+What approximation is used for LBA to physical address mapping on modern drives?,"Increasing LBAs generally mean increasing physical addresses, and close LBAs equate to physical proximity."
+"What is the simplest disk scheduling algorithm, and what are its alternative names?","First-Come, First-Served (FCFS) or FIFO."
+Is FCFS disk scheduling fair?,"Yes, it is intrinsically fair."
+Does FCFS provide the fastest service?,"Generally, no."
+"What is a common problem with FCFS disk scheduling, especially illustrated by a ""wild swing"" example?","It can lead to inefficient head movement (e.g., a ""wild swing"" where the head moves far for one request, then far back for another, then far forward again), not optimizing for seek time."
+Define the SCAN algorithm for HDD I/O scheduling.,"The disk arm starts at one end, moves to the other, servicing requests, and when it reaches the other end, its direction is reversed, and servicing continues."
+What is another name for the SCAN algorithm?,Elevator algorithm.
+"In the SCAN algorithm, what happens to a request just in front of the head?",It is serviced almost immediately.
+"In the SCAN algorithm, what happens to a request just behind the head?","It waits until the arm moves to the end, reverses, and comes back."
+"With a uniform distribution of requests, where is the heaviest density of requests in SCAN, and where are there few requests after reversal?",Few requests are immediately in front of the head after reversal (recently serviced); the heaviest density of requests is at the other end of the disk (where requests have waited longest).
+Define Circular SCAN (C-SCAN) scheduling.,"A variant of SCAN where the head moves from one end to the other, servicing requests, but upon reaching the other end, it immediately returns to the beginning of the disk without servicing requests on the return trip."
+What is the primary goal or benefit of C-SCAN scheduling compared to SCAN?,To provide more uniform wait time.
+How does C-SCAN conceptually treat cylinders?,As a circular list.
+Are many disk-scheduling algorithms commonly used?,"No, many exist but are rarely used."
+"Is an optimal order definable for any request list, and is its computation always justified?","Yes, an optimal order can be defined, but its computation may not justify the savings over simpler algorithms like SCAN."
+What heavily influences the performance of a disk-scheduling algorithm?,The number and types of requests.
+How do all disk scheduling algorithms behave if there is only one outstanding request in the queue?,They all behave like FCFS.
+Which disk scheduling algorithms are generally better for heavy disk load and less likely to cause starvation?,SCAN and C-SCAN.
+Which Linux scheduler was created to prevent starvation?,The deadline scheduler.
+What type of queues does the Linux deadline scheduler maintain?,Separate read and write queues.
+Why does the Deadline scheduler give reads priority?,Because processes are more likely to block on read operations.
+How are the queues in the Deadline scheduler sorted?,"In LBA (Logical Block Addressing) order, which implements a C-SCAN like behavior."
+How are I/O requests typically sent in the Deadline scheduler?,"In batches, sorted by LBA order."
+"How many queues does the Deadline scheduler specifically keep, and how are they organized?","Four queues: two read queues and two write queues (one of each sorted by LBA, the other by FCFS)."
+How does the Deadline scheduler check for and prevent starvation of FCFS requests?,"After each batch, it checks if any FCFS requests are older than a configured age (default 500 ms); if so, the LBA queue (read/write) containing the old request is selected for the next batch."
+What was the default I/O scheduler in Linux RedHat 7?,The Deadline I/O scheduler.
+"Besides Deadline, what other I/O schedulers were included in RHEL 7?",NOOP and Completely Fair Queueing scheduler (CFQ).
+What are the characteristics of the NOOP scheduler and when is it preferred?,"It is preferred for CPU-bound systems using fast storage (NVM devices), as it does minimal work, effectively acting as FCFS."
+What type of drives is the Completely Fair Queueing scheduler (CFQ) the default for?,SATA drives.
+"How many queues does CFQ maintain, and how are they sorted?","Three queues (insertion sort, LBA order): real time, best effort (default), and idle."
+"What are the priorities among CFQ's queues, and what is a potential issue?","Real time has the highest priority, then best effort, then idle (real time > best effort > idle); starvation is possible."
+How does CFQ use historical data to optimize?,"It anticipates if a process will issue more I/O requests soon; if so, it idles waiting for new I/O, ignoring other queued requests to minimize seek time, assuming locality of reference per process."
+"Define ""bandwidth"" (from table definition).",Total amount of data transferred divided by total time between first request for service and completion of last transfer.
+"Define ""SCAN algorithm"" (from table definition).","HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then reverses."
+"Define ""Circular SCAN (CSCAN) scheduling"" (from table definition).","HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then returns to beginning without servicing."
+"Define ""Completely Fair Queueing (CFQ)"" (from table definition).","In Linux, default I/O scheduler in kernel 2.6 and later."

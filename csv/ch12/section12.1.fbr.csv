@@ -1,0 +1,20 @@
+Front,Back,Reversible
+What are the two main jobs of a computer?,I/O and computing.,y
+"Which of the computer's main jobs is often primary, with the other being incidental?","I/O is often primary, with computing being incidental (e.g., browsing, editing).",y
+What is the operating system's role concerning I/O?,To manage and control I/O operations and devices.,y
+What aspect of I/O hardware provides constraints on OS internal facilities?,I/O hardware basics.,y
+What gap is bridged by OS I/O services and application I/O interfaces?,The gap between hardware and application interfaces.,y
+What is the UNIX System V STREAMS mechanism?,A mechanism involving dynamic driver code pipelines.,y
+What is a major operating system design concern related to devices?,Device control.,y
+How does the wide variation in I/O device function and speed impact control methods?,It requires varied control methods.,y
+What forms the kernel's I/O subsystem?,The varied control methods for I/O devices.,y
+What is the purpose of the kernel's I/O subsystem?,To separate the kernel from device management complexities.,y
+What is a key trend in I/O device technology regarding interfaces?,Increasing standardization of software/hardware interfaces.,y
+What is the benefit of increasing standardization of software/hardware interfaces in I/O device technology?,It helps incorporate new device generations.,y
+What is another key trend in I/O device technology besides standardization?,Increasingly broad variety of I/O devices.,y
+What challenge does the increasingly broad variety of I/O devices pose?,"It is a challenge to incorporate new, unlike devices.",y
+What basic I/O hardware elements accommodate diverse devices?,"Ports, buses, and device controllers.",y
+How is the kernel structured to encapsulate device details and meet I/O challenges?,With device-driver modules.,y
+Define 'device driver'.,An OS component providing uniform access and managing I/O to various devices.,y
+What kind of interface do device drivers provide to the I/O subsystem?,A uniform device-access interface.,y
+What are device drivers' uniform device-access interfaces similar to for applications?,System calls.,y

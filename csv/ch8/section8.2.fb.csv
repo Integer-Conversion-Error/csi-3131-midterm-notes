@@ -1,0 +1,25 @@
+Front,Back
+What concept is illustrated by the Pthreads example in multithreaded applications?,Deadlock with POSIX mutex locks.
+What is the function of `pthread_mutex_init()`?,Initializes an unlocked mutex.
+What is the function of `pthread_mutex_lock()`?,Acquires a lock; blocks if the lock is held.
+What is the function of `pthread_mutex_unlock()`?,Releases a lock.
+Which two mutex locks are used in the Pthreads deadlock scenario?,"`first_mutex`, `second_mutex`."
+Which two threads are involved in the Pthreads deadlock scenario?,"`thread_one`, `thread_two`."
+"In the Pthreads deadlock scenario, in what order does `thread_one` acquire locks?","(1) `first_mutex`, (2) `second_mutex`."
+"In the Pthreads deadlock scenario, in what order does `thread_two` acquire locks?","(1) `second_mutex`, (2) `first_mutex`."
+Describe the condition under which deadlock is possible in the Pthreads scenario with `first_mutex` and `second_mutex`.,"If `thread_one` acquires `first_mutex` and `thread_two` acquires `second_mutex`, both threads will block waiting for the other's lock."
+What is a significant characteristic of deadlock occurrence?,It is intermittent.
+Why might a potential deadlock not always occur?,If one thread acquires and releases both locks before the other thread starts.
+What system component can influence whether a deadlock occurs?,The CPU scheduler.
+What difficulty does the intermittent nature of deadlocks present?,Makes identifying and testing for deadlocks difficult.
+What kind of failure is livelock classified as?,A liveness failure.
+How is livelock similar to deadlock?,Both are liveness failures.
+What is a key distinction between livelock and deadlock regarding thread state?,"In livelock, threads are not blocked, unlike deadlock."
+Define livelock.,A condition in which a thread continuously attempts an action that fails.
+Provide an analogy that illustrates livelock.,"Two people trying to pass in a hallway, repeatedly moving into each other's way. They are active but make no progress."
+"Which Pthreads function is used in the livelock example, and what is its purpose?",`pthread_mutex_trylock()` attempts to acquire a lock without blocking.
+Describe the livelock scenario involving `pthread_mutex_trylock()` and two threads.,"`thread_one` acquires `first_mutex`, `thread_two` acquires `second_mutex`. Both then call `trylock` on the other mutex, which fails. They release their locks and repeat indefinitely."
+What often causes livelock to occur?,When threads retry failing operations at the same time.
+How can livelock be avoided?,By having threads retry failing operations at random times.
+What real-world example demonstrates a mechanism similar to livelock avoidance?,Ethernet: Hosts involved in a network collision backoff for a random period before retransmitting.
+"How common is livelock compared to deadlock, and is it still a concern?","Less common than deadlock, but still a challenge in concurrent application design."

@@ -1,0 +1,36 @@
+Front,Back
+"How does an OS connect an application's request (e.g., reading a file) to hardware operations (e.g., disk sector access)?",The OS maps the application's file name reference through the file system's directory structure to specific space allocation on disk.
+What is the initial step for an application referring to data?,It refers to data by file name.
+What is the role of the file system in connecting application requests to hardware?,"The file system maps the file name, through directories, to space allocation on the disk."
+How does MS-DOS (FAT) map a file name to disk blocks?,"The file name maps to a number, which indicates an entry in the file-access table, telling which disk blocks are allocated."
+How does UNIX map a file name to disk blocks?,"The file name maps to an inode number, and the inode contains the space-allocation information."
+How does MS-DOS identify hardware devices within a file name?,"The first part of the file name (before the colon), e.g., `C:`, identifies the hardware device."
+"In MS-DOS, how is a device name like `C:` mapped to hardware?",It is mapped to a specific port address via a device table.
+What is a key characteristic of the device name space in MS-DOS compared to its file-system name space?,"It is separate from the file-system name space, indicated by the colon separator (e.g., `C:`)."
+What is an advantage of MS-DOS's separate device name space?,"It makes it easy to associate extra functionality, such as spooling for printer files."
+How is the device name space handled in UNIX?,"It is incorporated into the regular file-system name space, with no clear separation of the device portion in the path name."
+What is the purpose of the mount table in UNIX?,It associates path name prefixes with specific device names.
+How does UNIX resolve a path name involving a device?,It looks up the path name in the mount table for the longest matching prefix.
+What does a mount table entry provide after a successful lookup in UNIX?,A device name (which is also in the file-system name space).
+What is found when a device name is looked up in UNIX?,"A `<major, minor>` device number, not an inode."
+What does the major device number indicate?,It identifies the specific device driver responsible for handling I/O for that device.
+What is the purpose of the minor device number?,It is passed to the device driver to index into its internal device table.
+What information does a device-table entry provide?,The port address or memory-mapped address of the device controller.
+How do modern operating systems enhance flexibility in device lookup?,They use multiple stages of lookup tables.
+What is a benefit of the general mechanisms for passing requests between applications and drivers in modern OS?,New devices and drivers can be introduced without requiring kernel recompilation.
+How do some operating systems manage loading device drivers?,They load device drivers on demand.
+Describe driver loading during boot time.,"The system probes buses and loads necessary drivers, either immediately or upon the first request for the device."
+How are drivers loaded for devices added after system boot?,"The device is detected, often by an error, the kernel inspects it, and then loads the driver dynamically."
+What are some challenges associated with dynamic loading/unloading of drivers?,"It requires more complex kernel algorithms, careful device-structure locking, and robust error handling."
+What is the first step in the life cycle of a blocking `read()` system call?,A process issues a blocking `read()` system call to a file descriptor of an opened file.
+What is the kernel's first action after receiving a `read()` system call?,"The kernel system-call code checks parameters. If the data is already in the buffer cache, the data is returned and I/O completed."
+What happens if the requested data is not in the buffer cache during a `read()` system call?,"Physical I/O is performed. The process is removed from the run queue and placed on a wait queue for the device, and the I/O request is scheduled."
+What happens after an I/O request is scheduled by the kernel?,The I/O subsystem sends the request to the device driver (via subroutine call or in-kernel message).
+What is the device driver's role in a blocking `read()` request after receiving the request?,"The device driver allocates kernel buffer space, schedules the I/O, and sends commands to the device controller by writing to device-control registers."
+What is the device controller's responsibility during a `read()` request?,It operates the device hardware to perform the data transfer.
+How can a driver handle data transfer completion from the device controller?,"The driver may poll for status/data, or set up a DMA transfer to kernel memory, where the DMA controller generates an interrupt upon transfer completion."
+What happens immediately after a DMA transfer completes and an interrupt is generated?,"The correct interrupt handler receives the interrupt via the interrupt-vector table, stores the data, signals the device driver, and then returns."
+What does the device driver do upon receiving a signal from the interrupt handler?,"It determines the completed I/O request and its status, then signals the kernel I/O subsystem."
+What is the kernel's final action regarding data transfer and process state after being signaled by the device driver?,The kernel transfers the data and return codes to the requesting process's address space and moves the process from the wait queue to the ready queue.
+What happens to the process after it is moved to the ready queue following a `read()` system call?,"Moving the process to the ready queue unblocks it. The scheduler then assigns the CPU, allowing the process to resume at the system call completion."
+"Define ""mount table"".","An in-memory data structure containing information about each mounted volume, used to track file systems and access."

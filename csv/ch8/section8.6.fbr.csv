@@ -1,0 +1,34 @@
+Front,Back,Reversible
+What is the primary goal of deadlock avoidance?,"To dynamically examine the resource-allocation state to prevent circular-wait, by requiring additional information on resource requests.",y
+What information does a system need for deadlock avoidance algorithms to function?,The system needs to know the maximum resources each thread may need (a priori information).,y
+How does deadlock prevention differ from deadlock avoidance?,"Deadlock prevention limits how requests are made to ensure no necessary condition occurs, while deadlock avoidance dynamically examines the state to prevent circular-wait.",y
+What are the common side effects of deadlock prevention?,Low device utilization and reduced system throughput.,y
+How is the resource-allocation state defined?,"By the currently available resources, resources allocated to each thread, and the maximum demands of each thread.",y
+"Define a ""safe state"" in the context of deadlock avoidance.",A state is safe if the system can allocate resources to each thread (up to its maximum need) in some order and avoid deadlock.,y
+When is a system considered to be in a safe state?,A system is in a safe state if a safe sequence exists.,y
+"Define a ""safe sequence"".","A safe sequence <T₁, T₂, …, Tₙ> is an ordering of threads such that for each T₁, its resource requests can be met by currently available resources plus the resources held by all threads Tₗ where j < i.",y
+"What is the relationship between safe states, unsafe states, and deadlocks?","A safe state is not deadlocked. A deadlocked state is unsafe. Not all unsafe states are deadlocks, but unsafe states may lead to deadlock.",y
+What is the operating system's role regarding safe and unsafe states?,"The OS avoids unsafe states as long as the system state is safe. In an unsafe state, the OS cannot prevent deadlocks; thread behavior controls these states.",y
+For what kind of systems is the Resource-Allocation Graph Algorithm applicable?,Systems with only one instance of each resource type.,y
+"What is a ""claim edge"" in a resource-allocation graph?","A claim edge (T₁ → Rₗ, represented by a dashed line) indicates that thread T₁ may request resource Rₗ in the future.",y
+Describe the transitions of edges in the Resource-Allocation Graph Algorithm.,A claim edge T₁ → Rₗ converts to a request edge when T₁ requests Rₗ. A request edge converts to an assignment edge when Rₗ is allocated to T₁. An assignment edge Rₗ → T₁ converts back to a claim edge when Rₗ is released by T₁.,y
+What is a key requirement for resource claims in the Resource-Allocation Graph Algorithm?,Resources must be claimed a priori.,y
+How does the Resource-Allocation Graph Algorithm determine if a resource request can be granted?,A request is granted only if granting it does not form a cycle in the graph. The presence of a cycle indicates an unsafe state.,y
+What is the time complexity of the Resource-Allocation Graph Algorithm?,"O(n²) operations, where n is the number of threads.",y
+For what kind of systems is the Banker's Algorithm applicable?,Systems with multiple instances of each resource type.,y
+How does the efficiency of the Banker's Algorithm compare to the Resource-Allocation Graph Algorithm?,It is generally less efficient than the resource-allocation graph scheme.,y
+What is the initial requirement for a new thread entering a system using the Banker's Algorithm?,"A new thread must declare its maximum instances of each resource type it may need, which cannot exceed total system resources.",y
+Under what condition is a resource request granted in the Banker's Algorithm?,A request is granted only if the allocation leaves the system in a safe state.,y
+Describe the 'Available' data structure in the Banker's Algorithm.,A vector of length m (number of resource types) indicating the number of available resources of each type.,y
+Describe the 'Max' data structure in the Banker's Algorithm.,An n × m matrix (where n is the number of threads and m is the number of resource types) representing the maximum demand of each thread.,y
+Describe the 'Allocation' data structure in the Banker's Algorithm.,An n × m matrix (where n is the number of threads and m is the number of resource types) representing the resources currently allocated to each thread.,y
+Describe the 'Need' data structure in the Banker's Algorithm and how it's calculated.,An n × m matrix (where n is the number of threads and m is the number of resource types) representing the remaining resource need of each thread. It is calculated as Need[i][j] = Max[i][j] - Allocation[i][j].,y
+Outline the steps of the Safety Algorithm used within the Banker's Algorithm.,"1. Initialize Work = Available and Finish[i] = false for i = 0, …, n-1.
+2. Find an index i such that Finish[i] == false and Need₁ ≤ Work. If no such i exists, go to step 4.
+3. Update Work = Work + Allocation₁ and set Finish[i] = true. Go to step 2.
+4. If Finish[i] == true for all i, the system is in a safe state.",y
+What is the time complexity of the Safety Algorithm in the Banker's Algorithm?,"O(m × n²) operations, where m is the number of resource types and n is the number of threads.",y
+Outline the steps of the Resource-Request Algorithm for thread T₁ in the Banker's Algorithm.,"1. If Request₁ ≤ Need₁, proceed. Otherwise, an error occurs (thread exceeded its maximum claim).
+2. If Request₁ ≤ Available, proceed. Otherwise, thread T₁ must wait (resources are unavailable).
+3. Pretend to allocate the resources: Update Available = Available - Request₁, Allocation₁ = Allocation₁ + Request₁, and Need₁ = Need₁ - Request₁.
+4. If the resulting state is safe (checked using the Safety Algorithm), grant the request. Otherwise, thread T₁ waits and the old state is restored.",y

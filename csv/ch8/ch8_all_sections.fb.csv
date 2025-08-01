@@ -1,0 +1,217 @@
+Front,Back
+What is a Multiprogramming Environment?,A system where multiple threads compete for finite resources.
+What happens when a thread requests a resource that is unavailable?,The thread enters a waiting state.
+Define Deadlock (conceptual).,A situation where a waiting thread can never change state because its requested resources are held by other waiting threads.
+Provide the formal definition of Deadlock.,Every process in a set is waiting for an event that can only be caused by another process in the set. (This definition also applies to threads.)
+What constitutes the System Composition in the context of resource management?,A finite number of resources distributed among competing threads.
+How are Resource Types organized in a system model?,"Resources are partitioned into types (classes), each with identical instances."
+Give examples of Resource Types.,"CPU cycles, files, I/O devices."
+Explain the concept of identical instances for a resource type.,"Any instance of a resource type should satisfy a request (e.g., if a system has 4 CPUs, any one CPU can satisfy a request for a CPU)."
+Which Synchronization Tools are common sources of deadlock?,Mutex locks and semaphores.
+How are individual lock instances typically classified as resources?,"Each lock instance is typically its own resource class (e.g., one lock for a queue, another for a linked list)."
+What are the three steps in the Resource Utilization Sequence for a thread?,"1. Request
+2. Use
+3. Release"
+"Describe the ""Request"" step in resource utilization.",A thread requests a resource and waits if it is not immediately available.
+"Describe the ""Use"" step in resource utilization.",A thread operates on the requested resource.
+"Describe the ""Release"" step in resource utilization.",A thread releases the resource after use.
+How do threads typically perform resource requests and releases at the system level?,"Via system calls (e.g., `request()`, `release()`, `open()`, `close()`, `allocate()`, `free()`) or via semaphore operations (`wait()`, `signal()`) and mutex locks (`acquire()`, `release()`)."
+How does the Operating System (OS) manage resource allocation?,The OS checks for resource allocation via a system table.
+What information does the OS's system table track for resource management?,Free/allocated resources and the owning thread for allocated resources.
+What happens to threads waiting for requested resources?,They are queued for those resources.
+What are the main events that threads in a deadlocked state wait for?,Resource acquisition and release.
+Provide an example illustrating a Deadlocked State.,"The Dining-philosophers problem, where each philosopher holds one chopstick and waits for another, creating a circular wait."
+What is the developer's responsibility regarding deadlock?,Developers must be aware of deadlock possibilities.
+How do locking tools relate to race conditions and deadlocks?,Locking tools prevent race conditions but require careful management of lock acquisition/release to avoid deadlocks.
+What concept is illustrated by the Pthreads example in multithreaded applications?,Deadlock with POSIX mutex locks.
+What is the function of `pthread_mutex_init()`?,Initializes an unlocked mutex.
+What is the function of `pthread_mutex_lock()`?,Acquires a lock; blocks if the lock is held.
+What is the function of `pthread_mutex_unlock()`?,Releases a lock.
+Which two mutex locks are used in the Pthreads deadlock scenario?,"`first_mutex`, `second_mutex`."
+Which two threads are involved in the Pthreads deadlock scenario?,"`thread_one`, `thread_two`."
+"In the Pthreads deadlock scenario, in what order does `thread_one` acquire locks?","(1) `first_mutex`, (2) `second_mutex`."
+"In the Pthreads deadlock scenario, in what order does `thread_two` acquire locks?","(1) `second_mutex`, (2) `first_mutex`."
+Describe the condition under which deadlock is possible in the Pthreads scenario with `first_mutex` and `second_mutex`.,"If `thread_one` acquires `first_mutex` and `thread_two` acquires `second_mutex`, both threads will block waiting for the other's lock."
+What is a significant characteristic of deadlock occurrence?,It is intermittent.
+Why might a potential deadlock not always occur?,If one thread acquires and releases both locks before the other thread starts.
+What system component can influence whether a deadlock occurs?,The CPU scheduler.
+What difficulty does the intermittent nature of deadlocks present?,Makes identifying and testing for deadlocks difficult.
+What kind of failure is livelock classified as?,A liveness failure.
+How is livelock similar to deadlock?,Both are liveness failures.
+What is a key distinction between livelock and deadlock regarding thread state?,"In livelock, threads are not blocked, unlike deadlock."
+Define livelock.,A condition in which a thread continuously attempts an action that fails.
+Provide an analogy that illustrates livelock.,"Two people trying to pass in a hallway, repeatedly moving into each other's way. They are active but make no progress."
+"Which Pthreads function is used in the livelock example, and what is its purpose?",`pthread_mutex_trylock()` attempts to acquire a lock without blocking.
+Describe the livelock scenario involving `pthread_mutex_trylock()` and two threads.,"`thread_one` acquires `first_mutex`, `thread_two` acquires `second_mutex`. Both then call `trylock` on the other mutex, which fails. They release their locks and repeat indefinitely."
+What often causes livelock to occur?,When threads retry failing operations at the same time.
+How can livelock be avoided?,By having threads retry failing operations at random times.
+What real-world example demonstrates a mechanism similar to livelock avoidance?,Ethernet: Hosts involved in a network collision backoff for a random period before retransmitting.
+"How common is livelock compared to deadlock, and is it still a concern?","Less common than deadlock, but still a challenge in concurrent application design."
+What are the four necessary conditions for a deadlock to occur?,"Mutual exclusion, Hold and wait, No preemption, Circular wait."
+"Define ""Mutual exclusion"" as a necessary condition for deadlock.",At least one resource must be held in a nonsharable mode.
+"Define ""Hold and wait"" as a necessary condition for deadlock.",A thread must be holding at least one resource and waiting to acquire additional resources held by other threads.
+"Define ""No preemption"" as a necessary condition for deadlock.",A resource can be released only voluntarily by the thread holding it.
+"Define ""Circular wait"" as a necessary condition for deadlock.","A set of waiting threads {T0, T1, ..., Tn} must exist such that T0 is waiting for a resource held by T1, T1 is waiting for a resource held by T2, ..., Tn-1 is waiting for a resource held by Tn, and Tn is waiting for a resource held by T0."
+"For a deadlock to occur, must all four necessary conditions hold simultaneously?",Yes.
+"Which of the four necessary deadlock conditions implies the ""Hold and wait"" condition?",The circular-wait condition.
+What is a system resource-allocation graph?,"A directed graph used for precise description of deadlocks, consisting of a set of vertices V and a set of edges E."
+How are the vertices (V) in a system resource-allocation graph partitioned?,"Into two types: T (set of all active threads: {T1, T2, ..., Tn}) and R (set of all resource types: {R1, R2, ..., Rm})."
+"In a system resource-allocation graph, what is a ""request edge""?","A directed edge from thread Ti to resource type Rj (Ti → Rj), signifying that Ti has requested an instance of Rj."
+"In a system resource-allocation graph, what is an ""assignment edge""?","A directed edge from resource type Rj to thread Ti (Rj → Ti), signifying that an instance of Rj has been allocated to Ti."
+What does it signify if a system resource-allocation graph contains no cycles?,No thread is deadlocked.
+"If a system resource-allocation graph contains a cycle, what does that imply about a deadlock?",A deadlock may exist.
+When does a cycle in a system resource-allocation graph *imply* that a deadlock has occurred?,If each resource type has exactly one instance.
+"If a system resource-allocation graph contains a cycle, but each resource type has *several* instances, what is the implication regarding deadlock?",A cycle is a necessary but not a sufficient condition for deadlock.
+What are the three main ways to deal with deadlock?,"Ignore problem, Prevent/Avoid, and Detect/Recover."
+"Describe the ""Ignore problem"" approach to deadlock handling.","Pretend deadlocks never occur (most OS, e.g., Linux, Windows)."
+"Describe the ""Prevent/Avoid"" approach to deadlock handling.",Use a protocol to ensure the system *never* enters a deadlocked state.
+"Describe the ""Detect/Recover"" approach to deadlock handling.","Allow the system to enter a deadlocked state, then detect and recover (some systems, e.g., databases)."
+"Why is the ""ignoring problem"" solution for deadlocks common in operating systems?",Due to the infrequency of deadlocks and the cost of other methods.
+Can different deadlock handling approaches be combined?,"Yes, basic approaches can be combined for an optimal solution per resource class."
+"Define ""deadlock prevention.""",Methods to ensure at least one necessary condition for deadlock cannot hold.
+How does Deadlock Prevention prevent deadlocks?,By constraining resource request methods.
+What information must the OS be given in advance for Deadlock Avoidance?,Information on resources a thread will request/use.
+What factors does the OS consider when deciding to satisfy or delay a resource request using Deadlock Avoidance?,"Currently available resources, resources allocated to each thread, and future requests/releases of each thread."
+When is the Deadlock Detection and Recovery approach applied?,"If no prevention or avoidance mechanisms are in place, allowing deadlock to arise."
+What two main functions do system algorithms provide in Deadlock Detection and Recovery?,"Examine system state to determine if deadlock occurred, and recover from deadlock."
+What are the consequences of an undetected deadlock?,"System performance deteriorates, resources remain held, more threads deadlock, eventually requiring a manual restart."
+"Can manual recovery methods used for other liveness failures (e.g., livelock) be applied to deadlock recovery?",Yes.
+"Define ""deadlock avoidance.""",OS method where processes inform OS of resource use; system approves/denies requests to avoid deadlock.
+How does deadlock occur?,Deadlock occurs if all four necessary conditions for deadlock hold simultaneously.
+How can deadlock be prevented?,Prevent deadlock by ensuring at least one of the four necessary conditions cannot hold.
+When is the mutual-exclusion condition necessary for deadlock?,The mutual-exclusion condition must hold for deadlock to occur.
+What types of resources do not require mutual exclusion and thus cannot be involved in deadlock?,"Sharable resources (e.g., read-only files) do not require mutual exclusion."
+Why can't deadlocks generally be prevented by denying mutual-exclusion?,"Some resources are intrinsically nonsharable (e.g., mutex locks), so mutual exclusion cannot always be denied."
+What is Protocol 1 to prevent 'hold and wait'?,A thread requests and allocates all resources it needs before beginning its execution.
+What is a major impracticality of Protocol 1 for preventing 'hold and wait'?,"It is impractical for dynamic resources, as a thread may not know all resources it will need at the outset."
+What is Protocol 2 to prevent 'hold and wait'?,A thread requests resources only when it is holding none. It must release all current resources before requesting more.
+What are the disadvantages of both protocols for preventing 'hold and wait'?,Low resource utilization and possible starvation.
+What is 'low resource utilization' in the context of 'hold and wait' prevention?,"Resources are allocated but remain unused for long periods, leading to inefficient use of resources."
+What is 'starvation' in the context of 'hold and wait' prevention?,"A thread waits indefinitely for popular resources, potentially never acquiring them."
+What is Protocol 1 to prevent 'no preemption'?,"If a thread requests a resource and must wait, all resources it currently holds are preempted (implicitly released). The thread restarts when its old and new requested resources are all available."
+What is Protocol 2 to prevent 'no preemption'?,"If a requested resource is unavailable, check if it's held by a waiting thread. If so, preempt it and allocate to the requesting thread. If not, the requesting thread waits, and its resources may be preempted by other requests. The thread restarts when new resources are allocated and preempted resources are recovered."
+To what types of resources is 'no preemption' prevention often applied?,"Resources whose state can be saved and restored (e.g., CPU registers, database transactions)."
+To what types of resources can 'no preemption' prevention generally not be applied?,"Mutex locks and semaphores, where deadlocks commonly occur."
+What is a practical solution to prevent 'circular wait'?,Impose a total ordering of all resource types.
+How does imposing a total ordering of resource types prevent 'circular wait'?,Require threads to request resources in increasing order of their enumeration (based on the total ordering).
+What is an alternative rule for requesting resources when using a total ordering to prevent 'circular wait'?,"A thread requesting resource R_j must have released any resource R_i such that F(R_i) ≥ F(R_j), where F is the ordering function."
+How are multiple instances of the same resource type handled when using total ordering to prevent 'circular wait'?,A single request for all needed instances of that resource type must be issued.
+Does the protocol of total ordering resource types prevent 'circular wait'?,"Yes, this protocol prevents circular wait (proof by contradiction)."
+What is a challenge in developing a total ordering for resources to prevent 'circular wait'?,Developing an effective ordering can be difficult for systems with many locks.
+What method does Java use for lock acquisition ordering?,`System.identityHashCode(Object)`.
+Does lock ordering guarantee deadlock prevention if locks are acquired dynamically?,"No, lock ordering does not guarantee deadlock prevention if locks are acquired dynamically (e.g., within a `transaction()` function)."
+Define: deadlock prevention,A set of methods intended to ensure that at least one of the necessary conditions for deadlock cannot hold.
+Define: deadlock avoidance,An operating system method in which processes inform the operating system of which resources they will use during their lifetimes so the system can approve or deny requests to avoid deadlock.
+What is the primary characteristic of deadlock-prevention?,"It limits how resource requests are made, ensuring no necessary condition for deadlock occurs."
+What are the side effects of deadlock-prevention?,Low device utilization and reduced system throughput.
+What information is required by deadlock avoidance algorithms regarding resource requests?,"Additional information on resource requests, specifically the maximum resources each thread may need (a priori information)."
+How does a deadlock-avoidance algorithm prevent deadlocks?,By dynamically examining the resource-allocation state to prevent the occurrence of a circular-wait condition.
+"How is the ""resource-allocation state"" defined in the context of deadlock avoidance?","It is defined by the available resources, allocated resources, and maximum demands of the threads."
+"What defines a ""safe state"" in a system?",A state is safe if the system can allocate resources to each thread (up to its maximum declared need) in some specific order and thus avoid deadlock.
+When is a system considered to be in a safe state?,"A system is considered safe if a ""safe sequence"" exists."
+"Define ""safe sequence"".","A sequence of threads <T_1, T_2, …, T_n> where for each thread T_i, its resource requests can be met by the currently available resources plus the resources held by all preceding threads T_j (j < i)."
+What is the relationship between a safe state and a deadlocked state?,"A safe state is not deadlocked, while a deadlocked state is inherently unsafe."
+Are all unsafe states considered deadlocks?,"No, not all unsafe states are deadlocks, but they **may** lead to deadlock."
+What is the operating system's strategy regarding unsafe states?,The OS avoids unsafe states as long as the system state is safe.
+What is the OS's capability in an unsafe state regarding deadlock prevention?,"In an unsafe state, the OS cannot prevent deadlocks; thread behavior controls the outcome of unsafe states."
+What type of systems is the Resource-allocation-graph algorithm suitable for?,Systems with only one instance of each resource type.
+"Define ""claim edge"" in a resource-allocation graph.",A dashed line (T_i → R_j) indicating that thread T_i may request resource R_j in the future.
+When is a claim edge (T_i → R_j) converted to a request edge in the Resource-allocation-graph algorithm?,When thread T_i actually requests resource R_j.
+When is a request edge (T_i → R_j) converted to an assignment edge in the Resource-allocation-graph algorithm?,When resource R_j is successfully allocated to thread T_i.
+When is an assignment edge (R_j → T_i) converted back to a claim edge in the Resource-allocation-graph algorithm?,When resource R_j is released by thread T_i.
+What is the requirement for claiming resources in the Resource-allocation-graph algorithm?,Resources must be claimed a priori (in advance).
+Under what condition is a resource request granted in the Resource-allocation-graph algorithm?,A request is granted only if no cycle is formed in the graph (which is checked by a cycle-detection algorithm).
+What does the formation of a cycle in a resource-allocation graph indicate?,It indicates an unsafe state.
+What is the time complexity of the Resource-allocation-graph algorithm?,"O(n^2) operations, where n is the number of threads."
+What type of systems is the Banker's algorithm applicable to?,Systems with multiple instances of each resource type.
+How does the efficiency of the Banker's algorithm compare to the Resource-allocation graph scheme?,The Banker's algorithm is less efficient.
+What must a new thread declare when it enters the system under the Banker's algorithm?,"The maximum instances of each resource type it may need, which cannot exceed the total system resources."
+Under what condition is a resource request granted by the Banker's algorithm?,Only if the allocation of the requested resources leaves the system in a safe state.
+"Describe the ""Available"" data structure in the Banker's algorithm.",A vector of length m (number of resource types) indicating the number of available resources of each type.
+"Describe the ""Max"" data structure in the Banker's algorithm.","An n × m matrix (n threads, m resource types) defining the maximum demand of each thread for each resource type."
+"Describe the ""Allocation"" data structure in the Banker's algorithm.","An n × m matrix (n threads, m resource types) indicating the number of resources of each type currently allocated to each thread."
+"Describe the ""Need"" data structure in the Banker's algorithm and its calculation.","An n × m matrix (n threads, m resource types) representing the remaining resource need of each thread. It is calculated as Need[i][j] = Max[i][j] - Allocation[i][j]."
+What are the initial steps for the Banker's Safety Algorithm?,"Initialize Work = Available and set Finish[i] = false for all threads i = 0, 1, …, n-1."
+What is the iterative step (Step 2) in the Banker's Safety Algorithm?,"Find an index i such that Finish[i] == false and the thread's Need_i is less than or equal to Work. If no such i exists, proceed to Step 4."
+What updates are performed (Step 3) in the Banker's Safety Algorithm when a suitable thread T_i is found?,"Work = Work + Allocation_i and Finish[i] = true. Then, return to Step 2."
+What is the final condition (Step 4) for a system to be in a safe state according to the Banker's Safety Algorithm?,"If Finish[i] == true for all threads i, the system is in a safe state."
+What is the time complexity of the Banker's Safety Algorithm?,"O(m × n^2) operations, where m is the number of resource types and n is the number of threads."
+What is Request_i in the Banker's Resource-request algorithm?,A vector representing the current resource request for thread T_i.
+What is the first check performed in the Banker's Resource-request algorithm when T_i makes a request?,"Check if Request_i ≤ Need_i. If not, it means the thread has exceeded its maximum claimed resources, resulting in an error."
+What is the second check performed in the Banker's Resource-request algorithm if Request_i ≤ Need_i?,"Check if Request_i ≤ Available. If not, thread T_i must wait because the requested resources are not currently available."
+"What ""pretend allocation"" steps are taken in the Banker's Resource-request algorithm before checking for safety?","Available = Available - Request_i, Allocation_i = Allocation_i + Request_i, and Need_i = Need_i - Request_i."
+"What is the final decision process after a ""pretend allocation"" in the Banker's Resource-request algorithm?","If the resulting state is safe (verified using the Safety Algorithm), the request is granted. Otherwise, thread T_i waits, and the system's state is restored to its original configuration."
+"Define ""Banker's algorithm"".","A deadlock avoidance algorithm applicable to systems with multiple instances of each resource type, which is less efficient than the resource-allocation graph scheme."
+When is deadlock detection used in a system?,It is used if the system does not employ deadlock-prevention or deadlock-avoidance schemes.
+What two algorithms are needed if a system uses deadlock detection?,"An algorithm to determine if a deadlock has occurred, and an algorithm to recover from the deadlock."
+What constitutes the overhead of deadlock detection and recovery?,Run-time costs of the detection algorithm and potential losses resulting from the recovery process.
+What is the primary tool for deadlock detection when there is a single instance of each resource type?,A wait-for graph.
+How is a wait-for graph derived from a resource-allocation graph?,It is obtained by removing resource nodes and collapsing the corresponding edges.
+"In a wait-for graph, what does an edge $T_i \to T_j$ imply?",It implies that thread $T_i$ is waiting for thread $T_j$ to release a resource $R_q$ that $T_i$ needs.
+How is a deadlock detected using a wait-for graph?,A deadlock exists if the wait-for graph contains a cycle.
+What is the computational complexity of cycle detection in a wait-for graph?,"$O(n^2)$ operations, where $n$ is the number of vertices (threads)."
+What is the purpose of the `deadlock_detector` tool in the BCC toolkit?,It is used for detecting deadlocks in Pthreads mutex locks on Linux.
+How does the `deadlock_detector` tool work?,"It inserts probes to trace `pthread_mutex_lock()` and `pthread_mutex_unlock()` calls, constructs a wait-for graph, and reports a deadlock if a cycle is detected."
+Is the wait-for graph scheme applicable for deadlock detection when there are several instances of a resource type?,"No, the wait-for graph scheme is not applicable in this scenario."
+What is the detection algorithm for several instances of a resource type similar to?,It is similar to the banker's algorithm.
+Define 'Available' vector in the context of deadlock detection for multiple resource instances.,A vector of length $m$ (number of resource types) indicating the number of available instances of each resource type.
+Define 'Allocation' matrix in the context of deadlock detection for multiple resource instances.,"An $n \times m$ matrix (n threads, m resource types) indicating the number of resources of each type currently allocated to each thread."
+Define 'Request' matrix in the context of deadlock detection for multiple resource instances.,"An $n \times m$ matrix (n threads, m resource types) indicating the current request of each thread; `Request[i][j] = k` means thread $T_i$ requests $k$ more instances of resource type $R_j$."
+Briefly describe the detection algorithm steps for several instances of a resource type.,"1. Initialize 'Work' = 'Available' and 'Finish' flags (false if Allocation_i \u2260 0, else true). 2. Find an index $i$ where Finish[$i$] == false and Request$_i$ \u2264 Work. If none, go to step 4. 3. Work = Work + Allocation$_i$; Finish[$i$] = true. Go to step 2. 4. If Finish[$i$] == false for any $i$, then thread $T_i$ is deadlocked."
+What is the computational complexity of the detection algorithm for several instances of a resource type?,"$O(m \times n^2)$ operations, where $m$ is the number of resource types and $n$ is the number of threads."
+What is the 'optimistic attitude' adopted by the detection algorithm for multiple resource instances?,"It assumes that if a thread's request can be satisfied by the currently available resources (Work), that thread will complete its execution and return its allocated resources."
+"In the example provided, was the initial system state (before $T_2$ requested 1 C) deadlocked?","No, the initial system state was not deadlocked. A safe sequence such as $<T_0, T_2, T_3, T_1, T_4>$ could be found."
+"In the example provided, if thread $T_2$ requests 1 additional instance of resource C, does a deadlock occur?","Yes, a deadlock occurs. The system becomes deadlocked, involving threads $T_1, T_2, T_3, T_4$."
+What factors influence when to invoke a deadlock detection algorithm?,The likelihood of a deadlock occurring and the number of threads that would be affected if a deadlock happens.
+What happens to resources allocated to deadlocked threads?,"They become idle, leading to resource waste."
+What is the most extreme frequency for invoking a deadlock detection algorithm?,Invoking it every time a resource request cannot be granted immediately.
+What is a benefit of invoking a deadlock detection algorithm every time a resource request cannot be granted?,It identifies the deadlocked threads and the specific thread that 'caused' the deadlock.
+What is a drawback of invoking a deadlock detection algorithm every time a resource request cannot be granted?,It incurs high computational overhead.
+What is a less expensive strategy for invoking a deadlock detection algorithm?,"Invoking it at defined intervals (e.g., hourly, or when CPU utilization drops below a certain threshold like 40%)."
+What is a drawback of invoking a deadlock detection algorithm at defined intervals?,It may not identify the exact thread that 'caused' the deadlock.
+How do database systems typically manage deadlocks?,They use deadlock detection and recovery mechanisms.
+"In database systems, what are updates referred to as, and what are locks used for?","Updates are referred to as 'transactions', and locks are used to ensure data integrity during multiple concurrent transactions."
+How does a database server detect deadlocks?,It periodically searches for cycles in the wait-for graph of transactions.
+What steps are taken when a deadlock is detected in a database system?,"A victim transaction is selected, aborted, and rolled back (releasing its locks). The remaining transactions are freed from the deadlock, and the aborted transaction is reissued."
+How might a victim transaction be chosen in a database deadlock scenario?,"The choice often minimizes the cost of recovery, for example, by selecting the transaction that has performed the fewest inserts, updates, or deletes (e.g., as in MySQL)."
+Definition: wait-for graph,"In deadlock detection, a variant of the resource-allocation graph with resource nodes removed; it indicates a deadlock if the graph contains a cycle."
+Definition: thread dump,"In Java, a snapshot of the state of all threads in an application; a useful debugging tool for deadlocks."
+"When deadlock is detected, what are the two main options for recovery?","1. Inform operator (manual recovery).
+2. System recovers automatically."
+What are the two primary options for breaking a deadlock once detected?,"1. Abort one or more threads (to break circular wait).
+2. Preempt resources from deadlocked threads."
+How does 'process and thread termination' contribute to eliminating deadlocks?,"By aborting processes/threads, which allows the system to reclaim all resources held by them."
+Describe the 'Abort all deadlocked processes' method for deadlock recovery.,"This method immediately breaks the deadlock cycle. However, it is expensive because it discards all computations by the involved processes, necessitating recomputation."
+What is the 'Abort one process at a time until deadlock eliminated' method for deadlock recovery?,This method involves aborting processes sequentially until the deadlock is resolved. It incurs high overhead because deadlock detection must be performed after each individual abort.
+What are some issues that can arise when aborting a process for deadlock recovery?,"1. Files might be left in an incorrect state if they were being updated.
+2. Shared data integrity issues can occur if the process was updating data while holding a mutex lock (the lock status must be restored)."
+"If partial termination is chosen for deadlock recovery, how is the 'victim' process typically determined?","It is a policy decision, often based on economic factors to minimize cost."
+What factors are considered when choosing a 'victim' process to terminate (to minimize cost) during deadlock recovery?,"1. Process priority.
+2. Computation time (how long computed, how much longer it needs).
+3. Resources used (types, ease of preemption).
+4. Resources needed to complete.
+5. Number of processes to terminate."
+What is 'resource preemption' in the context of deadlock recovery?,It involves successively preempting resources from processes and allocating them to other processes until the deadlock is broken.
+What is the 'Selecting a victim' issue in resource preemption for deadlock recovery?,"It involves determining which specific resources or processes to preempt, with the goal of minimizing the cost (e.g., considering resources held or time consumed by the process)."
+Explain the 'Rollback' issue concerning resource preemption for deadlock recovery.,"When a resource is preempted, the process that held it cannot continue normal execution. The 'Rollback' issue addresses what to do with this preempted process, typically requiring it to roll back to a safe state and restart."
+What is the simplest method for 'rollback' in resource preemption?,"Total rollback, which means aborting the process and restarting it from the beginning."
+What is a more effective (but complex) method for 'rollback' in resource preemption?,"Rolling back only as necessary, which requires more detailed state information about the process."
+"What is the 'Starvation' issue in resource preemption, and why is it a concern?","Starvation occurs when resources are always preempted from the same process, preventing it from ever completing its execution. It's a concern because it means a process never makes progress."
+How is the 'starvation' issue commonly addressed in resource preemption?,"A common solution is to include the number of times a process has been rolled back (or picked as a victim) in the cost factor used for victim selection, ensuring it is picked a finite number of times."
+Define 'recovery mode'.,A system boot state that provides limited services and is designed to enable the system administrator to repair system problems and debug system startup.
+What is a deadlock?,A set of processes where each process is waiting for an event caused by another process in the set.
+What are the four necessary conditions for deadlock?,"Mutual exclusion, Hold and wait, No preemption, Circular wait."
+Define Mutual Exclusion in the context of deadlocks.,Only one process at a time can use a resource.
+Define Hold and Wait in the context of deadlocks.,A process holding at least one resource is waiting to acquire additional resources held by other processes.
+Define No Preemption in the context of deadlocks.,"A resource can only be released voluntarily by the process holding it, after that process has completed its task."
+Define Circular Wait in the context of deadlocks.,"A set of processes {P0, P1, ..., Pn} exists such that P0 is waiting for a resource held by P1, P1 is waiting for a resource held by P2, ..., Pn-1 is waiting for a resource held by Pn, and Pn is waiting for a resource held by P0."
+When is deadlock only possible?,"Only if all four necessary conditions (mutual exclusion, hold and wait, no preemption, circular wait) are present."
+How are deadlocks typically modeled?,Using resource-allocation graphs.
+What indicates a deadlock in a resource-allocation graph?,A cycle in the graph.
+What is the goal of deadlock prevention?,To ensure that at least one of the four necessary conditions for deadlock cannot occur.
+What is a practical strategy for deadlock prevention?,Eliminating circular wait.
+What is the strategy for deadlock avoidance?,Using the Banker's Algorithm to not grant resources if doing so would lead to an unsafe state.
+What is the strategy for deadlock detection?,An algorithm that evaluates processes and resources on a running system to find a deadlocked state.
+What are two methods for deadlock recovery?,"Aborting one process in a circular wait, or preempting resources assigned to a deadlocked process."
+Describe one method for deadlock recovery related to processes.,Aborting one process that is part of the circular wait.
+Describe one method for deadlock recovery related to resources.,Preempting resources that are assigned to a deadlocked process.

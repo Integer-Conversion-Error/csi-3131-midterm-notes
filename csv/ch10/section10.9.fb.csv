@@ -1,0 +1,60 @@
+Front,Back
+What issue does pure demand paging face when a process starts?,A large number of page faults occur due to initial locality.
+Define prepaging.,"Bringing pages into memory before they are requested, as an attempt to prevent high initial paging."
+What is the strategy employed by prepaging?,To bring some or all needed pages into memory at once.
+Provide an example of prepaging using the working-set model.,Remembering the working set for a suspended process and automatically bringing the entire working set back into memory before restarting.
+What is the primary advantage of prepaging?,Comparing the cost of prepaging against the potential cost of servicing numerous page faults.
+What is the main risk associated with prepaging?,"Many prepaged pages may not be used, leading to wasted memory and effort."
+"In prepaging cost analysis, if 's' pages are prepaged and 'α' is the fraction of 's' pages actually used, what does 's · (1 - α)' represent?",The cost of unnecessary pages that were prepaged but not used.
+Under what condition does prepaging generally result in a loss according to cost analysis?,If 'α' (the fraction of used prepaged pages) is approximately 0.
+Under what condition does prepaging generally result in a win according to cost analysis?,If 'α' (the fraction of used prepaged pages) is approximately 1.
+Why is prepaging executable programs difficult?,It is unclear what specific pages should be brought into memory.
+Why is prepaging files more predictable?,Files are often accessed sequentially.
+What Linux system call is used to prefetch file contents into memory?,`readahead()`.
+What are typical characteristics of page sizes in new machine designs?,"They are invariably powers of 2, typically ranging from 4,096 ($2^{12}$) to 4,194,304 ($2^{22}$) bytes."
+How does decreasing page size affect the page table size?,"It increases the number of pages, thereby increasing the overall page table size."
+Why is a larger page size desirable for page table size?,"Each active process has its own copy of the page table, and larger pages mean fewer entries, reducing the physical memory consumed by the page tables."
+How does page size impact memory utilization and internal fragmentation?,"Memory is better utilized with smaller pages, as processes are unlikely to end exactly on a page boundary, leading to unused allocated space (internal fragmentation) in larger pages."
+Define internal fragmentation.,The phenomenon where a part of the final page allocated to a process is unused because the process does not require the entire page.
+What is the average waste due to internal fragmentation?,Half of the final page allocated to a process.
+What page size is required to minimize internal fragmentation?,A small page size.
+What are the three components of I/O time when reading or writing a page?,"Seek time, latency, and transfer time."
+Which component of I/O time is directly proportional to the page size?,Transfer time.
+Why does a larger page size generally argue for minimizing total I/O time?,"Because seek and latency times often dwarf the transfer time, doubling the page size results in a minimal increase in total I/O time compared to performing multiple smaller I/Os."
+How does a smaller page size affect locality and total I/O?,It can reduce total I/O and improve locality because each page can match a program's locality more accurately.
+Define 'resolution' in the context of paging.,"The ability to isolate and bring into memory only the data that is actually needed, without transferring unneeded data within the same page."
+How does page size influence the number of page faults?,Larger page sizes generally lead to a reduced number of page faults.
+What are some significant overheads associated with each page fault?,"An interrupt, saving registers, replacing a page, queuing, and updating page tables."
+What has been the historical trend in page size development?,"A trend toward larger page sizes, even for mobile systems, with modern systems supporting very large page sizes (e.g., Linux huge pages)."
+Define TLB hit ratio.,The percentage of virtual address translations that are successfully resolved in the Translation Look-aside Buffer (TLB).
+How can the TLB hit ratio be increased?,"By increasing the number of entries in the TLB, although this is expensive and power-hungry due to associative memory."
+Define TLB reach.,"The amount of memory addressable by the Translation Look-aside Buffer (TLB), calculated as the number of entries multiplied by the page size."
+What is the ideal goal for TLB reach?,The working set for a process should ideally be stored entirely within the TLB.
+What happens if a process has insufficient TLB reach?,"The process spends more time resolving memory references by traversing the page table, rather than using the faster TLB."
+"Besides increasing TLB entries, what other approach can increase TLB reach?",Increasing the page size or providing support for multiple page sizes.
+What is the 'contiguous bit' in an ARM v8 TLB entry?,"A bit that, when set, indicates that the TLB entry maps contiguous (adjacent) blocks of memory rather than a single page."
+How might an operating system manage the TLB when multiple page sizes are supported?,"The OS may manage the TLB in software, often with a TLB entry field indicating the page frame size or a contiguous block."
+What is the primary purpose of inverted page tables?,To reduce the physical memory needed for virtual-to-physical address translations.
+How do inverted page tables work?,"They have one entry per page of physical memory, indexed by a combination of process ID and page number (<process-id, page-number>)."
+What is a main downside of using inverted page tables?,"They no longer contain complete information about the logical address space of a process, which is needed for demand paging."
+How do inverted page tables compensate for the lack of complete logical address space information for demand paging?,"An external page table (one per process) is kept, which looks like a traditional per-process page table and contains virtual page location information."
+When are external page tables (used with inverted page tables) referenced?,"Only on a page fault, meaning they don't need to be quickly available and can themselves be paged in/out as necessary."
+What special case can occur with inverted page tables that requires careful kernel handling?,"A page fault may cause another page fault (a 'double fault') if the external page table itself needs to be paged in, leading to a delay in page-lookup processing."
+"How can system performance be improved, even though demand paging is designed to be transparent to user programs?",By making the user or compiler aware of demand paging and structuring programs accordingly.
+"In a 128x128 array initialized with 128-word pages, how many page faults occur for row-major order (outer loop 'j', inner loop 'i') if fewer than 128 frames are allocated?","16,384 page faults (128 × 128), because it zeros one word in each page, then another word in each page, leading to many page misses."
+"In a 128x128 array initialized with 128-word pages, how many page faults occur for column-major order (outer loop 'i', inner loop 'j')?","128 page faults, because it zeros all words on one page before moving to the next, improving locality."
+How can careful selection of data structures and programming structures improve paging performance?,"By increasing locality, lowering the page-fault rate, and resulting in a smaller working set."
+Provide an example of a data structure with good locality.,"A stack, where access is almost always to the top."
+Provide an example of a data structure with bad locality.,"A hash table, which tends to scatter memory references across different pages."
+What are 'clean pages' in the context of program structure and paging?,"Code pages that are read-only and never modified; they are beneficial because they do not need to be paged out, saving I/O operations."
+How can loaders optimize for paging performance?,By avoiding placing routines across page boundaries (keeping a routine in one page) and by packing frequently called routines into the same page.
+What is the purpose of 'I/O interlock' and 'page locking' in demand paging?,"To allow pages to be fixed in memory (locked) and prevent them from being paged out, particularly during I/O operations to user memory."
+Describe the problem scenario that page locking addresses during I/O.,"If a process initiates an I/O operation to a user memory buffer, and that page is subsequently swapped out by another process through global replacement, the pending I/O operation would then target an incorrect or different page frame."
+"What is one solution to the I/O interlock problem, besides page locking?","Never executing I/O directly to user memory, instead copying data between system memory and user memory; however, this incurs potentially high overhead."
+How does a 'lock bit' function in page locking?,"A 'lock bit' is associated with every frame, and when set, prevents that frame from being selected for replacement by the page replacement algorithm."
+How are lock bits used when performing a disk write operation?,"The pages containing the block to be written are locked into memory before the I/O operation starts, and then unlocked once the I/O is complete."
+Why are some or all OS kernel pages often locked into memory?,"Many operating systems cannot tolerate a page fault occurring within the kernel itself, as it could lead to system instability."
+Define pinning in the context of page locking.,"The act of locking pages into memory, often initiated by user processes, to prevent them from being paged out."
+Give an example of a user process that might utilize page pinning.,"A database process that manages a large chunk of memory and frequently moves blocks between secondary storage and memory, benefiting from persistent memory residency."
+What is a potential danger or downside of using the lock bit feature?,"A bug could cause a lock bit to be turned on but never turned off, rendering the locked frame permanently unusable."
+How does Solaris handle applications' requests for page locking (pinning)?,"Solaris allows applications to provide locking 'hints', but the OS can disregard these hints if the free-frame pool is too small or if a process requests an excessive number of locked pages."

@@ -1,0 +1,22 @@
+Front,Back
+What are a computer's two main jobs?,I/O and computing.
+"In many cases, which of a computer's main jobs is considered primary?","I/O is often primary, with computing being incidental (e.g., browsing, editing)."
+What is the operating system's role concerning I/O?,To manage and control I/O operations and devices.
+What aspect of I/O hardware is studied regarding OS internal facilities?,"I/O hardware basics, specifically constraints on OS internal facilities."
+What two main areas concerning OS and applications are covered regarding I/O?,OS I/O services and application I/O interface.
+"What ""gap"" is a key topic in I/O study?",Bridging the gap between hardware and application interfaces.
+What is the UNIX System V STREAMS mechanism?,A mechanism for dynamic driver code pipelines.
+What OS design principles are covered regarding I/O performance?,I/O performance and OS design principles for improvement.
+What is a major concern in operating system design related to hardware?,Device control.
+Why do I/O devices require varied control methods?,"Due to wide variations in their function and speed (e.g., mouse, hard disk, flash drive, tape robot)."
+What OS component is formed by the varied I/O control methods?,The kernel's I/O subsystem.
+What is a key benefit of the kernel's I/O subsystem?,It separates the kernel from device management complexities.
+What is a trend in I/O device technology regarding software and hardware interfaces?,Increasing standardization of software/hardware interfaces.
+What is the benefit of increasing standardization of I/O software/hardware interfaces?,It helps incorporate new device generations.
+What is another trend in I/O device technology related to the diversity of devices?,An increasingly broad variety of I/O devices.
+What challenge does the increasing variety of I/O devices pose?,"Incorporating new, unlike devices."
+How do basic I/O hardware elements accommodate diverse devices?,"Elements like ports, buses, and device controllers are designed to accommodate diverse devices."
+How is the kernel structured to manage diverse device details?,With device-driver modules that encapsulate device details.
+What do device drivers provide to the I/O subsystem?,A uniform device-access interface.
+What is the uniform device-access interface provided by device drivers analogous to?,System calls for applications.
+Define: Device driver,An OS component providing uniform access and managing I/O to various devices.

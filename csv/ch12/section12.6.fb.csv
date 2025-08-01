@@ -1,0 +1,38 @@
+Front,Back
+Which UNIX systems typically include the STREAMS mechanism?,UNIX System V and subsequent releases.
+Define STREAMS.,A UNIX I/O feature allowing dynamic assembly of driver code pipelines.
+"Define ""Stream"" in the context of STREAMS.",A full-duplex connection between a device driver and a user-level process.
+What are the main components of a STREAMS mechanism?,"Stream head, driver end, and zero or more stream modules."
+Define stream head.,The interface between STREAMS and user processes.
+Define driver end.,The interface between STREAMS and the controlled device.
+Define stream modules.,Modules of functionality loadable into a STREAM.
+Where are stream modules positioned within a STREAMS connection?,Between the stream head and the driver end.
+What type of queues does each component of a STREAMS mechanism contain?,A pair of queues: a read queue and a write queue.
+How is data transferred between components in a STREAMS mechanism?,Via message passing between queues.
+What is the function of modules in STREAMS?,They provide STREAMS processing functionality.
+How are modules added (pushed) onto a stream?,Using the `ioctl()` system call.
+Provide an example of using a module in STREAMS.,Opening a USB device (like a keyboard) via a stream and pushing a module for input editing.
+Define flow control in STREAMS.,"A method to pause a sender of I/O, which limits the data flow rate."
+How does a STREAMS queue behave when *without* flow control?,It accepts all messages and immediately sends them to the adjacent queue without buffering.
+How does a STREAMS queue behave when *with* flow control?,It buffers messages and does not accept new messages without sufficient buffer space.
+What is involved in flow control between adjacent STREAMS module queues?,Control message exchanges.
+What system calls can a user process use to write data to a device via STREAMS?,`write()` or `putmsg()`.
+What type of data does the `write()` system call handle in STREAMS?,Raw data (unstructured byte stream).
+What additional capability does the `putmsg()` system call provide compared to `write()` in STREAMS?,It allows the user to specify a message.
+What happens after a user process writes data to a stream head?,The stream head copies the data into a message and delivers it to the next module's queue.
+What is the path of data after it leaves the stream head when writing to a device?,"Copying continues from module to module until it reaches the driver end, and then the device."
+What system calls can a user process use to read data from a stream head?,`read()` or `getmsg()`.
+How does the `read()` system call process data received from a stream head?,The stream head gets the message and returns ordinary data (an unstructured byte stream).
+What type of data does the `getmsg()` system call return to the process?,The entire message.
+What is the general nature of STREAMS I/O?,"Asynchronous (or nonblocking), except when communicating directly with the stream head."
+When does a user process block when writing to a stream?,If the next queue in the stream uses flow control and there is no room to copy the message.
+When does a user process block when reading from a stream?,Until data becomes available.
+What is a key responsibility of the driver end regarding device interaction?,"It must respond to interrupts (e.g., when a frame is ready from a network device)."
+How does the driver end's handling of incoming data differ from the stream head's?,"Unlike the stream head, which may block, the driver end *must* handle all incoming data."
+Must drivers support flow control within the STREAMS mechanism?,"Yes, drivers must support flow control."
+What often happens if a device's buffer becomes full when interacting via STREAMS?,"The device typically drops incoming messages (e.g., a network card dropping frames)."
+What is a major benefit of the STREAMS mechanism?,It provides a framework for modular and incremental development of device drivers and network protocols.
+What is an advantage regarding the reusability of STREAMS modules?,"Modules are reusable by different streams or devices (e.g., a networking module for Ethernet and 802.11 wireless)."
+"What type of data and information can STREAMS support transfer between modules, beyond just unstructured byte streams?",Message boundaries and control information.
+How widely adopted is STREAMS in UNIX variants and for what purpose?,Most UNIX variants support STREAMS; it is preferred for implementing protocols and device drivers.
+Provide an example of a system where the socket mechanism is implemented using STREAMS.,System V UNIX and Solaris.

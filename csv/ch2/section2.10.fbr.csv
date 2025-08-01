@@ -1,0 +1,33 @@
+Front,Back,Reversible
+What is debugging?,"The activity of finding and fixing errors (bugs) in a system, including hardware and software. It can also involve performance tuning.",y
+What is performance tuning?,"The activity of improving system efficiency by removing bottlenecks; also, the activity of finding and fixing performance bottlenecks.",y
+What is a bottleneck?,A performance-limiting aspect of computing.,y
+What are the primary focuses of operating-system debugging?,"Debugging process and kernel errors, and performance problems.",y
+"When a process fails, what actions do operating systems typically take?","Write error information to a log file, create a core dump (a capture of the process's memory) for later analysis, and allow debuggers to probe running programs and core dumps.",y
+What is a log file?,"A file containing error or ""logging"" information.",y
+What is a core dump?,"A copy of the state of a process written to disk when it crashes, or a capture of the process's memory for later analysis.",y
+Why is kernel debugging more complex than process debugging?,"Due to its size, control of hardware, and lack of user-level tools.",y
+What is a crash?,Termination of execution due to a problem (can refer to kernel or process failure).,y
+What happens when a kernel fails?,"It is called a ""crash,"" error information is saved to a log file, and memory state is saved to a crash dump.",y
+What is a crash dump?,A copy of the state of the kernel written to disk during a crash.,y
+Where is kernel memory state often saved during a crash and why?,To a dedicated disk section without a file system to ensure data integrity during a crash.,y
+What are the two main methods for monitoring system behavior in performance tuning?,Counters and tracing.,y
+How do operating systems track activity using counters?,"By tracking various operations such as system calls, network operations, or disk operations.",y
+Name a per-process Linux tool that reports information for processes.,`ps`,y
+Name a per-process Linux tool that reports real-time statistics for current processes.,`top`,y
+Name a system-wide Linux tool that reports memory-usage statistics.,`vmstat`,y
+Name a system-wide Linux tool that reports network interface statistics.,`netstat`,y
+Name a system-wide Linux tool that reports disk I/O usage.,`iostat`,y
+From what pseudo file system do most Linux counter tools read statistics?,The `/proc` pseudo file system (kernel memory).,y
+"What Windows tool provides information on applications, processes, CPU/memory usage, and networking statistics?",Windows Task Manager,y
+What is the purpose of tracing tools in performance monitoring?,"To collect data for specific events, such as system-call invocation steps.",y
+Name a per-process Linux tool that traces system calls invoked by a process.,`strace`,y
+Name a per-process Linux tool that is a source-level debugger.,`gdb`,y
+Name a system-wide Linux tool that is a collection of Linux performance tools for tracing.,`perf`,y
+Name a system-wide Linux tool that collects network packets for tracing.,`tcpdump`,y
+What is BCC (BPF Compiler Collection)?,"A rich toolkit for dynamic kernel tracing in Linux, providing a dynamic, secure, low-impact debugging environment; it acts as a front-end interface to eBPF.",y
+What is eBPF (extended Berkeley Packet Filter)?,A technology where programs written in a subset of C are compiled into eBPF instructions and dynamically inserted into a running Linux system to capture events or monitor performance.,y
+"What is the role of the ""Verifier"" in eBPF?",It checks eBPF instructions for potential system performance or security impact before they are inserted into the kernel.,y
+How are BCC tools implemented?,"They are written in Python, embedding C code for eBPF instrumentation. This C code is compiled to eBPF instructions and inserted using probes or tracepoints.",y
+Provide an example of a BCC tool and its functionality.,"`disksnoop.py`, which traces disk I/O activity, reporting timestamp, read/write operation, bytes transferred, and latency.",y
+What are the key advantages of using BCC?,"It can be used on live production systems without harm, and is useful for system administrators to identify bottlenecks or security exploits.",y

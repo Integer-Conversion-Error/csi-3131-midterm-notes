@@ -1,0 +1,60 @@
+Front,Back
+What is a file?,A collection of related information defined by its creator; the smallest allotment of logical secondary storage from a user's perspective; a named collection of related information recorded on secondary storage.
+What is the primary role of the OS regarding files and physical storage?,The OS maps files onto physical mass-storage devices.
+Define 'file system'.,Describes how files map to physical devices and how they are accessed/manipulated.
+What are the key design goals for file systems?,"Efficient access (as physical storage can be slow), file sharing support, and remote access."
+Why is the file system considered the most visible OS aspect for users?,It provides a mechanism for online storage and access to OS data/programs and user data.
+What are the two main components of a file system?,1. A collection of files (storing related data). 2. A directory structure (organizes and provides information about files).
+What kind of storage do most file systems reside on?,"Nonvolatile, persistent storage devices."
+How does the OS provide a uniform logical view of stored information?,It abstracts physical properties to define a logical storage unit called the file.
+What types of information do files commonly represent?,Programs (source/object) and data.
+What are common categories of data files?,"Numeric, alphabetic, alphanumeric, and binary."
+How can files be structured in terms of formatting?,They can be free form (like text) or rigidly formatted.
+What is a 'text file'?,A file containing text (alphanumeric characters); a sequence of characters organized into lines.
+What is a 'source file'?,"A file containing program source code; a sequence of functions (declarations, executable statements)."
+What is an 'executable file'?,A file containing a program ready for loading/execution; a series of code sections a loader can bring into memory and execute.
+How are files typically named for human users?,"They are named symbolically, e.g., `example.c`."
+What does it mean for a file to be 'independent'?,"A file is independent of its creator process, user, and system. A copy remains independent if no sharing or synchronization is involved."
+List the typical attributes of a file.,"Name, Identifier, Type, Location, Size, Protection, Timestamps and user identification."
+What is the 'Name' attribute of a file?,"The symbolic, human-readable name of the file."
+What is the 'Identifier' attribute of a file?,"A unique tag (number), non-human-readable, that identifies the file within the file system."
+What is the 'Type' attribute of a file?,An attribute used in systems supporting different file types to categorize the file.
+What is the 'Location' attribute of a file?,A pointer to the device and the file's location on that device.
+What is the 'Size' attribute of a file?,"The current size of the file (in bytes, words, or blocks), possibly including the maximum allowed size."
+What is the 'Protection' attribute of a file?,"Access-control information, specifying permissions like read, write, or execute."
+"What information is included in 'Timestamps and user identification' attributes of a file, and what is its purpose?","Includes creation time, last modification time, and last use time. Useful for protection, security, and monitoring."
+What are 'extended file attributes'?,"Extended metadata supported by newer file systems, such as character encoding and file checksums."
+What is a 'file info window'?,A GUI view of file metadata.
+Where is information about all files stored within the file system structure?,"In the directory structure, typically on the same device as the files themselves."
+What does a directory entry contain?,"The file name and a unique identifier, which in turn locates other attributes of the file."
+How does the OS typically handle file operations?,"It provides system calls for operations like create, write, read, reposition, delete, and truncate files."
+What are the two steps involved in creating a file?,1. Find space in the file system. 2. Make an entry for the new file in the directory.
+What is typically required before performing most file operations (except create/delete)?,The `open()` system call.
+What is a 'write pointer'?,"The location in a file for the next write operation, maintained by the system during sequential writes."
+What is a 'read pointer'?,"The location in a file for the next read operation, maintained by the system during sequential reads."
+What is the 'current-file-position pointer'?,"A per-process pointer that indicates the next read/write location within a file, shared by read and write operations."
+What is the 'seek' operation in the context of files?,"The operation of changing the current-file-position pointer to a given value, without actual I/O involved."
+What are the steps involved in deleting a file?,1. Search the directory for the named file. 2. Release all file space for reuse. 3. Erase or mark the directory entry as free.
+What are 'hard links'?,File-system links where a file has two or more names pointing to the same inode. The actual content is deleted only when the last link is deleted.
+What does it mean to 'truncate' a file?,"To erase the contents of a file but keep its attributes, resetting the file length to zero and releasing its allocated space."
+Why does the `open()` system call exist for files?,To avoid constant directory searching for file location and attributes during repeated operations on the same file.
+What is an 'open-file table'?,"An OS data structure that contains information about all currently open files, allowing files to be specified by an index into the table rather than requiring directory searches."
+What happens when a file is closed?,The OS removes its entry from the open-file table and releases any associated locks.
+What are the two levels of internal tables the OS uses for open files when multiple processes are involved?,A per-process table and a system-wide open-file table.
+What information does the per-process open-file table track?,"Files a specific process has open, its current file pointer, access rights, and accounting information."
+What information does the system-wide open-file table contain?,"Process-independent information about open files, such as disk location, access dates, and size."
+What is an 'open count' in the context of file management?,"A counter in the system-wide open-file table that tracks the number of processes that currently have a file open. When it reaches zero, the entry is removed."
+What is the purpose of file locks?,"They allow one process to lock a file or sections of a file to prevent other processes from accessing them, useful for shared files like system logs."
+What is a 'shared lock'?,"A type of file lock that allows multiple processes to acquire it concurrently, similar to a reader lock."
+What is an 'exclusive lock'?,"A type of file lock that allows only one process to acquire it at a time, similar to a writer lock."
+Differentiate between 'mandatory' and 'advisory' file-locking mechanisms.,"In mandatory locking, the OS prevents other processes from accessing a locked file (e.g., Windows). In advisory locking, the OS does not prevent access; applications must manually acquire and respect the locks (e.g., UNIX)."
+What is a common technique for indicating file types?,"Including the type as part of the file name, often as an extension (e.g., `name.extension`)."
+How do operating systems typically use file extensions?,"The OS uses the extension to indicate the file type and the allowed operations, such as identifying executable files (.com, .exe, .sh)."
+What is a 'shell script'?,"A file containing a set series of commands specific to a shell, often identified by a `.sh` extension."
+How does macOS handle file types and application associations?,"Each file has a type (e.g., `.app`) and a 'creator attribute' (the program that created it). The OS sets and enforces the creator attribute, allowing double-clicking a file to open the associated application."
+What is a 'magic number' in the context of file types?,"A specific number or byte sequence at the beginning of some binary files that indicates their data type, such as an image format. Text files can also have magic numbers to indicate their shell language, for example."
+How does UNIX generally treat file structures?,Each file is a sequence of 8-bit bytes with no OS interpretation. This provides maximum flexibility but requires applications to interpret the file structure themselves.
+What is the universal file structure that all operating systems must support?,"The executable file structure, necessary for loading and running programs."
+What is the unit of disk I/O?,"All disk I/O operates in units of one block (or sector), and all blocks are typically the same size."
+What is 'internal fragmentation' in file systems?,"Wasted disk space that occurs in the last allocated block of a file because the block size is fixed, and the file's data may not perfectly fill the last block."
+How does block size relate to internal fragmentation?,A larger block size generally leads to greater internal fragmentation.

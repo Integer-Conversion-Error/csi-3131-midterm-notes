@@ -1,0 +1,60 @@
+Front,Back,Reversible
+What do system calls provide an interface to?,"System calls provide an interface to OS services, typically as C/C++ functions, sometimes assembly.",y
+How extensively are system calls used even by simple programs?,"Even simple programs (e.g., file copy) make extensive use of system calls.",y
+"List the steps involved in a file copy program (e.g., `cp in.txt out.txt`) that involve system calls.","1. Obtaining file names (command line, user input, GUI).
+2. Opening input file, creating/opening output file (with error handling for non-existence, protection, or existing files).
+3. Looping to read from input and write to output (with error handling for EOF, hardware failure, disk space).
+4. Closing files, displaying messages, and terminating the program.",y
+What is the fundamental role of system calls?,System calls are fundamental for program interaction with the OS.,y
+What is an Application Programming Interface (API)?,"An API is a set of commands, functions, and other tools that can be used by a programmer in developing a program. It specifies functions, parameters, and return values available to programmers (e.g., Windows API, POSIX API, Java API).",y
+How do application developers typically interact with OS services?,Application developers typically use an Application Programming Interface (API) rather than direct system calls.,y
+How are APIs accessed?,"APIs are accessed via libraries (e.g., libc for C programs on UNIX/Linux).",y
+What is `libc`?,libc (C library) is the standard UNIX/Linux system API for programs written in the C programming language.,y
+How do API functions relate to actual system calls?,"API functions invoke actual system calls in the kernel (e.g., `CreateProcess()` calls `NTCreateProcess()`).",y
+What are the benefits of using APIs?,"1. **Portability:** Programs can run on any system supporting the same API.
+2. **Simplicity:** APIs are often less detailed and easier to use than raw system calls.",y
+What is the Run-Time Environment (RTE)?,"The Run-Time Environment (RTE) is the full suite of software needed to execute applications written in a given programming language, including its compilers, libraries, and loaders. It provides a system-call interface that links API calls to OS system calls.",y
+What is the system-call interface?,The system-call interface is an interface that serves as the link to system calls made available by the operating system and that is called by processes to invoke system calls. It uses a table indexed by system call numbers to invoke the correct kernel function.,y
+What hides the details of system call implementation from the programmer?,The API and the Run-Time Environment (RTE) hide the details of system call implementation from the programmer.,y
+How can parameters be passed to system calls?,"Parameters to system calls can be passed via registers, memory blocks, or a stack (using push and pop operations).",y
+What is a `stack`?,"A stack is a sequentially ordered data structure that uses the last-in, first-out (LIFO) principle for adding and removing items; the last item placed onto a stack is the first item removed.",y
+What does `push` refer to in the context of a stack?,Push is the action of placing a value on a stack data structure.,y
+What are the six broad categories of system calls?,"1. Process control
+2. File management
+3. Device management
+4. Information maintenance
+5. Communications
+6. Protection",y
+What is Process Control?,"Process control is a category of system calls that manages processes, including creating, terminating, loading, executing, and controlling process attributes.",y
+List common system calls for process termination.,`end()` (terminate normally) or `abort()` (terminate abnormally).,y
+What is a `debugger` and how does it relate to process control?,A debugger is a system program designed to aid programmers in finding and correcting errors. It can examine memory dumps from abnormal program terminations (a process control function).,y
+What is a `bug`?,A bug is an error in computer software or hardware.,y
+List common system calls for loading and executing programs.,"`load()`, `execute()`.",y
+List common system calls for creating new processes.,"`create_process()`, `fork()`.",y
+List common system calls for controlling process attributes.,"`get_process_attributes()`, `set_process_attributes()` (for priority, execution time, etc.).",y
+List common system calls for terminating created processes.,`terminate_process()`.,y
+List common system calls for process waiting and signaling.,"`wait_time()`, `wait_event()`, `signal_event()`.",y
+What is a `lock` and what system calls are used to manage it?,A lock is a mechanism that restricts access by processes or subroutines to ensure integrity of shared data. System calls include `acquire_lock()` and `release_lock()`.,y
+What is an `Arduino sketch`?,An Arduino sketch is an Arduino program.,y
+Provide examples of process control in different OS contexts.,"Arduino (single-tasking) uses `sketch` and `boot loader`. FreeBSD (multitasking) uses `fork()`, `exec()`, `exit()`.",y
+What are the basic file management system calls?,"`create()`, `delete()`, `open()`, `read()`, `write()`, `reposition()`, `close()` files.",y
+Do file management operations apply only to files?,"No, similar file management operations also apply to directories.",y
+List system calls for managing file/directory attributes.,"`get_file_attributes()`, `set_file_attributes()`.",y
+What are the primary device management system calls?,"`request()` and `release()` devices for exclusive use. Also, read, write, and reposition devices, similar to files.",y
+"How do many operating systems (e.g., UNIX) handle files and devices?","Many operating systems (e.g., UNIX) merge files and devices into a combined structure.",y
+What is Information Maintenance in the context of system calls?,Information maintenance is a category of system calls that involves transferring information between a user program and the OS.,y
+Give examples of information maintenance system calls.,"Current `time()` and `date()`, OS version, free memory/disk space. Also, debugging aids like `dump()` memory, `strace` (Linux), and `single step` CPU mode.",y
+What is `single step` CPU mode?,"Single step is a CPU mode in which a trap is executed by the CPU after every instruction, allowing examination of the system state after every instruction; useful in debugging.",y
+What system calls are used for getting/setting process information under information maintenance?,"`get_process_attributes()`, `set_process_attributes()`.",y
+What are the two main models for interprocess communication via system calls?,The Message-Passing Model and the Shared-Memory Model.,y
+Describe the Message-Passing Model of communication.,"The Message-Passing Model is a method of interprocess communication in which processes exchange messages directly or via mailboxes. It requires opening connections and knowing the host name and process name. Daemons (servers) wait for connections from clients, using `read_message()` and `write_message()` for exchange.",y
+What is a `host name`?,A host name is a human-readable name for a computer.,y
+What is a `process name`?,A process name is a human-readable name for a process.,y
+What is a `daemon`?,A daemon is a service that is provided outside of the kernel by system programs that are loaded into memory at boot time and run continuously. Also known as a server in communication contexts.,y
+What is a `client` in the context of communications?,A client is a computer that uses services from other computers (such as a web client). It is the source of a communication.,y
+What is a `server`?,"A server is, in general, any computer, no matter the size, that provides resources to other computers.",y
+Describe the Shared-Memory Model of communication.,"The Shared-Memory Model is an interprocess communication method in which multiple processes share memory and use that memory for message passing. Processes agree to remove memory access restrictions, and exchange information by reading/writing shared data. It is faster communication, but requires protection and synchronization.",y
+Which communication models do most systems implement?,Most systems implement both the Message-Passing Model and the Shared-Memory Model.,y
+What is `Protection` in the context of system calls?,Protection is a category of system calls that refers to any mechanism for controlling the access of processes or users to the resources defined by a computer system.,y
+List example system calls for protection.,"`set_permission()`, `get_permission()`, `allow_user()`, `deny_user()`.",y
+Why is protection essential in modern systems?,"Protection is essential for multiprogrammed, networked, and mobile systems.",y

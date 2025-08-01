@@ -1,0 +1,32 @@
+Front,Back,Reversible
+What is the primary purpose of an operating system?,To provide an environment for the execution of programs by offering services to users and programs.,y
+What are the three primary approaches for interacting with an operating system?,"1. Command interpreters
+2. Graphical user interfaces (GUIs)
+3. Touch-screen interfaces",y
+What do system calls provide?,An interface to the services made available by an operating system.,y
+How do programmers access system-call services?,They use a system call's application programming interface (API).,y
+Name the six major categories of system calls.,"1. Process control
+2. File management
+3. Device management
+4. Information maintenance
+5. Communications
+6. Protection",y
+What provides the system-call interface for UNIX and Linux systems?,The standard C library.,y
+What are system programs?,A collection of utilities provided by the operating system to users.,y
+"Define ""linker"".",A program that combines several relocatable object modules into a single binary executable file.,y
+"Define ""loader"".","A program that loads an executable file into memory, making it eligible to run on an available CPU.",y
+Why are applications often operating-system specific?,"Due to different binary formats for program executables, different instruction sets for different CPUs, and system calls that vary between operating systems.",y
+"How do goals, policies, and mechanisms relate in operating system design?","Specific design goals determine the operating system's policies, which are then implemented through specific mechanisms.",y
+"Define ""monolithic operating system"".","An operating system with no structure, where all functionality is provided in a single, static binary file that runs in a single address space.",y
+What is the primary benefit and drawback of a monolithic operating system?,"Benefit: Efficiency.
+Drawback: Difficult to modify.",y
+"Define ""layered operating system"".","An operating system divided into discrete layers, with the bottom layer as the hardware interface and the highest as the user interface.",y
+Why is the layered approach generally not ideal for designing operating systems?,Due to performance problems.,y
+"Describe the ""microkernel"" approach for OS design.","It uses a minimal kernel, with most services running as user-level applications.",y
+How does communication occur in a microkernel operating system?,Via message passing.,y
+"Describe the ""modular"" approach for OS design.",It provides operating-system services through modules that can be loaded and removed during run time.,y
+"Define ""hybrid system"" in the context of operating systems.",A contemporary operating system constructed using a combination of a monolithic kernel and modules.,y
+"Define ""boot loader"".","A program that loads an operating system into memory, performs initialization, and begins system execution.",y
+What are two methods for monitoring the performance of an operating system?,Counters and tracing.,y
+"Define ""counters"" in the context of OS performance monitoring.",A collection of system-wide or per-process statistics.,y
+"Define ""tracing"" in the context of OS performance monitoring.",Following the execution of a program through the operating system.,y

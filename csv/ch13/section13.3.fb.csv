@@ -1,0 +1,80 @@
+Front,Back
+What is a directory in a file system context?,A symbol table translating file names to file control blocks.
+What are the essential organizational capabilities a directory must allow?,"Insert entries, Delete entries, Search for named entry, List all entries."
+List the common operations on a directory.,"Search for a file, Create a file, Delete a file, List a directory, Rename a file, Traverse the file system."
+What is the purpose of the 'Search for a file' operation on a directory?,To find the entry for a particular file or find files matching a pattern.
+What is the purpose of the 'Create a file' operation on a directory?,To add new files to the directory.
+"What is the purpose of the 'Delete a file' operation on a directory, and what can be a consequence?","To remove a file from the directory; it may leave a hole, requiring defragmentation."
+What is the purpose of the 'List a directory' operation?,To list files and their entry contents.
+What is the purpose of the 'Rename a file' operation on a directory?,To change a file name when its contents/use changes; it may also change the file's position.
+What is the purpose of the 'Traverse the file system' operation on a directory?,"To access every directory/file, typically for backup or space release."
+Describe the simplest directory structure.,"Single-level directory, where all files are in the same directory."
+What are the advantages of a single-level directory?,Easy to support and understand.
+What are the limitations of a single-level directory?,Files must have unique names (name collision problem for multiple users) and it's difficult for a single user to remember many file names.
+How is a two-level directory structured?,"It separates directories for each user, with each user having their own User File Directory (UFD)."
+What is a User File Directory (UFD)?,Per-user directory of files in two-level directory implementation.
+What is the Main File Directory (MFD) in a two-level directory system?,"The system's main file directory, indexed by user name/account, which points to each User File Directory (UFD)."
+How does file searching work when a user refers to a file in a two-level directory system?,Only their User File Directory (UFD) is searched.
+What is an advantage of the two-level directory structure regarding file names?,"Different users can have the same file names, as names are unique only within each User File Directory (UFD)."
+Who typically handles the creation and deletion of User File Directories (UFDs)?,"Special system programs, restricted to administrators."
+What are the disadvantages of a two-level directory structure?,"It isolates users, which is a disadvantage for cooperation; to access another user's file, one must specify both the user name and the file name."
+How can a two-level directory be visualized as a tree structure?,"The Main File Directory (MFD) is the root, User File Directories (UFDs) are descendants, and files are the leaves."
+What is a path name in the context of a two-level directory?,"The combination of the user name and the file name used to locate a file (e.g., '/userb/test.txt' or 'C:\userb\test')."
+What problem arises with system files in a two-level directory structure?,Copying system files to each User File Directory (UFD) wastes space.
+What is the solution to the system file problem in two-level directories?,"Create a special user directory for system files (e.g., user 0)."
+Describe the search sequence for files in a two-level directory system with system file optimization.,"The OS first searches the local User File Directory (UFD), then the special system directory."
+What is a search path?,A sequence of directories searched for an executable file when a command is executed.
+Can search paths be customized in a two-level directory system?,"Yes, the search path can be extended, and users can have their own search paths."
+What is the relationship between tree-structured directories and two-level directories?,Tree-structured directories are a generalization of two-level directories to arbitrary height.
+What is the most common directory structure?,Tree-structured directories.
+"In a tree-structured directory, what are the characteristics of files and path names?","There is a root directory, and every file has a unique path name."
+What can a directory (or subdirectory) contain in a tree-structured directory system?,Files or subdirectories.
+"How is a directory often treated in a tree-structured directory system, and how is its type distinguished?",A directory is often treated as a special file; one bit defines whether an entry is a file (0) or a subdirectory (1).
+How are directories created and deleted in a tree-structured system?,Using special system calls.
+What is a 'current directory' in a tree-structured file system?,Each process has a directory that is currently being referenced.
+How is a file referenced in a tree-structured directory system if it's not in the current directory?,One must specify its path name or change the current directory.
+Where does the initial current directory come from?,From an accounting file.
+Define 'absolute path name' in a tree-structured directory.,"A path name that begins at the root (e.g., '/') and follows the path down to the file."
+Define 'relative path name' in a tree-structured directory.,A path name that defines the path from the current directory.
+Provide an example of a relative path name.,"If the current directory is '/spell/mail', then 'prt/first' refers to '/spell/mail/prt/first'."
+How do users typically organize their files in a tree-structured directory system?,By defining subdirectories based on topic or information type.
+How is a directory deleted if it is empty in some tree-structured systems?,The entry is simply deleted.
+How do some systems (like UNIX with 'rm -r') handle the deletion of a non-empty directory in a tree-structured system?,"They delete the directory and all its files/subdirectories recursively, which is convenient but dangerous."
+How do other systems handle the deletion of a non-empty directory in a tree-structured system if they do not support recursive deletion?,"They only delete the directory if it's empty, requiring the user to delete contents recursively first."
+How can users access other users' files in a tree-structured directory system?,By specifying the full path name or by changing their current directory to the relevant path.
+What is the primary feature of acyclic-graph directories?,They allow directories to share subdirectories and files.
+What constraint defines an acyclic-graph directory structure?,There are no cycles (loops) in the graph.
+What happens when a shared file is modified in an acyclic-graph directory system?,"Changes are visible to all directories sharing the file, as only one actual file exists."
+What happens when new files are added to a shared subdirectory in an acyclic-graph directory system?,The new files appear in all shared subdirectories.
+What are two main ways to implement shared files/subdirectories in an acyclic-graph directory system?,Using links (pointers) or by duplicating all information in both sharing directories.
+What is a 'link' in the context of acyclic-graph directories?,"A file that has no contents but points to another file or subdirectory (e.g., using an absolute or relative path name)."
+What does it mean to 'resolve' a link?,To follow the path name in the link to locate the real target file.
+How does the OS typically handle links during directory traversal in acyclic-graph systems?,It ignores links to preserve the acyclic structure.
+What is a disadvantage of implementing sharing by duplicating all information in both sharing directories?,It leads to consistency issues if the original file/subdirectory is modified.
+What are the main problems associated with acyclic-graph directories?,"Multiple absolute path names for the same file (aliasing), issues with traversing the entire file system efficiently, and complexity in determining when space can be deallocated upon deletion."
+What is the 'aliasing' problem in acyclic-graph directories?,The same file can have multiple absolute path names.
+What is a challenge when traversing an entire file system structured as an acyclic graph?,Avoiding traversing shared structures more than once.
+What problem does deleting a file linked in an acyclic-graph directory present?,Deleting the original file may leave dangling pointers if other links to it still exist.
+How do symbolic links behave upon deletion of the original file?,"Deletion of the link itself doesn't affect the original file, but if the original file is deleted, the symbolic links dangle."
+How can the dangling pointer problem be avoided when deleting files in an acyclic-graph directory system?,"By preserving the file until all references to it are deleted, typically by using a reference count."
+How does a 'reference count' work for file deletion?,The count is incremented on a new link/entry creation and decremented on deletion; the file is deleted only when the count reaches 0.
+What type of links in UNIX use a reference count for deletion?,Hard links.
+What are hard links?,File-system links where a file has two or more names pointing to the same inode.
+What is the main characteristic of a general graph directory structure?,It allows cycles (loops) in the directory structure.
+What is the primary advantage of acyclic graph directories over general graph directories?,Simpler traversal and deletion algorithms.
+What are the problems associated with cycles in a general graph directory structure?,Infinite loops during search/traversal and reference counts may not reach 0 even if a file/directory is inaccessible.
+What is required to determine when space can be reallocated in a general graph directory system with cycles?,Garbage collection.
+What is 'garbage collection' in the context of file systems?,The recovery of space containing no-longer-valid data.
+Why is garbage collection problematic for disk-based file systems?,It can be very time-consuming.
+What is a simpler approach to dealing with cycles in general graph directories?,Bypass links during directory traversal.
+Define 'user file directory (UFD)'.,Per-user directory of files in two-level directory implementation.
+Define 'main file directory (MFD)'.,Index pointing to each UFD in two-level directory implementation.
+Define 'path name'.,"File-system name for a file, containing mount-point and directory-entry info to locate it (e.g., 'C:/foo/bar.txt')."
+Define 'search path'.,Sequence of directories searched for an executable file when a command is executed.
+Define 'absolute path name'.,Path name starting at the top of the file system hierarchy.
+Define 'relative path name'.,"Path name starting at a relative location (e.g., current directory)."
+Define 'acyclic graph' in the context of directory structures.,Directory structure implementation that contains no cycles (loops).
+Define 'link' (in the context of acyclic-graph directories).,File that has no contents but points to another file.
+Define 'resolve' (in relation to links).,To follow a link and find the target file.
+Define 'hard links'.,File-system links where a file has two or more names pointing to the same inode.
+Define 'garbage collection' (in context of file systems).,Recovery of space containing no-longer-valid data.

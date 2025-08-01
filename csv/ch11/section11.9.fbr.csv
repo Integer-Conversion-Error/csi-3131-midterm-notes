@@ -1,0 +1,35 @@
+Front,Back,Reversible
+What are the major secondary storage I/O units?,Hard disk drives (HDDs) and nonvolatile memory (NVM) devices.,y
+How is modern secondary storage structured?,As large one-dimensional arrays of logical blocks.,y
+How can drives be attached to a computer?,"1. Through local I/O ports on the host.
+2. Directly connected to motherboards.
+3. Through a communications network or storage network connection.",y
+What systems generate requests for secondary storage I/O?,The file system and the virtual memory system.,y
+How does each secondary storage I/O request specify the device address?,As a logical block number.,y
+What do disk-scheduling algorithms aim to improve for HDDs?,"Effective bandwidth, average response time, and variance in response time.",y
+How do algorithms like SCAN and C-SCAN improve HDD performance?,Via disk-queue ordering strategies.,y
+How does HDD performance relate to scheduling algorithms?,It varies greatly with scheduling algorithms.,y
+What are the characteristics of Solid-state disks (SSDs) in relation to moving parts and scheduling algorithms?,"They have no moving parts, and their performance varies little among different scheduling algorithms.",y
+Which scheduling strategy do SSDs often use?,"A simple FCFS (First-Come, First-Served) strategy.",y
+What is a common characteristic and outcome of data storage and transmission?,They are complex and frequently result in errors.,y
+Define Error detection.,"The process that attempts to spot problems, alert the system for corrective action, and avoid error propagation.",y
+Define Error correction.,"The process that detects and repairs problems, depending on available correction data and the amount of corruption.",y
+How are storage devices typically organized?,They are partitioned into one or more chunks of space.,y
+What can each partition of a storage device hold?,"A volume, or it can be part of a multidevice volume.",y
+Where are file systems created?,In volumes.,y
+What manages a storage device's blocks?,The Operating System (OS).,y
+How are new storage devices typically supplied?,Typically pre-formatted.,y
+What are boot blocks and when are they allocated?,"Blocks allocated to store the system's bootstrap program, if the device contains the Operating System (OS).",y
+What action must a system take if a block or page becomes corrupted?,The system must lock it out or logically replace it with a spare.,y
+"What is key to good performance in some systems, related to memory management?",Efficient swap space.,y
+How do some systems implement swap space?,By dedicating a raw partition to it.,y
+How do other systems implement swap space?,By using a file within the file system.,y
+What other options exist for swap space implementation?,"Some systems provide both dedicating a raw partition and using a file within the file system, allowing for user/admin decision.",y
+How are secondary storage devices in large systems frequently made redundant?,Via RAID algorithms.,y
+What do RAID algorithms allow for in storage systems?,"They allow more than one drive for operation, and enable continued operation or automatic recovery from drive failure.",y
+How are RAID algorithms organized and what does each level provide?,"They are organized into different levels, with each level providing a specific combination of reliability and high transfer rates.",y
+What is Object storage used for?,"It is used for big data problems, such as Internet indexing and cloud photo storage.",y
+How are objects defined and addressed in object storage?,"They are self-defining collections of data, addressed by an object ID (not a file name).",y
+What method is typically used for data protection in object storage?,Replication.,y
+Where do computations based on data occur in object storage systems?,On systems where a copy of the data exists.,y
+"What is a key scalability characteristic of object storage, and why is it important?","It is horizontally scalable, allowing for vast capacity and easy expansion.",y

@@ -1,0 +1,450 @@
+Front,Back
+What is the main purpose of a computer system?,To execute programs.
+Where must programs and data reside for execution?,Partially in main memory.
+How do modern computer systems handle multiple processes regarding memory?,They maintain several processes in memory concurrently.
+What affects the effectiveness of memory-management schemes?,The specific situation or scenario.
+What kind of support do most memory management algorithms require?,Hardware support.
+What technique allows the CPU to be shared by processes?,CPU Scheduling.
+What benefits arise from sharing the CPU among processes and keeping many processes in memory?,Improved CPU utilization and response speed.
+What factor influences the selection of a memory management approach?,Hardware design.
+Why is integrated hardware/OS memory management common?,Many memory management algorithms require hardware support.
+How is memory structured in a modern computer system?,"As a large array of bytes, each with its own address."
+What is the role of the program counter in the CPU's interaction with memory?,The CPU fetches instructions from memory based on the program counter.
+What are the stages of an instruction-execution cycle?,"Fetch instruction, decode, fetch operands, execute, store results."
+What are key issues pertinent to managing memory discussed in this context?,"Basic hardware, binding symbolic/virtual addresses to physical addresses, and the distinction between logical and physical addresses."
+What are the only general-purpose storage components the CPU can access directly?,Main memory and registers.
+What is the access speed difference between registers and main memory?,"Registers are accessible within one CPU clock cycle, while main memory accessed via a memory bus may take many CPU cycles."
+"What is a ""stall"" in the context of CPU operation?","A CPU state when the CPU is waiting for data from main memory, which delays execution."
+How is a CPU stall remedied?,"By adding a fast memory, called a cache, between the CPU and main memory."
+Who manages the cache for speeding up memory access?,"Hardware automatically, without OS control."
+How can a multithreaded core handle memory stalls?,It can switch threads during a memory stall.
+What are the main concerns regarding memory access and concurrent execution?,"Correct operation, protection of the OS from user processes, and protection of user processes from each other."
+How is memory protection typically implemented to ensure performance?,"By hardware, so the OS does not have to intervene for every memory access."
+Why does each process need a separate memory space?,For protection and concurrent execution.
+What two hardware components are used to implement memory protection by defining a legal address range?,A base register and a limit register.
+What is the purpose of the base register in memory protection?,It holds the smallest legal physical memory address for a process.
+What is the purpose of the limit register in memory protection?,"It defines the size of the legal memory range, in conjunction with the base register."
+How does CPU hardware enforce memory protection in user mode?,It compares every address generated in user mode with the base and limit registers.
+"What happens if a user-mode process attempts to access memory outside its defined legal range (e.g., OS or another user's memory)?","A trap to the OS occurs, which is considered a fatal error."
+What types of modifications does the base/limit register protection mechanism prevent?,Accidental or deliberate modification of the OS or other user's code/data.
+"Who is allowed to load the base and limit registers, and under what conditions?","Only the OS, using a privileged instruction while in kernel mode."
+Does the OS have restricted or unrestricted access to memory?,The OS has unrestricted access to both OS and user memory.
+What are some tasks the OS performs that require its unrestricted memory access?,"Loading programs, dumping programs on errors, accessing system call parameters, performing I/O, and context switches."
+What is the initial state of a program on disk before execution?,A binary executable.
+What steps are required for a binary executable to run?,"It must be brought into memory, placed in a process context, and then becomes eligible for execution."
+What happens to memory when a process terminates?,The memory used by the process is reclaimed.
+"In most systems, where can a user process reside in physical memory?",Anywhere.
+"What is the first stage of address binding, involving symbolic addresses?","The compiler binds symbolic addresses (e.g., `count`) to relocatable addresses (e.g., ""14 bytes from module start"")."
+"What is the second stage of address binding, involving relocatable addresses?","The linker/loader binds relocatable addresses to absolute addresses (e.g., 74014)."
+What happens at each stage of address binding?,A mapping from one address space to another occurs.
+"When does compile-time address binding occur, and what type of code is generated?","If the process's final memory location is known at compile time, absolute code is generated."
+"When does load-time address binding occur, and what type of code is generated?","If the process's final memory location is unknown at compile time, the compiler generates relocatable code, and binding occurs at load time."
+When does execution-time address binding occur?,"If the process can be moved in memory during its execution, binding is delayed until run time."
+What is a logical address?,An address generated by the CPU.
+What is a physical address?,"An address seen by the memory unit (i.e., loaded into the memory-address register), representing the actual location in physical memory."
+When are logical and physical addresses identical?,With compile-time or load-time address binding.
+When do logical and physical addresses differ?,With execution-time address binding.
+What is another term for a logical address?,Virtual address.
+What is a logical address space?,The set of all logical addresses generated by a program.
+What is a physical address space?,The set of all physical addresses corresponding to the logical addresses generated by a program.
+What hardware component performs the run-time mapping of virtual addresses to physical addresses?,The Memory-Management Unit (MMU).
+Describe a simple MMU scheme for address translation.,It uses a relocation register (a generalization of the base register) whose value is added to every logical address generated by a user process to create the physical address.
+Do user programs directly access real physical addresses?,"No, user programs only deal with logical addresses."
+When is the final location of a referenced memory address determined in an MMU system?,At the time of reference (run time).
+Why is the concept of a logical address space bound to a separate physical address space central to memory management?,"It allows for proper memory management, including protection and flexibility in process placement."
+What was the traditional requirement for program execution regarding memory?,The entire program and data had to be in physical memory.
+What was a limitation of the traditional memory loading approach?,Process size was limited by the physical memory size.
+What technique improves memory-space utilization by loading routines only when needed?,Dynamic loading.
+How does dynamic loading work?,"All routines are kept on disk in relocatable load format. The main program is loaded and executed. When a routine calls another, it checks if the routine is loaded; if not, a relocatable linking loader loads it, updates address tables, and passes control."
+What is the main advantage of dynamic loading?,A routine is loaded into memory only when it is needed.
+For what types of programs is dynamic loading particularly useful?,"Programs with large amounts of code that handle infrequent cases, such as error routines."
+What is the relationship between the total program size and the loaded portion in dynamic loading?,"The total program size can be very large, but the portion actually used (and thus loaded) is much smaller."
+Does dynamic loading require special OS support?,"No, it is generally the user's responsibility, although the OS may provide library routines to help."
+What is the definition of dynamically linked libraries (DLLs)?,System libraries that are linked to user programs at run time.
+How does static linking differ from dynamic linking?,"In static linking, system libraries are treated like object modules and combined by the loader into the binary program image, whereas in dynamic linking, linking is postponed until execution time."
+What is the primary use case for dynamic linking?,"It is usually used with system libraries, such as the standard C library."
+"What is a disadvantage of not using DLLs (i.e., using static linking for libraries)?","Each program includes a copy of the language library in its executable image, which increases executable size and wastes main memory."
+What is a key advantage of DLLs related to memory usage?,"They can be shared among multiple processes, with only one instance loaded into memory."
+What is another term for dynamically linked libraries when they are shared among processes?,Shared libraries.
+How do programs reference a dynamic library routine?,"The loader locates the DLL, loads it if needed, and adjusts addresses referencing DLL functions to the DLL's memory location."
+What is an advantage of DLLs concerning library updates and bug fixes?,"When a library is replaced by a new version, all programs referencing it automatically use the new version without needing to be relinked."
+How is backward compatibility managed with dynamic linking and library updates?,"Version information is included in the program and library. Multiple library versions can be loaded, and programs use their specific version info. Minor changes retain the same version number, while major changes increment it."
+Do dynamic linking and shared libraries generally require OS help?,Yes.
+How does the OS facilitate shared libraries when processes are protected?,The OS checks if a routine is already in another process's memory and allows multiple processes to access the same addresses for shared libraries.
+"Define ""stall"" in the context of CPU operation.","A CPU state when the CPU is waiting for data from main memory, which delays execution."
+"Define ""cache"".",A temporary copy of data in a reserved memory area used to improve performance.
+"Define ""base register"".","A CPU register holding the starting address of an address space, which defines a logical address space when used with a limit register."
+"Define ""limit register"".","A CPU register defining the size of a memory range, which defines a logical address space when used with a base register."
+"Define ""bind"" in the context of addresses.","To tie together; for example, a compiler binds a symbolic address to a relocatable address."
+"Define ""absolute code"".",Code with bindings to absolute memory addresses.
+"Define ""relocatable code"".",Code with bindings to memory addresses that can be changed at loading time to reflect the actual location in main memory.
+"Define ""logical address"".",An address generated by the CPU; it is translated to a physical address before use.
+"Define ""physical address"".",The actual location in physical memory of code or data.
+"Define ""virtual address"".",An address generated by the CPU; it is translated to a physical address before use (synonymous with logical address).
+"Define ""logical address space"".",The set of all logical addresses generated by a program.
+"Define ""physical address space"".",The set of all physical addresses generated by a program.
+"Define ""memory-management unit (MMU)"".",A hardware component of the CPU or motherboard that allows memory access.
+"What does ""MMU"" stand for?",Memory-Management Unit.
+"Define ""relocation register"".",A CPU register whose value is added to every logical address to create the corresponding physical address.
+"Define ""dynamic loading"".","The loading of a process routine only when it is called, rather than at the start of the process."
+"Define ""dynamically linked libraries (DLLs)"".","System libraries that are linked to user programs at run time, with the linking postponed until execution time."
+"Define ""static linking"".",Linking where system libraries are treated like object modules and combined by the loader into the binary program image.
+"Define ""shared libraries"".","Libraries that are loaded once and then used by many processes, typically found in systems supporting dynamic linking."
+What does main memory accommodate?,The Operating System (OS) and user processes.
+How is memory usually divided for the OS and user processes?,"Into two partitions: one for the OS, and one for user processes."
+Where can the OS reside in memory?,"In low or high memory. Many OS, including Linux/Windows, use high memory."
+How many user processes typically reside in memory concurrently?,Several.
+Define Contiguous Memory Allocation.,A memory allocation method where each process is in a single contiguous memory section.
+What is the primary goal of memory protection?,To prevent a process from accessing memory it does not own.
+Which two registers are combined to implement memory protection?,The relocation register and the limit register.
+What is the purpose of the relocation register in memory protection?,It holds the smallest physical address (base address) that a process can access.
+What is the purpose of the limit register in memory protection?,It specifies the range of logical addresses that a process can access.
+How is a logical address validated in a relocation-register scheme?,Each logical address must fall within the range specified by the limit register.
+How does the MMU (Memory Management Unit) map a logical address dynamically using the relocation-register scheme?,By adding the relocation register's value to the logical address.
+What is the CPU scheduler's role regarding relocation and limit registers during a context switch?,It loads the relocation and limit registers.
+When are CPU-generated addresses checked against the relocation and limit registers?,Every CPU-generated address is checked.
+What does the relocation-register scheme allow regarding OS size?,Dynamic changes to the OS size.
+Why is the relocation-register scheme desirable for device drivers?,It allows them to be loaded only when needed and removed when no longer needed.
+What is the simplest method for memory allocation?,Assigning processes to variably sized partitions.
+Define Variable-Partition scheme.,A memory-allocation scheme where each memory partition contains exactly one process.
+What does the OS keep track of regarding memory parts in variable-partition allocation?,A table of available and occupied memory parts.
+What is the initial state of memory for user processes in a variable-partition scheme?,"All memory is available for user processes as one large block, known as a 'hole'."
+What does memory contain after some processes have been loaded and removed?,A set of 'holes' of various sizes scattered throughout memory.
+What does the OS consider when a process arrives and requires memory?,Its memory requirements and the available space (holes).
+What happens if a process terminates and releases its memory block?,"The OS provides the released memory to another process, and the block is returned to the set of available 'holes'."
+What action is taken if a new hole is adjacent to existing holes upon process termination?,The new hole is merged with the adjacent ones to form a larger hole.
+Define Dynamic Storage-Allocation Problem.,The problem of satisfying a memory request of size 'n' from a list of free 'holes'.
+Name the three common strategies for selecting a free 'hole' in memory allocation.,"First-fit, Best-fit, and Worst-fit."
+Define First-Fit in memory allocation.,"In memory allocation, selecting the first hole large enough for a request, searching from the beginning or the last search end. The search stops when a large enough hole is found."
+Define Best-Fit in memory allocation.,"In memory allocation, selecting the smallest hole large enough for a request."
+Define Worst-Fit in memory allocation.,"In memory allocation, selecting the largest hole available."
+What is typically required when using the Best-Fit strategy?,The entire list of holes must be searched (unless ordered by size).
+What kind of leftover hole does Best-fit allocation produce?,The smallest leftover hole.
+What kind of leftover hole does Worst-fit allocation produce?,The largest leftover hole.
+How do First-fit and Best-fit compare to Worst-fit in simulations?,"First-fit and Best-fit are generally better than Worst-fit, both in terms of decreasing time and improving storage utilization."
+"Which memory allocation strategy, First-fit or Best-fit, is generally faster?",First-fit.
+Define External Fragmentation.,"A type of fragmentation where available memory has holes that together are enough to satisfy a request, but no single hole is large enough. The storage is fragmented and non-contiguous."
+How does external fragmentation occur?,"When processes are loaded and removed from memory, free memory is broken into many small, noncontiguous pieces."
+What is the 50-percent rule in memory fragmentation?,"A statistical finding that for N allocated blocks, 0.5 N blocks are lost to fragmentation, meaning one-third of memory may become unusable."
+What are the two types of memory fragmentation?,Internal fragmentation and external fragmentation.
+Define Internal Fragmentation.,Unused memory that is internal to a partition.
+When does internal fragmentation occur?,"When allocated memory is slightly larger than the requested memory (e.g., in fixed-sized blocks)."
+What is a common solution to external fragmentation?,Compaction.
+Define Compaction in memory management.,Shuffling storage contents to consolidate all used space and create one or more large contiguous blocks of free memory (holes).
+Under what condition is compaction possible?,Only if relocation is dynamic (execution time). It is not possible if relocation is static (assembly/load time).
+What actions are required during compaction if dynamic relocation is enabled?,Move the program/data and change the base register.
+Is compaction generally expensive or inexpensive?,"It can be expensive (e.g., moving all processes to one end)."
+What is another solution to external fragmentation besides compaction?,Permitting a noncontiguous logical address space.
+Which common memory-management technique permits noncontiguous logical address space to solve external fragmentation?,Paging.
+What is the most common memory-management technique?,Paging.
+What memory management challenge did paging address?,The requirement for contiguous physical address space.
+What is Paging?,A memory-management scheme allowing noncontiguous physical address space.
+What issues does Paging avoid?,External fragmentation and compaction issues.
+Why is Paging widely used?,"Due to its advantages, it is used in most operating systems, from servers to mobile devices."
+How is Paging implemented?,Through OS and hardware cooperation.
+What are fixed-sized blocks of physical memory called in paging?,Frames.
+What are fixed-sized blocks of logical memory called in paging?,Pages.
+How are pages loaded during process execution in a paging system?,"Pages are loaded into any available memory frames, either from the file system or backing store."
+How is the backing store divided in a paging system?,"Into fixed-sized blocks, typically the same size as frames or clusters."
+What is the relationship between logical address space and physical address space in paging?,They are totally separate.
+What are the two parts of a CPU-generated address in a paging system?,Page number (p) and page offset (d).
+What is the page number (p) in a CPU-generated address?,It is an index into the per-process page table.
+What is the page offset (d) in a CPU-generated address?,It is the location within the referenced frame.
+What does a page table contain?,The base address of each frame in physical memory.
+How is the physical memory address calculated in a paging system?,Base address of frame + page offset.
+List the MMU steps to translate a logical address to a physical address in a paging system.,"1. Extract page number 'p', use as index into page table. 2. Extract corresponding frame number 'f' from page table. 3. Replace page number 'p' with frame number 'f'."
+Does the page offset 'd' change during logical to physical address translation?,"No, the offset 'd' does not change."
+Who defines the page size (and thus frame size) in a paging system?,Hardware.
+"What characteristic do page sizes typically have, and what is their typical range?","They are a power of 2, typically ranging from 4 KB to 1 GB."
+Why is a power of 2 page size beneficial?,It allows for easy translation of a logical address into its page number and offset.
+"Given a logical address space of 2^m bytes and a page size of 2^n bytes, how are the page number and page offset determined?","The high-order m-n bits represent the page number, and the low-order n bits represent the page offset."
+What form of relocation is paging considered?,Dynamic relocation.
+How are logical addresses bound to physical addresses in a paging system?,Every logical address is bound by paging hardware to a physical address.
+Does paging suffer from external fragmentation?,"No, because any free frame can be allocated."
+Does paging suffer from internal fragmentation?,"Yes, the last frame allocated for a process may not be completely full."
+What is the average internal fragmentation per process in a paging system?,One-half page.
+What is the effect of using smaller page sizes?,Less internal fragmentation.
+What is the effect of using larger page sizes?,"The overhead per page-table entry is reduced, and disk I/O is more efficient with larger data transfers."
+How have page sizes changed over time?,"Page sizes have generally grown over time as processes, data sets, and main memory have become larger."
+What are typical modern page sizes?,4 KB or 8 KB.
+Give examples of systems that support multiple page sizes.,"Windows 10 (4 KB, 2 MB) and Linux (default 4 KB, huge pages)."
+What is the typical size of a 32-bit CPU's page-table entry?,4 bytes.
+How much physical memory can a system address if it uses 4 KB frames and 4-byte page-table entries that can point to 2^32 physical page frames?,2^44 bytes (16 TB).
+Is the physical memory size typically the same as the maximum logical size of a process?,"No, physical memory size is typically different from the maximum logical size of a process."
+What information do page-table entries contain in addition to frame addresses?,Other information that reduces the bits available for frame addresses.
+"When a process arrives and needs 'n' pages, how many frames must be available?",'n' frames must be available.
+How does the programmer's view of memory differ from the actual physical memory in a paged system?,"The programmer views memory as a single contiguous space for one program, while the user program is actually scattered throughout physical memory, which also holds other programs."
+What reconciles the programmer's view of memory with the actual physical memory layout?,Address-translation hardware.
+Can a user process access memory it doesn't own in a paging system? Why or why not?,"No, because it has no way to address memory outside of its own page table."
+What information does the OS manage regarding physical memory allocation?,Details about allocated/available frames and total frames.
+What is the system-wide data structure that keeps information about physical memory frames?,The frame table.
+What information does the frame table contain?,"One entry per physical page frame, indicating whether it's free or allocated, and to which process/page it belongs."
+How does the OS handle address parameters in system calls in a paged environment?,"The OS is aware that user processes operate in user space and their logical addresses are mapped to physical addresses, so it maps the given address to the correct physical address."
+What does the OS maintain for each process related to paging?,"A copy of the page table, similar to an instruction counter or registers."
+When is the OS's copy of the page table used?,For manual logical-to-physical translation by the OS and by the CPU dispatcher to define the hardware page table when a process is allocated the CPU.
+How does paging affect context-switch time?,Paging increases context-switch time.
+Are page tables per-process or system-wide data structures?,Page tables are per-process data structures.
+Where is the pointer to a process's page table stored?,"In the process control block (PCB), along with other registers."
+"What happens when the CPU scheduler selects a process, regarding hardware page-table values?",It reloads user registers and hardware page-table values from the stored user page table.
+What is the simplest hardware implementation for a page table?,Using dedicated high-speed hardware registers.
+What are the pros and cons of using dedicated hardware registers for page tables?,"Pro: Efficient translation. Con: Increases context-switch time (due to register exchange). Feasible only for small page tables (e.g., 256 entries)."
+Why are dedicated hardware registers not feasible for page tables in contemporary CPUs?,"Contemporary CPUs have much larger page tables (e.g., 2^20 entries), making registers impractical."
+Where are large page tables typically kept?,In main memory.
+What register points to the page table when it's kept in main memory?,The Page-Table Base Register (PTBR).
+How does using a PTBR for in-memory page tables affect context-switch time?,It reduces context-switch time because only the PTBR needs to be changed to switch page tables.
+What is the main problem with storing page tables in main memory?,"It results in slower memory access times, effectively doubling the number of memory accesses needed for data."
+How many memory accesses are typically needed to access data if the page table is stored in main memory?,"Two memory accesses: one for the page-table entry, and one for the actual data."
+What is the standard solution to mitigate the performance overhead of in-memory page tables?,"A special, small, fast-lookup hardware cache called a Translation Look-aside Buffer (TLB)."
+What kind of memory is a TLB?,"Associative, high-speed memory."
+What does each TLB entry consist of?,A key (tag) and a value.
+How does associative memory perform a search?,"An item presented to associative memory is compared with all keys simultaneously, returning the corresponding value quickly if found."
+Why does TLB lookup not typically incur a performance penalty?,It is part of the instruction pipeline.
+What is the typical size range for a TLB?,"32 to 1,024 entries."
+What is the purpose of separate instruction and data address TLBs in some CPUs?,"It effectively doubles the number of entries, providing more cache for translations."
+Describe the process of using a TLB with page tables when the CPU generates a logical address.,"The MMU first checks if the page number is in the TLB (TLB hit). If found, the frame number is immediately available and used. If not found (TLB miss), a memory reference to the page table is made to get the frame number, which is then used to access memory. The page number and frame number are then added to the TLB."
+What happens when a TLB is full and a new entry needs to be added?,"An existing entry must be replaced, using policies like LRU, round-robin, or random."
+What does it mean for a TLB entry to be 'wired down'?,"It means the entry cannot be removed by the usual replacement algorithms, typically used for critical kernel code."
+What are Address-Space Identifiers (ASIDs) in TLB entries?,"ASIDs uniquely identify a process and provide address-space protection. If the current process's ASID does not match the virtual page's ASID in a TLB entry, it's treated as a TLB miss."
+What is an advantage of TLBs that store ASIDs?,They allow the TLB to contain entries for multiple processes simultaneously without needing to be flushed on every context switch.
+"What is required for a TLB without ASIDs on each context switch, and why?",It must be 'flushed' (erased) on each context switch to prevent the next process from using incorrect translation information from old entries.
+What is the hit ratio in the context of a TLB?,The percentage of times a page number is found in the TLB (a measure of TLB effectiveness).
+Calculate the effective memory-access time given an 80% TLB hit ratio and a 10 ns memory access time.,Effective memory-access time = (0.80 * 10 ns) + (0.20 * 20 ns) = 8 ns + 4 ns = 12 ns.
+Calculate the effective memory-access time given a 99% TLB hit ratio and a 10 ns memory access time.,Effective memory-access time = (0.99 * 10 ns) + (0.01 * 20 ns) = 9.9 ns + 0.2 ns = 10.1 ns.
+Describe the multi-level TLB architecture in modern CPUs like Intel Core i7.,"Modern CPUs can have multiple TLB levels, such as L1 instruction TLB, L1 data TLB, and L2 TLB. A miss at L1 checks L2; a miss at L2 requires walking page-table entries in memory or an OS interrupt."
+How is memory protection implemented in a paged environment?,Through protection bits associated with each frame in the page table.
+What can a single protection bit in a page table indicate?,Whether a page is read-write or read-only.
+What happens if a process attempts to write to a read-only page?,"The hardware generates a trap to the OS, indicating a memory-protection violation."
+What types of finer protection can be implemented with page-table bits?,"Read-only, read-write, execute-only (separate bits for each access type)."
+What is the purpose of the 'valid-invalid' bit in a page table entry?,It indicates whether the page is part of the process's logical address space (valid) or not (invalid).
+Who sets the valid-invalid bit for each page?,The operating system.
+How does the valid-invalid bit help in handling illegal addresses?,"If a process tries to access a page marked invalid, the system traps to the OS, indicating an illegal address."
+What is a potential issue with relying solely on the valid-invalid bit for protection with programs that don't use their full logical address range?,"It may allow access to valid, allocated pages beyond the program's actual used range (e.g., if a program uses up to address 10468, but its page 5 extends to 12287, all addresses in page 5 are valid, reflecting internal fragmentation)."
+What register is used in some systems to indicate the size of the page table?,The Page-Table Length Register (PTLR).
+How does the PTLR provide protection?,Its value is checked against every logical address to verify it is within the valid range of the page table. A test failure results in an error trap to the OS.
+"What is a significant advantage of paging, especially in a multi-process environment?","The possibility of sharing common code, such as the standard C library (libc)."
+What is the problem if each process loads its own copy of a common library like libc?,"It leads to significant memory waste. For example, 40 processes each loading a 2 MB libc would consume 80 MB of memory."
+What characteristic must code have to be shared among multiple processes?,It must be reentrant code.
+What is reentrant code?,"Non-self-modifying code that never changes during execution, allowing two or more processes to execute the same code simultaneously."
+How do processes use shared reentrant code in a paged system?,"Only one copy of the reentrant code (e.g., libc) exists in physical memory. Each user process's page table maps to this same physical copy, while each process has its own copy of registers and data storage."
+What are examples of other programs besides libc that can be shared via paging?,"Compilers, window systems, and database systems."
+How are shared libraries (from dynamic linking) typically implemented?,Using shared pages.
+What must the OS enforce regarding shared code?,The read-only nature of the shared code.
+How is sharing memory among processes similar to sharing address space by threads?,"Both involve multiple entities accessing the same underlying memory resources, facilitated by mechanisms like shared pages."
+How is shared memory for interprocess communication (IPC) implemented using paging?,"Through shared pages, where different processes can map the same physical pages into their respective logical address spaces."
+paging,Memory management scheme avoiding external fragmentation by splitting physical memory into fixed-sized frames and logical memory into pages.
+frames,Fixed-sized blocks of physical memory.
+page,Fixed-sized block of logical memory.
+page number (p),Part of CPU-generated memory address in paged system; index into page table.
+page offset (d),Part of CPU-generated memory address in paged system; offset of location within page.
+page table,"Table in paged memory containing base address of each physical memory frame, indexed by logical page number."
+huge pages,Feature designating a region of physical memory for especially large pages.
+frame table,"Table in paged memory containing frame details (allocated/free, total frames)."
+page-table base register (PTBR),CPU register pointing to the in-memory page table.
+translation look-aside buffer (TLB),"Small, fast-lookup hardware cache in paged memory address translation for fast access to a subset of addresses."
+TLB miss,TLB lookup failing to provide address translation because it's not in TLB.
+wired down,"TLB entry locked into TLB, not replaceable by usual algorithm."
+address-space identifier (ASIDs),Part of TLB entry identifying the associated process; causes a TLB miss if the requesting process ID doesn't match.
+flush (TLB),Erasure of entries in TLB or other cache to remove invalid data.
+hit ratio,"Percentage of times a cache provides a valid lookup (e.g., TLB effectiveness measure)."
+effective memory-access time,Statistical or real measure of CPU time to read/write to memory.
+valid-invalid bit,Page-table bit indicating if an entry points to a page within a process's logical address space.
+page-table length register (PTLR),CPU register indicating the size of the page table.
+reentrant code,Code supporting multiple concurrent threads (can be shared) because it is non-self-modifying.
+What are common techniques for structuring page tables?,"Hierarchical paging, hashed page tables, and inverted page tables."
+What is the typical size of logical address spaces supported by modern computer systems?,$2^{32}$ to $2^{64}$ bits.
+What problem arises with page tables when supporting large logical address spaces?,The page table itself becomes excessively large.
+"For a 32-bit logical address space with a 4 KB page size, how many entries would a traditional page table have?",Over 1 million entries ($2^{20}$).
+"Given a 32-bit logical address space, 4 KB page size, and 4-byte entries, how much physical address space would the page table alone consume per process?",Up to 4 MB.
+What is a common solution to the problem of excessively large page tables?,Divide the page table into smaller pieces.
+What is the 'two-level paging algorithm'?,A method where the page table itself is paged.
+"In a two-level paging algorithm for a 32-bit logical address space with a 4 KB page size, how is the logical address divided?",Into a 20-bit page number and a 12-bit page offset.
+"In a two-level paging algorithm for a 32-bit logical address space, how is the 20-bit page number further divided?","$p_1$ (10-bit outer page number, index into outer page table) and $p_2$ (10-bit inner page offset, displacement within inner page table)."
+How does address translation occur in a two-level paging scheme?,From the outer page table inward.
+What is a forward-mapped page table?,A scheme for hierarchical page tables where address translation starts at the outer page table and moves inward.
+Why is a two-level paging scheme inappropriate for a 64-bit logical address space?,"Even with a 4 KB page size, the page table could have up to $2^{52}$ entries, resulting in an outer page table of $2^{42}$ entries or 16 GB, which is still too large."
+What is a three-level paging scheme?,A hierarchical paging method that further pages the outer page table of a two-level scheme.
+Why are hierarchical page tables generally inappropriate for 64-bit architectures?,"Because they would require too many levels of paging (e.g., seven for 64-bit UltraSPARC), leading to prohibitive memory accesses."
+What is the primary approach that hashed page tables handle?,Handling address spaces larger than 32 bits.
+What is used as the hash value in a hashed page table?,The virtual page number.
+How do hashed page tables handle collisions?,Each entry in the hash table points to a linked list of elements.
+What three fields does each element in a hashed page table's linked list consist of?,"1. Virtual page number.
+2. Value of the mapped page frame.
+3. Pointer to the next element in the linked list."
+Describe the algorithm for a hashed page table lookup.,"The virtual page number in the virtual address is hashed into the hash table. The virtual page number is compared with field 1 in the first element of the linked list. If they match, the corresponding page frame (field 2) is used to form the physical address. If no match, subsequent entries in the linked list are searched."
+What is a clustered page table?,"Similar to a hashed page table, but an entry refers to a cluster of several pages (e.g., 16) instead of a single page."
+"What is a benefit of clustered page tables, and for what type of address spaces are they useful?","A single page-table entry stores mappings for multiple physical-page frames, making them useful for sparse address spaces where memory references are noncontiguous or scattered."
+"In memory management, what does 'sparse' describe?","A page table with noncontiguous, scattered entries; an address space with many holes."
+What is a significant drawback of standard page tables in terms of memory consumption?,"Each page table may consist of millions of entries, consuming large amounts of physical memory."
+What is an inverted page table?,"A page-table scheme with one entry for each real physical page frame in memory, mapping to a logical page (virtual address) value."
+What information does each entry in an inverted page table contain?,"The virtual address of the page stored in that real memory location, plus process information (often an address-space identifier or process-id)."
+How many page tables are typically present in a system utilizing inverted page tables?,"Only one page table, with one entry per physical memory page."
+Which systems are examples of those that use inverted page tables?,64-bit UltraSPARC and PowerPC.
+"In the IBM RT simplified version of an inverted page table, what is the structure of the virtual address and the inverted page-table entry?","Virtual address: <process-id, page-number, offset>. Inverted page-table entry: <process-id, page-number>."
+Describe the memory reference process in the IBM RT simplified version of an inverted page table.,"The <process-id, page-number> from the virtual address is presented to the memory subsystem. The inverted page table is searched for a match. If a match is found at entry 'i', the physical address <i, offset> is generated. If no match, it's an illegal address access."
+What is a main drawback of inverted page tables concerning search time?,"It increases the time to search the table because the table is sorted by physical address, but lookups are by virtual address."
+How can the increased search time in inverted page tables be alleviated?,By using a hash table to limit the search.
+What is the performance implication of using a hash table with inverted page tables for address translation?,"Each access to the hash table adds a memory reference, meaning one virtual memory reference requires at least two real memory reads (one for the hash-table entry, one for the page table entry)."
+What is searched first to improve performance with inverted page tables?,The TLB (Translation Lookaside Buffer).
+"What issue arises with shared memory when using inverted page tables, compared to standard paging?","Standard paging allows multiple virtual addresses to map to the same physical address. Inverted page tables only have one virtual page entry for every physical page, meaning one physical page cannot have two or more shared virtual addresses. If another process sharing memory references it, it might cause a page fault and replace the mapping."
+What is characteristic of the Oracle SPARC Solaris approach to virtual memory?,Modern 64-bit CPU and OS are tightly integrated for low-overhead virtual memory.
+What operating system and CPU are discussed in the Oracle SPARC Solaris section?,Solaris running on SPARC CPU.
+How does Oracle SPARC Solaris efficiently solve the virtual memory problem?,By using hashed page tables.
+"How many hash tables does Oracle SPARC Solaris use for virtual memory, and what do they map?",Two hash tables: one for the kernel and one for all user processes. Both map virtual to physical memory.
+"What do the hash-table entries in Oracle SPARC Solaris represent, and why is this efficient?","Each entry represents a contiguous area of mapped virtual memory (a 'span'), which is more efficient than a per-page entry."
+What two fields does an Oracle SPARC Solaris hash-table entry include?,Base address and span (number of pages represented).
+What is the TLB (Translation Lookaside Buffer)?,A cache that holds translation table entries (TTEs) for fast hardware lookups.
+What is the TSB (Translation Storage Buffer) in Oracle SPARC Solaris?,A cache of TTEs (translation table entries) that includes an entry per recently accessed page.
+Describe the steps of a virtual address reference process in Oracle SPARC Solaris when a translation is not immediately found in the TLB.,"1. Hardware searches TLB for translation.
+2. None found, hardware walks through in-memory TSB (TLB walk).
+3. Match in TSB, CPU copies TSB entry into TLB, memory translation completes.
+4. No match in TSB, kernel interrupted to search hash table.
+5. Kernel creates TTE from hash table, stores in TSB for automatic loading into TLB by MMU.
+6. Interrupt handler returns control to MMU, completes address translation, retrieves data."
+What is a TLB walk?,The steps involved in traversing page-table structures to locate a needed translation and copying the result into the TLB.
+What is Solaris?,"A UNIX derivative, main operating system of Sun Microsystems (now Oracle); active open source version called Illumos."
+What is SPARC?,A proprietary RISC CPU created by Sun Microsystems (now Oracle); active open source version called OpenSPARC.
+Why must process instructions and data reside in memory?,They must be in memory for execution.
+"What is the primary purpose of ""swapping"" in memory management?","To temporarily move a process or a portion of a process out of memory to a backing store, and then bring it back for continued execution."
+"Define the term ""backing store"".",Secondary storage area used for process swapping.
+Describe the characteristics of a backing store used for standard swapping.,It is a fast secondary storage that is large enough for process parts and provides direct access to memory images.
+"Define the term ""swapped"".","Moved between main memory and a backing store. Process swapped out to free main memory, then swapped back in to continue execution."
+What is the key benefit of swapping regarding memory utilization?,It allows the total physical address space of all processes to exceed the real physical memory.
+How does swapping impact the degree of multiprogramming?,It increases the degree of multiprogramming.
+"What does ""standard swapping"" involve?",Moving entire processes between main memory and a backing store.
+What data structures are written to the backing store when a process (or part) is swapped out?,"Associated data structures, including per-thread data for multithreaded processes."
+What does the operating system (OS) maintain for swapped-out processes?,Metadata for their restoration.
+What is an advantage of standard swapping for physical memory oversubscription?,"It allows physical memory to be oversubscribed, accommodating more processes than physical memory can hold."
+Which types of processes are ideal candidates for swapping out?,Idle or mostly idle processes.
+What happens to memory allocated to inactive processes when they are swapped out?,It can be dedicated to active processes.
+"What is required if an inactive, swapped-out process becomes active?",It must be swapped back into memory.
+"Is ""standard swapping"" commonly used in contemporary operating systems?","Generally no, except for Solaris under dire circumstances."
+Why is standard swapping generally no longer used in modern OS?,The time required to move entire processes is prohibitive.
+"How do most contemporary systems (e.g., Linux, Windows) perform swapping?","They use a variation where individual pages of a process are swapped, not the entire process."
+What benefit does swapping with paging share with standard swapping?,It still allows physical memory oversubscription.
+What is an advantage of swapping with paging over standard swapping in terms of cost?,"It does not incur the high cost of swapping entire processes, as only a small number of pages are involved."
+"How is the term ""swapping"" generally interpreted in contemporary discussions?","It generally refers to ""standard swapping"" (moving entire processes)."
+"What does the term ""paging"" refer to?","It refers to ""swapping with paging"" (moving individual pages)."
+"Define ""page out"".",The process of moving a page from memory to a backing store.
+"Define ""page in"".","The reverse process of ""page out,"" where a page is moved from a backing store into memory."
+How does swapping with paging relate to virtual memory?,It works well with virtual memory.
+Do mobile systems typically support swapping?,No.
+List the reasons why mobile systems generally do not support swapping.,"1. They use flash memory for nonvolatile storage, which has space constraints. 2. Flash memory has a limited number of writes it tolerates before becoming unreliable. 3. There is poor throughput between main memory and flash memory."
+"How does Apple's iOS manage memory when free memory is low, instead of swapping?",It asks applications to voluntarily relinquish allocated memory.
+"In iOS, what type of data is removed from main memory (and reloaded from flash if needed) when memory is low?","Read-only data (e.g., code)."
+"In iOS, what type of data is never removed from main memory when memory is low?","Modified data (e.g., stack)."
+What is the consequence for iOS applications that fail to free memory when requested?,They may be terminated by the OS.
+How does Android manage memory when free memory is low?,"It uses a strategy similar to iOS, and may terminate processes if there is insufficient free memory."
+What does Android do before terminating a process due to insufficient memory?,"It writes the ""application state"" to flash memory for a quick restart."
+"Define the term ""application state"".",A software construct for data storage.
+What is a key responsibility for developers on mobile systems regarding memory management?,They must carefully allocate and release memory to avoid excessive use or leaks.
+"What does excessive ""swapping"" (in any form) often indicate about system performance?",It is often a sign of more active processes than available physical memory.
+What are two general approaches to improve system performance when excessive swapping occurs?,1. Terminate some processes. 2. Get more physical memory.
+What were the early 16-bit Intel chips that dominated the PC landscape?,Intel 8086 (late 1970s) and 8088 (original IBM PC).
+What is IA-32?,"Intel's 32-bit chip architecture, which included Pentium processors."
+What architecture are current 64-bit Intel chips based on?,x86-64 architecture.
+Where does Intel dominate the market versus where it does not?,"Intel dominates PC OS (Windows, Mac, Linux) but not mobile systems, where ARM architecture is successful."
+What are the two major memory-management concepts in IA-32?,Segmentation and Paging.
+Describe the address translation process in IA-32 architecture.,CPU generates logical addresses → segmentation unit produces linear address → paging unit generates physical address in main memory.
+What is the Memory-Management Unit (MMU) in IA-32?,The segmentation and paging units combined.
+What is the maximum segment size in IA-32 segmentation?,Up to 4 GB.
+What is the maximum number of segments allowed per process in IA-32 segmentation?,16 K segments.
+How is the logical address space divided in IA-32 segmentation?,"Into two partitions: one for up to 8 K segments private to the process, and one for up to 8 K segments shared among all processes."
+What is the Local Descriptor Table (LDT) in IA-32 segmentation?,A table that holds information for segments private to a process (first partition).
+What is the Global Descriptor Table (GDT) in IA-32 segmentation?,A table that holds information for segments shared among all processes (second partition).
+What is a segment descriptor in IA-32 segmentation?,"An 8-byte entry in an LDT or GDT that contains detailed information about a segment (e.g., base location, limit)."
+What is the format of a logical address in IA-32 segmentation?,"(selector, offset)."
+What are the components of the 16-bit selector in an IA-32 logical address?,"Segment number (s), GDT or LDT indicator (g), and protection (p)."
+What is the offset in an IA-32 logical address?,A 32-bit number representing the byte location within a segment.
+How many segments can be addressed at once in an IA-32 machine?,"Six, using six segment registers."
+How does IA-32 optimize segment descriptor access?,Six 8-byte microprogram registers (LDT/GDT cache) hold descriptors to avoid reading from memory for every reference.
+What is the length of a linear address in IA-32?,32 bits long.
+How is a linear address generated from a logical address in IA-32 segmentation?,A segment register points to an LDT/GDT entry; the base and limit from the segment descriptor are used. The offset is added to the base address.
+What happens if an address is invalid during IA-32 segmentation's limit check?,"A memory fault occurs, trapping to the OS."
+What are the possible page sizes in IA-32 paging?,4 KB or 4 MB.
+What paging scheme does IA-32 use for 4-KB pages?,A two-level paging scheme.
+How is a 32-bit linear address divided for 4-KB pages in IA-32 paging?,"Page number p1 (10 high-order bits), Page number p2 (10 inner bits), and Page offset d (12 low-order bits)."
+What is the page directory in IA-32 paging?,"The outermost page table, referenced by the 10 high-order bits of the linear address."
+What is the function of the CR3 register in IA-32 paging?,It points to the page directory for the current process.
+How does the Page_Size flag in a page directory entry affect IA-32 paging?,"If set, the page frame is 4 MB, bypassing the inner page table."
+How many low-order bits are used as the offset in a 4-MB page frame in IA-32 paging?,22 low-order bits.
+How does IA-32 handle page tables that are not in memory?,"Page tables can be swapped to disk for efficiency; an invalid bit in the page directory entry indicates if a table is on disk, and the OS brings it into memory on demand."
+What is the purpose of Page Address Extension (PAE) in IA-32?,"To allow 32-bit processors to access physical address space larger than 4 GB, addressing the 4-GB memory limitation of 32-bit architectures."
+How does PAE change the paging scheme in IA-32?,It changes it from a two-level to a three-level scheme.
+What are the top two bits of a linear address used for in IA-32 PAE?,They refer to the page directory pointer table.
+What additional page size does PAE support?,2-MB pages.
+How did PAE increase the address space capability?,"It increased page-directory and page-table entries from 32 to 64 bits, allowing the base address of page tables/frames to extend from 20 to 24 bits."
+What is the total address space increased to with PAE and what is the maximum physical memory supported?,"36 bits (allowing up to 64 GB physical memory), by combining the 24-bit base address with a 12-bit offset."
+What OS support is required for PAE?,"OS support is required (e.g., Linux, Mac support it; 32-bit Windows desktop is limited to 4 GB)."
+What was Intel's initial 64-bit architecture and why was it not widely adopted?,"IA-64, later known as Itanium. It was not widely adopted."
+Who developed the x86-64 architecture and what were its key features?,"AMD developed it, extending the existing IA-32 instruction set to support larger logical/physical address spaces and architectural advances."
+"Why is ""x86-64"" the general term for current 64-bit Intel/AMD CPUs?","Because Intel adopted AMD's x86-64 architecture, and it describes a class of 64-bit CPUs running identical instruction sets."
+What is the theoretical maximum address space for a 64-bit architecture?,2^64 bytes (16 quintillion / 16 exabytes).
+What is the actual virtual address size used in the x86-64 architecture?,48-bit virtual address.
+What page sizes does x86-64 support?,"4 KB, 2 MB, or 1 GB."
+How many levels of paging hierarchy does x86-64 use?,Four levels.
+What existing addressing scheme does x86-64 use for paging?,PAE (Page Address Extension).
+What are the maximum virtual and physical address capabilities of x86-64?,"Supports 48-bit virtual addresses and 52-bit physical addresses (4,096 terabytes)."
+"Define ""page directory"" (Intel IA-32).","In Intel IA-32 CPU architecture, the outermost page table."
+"Define ""page address extension (PAE)"".",Intel IA-32 CPU hardware allowing 32-bit processors to access physical address space larger than 4GB.
+"Define ""page directory pointer table"".",PAE pointer to page tables.
+What is Itanium?,Intel IA-64 CPU.
+What is AMD 64?,A 64-bit CPU designed by Advanced Micro Devices; part of the x86-64 class.
+What is Intel 64?,"Intel 64-bit CPUs, part of the x86-64 class."
+"Define ""x86-64"".",A class of 64-bit CPUs running identical instruction sets; common in desktop/server systems.
+What type of devices commonly use ARM processors?,"Mobile devices (smartphones, tablets) and real-time embedded systems."
+What is Intel's primary role in chip production?,Intel designs and manufactures chips.
+What is ARM's primary role in chip production?,ARM only designs and licenses architectural designs to manufacturers.
+Name some well-known devices that utilize ARM processors.,"Apple devices (like iPhone, iPad) and most Android devices."
+"By quantity, what is the most widely used processor architecture?","ARM architecture, with over 100 billion processors produced."
+What specific ARM architecture is the primary focus of study?,The 64-bit ARM v8 architecture.
+What are the three translation granule sizes available in ARM v8?,"4 KB, 16 KB, and 64 KB."
+What do translation granules in ARM v8 define or provide?,Different page sizes and larger contiguous memory sections called regions.
+"For an ARM v8 4 KB translation granule, what are the associated page and region sizes?","Page size: 4 KB; Region sizes: 2 MB, 1 GB."
+"For an ARM v8 16 KB translation granule, what are the associated page and region sizes?",Page size: 16 KB; Region size: 32 MB.
+"For an ARM v8 64 KB translation granule, what are the associated page and region sizes?",Page size: 64 KB; Region size: 512 MB.
+How many levels of paging do 4-KB and 16-KB translation granules support in ARM v8?,Up to four levels.
+How many levels of paging do 64-KB translation granules support in ARM v8?,Up to three levels.
+"What is the bit architecture of ARM v8, and how many bits are currently utilized?","ARM v8 is a 64-bit architecture, but only 48 bits are currently used."
+"In a 4-KB granule paging structure where all four levels are used, which bits define the offset within a page?",Bits 0-11 (low-order 12 bits) refer to the offset within the 4-KB page.
+"If a Level-1 table entry in ARM v8 refers to a 1-GB region, which bits are used as the offset?",Low-order 30 bits (0-29).
+"If a Level-2 table entry in ARM v8 refers to a 2-MB region, which bits are used as the offset?",Low-order 21 bits (0-20).
+How many levels of TLBs does the ARM architecture support?,Two levels.
+What are the components of the inner level of ARM TLBs?,"Two micro TLBs (one for data, one for instructions); they support ASIDs."
+What is the component of the outer level of ARM TLBs?,A single main TLB.
+Where does the address translation process begin in ARM architecture?,At the micro-TLB level.
+What happens during address translation if there is a micro-TLB miss?,The main TLB is checked.
+What happens during address translation if both the micro-TLB and main TLB miss?,A page table walk is performed in hardware.
+Define translation granules.,Features of ARM v8 CPUs defining page sizes and regions.
+Define regions (in ARM v8 CPUs).,Contiguous memory areas with separate privilege and access rules.
+Define translation table base register (TTBR).,ARM v8 CPU register pointing to the level 0 (outer) page table for the current thread.
+Define micro TLB.,"ARM CPU inner-level TLBs, one for instructions and one for data."
+Define main TLB.,ARM CPU outer-level TLB; checked after micro TLB lookup and before page table walk.
+What is memory in modern computer systems?,"A large array of bytes, each with its own address."
+How is address space allocation managed?,Using base and limit registers.
+What is a Base register?,The smallest legal physical memory address.
+What does 'Limit' specify in address space allocation?,The size of the address range.
+What are the different times for binding symbolic address references to physical addresses?,"Compile time, Load time, Execution time."
+What is a Logical address?,An address generated by the CPU.
+What is an MMU (Memory Management Unit)?,A hardware component that translates a logical address to a physical address.
+What is a Physical address?,"The actual address in physical memory, resulting from an MMU translation of a logical address."
+Describe a common memory allocation approach.,Contiguous memory partitions of varying sizes.
+What are the three common partition allocation strategies?,"First fit, Best fit, Worst fit."
+Which memory management technique do modern OS typically use?,Paging.
+How is Physical memory divided in paging?,Into fixed-sized blocks called frames.
+What are Frames in the context of paging?,Fixed-sized blocks into which physical memory is divided.
+How is Logical memory divided in paging?,Into blocks of the same size called pages.
+What are Pages in the context of paging?,Blocks of the same size into which logical memory is divided.
+How is a logical address divided in paging?,Into a page number and a page offset.
+What is a Page number?,An index into a per-process page table.
+What is a Page table?,A data structure that contains the frame in physical memory holding a specific page.
+What is the Offset in paging?,The specific location within a frame.
+What is a TLB (Translation Look-aside Buffer)?,A hardware cache of the page table.
+What information does each TLB entry contain?,A page number and its corresponding frame.
+Describe the steps of TLB in address translation.,"1. Get the page number from the logical address. 2. Check if the frame for the page is in the TLB. 3. If in TLB, the frame is obtained from TLB. 4. If not in TLB (TLB miss), retrieve the frame from the page table."
+What is Hierarchical paging?,A method where the logical address is divided into multiple parts for different page table levels.
+What problem arises with expanding addresses beyond 32 bits when using hierarchical paging?,A large number of hierarchical levels would be required.
+What strategies are used to address the problem of a large number of hierarchical levels in paging?,Hashed page tables and Inverted page tables.
+What is Swapping?,The process of moving pages to disk to increase the degree of multiprogramming.
+"How many levels of page tables does the Intel 32-bit architecture typically use, and what page sizes does it support?","Two levels of page tables, supporting 4-KB or 4-MB page sizes."
+What is Page-address extension (PAE)?,A feature that allows 32-bit processors to access a physical address space greater than 4 GB.
+Which modern architectures use hierarchical paging for their 64-bit systems?,x86-64 and ARM v8 architectures.

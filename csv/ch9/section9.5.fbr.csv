@@ -1,0 +1,37 @@
+Front,Back,Reversible
+What is a fundamental requirement for process instructions and data during execution?,They must be in memory for execution.,y
+"Define the term ""swapped"" in the context of memory management.","To be temporarily moved out of main memory to a backing store, typically to free up main memory, and then brought back into memory for continued execution.",y
+"What is a ""backing store"" in the context of swapping, and what are its key characteristics?","A fast secondary storage area used for process swapping, large enough for process parts, and providing direct access to memory images. It's where processes or their parts are temporarily moved.",y
+What is the primary purpose or benefit of swapping in an operating system?,It allows the total physical address space of all processes to exceed the real physical memory available.,y
+How does swapping affect the degree of multiprogramming?,It increases the degree of multiprogramming.,y
+"Describe the mechanism of ""standard swapping"".",It involves moving entire processes between main memory and a backing store.,y
+"When a process or part is swapped to a backing store, what associated data structures must be written?","Associated data structures, including per-thread data for multithreaded processes, must be written.",y
+What does the OS maintain for swapped-out processes?,Metadata for restoration.,y
+What is a significant advantage of standard swapping in terms of memory allocation?,"It allows physical memory to be oversubscribed, accommodating more processes than actual physical memory is available.",y
+Which types of processes are considered good candidates for swapping out?,Idle or mostly idle processes.,y
+What is the benefit of swapping out inactive processes for active processes?,Memory allocated to inactive processes can be dedicated to active processes.,y
+What happens if a swapped-out inactive process becomes active?,It must be swapped back into memory.,y
+Is standard swapping commonly used in contemporary operating systems?,"Generally no, with Solaris under dire circumstances being an exception.",y
+What is the main reason standard swapping is generally no longer used in contemporary OS?,The time required to move entire processes is prohibitive.,y
+"What variation of swapping do most contemporary systems (e.g., Linux, Windows) use?","Pages of a process are swapped, not the entire process.",y
+"Does ""swapping with paging"" still allow for physical memory oversubscription?",Yes.,y
+What is a cost advantage of swapping with paging compared to standard swapping?,"It does not incur the high cost of swapping entire processes, as only a small number of pages are involved.",y
+"In contemporary contexts, what does the term ""swapping"" generally refer to?",Standard swapping (moving entire processes).,y
+"In contemporary contexts, what does the term ""paging"" refer to?",Swapping with paging (moving individual pages).,y
+"Define ""page out"".",Moving a page from memory to backing store.,y
+"Define ""page in"".",Moving a page from backing store back into memory.,y
+How does swapping with paging relate to virtual memory?,It works well with virtual memory.,y
+Do mobile systems typically support swapping?,No.,y
+What type of nonvolatile storage do mobile systems typically use that contributes to their lack of swapping support?,"Flash memory (not hard disks), which has space constraints.",y
+What is a limitation of flash memory regarding writes that discourages swapping on mobile systems?,It tolerates a limited number of writes before becoming unreliable.,y
+What is the issue with throughput between main memory and flash memory in mobile systems that discourages swapping?,Poor throughput.,y
+"How does Apple's iOS manage memory when free memory is low, instead of swapping?",It asks applications to voluntarily relinquish allocated memory.,y
+"In iOS, what happens to read-only data (like code) when memory is low?",It can be removed from main memory and reloaded from flash if needed.,y
+"In iOS, what happens to modified data (like stack) when memory is low?",It is never removed from main memory.,y
+What is the consequence if iOS applications fail to voluntarily free memory when requested?,They may be terminated by the OS.,y
+"How does Android manage memory when free memory is insufficient, similar to iOS?","It uses a similar strategy, potentially terminating processes.",y
+What does Android do before terminating a process due to insufficient free memory?,"It writes the ""application state"" to flash memory for a quick restart.",y
+"Define ""application state"".",A software construct for data storage.,y
+What is a key responsibility for developers designing applications for mobile systems regarding memory?,They must carefully allocate and release memory to avoid excessive use or leaks.,y
+What does swapping (in any form) often indicate about system performance?,It is often a sign of more active processes than available physical memory.,y
+What are two general approaches to address a system that is swapping excessively?,1. Terminate some processes. 2. Get more physical memory.,y

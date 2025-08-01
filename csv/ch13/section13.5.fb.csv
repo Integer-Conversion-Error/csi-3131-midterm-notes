@@ -1,0 +1,34 @@
+Front,Back
+What is memory mapping in the context of file access?,An alternative file access method where a file's I/O is treated as routine memory accesses using virtual memory techniques.
+What is a key benefit of using memory-mapped files?,It can lead to significant performance increases by simplifying and speeding up file access.
+How does memory mapping conceptually link a file to memory?,It maps a disk block to one or more pages in memory.
+What happens upon initial access to a memory-mapped file?,"It triggers demand paging, resulting in a page fault."
+What is read into physical memory during the initial access of a memory-mapped file?,A page-sized portion of the file is read into a physical page.
+How are subsequent reads/writes to a memory-mapped file handled?,They are handled as routine memory accesses.
+How do memory-mapped files simplify and speed up file access?,By avoiding `read()` and `write()` system call overhead.
+Are writes to a memory-mapped file immediately reflected on secondary storage?,"No, writes to a memory-mapped file are not necessarily immediate to secondary storage."
+When are updates to a memory-mapped file generally written back to secondary storage?,"Generally, updates are written back when the file is closed."
+What can happen to intermediate changes in a memory-mapped file under memory pressure?,"Under memory pressure, intermediate changes may go to swap space."
+"How do some operating systems, like Solaris, handle all file I/O?","Some OS (e.g., Solaris) memory-map all file I/O, even with standard calls, to kernel address space."
+Can multiple processes map the same file concurrently using memory mapping?,"Yes, multiple processes can map the same file concurrently for data sharing."
+"If multiple processes map the same memory-mapped file, are writes by one process visible to others?","Yes, writes by one process are visible to others mapping the same section."
+How is data sharing via memory-mapped files implemented at a low level?,It is implemented by a virtual memory map pointing to the same physical page.
+Does memory mapping support copy-on-write functionality?,"Yes, it supports copy-on-write, allowing processes to share read-only data and get their own copies for modification."
+What mechanism should processes use for shared data coordination when using memory-mapped files?,Processes should use mutual exclusion for shared data coordination.
+How is shared memory often implemented?,Shared memory is often implemented by memory mapping files.
+What are the two main steps to implement shared memory using memory-mapped files in the Windows API?,1. Create a file mapping for the file. 2. Establish a view of the mapped file in the process's virtual address space.
+How does a second process access shared memory established via memory-mapped files in Windows?,The second process opens and creates a view of the same mapped file.
+What does a mapped file act as in the context of Windows API shared memory?,A mapped file acts as a shared-memory object for inter-process communication.
+Provide an example use case for shared memory implemented with memory-mapped files.,"Producer writes, Consumer reads (classic inter-process communication example)."
+What Windows API call is used to open a file when setting up memory-mapped shared memory?,`CreateFile()` (returns `HANDLE`)
+What Windows API call is used to create a file mapping object after opening the file?,`CreateFileMapping()` (uses file `HANDLE`)
+What Windows API call is used to establish a view of the mapped file in the process's virtual address space?,`MapViewOfFile()` (uses mapped object `HANDLE`)
+What does `CreateFileMapping()` create that allows multiple processes to access the shared memory?,"A named shared-memory object (e.g., `SharedObject`)."
+"What does `MapViewOfFile()` return, and how are accesses to it handled?",It returns a pointer to the shared-memory object; accesses to this memory are accesses to the file.
+"Can only the entire file be mapped using memory mapping, or just a portion?",The entire file or a portion can be mapped.
+How are mapped files handled with respect to paging?,A mapped file may be demand-paged.
+What Windows API call is used to remove a view of a memory-mapped file?,`UnmapViewOfFile()`.
+"Define ""memory mapping"" (file access method).",File-access method where a file is mapped into a process's memory space for direct memory access.
+"In Windows, what is ""file mapping""?",The first step in memory-mapping a file.
+"In Windows, define ""view"" in the context of memory-mapped files.",An address range mapped in shared memory; the second step in memory-mapping a file.
+"In the Windows API, what is a ""named shared-memory object""?",A section of a memory-mapped file accessible by name from multiple processes.

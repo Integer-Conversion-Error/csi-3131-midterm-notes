@@ -1,0 +1,18 @@
+Front,Back,Reversible
+What is debugging in operating system development?,A crucial task involving the detection and correction of errors.,y
+What types of errors can debugging address in an operating system?,Errors ranging from hardware failures to application bugs.,y
+Define debugging.,"The process of finding and fixing errors, or bugs.",y
+Define bug.,An error in a program.,y
+Why are operating systems prone to bugs?,They are large and complex.,y
+What makes debugging challenging in operating systems?,Difficulty of reproducing errors and the system's concurrent nature.,y
+What are log files used for in debugging?,"System-generated files that record events, errors, and warnings; analyzing them helps identify the cause of issues.",y
+Define core dump.,"A file containing a snapshot of the memory and state of a process at the time of a crash, including register values, stack, and memory, useful for post-mortem analysis.",y
+Define crash dump.,"A file containing the state of the entire operating system when a kernel panic or system crash occurs, similar to a core dump but at the system level.",y
+Define system dump.,"A file containing the state of the entire operating system when a kernel panic or system crash occurs, similar to a core dump but at the system level.",y
+What is a debugger?,"A software tool that allows developers to step through code, inspect variables, and set breakpoints to understand program execution flow and identify bugs.",y
+Explain tracing as a debugging technique.,"A technique to record the sequence of events or function calls during program execution, providing insights into behavior.",y
+What is profiling in the context of debugging?,Analyzing program performance to identify bottlenecks and areas for optimization.,y
+Define performance tuning.,An activity focused on improving system efficiency.,y
+What are profilers used for in performance tuning?,"Identifying which parts of a program consume the most resources (CPU, memory).",y
+What are system monitors used for in performance tuning?,"Tracking real-time system resource usage (CPU utilization, memory usage, disk I/O, network activity).",y
+What are benchmarking tools used for in performance tuning?,Measuring system performance under specific workloads to compare against baselines or other systems.,y

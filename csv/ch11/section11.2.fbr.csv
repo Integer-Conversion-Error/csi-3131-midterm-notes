@@ -1,0 +1,52 @@
+Front,Back,Reversible
+What are the primary responsibilities of the OS for HDDs to ensure efficient hardware use?,To minimize access time and maximize data transfer bandwidth.,y
+What two main components contribute to access time in HDDs/mechanical storage?,Seek time and rotational latency.,y
+"Define ""seek time"" in HDD operations.",The time required for the device arm to move the read/write heads to the desired cylinder.,y
+"Define ""rotational latency"" in HDD operations.",The additional time needed for the disk platter to rotate the desired sector into position under the read/write head.,y
+"How is ""device bandwidth"" defined for storage devices?",The total amount of data transferred divided by the total time between the first request for service and the completion of the last transfer.,y
+How can the OS improve HDD access time and bandwidth?,By managing the order of storage I/O requests.,y
+What happens when a process requires I/O from a storage device?,It issues a system call to the operating system.,y
+What information does an I/O request typically include?,"Input/output direction, an open file handle, a memory address, and the amount of data.",y
+What occurs if the drive/controller is available when an I/O request is made?,The request is serviced immediately.,y
+What happens to new I/O requests if the drive/controller is busy?,New requests are placed in a queue.,y
+"In a multiprogramming system, what is commonly found in the device queue?",Pending I/O requests.,y
+What is the primary benefit of maintaining a queue of I/O requests for a device driver?,"It allows device drivers to improve performance by ordering requests, primarily by avoiding unnecessary head seeks.",y
+How do modern HDD interfaces differ from past ones regarding direct physical access control?,"Past interfaces allowed the host to specify track/head, necessitating significant disk scheduling effort. Modern drives do not expose these controls, mapping Logical Block Addresses (LBAs) to physical addresses internally.",y
+What are the current key goals of disk scheduling algorithms?,"Fairness, timeliness, and optimizations (e.g., bunching sequential reads/writes).",y
+What type of I/O operation do disk drives perform best with?,Sequential I/O.,y
+"Is it generally possible to have absolute knowledge of head, physical block, or cylinder locations on modern drives?","No, it is generally not possible.",y
+What approximation do operating systems use regarding Logical Block Addresses (LBAs) and physical disk locations on modern drives?,"Increasing LBAs generally correspond to increasing physical addresses, and close LBAs equate to physical proximity.",y
+Which disk scheduling algorithm is considered the simplest?,"First-Come, First-Served (FCFS) or FIFO.",y
+How fair is the FCFS disk scheduling algorithm?,It is intrinsically fair.,y
+Does FCFS disk scheduling typically provide the fastest service?,"No, it generally does not provide the fastest service.",y
+What is a significant performance problem associated with FCFS disk scheduling?,"It often leads to ""wild swings"" in head movement, resulting in high total head movement and suboptimal performance.",y
+"Describe the ""SCAN algorithm"" for HDD I/O scheduling.","A disk I/O scheduling algorithm where the disk head moves from one end to the other, servicing requests along the way, and then reverses direction upon reaching an end, continuing to service requests.",y
+What is another common name for the SCAN algorithm?,The elevator algorithm.,y
+"In the SCAN algorithm, how quickly is a request serviced if it's located immediately in front of the head's current direction?",It is serviced almost immediately.,y
+What happens to a request located just behind the head's current direction in the SCAN algorithm?,"It must wait until the arm moves to the end of the disk, reverses its direction, and then travels back to service the request.",y
+"With a uniform distribution of requests, what pattern is observed in the SCAN algorithm immediately after the head reverses direction?",There are typically few requests immediately in front of the head because those requests were likely serviced during the previous sweep.,y
+"In the SCAN algorithm, where is the heaviest density of pending requests typically found, and why?","At the other end of the disk (the end opposite to where the head just reversed), because those requests have generally waited the longest.",y
+"Describe ""Circular SCAN (C-SCAN) scheduling.""","A variant of the SCAN algorithm designed for more uniform wait times. The disk head moves from one end to the other, servicing requests, but upon reaching the other end, it immediately returns to the beginning of the disk without servicing any requests on the return trip.",y
+How does C-SCAN conceptually model the disk cylinders?,It essentially treats the cylinders as a circular list.,y
+What is the primary advantage of C-SCAN over SCAN regarding wait times?,It provides more uniform wait times for requests.,y
+Are most of the existing disk-scheduling algorithms widely used in practice?,"No, many exist but are rarely used.",y
+Is it always practical to compute the optimal order for a given list of disk requests?,"An optimal order can be defined, but the computational cost may not justify the performance savings compared to simpler algorithms like SCAN.",y
+What key factors heavily influence the performance of a disk-scheduling algorithm?,The number and types of I/O requests.,y
+How do all disk scheduling algorithms behave when there is only one outstanding request in the queue?,"They all behave like FCFS (First-Come, First-Served).",y
+"Which disk scheduling algorithms are generally preferred for heavy disk loads, and why?","SCAN and C-SCAN, because they are better at handling heavy loads and are less likely to cause starvation.",y
+"Can starvation still occur with algorithms like SCAN and C-SCAN, and what did Linux introduce to address this?","Yes, starvation is still possible. Linux introduced the ""deadline"" scheduler to mitigate this.",y
+"What type of separate queues does the Linux ""deadline"" scheduler maintain?",Separate read and write queues.,y
+"Why does the Linux ""deadline"" scheduler prioritize read requests?",Because processes are more likely to block (wait) on read operations.,y
+"How are the primary queues in the Linux ""deadline"" scheduler sorted?","They are sorted in Logical Block Address (LBA) order, which effectively implements a C-SCAN-like behavior.",y
+"How does the Linux ""deadline"" scheduler typically send I/O requests to the disk?","All I/O requests are sent in batches, sorted by LBA order.",y
+"Detail the four types of queues maintained by the Linux ""deadline"" scheduler.","Two read queues (one sorted by LBA, one by FCFS) and two write queues (one sorted by LBA, one by FCFS).",y
+"What check does the Linux ""deadline"" scheduler perform after processing each batch of I/O?","It checks if any FCFS requests are older than a configured age (by default, 500 ms).",y
+"What action does the Linux ""deadline"" scheduler take if an FCFS request is found to be older than its deadline?",The LBA queue (either read or write) associated with that old request is selected for the next batch of I/O operations to prevent starvation.,y
+Which I/O scheduler was the default in Linux RedHat 7?,The Deadline I/O scheduler.,y
+"Besides Deadline, what other I/O schedulers were included in RHEL 7?",NOOP and Completely Fair Queueing (CFQ) scheduler.,y
+"When is the NOOP scheduler preferred, and for what type of storage?","It is preferred for CPU-bound systems utilizing fast storage devices, such as Non-Volatile Memory (NVM) devices.",y
+"What is the ""Completely Fair Queueing (CFQ)"" scheduler, and where is it typically used as default?","It is the default I/O scheduler in Linux kernel 2.6 and later, commonly used as the default for SATA drives.",y
+"What are the three queues maintained by the CFQ scheduler, and how are they sorted?","Real time, best effort (default), and idle. They are sorted by insertion sort in LBA order.",y
+"Describe the priority scheme among CFQ's three queues, and what is a potential consequence?","Each queue has exclusive priority: real time is highest, followed by best effort, then idle. Starvation is still possible within this scheme.",y
+How does the CFQ scheduler use historical data to optimize I/O?,It anticipates whether a process will issue more I/O requests soon.,y
+"When CFQ anticipates future I/O from a process, what optimization does it perform, and what are the underlying assumptions?","It idles, waiting for new I/O from that specific process, and temporarily ignores other queued requests. This action minimizes seek time and assumes locality of reference per process.",y

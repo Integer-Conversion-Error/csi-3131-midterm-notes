@@ -1,0 +1,53 @@
+Front,Back
+What were the early 16-bit Intel chips that dominated the PC landscape?,Intel 8086 (late 1970s) and 8088 (original IBM PC).
+What is IA-32?,"Intel's 32-bit chip architecture, which included Pentium processors."
+What architecture are current 64-bit Intel chips based on?,x86-64 architecture.
+Where does Intel dominate the market versus where it does not?,"Intel dominates PC OS (Windows, Mac, Linux) but not mobile systems, where ARM architecture is successful."
+What are the two major memory-management concepts in IA-32?,Segmentation and Paging.
+Describe the address translation process in IA-32 architecture.,CPU generates logical addresses → segmentation unit produces linear address → paging unit generates physical address in main memory.
+What is the Memory-Management Unit (MMU) in IA-32?,The segmentation and paging units combined.
+What is the maximum segment size in IA-32 segmentation?,Up to 4 GB.
+What is the maximum number of segments allowed per process in IA-32 segmentation?,16 K segments.
+How is the logical address space divided in IA-32 segmentation?,"Into two partitions: one for up to 8 K segments private to the process, and one for up to 8 K segments shared among all processes."
+What is the Local Descriptor Table (LDT) in IA-32 segmentation?,A table that holds information for segments private to a process (first partition).
+What is the Global Descriptor Table (GDT) in IA-32 segmentation?,A table that holds information for segments shared among all processes (second partition).
+What is a segment descriptor in IA-32 segmentation?,"An 8-byte entry in an LDT or GDT that contains detailed information about a segment (e.g., base location, limit)."
+What is the format of a logical address in IA-32 segmentation?,"(selector, offset)."
+What are the components of the 16-bit selector in an IA-32 logical address?,"Segment number (s), GDT or LDT indicator (g), and protection (p)."
+What is the offset in an IA-32 logical address?,A 32-bit number representing the byte location within a segment.
+How many segments can be addressed at once in an IA-32 machine?,"Six, using six segment registers."
+How does IA-32 optimize segment descriptor access?,Six 8-byte microprogram registers (LDT/GDT cache) hold descriptors to avoid reading from memory for every reference.
+What is the length of a linear address in IA-32?,32 bits long.
+How is a linear address generated from a logical address in IA-32 segmentation?,A segment register points to an LDT/GDT entry; the base and limit from the segment descriptor are used. The offset is added to the base address.
+What happens if an address is invalid during IA-32 segmentation's limit check?,"A memory fault occurs, trapping to the OS."
+What are the possible page sizes in IA-32 paging?,4 KB or 4 MB.
+What paging scheme does IA-32 use for 4-KB pages?,A two-level paging scheme.
+How is a 32-bit linear address divided for 4-KB pages in IA-32 paging?,"Page number p1 (10 high-order bits), Page number p2 (10 inner bits), and Page offset d (12 low-order bits)."
+What is the page directory in IA-32 paging?,"The outermost page table, referenced by the 10 high-order bits of the linear address."
+What is the function of the CR3 register in IA-32 paging?,It points to the page directory for the current process.
+How does the Page_Size flag in a page directory entry affect IA-32 paging?,"If set, the page frame is 4 MB, bypassing the inner page table."
+How many low-order bits are used as the offset in a 4-MB page frame in IA-32 paging?,22 low-order bits.
+How does IA-32 handle page tables that are not in memory?,"Page tables can be swapped to disk for efficiency; an invalid bit in the page directory entry indicates if a table is on disk, and the OS brings it into memory on demand."
+What is the purpose of Page Address Extension (PAE) in IA-32?,"To allow 32-bit processors to access physical address space larger than 4 GB, addressing the 4-GB memory limitation of 32-bit architectures."
+How does PAE change the paging scheme in IA-32?,It changes it from a two-level to a three-level scheme.
+What are the top two bits of a linear address used for in IA-32 PAE?,They refer to the page directory pointer table.
+What additional page size does PAE support?,2-MB pages.
+How did PAE increase the address space capability?,"It increased page-directory and page-table entries from 32 to 64 bits, allowing the base address of page tables/frames to extend from 20 to 24 bits."
+What is the total address space increased to with PAE and what is the maximum physical memory supported?,"36 bits (allowing up to 64 GB physical memory), by combining the 24-bit base address with a 12-bit offset."
+What OS support is required for PAE?,"OS support is required (e.g., Linux, Mac support it; 32-bit Windows desktop is limited to 4 GB)."
+What was Intel's initial 64-bit architecture and why was it not widely adopted?,"IA-64, later known as Itanium. It was not widely adopted."
+Who developed the x86-64 architecture and what were its key features?,"AMD developed it, extending the existing IA-32 instruction set to support larger logical/physical address spaces and architectural advances."
+"Why is ""x86-64"" the general term for current 64-bit Intel/AMD CPUs?","Because Intel adopted AMD's x86-64 architecture, and it describes a class of 64-bit CPUs running identical instruction sets."
+What is the theoretical maximum address space for a 64-bit architecture?,2^64 bytes (16 quintillion / 16 exabytes).
+What is the actual virtual address size used in the x86-64 architecture?,48-bit virtual address.
+What page sizes does x86-64 support?,"4 KB, 2 MB, or 1 GB."
+How many levels of paging hierarchy does x86-64 use?,Four levels.
+What existing addressing scheme does x86-64 use for paging?,PAE (Page Address Extension).
+What are the maximum virtual and physical address capabilities of x86-64?,"Supports 48-bit virtual addresses and 52-bit physical addresses (4,096 terabytes)."
+"Define ""page directory"" (Intel IA-32).","In Intel IA-32 CPU architecture, the outermost page table."
+"Define ""page address extension (PAE)"".",Intel IA-32 CPU hardware allowing 32-bit processors to access physical address space larger than 4GB.
+"Define ""page directory pointer table"".",PAE pointer to page tables.
+What is Itanium?,Intel IA-64 CPU.
+What is AMD 64?,A 64-bit CPU designed by Advanced Micro Devices; part of the x86-64 class.
+What is Intel 64?,"Intel 64-bit CPUs, part of the x86-64 class."
+"Define ""x86-64"".",A class of 64-bit CPUs running identical instruction sets; common in desktop/server systems.

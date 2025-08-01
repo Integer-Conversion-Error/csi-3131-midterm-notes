@@ -1,0 +1,29 @@
+Front,Back,Reversible
+What is the primary objective of multiprogramming?,To maximize CPU utilization by always having a process running.,y
+What is the primary objective of time sharing?,To switch the CPU core among processes frequently to allow for user interaction.,y
+Define 'process scheduler'.,A scheduler that selects an available process (possibly from a set of several processes) for execution on a CPU.,y
+How many processes can run simultaneously on a single-core system?,One running process.,y
+How many processes can run simultaneously on a multicore system?,Multiple running processes.,y
+Define 'degree of multiprogramming'.,The number of processes currently in memory.,y
+Describe an 'I/O-bound process'.,A process that spends more of its time doing I/O than doing computations.,y
+Describe a 'CPU-bound process'.,A process that spends more time executing on CPU than it does performing I/O.,y
+What is the 'ready queue'?,The set of processes ready and waiting to execute; typically implemented as a linked list of Process Control Blocks (PCBs).,y
+What is the 'wait queue' in process scheduling?,"A queue holding processes waiting for an event to occur before they need to be put on the CPU (e.g., I/O completion).",y
+What is a 'queueing diagram' in process scheduling?,"A visual representation of process flow, including ready queue, wait queues, and resources.",y
+Outline the typical process flow in an operating system.,"New → Ready → Dispatched (Running) → (I/O wait, Child wait, Interrupt/Time slice expire → Ready) → Terminated.",y
+What does it mean for a process to be 'dispatched'?,Selected by the process scheduler to be executed next.,y
+What is the role of the CPU scheduler?,A kernel routine that selects a thread from the threads that are ready to execute and allocates a core to that thread. It selects a process from the ready queue and allocates a CPU core.,y
+How frequently does the CPU scheduler typically execute?,"Frequently, for example, every 100 milliseconds or more.",y
+Can the CPU scheduler forcibly remove a CPU from a process?,"Yes, it may forcibly remove the CPU from a process.",y
+Define 'swapping'.,Moving a process between main memory and a backing store. A process may be swapped out to free main memory temporarily and then swapped back in to continue execution.,y
+When is swapping typically used?,When memory is overcommitted.,y
+What triggers the OS to change a CPU core's task to a kernel routine during a context switch?,Interrupts.,y
+Define 'context' in the context of a process.,"The state of a process's execution, including the contents of CPU registers, its program counter, and its memory context (including its stack and heap).",y
+What is 'state save'?,Copying a process's context to save its state in order to pause its execution in preparation for putting another process on the CPU.,y
+What is 'state restore'?,Copying a process's context from its saved location to the CPU registers in preparation for continuing the process's execution.,y
+Define 'context switch'.,The switching of the CPU from one process or thread to another; requires performing a state save of the current process/thread and a state restore of the other.,y
+Is a context switch considered useful work?,"No, it is pure overhead, meaning no useful work is done during the switch.",y
+What factors influence the speed of a context switch?,"Memory speed, the number of registers to copy, and the presence of special instructions.",y
+What is the typical duration of a context switch?,Several microseconds.,y
+How can hardware support speed up context switches?,By providing multiple register sets.,y
+How does OS/memory management complexity affect context switch time?,More complex OS/memory management leads to more work and thus longer context switch times.,y

@@ -1,0 +1,92 @@
+Front,Back,Reversible
+What are some of the I/O-related services provided by the kernel's I/O subsystem?,"Scheduling, buffering, caching, spooling, device reservation, and error handling.",y
+On what infrastructure does the kernel I/O subsystem build?,Hardware and device-driver infrastructure.,y
+What is a key responsibility of the I/O subsystem regarding system integrity?,Protecting itself from errant processes and malicious users.,y
+What is I/O scheduling?,Determining a good execution order for I/O requests.,y
+What are the benefits of I/O scheduling?,"Improving overall system performance, providing fair device access, and reducing average waiting time.",y
+How is I/O scheduling typically implemented?,By maintaining a wait queue for each device.,y
+What happens to a request from a blocking I/O system call in the context of I/O scheduling?,"The request is placed on the device queue, and the I/O scheduler rearranges the queue for efficiency and average response time.",y
+"Can the OS prioritize certain I/O requests over others? If so, give an example.","Yes, the OS may prioritize delay-sensitive requests, such as those from the virtual memory subsystem over applications.",y
+How does the kernel manage multiple requests in asynchronous I/O?,The kernel tracks many requests.,y
+"Define ""device-status table"".",Kernel data structure tracking status and queues of operations for devices.,y
+What information does an entry in the device-status table typically contain?,"Device type, address, and state (e.g., not functioning, idle, busy). If busy, the request type and parameters are also stored.",y
+"Beyond direct request ordering, what else does scheduling I/O operations improve?","Computer efficiency, and it also uses storage space in the main memory/storage hierarchy via buffering, caching, and spooling.",y
+"Define ""buffer"".",Memory area storing data being transferred.,y
+What are the main reasons for using buffering in I/O operations?,"To cope with speed mismatches between producer and consumer, to provide adaptations for different data-transfer sizes, and to support copy semantics for application I/O.",y
+Provide an example of how buffering copes with speed mismatch.,"Data from a slow network can be accumulated in a buffer before being written in a single, larger operation to a fast SSD.",y
+"Define ""double buffering"".",Copying data twice or using two buffers to decouple producers/consumers.,y
+How does double buffering work to relax timing between a producer and consumer?,"While one buffer is being filled by the producer (e.g., network), the other buffer is being processed by the consumer (e.g., drive), and vice versa.",y
+How does buffering provide adaptations for different data-transfer sizes?,By handling issues like network fragmentation and reassembly.,y
+"Define ""copy semantics"".","Meaning assigned to data copying (e.g., if data can be modified after write request).",y
+"Explain ""copy semantics"" in the context of application I/O.","It means that the data written to disk is the version that existed at the time of the system call, independent of any subsequent changes to the application's buffer.",y
+How does the OS typically guarantee copy semantics for a `write()` system call?,"The `write()` system call copies application data to a kernel buffer before returning, and the disk write occurs from this kernel buffer.",y
+"Despite overhead, why is copying data between kernel and application space common?",Due to the clean semantics it provides.,y
+What is a more efficient alternative to directly copying data for buffering purposes?,Using virtual memory mapping and copy-on-write page protection.,y
+"Define ""cache"".",Temporary copy of data in fast memory to improve performance.,y
+What is the primary benefit of accessing a cached copy of data?,It is more efficient than accessing the original data.,y
+Provide an example of how caching is used in a computer system.,"Process instructions stored on disk are cached in physical memory, and then copied to CPU caches.",y
+What is the key difference between a buffer and a cache?,"A buffer may hold the only copy of data being transferred, whereas a cache holds a copy of an item that also resides elsewhere.",y
+Can a memory region serve as both a buffer and a cache?,"Yes, although caching and buffering are distinct concepts, a memory region can serve both purposes.",y
+How does the OS use main memory buffers in a way that involves caching?,"OS uses main memory buffers for disk data (for copy semantics and efficient scheduling), and these buffers also act as a cache to improve I/O efficiency for shared files or rapid write/reread operations.",y
+"What does the kernel do when it receives a file I/O request, regarding the buffer cache?","The kernel checks the buffer cache; if the data is available there, it avoids or defers physical disk I/O.",y
+How does the buffer cache optimize disk writes?,"Disk writes are accumulated in the buffer cache for seconds, allowing for more efficient write schedules.",y
+"Define ""spool"".",Buffer holding output for device that cannot accept interleaved data streams.,y
+"Why is spooling necessary, using a printer as an example?","A printer can only serve one job at a time, but multiple applications may try to print concurrently. Spooling coordinates this concurrent output.",y
+Describe the process of spooling for printer output.,"The OS intercepts printer output, spools each application's output to a separate secondary storage file, and then the spooling system queues and copies these files to the printer one at a time.",y
+How is a spooling system typically managed?,By a system daemon process or an in-kernel thread.,y
+What control interfaces does the OS provide for spooling?,"The ability to display the queue, remove jobs, and suspend printing.",y
+Give examples of devices that cannot multiplex I/O requests.,Tape drives and printers.,y
+"Besides spooling, what explicit coordination facilities does the OS provide for devices that cannot multiplex I/O?",Support for exclusive device access.,y
+Give examples of how different operating systems provide exclusive device access.,"VMS allows a process to allocate an idle device and deallocate it when done. Other OSes might limit access to one open file handle to such a device, or provide functions like Windows' `wait` for a device object or specific `OpenFile()` parameters for access types.",y
+What are applications responsible for when coordinating exclusive device access?,Avoiding deadlock.,y
+How does a protected memory OS handle hardware and application errors?,It guards against them to prevent system failure from minor malfunctions.,y
+What are the two main types of failures for devices and I/O transfers?,"Transient (e.g., network overloaded) and permanent (e.g., defective controller).",y
+How does the OS compensate for transient I/O failures?,"By retrying operations, such as a disk `read()` retry or a network `send()` resend.",y
+What is the OS's ability to recover from a permanent failure of an important component?,It is unlikely to recover.,y
+How do I/O system calls typically indicate success or failure?,They return a success/failure bit.,y
+How does UNIX report specific error codes for I/O system calls?,"Through an integer variable called `errno`, which returns hundreds of values indicating the error type (e.g., argument out of range, bad pointer, file not open).",y
+Do all OSes convey detailed hardware error information to applications?,"No, some hardware provides detailed error info, but many OSes do not convey it to the application.",y
+"Define ""sense key"".",SCSI protocol info in status register indicating error.,y
+What three levels of detail does SCSI protocol error reporting provide?,"Sense key (general nature of failure), additional sense code (category of failure), and additional sense-code qualifier (more detail about the failure).",y
+Do SCSI devices maintain internal error-log pages? Are they frequently used?,"Yes, many SCSI devices maintain internal error-log pages, but they are seldom requested.",y
+How might a user process disrupt the system related to I/O?,By issuing illegal I/O instructions.,y
+What is the primary prevention mechanism against user processes issuing illegal I/O instructions?,All I/O instructions are privileged.,y
+How do user programs perform I/O instructions?,They cannot issue I/O instructions directly; they must use the OS by making a system call.,y
+"When a user program makes a system call for I/O, what is the OS's role?","The OS, in monitor mode, checks the request's validity, performs the I/O, and then returns control to the user.",y
+How are memory-mapped and I/O port memory locations protected from user access?,By the memory-protection system.,y
+"Can the kernel deny all user access to I/O, even in specific cases like graphics?","No, the kernel cannot deny all user access; for example, graphics games need direct access to memory-mapped graphics memory.",y
+How might the kernel manage direct access to a specific I/O resource like graphics memory while maintaining protection?,It might provide a locking mechanism to allocate a graphics memory section to one process at a time.,y
+How does the kernel keep state information on I/O components?,"Via in-kernel data structures, such as an open-file table.",y
+"Besides open files, what other I/O activities do kernel data structures track?","Network connections, character-device communications, and other I/O activities.",y
+What various entities does UNIX file-system access cover?,"User files, raw devices, and process address spaces.",y
+How does UNIX handle the differing `read()` semantics for various entities?,It encapsulates these differences using an object-oriented technique.,y
+What does a UNIX open-file record contain to handle different file types?,A dispatch table with pointers to appropriate routines based on the file type.,y
+"What alternative method do some OSes, like Windows, use for I/O communication?",Message-passing.,y
+Describe the process of an I/O request using message-passing.,"An I/O request is converted to a message, sent through the kernel to the I/O manager, and then to the device driver. The message contents may change along the way.",y
+What is a potential drawback of message-passing for I/O compared to procedural techniques (shared data structures)?,Message-passing can have higher overhead.,y
+What are the benefits of using message-passing for I/O?,"It simplifies I/O system structure and design, and adds flexibility.",y
+Why is power management a critical concern in data centers?,"Due to high power costs, greenhouse gas emissions, and significant heat generation, where cooling alone can use twice as much electricity as powering the equipment.",y
+How does the OS contribute to power management in cloud computing environments?,"By adjusting processing loads, evacuating user processes, and idling or powering off systems.",y
+"How does the OS manage power for individual components (CPUs, external I/O devices)?",It analyzes the load and powers off components if the load is low and the hardware supports it. CPU cores can be suspended and resumed based on load.,y
+What is the benefit of disabling unneeded CPU cores in servers?,It decreases electricity and cooling needs.,y
+Why is power management a high priority in mobile computing?,To maximize battery life.,y
+"Describe ""power collapse"" in Android power management.","It is a deep sleep state that uses marginally more power than being off, but responds to external stimuli and allows for quick wake-up.",y
+How does Android achieve power collapse?,"By powering off individual components (screen, speakers, I/O subsystem) and putting the CPU in its lowest sleep state.",y
+"How much power does an idle Android phone use, and how quickly does it respond?","Very little power, and it wakes quickly for calls.",y
+What is the basis for Android's component-level power management?,An infrastructure that understands component relationships and usage.,y
+How does Android map out the physical device topology for power management?,It builds a device tree.,y
+How does Android track usage for each component in its device tree?,"Each component is associated with a device driver that tracks its usage (e.g., I/O pending to flash, open audio reference).",y
+How does Android's power management decide to power off components or enter power collapse?,"If a component is unused, it's turned off. If all components on a bus are unused, the bus is turned off. If all components in the device tree are unused, the system enters power collapse.",y
+"What are ""wakelocks"" in Android power management?",A mechanism for applications to temporarily prevent the system from entering power collapse.,y
+"How do applications use wakelocks, and how does the kernel respond?","Applications acquire and release wakelocks, and the kernel prevents power collapse while a wakelock is held.",y
+Give an example of wakelock usage in Android.,Android Market holds a wakelock during an application update.,y
+What is modern power management fundamentally based on?,Device management.,y
+What happens at boot time regarding hardware analysis and device tree creation for power management?,Firmware analyzes the hardware and creates a device tree in RAM.,y
+How does the kernel utilize the device tree after boot?,It uses the device tree to load drivers and manage devices.,y
+"Besides driver loading and basic device management, what other activities are handled related to device management?","Hot-plug (adding/subtracting devices), device state management, and power management.",y
+"Define ""advanced configuration and power interface (ACPI)"".","Firmware managing hardware aspects (power, device info).",y
+"What is ACPI, and what does it provide?","ACPI is an industry standard firmware that provides callable routines for the kernel, covering device state discovery/management, error management, and power management.",y
+Provide an example of how the kernel interacts with ACPI.,"The kernel calls a device driver, which then calls ACPI routines, which in turn communicate with the device.",y
+What is the overall role of the Kernel I/O subsystem?,It coordinates extensive services for applications and the kernel.,y
+What are the key areas supervised by the Kernel I/O subsystem?,"Management of name space for files/devices, access control, operation control (e.g., modem cannot `seek()`), file-system space allocation, device allocation, buffering, caching, spooling, I/O scheduling, device-status monitoring, error handling, failure recovery, device-driver configuration and initialization, and power management of I/O devices.",y
+How do the upper levels of the I/O subsystem access devices?,Via a uniform interface provided by device drivers.,y

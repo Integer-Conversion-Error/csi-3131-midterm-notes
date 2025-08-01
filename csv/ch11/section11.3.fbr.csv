@@ -1,0 +1,24 @@
+Front,Back,Reversible
+What is the primary goal of disk-scheduling algorithms for HDDs?,To minimize disk head movement.,y
+What is a key physical difference between NVM devices and HDDs that impacts scheduling?,NVM devices have no moving disk heads.,y
+What is the common scheduling policy used by NVM devices?,"Simple FCFS (First-Come, First-Served) policy.",y
+Define the Linux NOOP scheduler.,"A Linux NVM scheduling algorithm that uses FCFS (First-Come, First-Served) and merges adjacent requests.",y
+How do read and write service times differ in uniformity on NVM devices?,"Read service times are uniform, while write service times are not uniform due to flash memory properties.",y
+What is a common strategy employed by some SSD schedulers regarding read and write requests?,Merge only adjacent write requests and service all read requests in FCFS order.,y
+What are the two main types of I/O access patterns?,Sequential and random.,y
+"For which types of devices is sequential access optimal, and why?","Mechanical devices (e.g., HDD, tape), because data is typically near the read/write head, minimizing movement.",y
+IOPS,"Stands for **input/output operations per second**. It is a measure of random access I/O performance, representing the number of inputs plus outputs per second.",y
+What effect does random access I/O have on HDD performance?,"It causes significant HDD disk head movement, leading to slower performance.",y
+How does random access I/O performance compare between NVM devices (like SSDs) and HDDs? Provide a quantitative example.,"Random access I/O is much faster on NVM devices. HDDs typically achieve hundreds of IOPS, while SSDs can achieve hundreds of thousands of IOPS.",y
+Why do NVM devices show less performance advantage for raw sequential throughput compared to random access?,"Because HDDs already minimize head seeks during sequential operations, reducing NVM's comparative advantage in this area.",y
+What is the approximate performance advantage of NVM devices over HDDs specifically for sequential reads?,NVM performance is approximately 10x better than HDD for sequential reads.,y
+"How does writing to NVM compare to reading from NVM in terms of speed, and what is the consequence?","Writing to NVM is slower than reading, which decreases NVM's overall performance advantage.",y
+How consistent is HDD write performance over the device's lifespan?,Consistent throughout the device's life.,y
+What factors cause NVM write performance to vary?,Device fullness (influenced by garbage collection and over-provisioning) and 'wear'.,y
+How does the performance of a worn NVM device compare to a new one?,A worn NVM device has much worse performance than a new device.,y
+How can the lifespan and performance of NVM devices be improved in relation to file deletion?,"The file system can inform the device when files are deleted, allowing the device to proactively erase blocks.",y
+Why must garbage collection occur on NVM devices?,To reclaim space from invalid data.,y
+What complex operations might a single write trigger on an NVM device when garbage collection is involved?,"Reading of pages, writing of good data to overprovisioning space, erasing of an all-invalid-data block, and placing that block into overprovisioning space.",y
+"Summarize the I/O operations involved in a single write request on an NVM device, considering the impact of garbage collection.","A single write request involves the page write of the new data, plus one or more page reads and one or more page writes performed by garbage collection to move good data.",y
+Define write amplification.,"The creation of additional I/O requests by NVM devices (due to garbage collection and space management), which can greatly impact write performance.",y
+What is the worst-case scenario for write amplification?,Several extra I/Os being triggered with each write request.,y

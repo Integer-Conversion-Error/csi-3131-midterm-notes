@@ -1,0 +1,29 @@
+Front,Back
+What type of devices commonly use ARM processors?,"Mobile devices (smartphones, tablets) and real-time embedded systems."
+What is Intel's primary role in chip production?,Intel designs and manufactures chips.
+What is ARM's primary role in chip production?,ARM only designs and licenses architectural designs to manufacturers.
+Name some well-known devices that utilize ARM processors.,"Apple devices (like iPhone, iPad) and most Android devices."
+"By quantity, what is the most widely used processor architecture?","ARM architecture, with over 100 billion processors produced."
+What specific ARM architecture is the primary focus of study?,The 64-bit ARM v8 architecture.
+What are the three translation granule sizes available in ARM v8?,"4 KB, 16 KB, and 64 KB."
+What do translation granules in ARM v8 define or provide?,Different page sizes and larger contiguous memory sections called regions.
+"For an ARM v8 4 KB translation granule, what are the associated page and region sizes?","Page size: 4 KB; Region sizes: 2 MB, 1 GB."
+"For an ARM v8 16 KB translation granule, what are the associated page and region sizes?",Page size: 16 KB; Region size: 32 MB.
+"For an ARM v8 64 KB translation granule, what are the associated page and region sizes?",Page size: 64 KB; Region size: 512 MB.
+How many levels of paging do 4-KB and 16-KB translation granules support in ARM v8?,Up to four levels.
+How many levels of paging do 64-KB translation granules support in ARM v8?,Up to three levels.
+"What is the bit architecture of ARM v8, and how many bits are currently utilized?","ARM v8 is a 64-bit architecture, but only 48 bits are currently used."
+"In a 4-KB granule paging structure where all four levels are used, which bits define the offset within a page?",Bits 0-11 (low-order 12 bits) refer to the offset within the 4-KB page.
+"If a Level-1 table entry in ARM v8 refers to a 1-GB region, which bits are used as the offset?",Low-order 30 bits (0-29).
+"If a Level-2 table entry in ARM v8 refers to a 2-MB region, which bits are used as the offset?",Low-order 21 bits (0-20).
+How many levels of TLBs does the ARM architecture support?,Two levels.
+What are the components of the inner level of ARM TLBs?,"Two micro TLBs (one for data, one for instructions); they support ASIDs."
+What is the component of the outer level of ARM TLBs?,A single main TLB.
+Where does the address translation process begin in ARM architecture?,At the micro-TLB level.
+What happens during address translation if there is a micro-TLB miss?,The main TLB is checked.
+What happens during address translation if both the micro-TLB and main TLB miss?,A page table walk is performed in hardware.
+Define translation granules.,Features of ARM v8 CPUs defining page sizes and regions.
+Define regions (in ARM v8 CPUs).,Contiguous memory areas with separate privilege and access rules.
+Define translation table base register (TTBR).,ARM v8 CPU register pointing to the level 0 (outer) page table for the current thread.
+Define micro TLB.,"ARM CPU inner-level TLBs, one for instructions and one for data."
+Define main TLB.,ARM CPU outer-level TLB; checked after micro TLB lookup and before page table walk.

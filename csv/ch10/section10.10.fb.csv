@@ -1,0 +1,72 @@
+Front,Back
+How does Linux manage virtual memory?,Using demand paging.
+How does Linux allocate pages?,From a list of free frames.
+What page-replacement policy does Linux use?,A global policy similar to the LRU-approximation clock algorithm (second-chance).
+What are the two main page lists maintained by Linux's virtual memory system?,`active_list` and `inactive_list`.
+What is the purpose of the `active_list` in Linux's virtual memory management?,It contains pages considered in use.
+What is the purpose of the `inactive_list` in Linux's virtual memory management?,"It contains pages not recently referenced, which are eligible for reclamation."
+What bit is associated with each page in Linux to track its usage?,An `accessed` bit.
+What happens when a page is first allocated in Linux regarding its `accessed` bit and list placement?,"Its `accessed` bit is set, and it's added to the rear of the `active_list`."
+What happens when a page already in the `active_list` in Linux is referenced?,"Its `accessed` bit is set, and it moves to the rear of the `active_list`."
+How often are the `accessed` bits for pages in the `active_list` reset in Linux?,Periodically.
+"In Linux, where is the least recently used page typically found in the `active_list`, and what can happen to it?","At the front of the `active_list`, and it may migrate to the rear of the `inactive_list`."
+What happens when a page in the `inactive_list` in Linux is referenced?,It moves back to the rear of the `active_list`.
+What is the goal regarding the size of the `active_list` and `inactive_list` in Linux?,They are kept in relative balance.
+What happens in Linux if the `active_list` grows larger than the `inactive_list`?,"Pages from the front of the `active_list` move to the `inactive_list`, making them eligible for reclamation."
+What is the name of the page-out daemon process in the Linux kernel?,`kswapd`.
+What is the primary function of the `kswapd` process in Linux?,It periodically awakens and checks the amount of free memory.
+What action does `kswapd` take in Linux if free memory falls below a certain threshold?,It scans the `inactive_list` and reclaims pages for the free list.
+What system architectures does Windows 10 support?,"32-bit and 64-bit systems (Intel, ARM)."
+What is the default virtual address space and physical memory limit for 32-bit systems in Windows?,"Default 2 GB virtual address space (extendable to 3 GB), 4 GB physical memory."
+What is the virtual address space and physical memory limit for 64-bit systems in Windows?,"128-TB virtual address space, up to 24 TB physical memory (Windows Server up to 128 TB)."
+List key virtual memory management features implemented in Windows.,"Shared libraries, demand paging, copy-on-write, paging, memory compression."
+How does Windows implement demand paging for virtual memory?,With clustering.
+Define clustering in the context of Windows virtual memory management.,Paging in a group of contiguous pages when a single page is requested via a page fault.
+How does clustering handle page faults in Windows?,By bringing in the faulting page plus several immediately preceding and/or following pages.
+What is the cluster size for a data page fault in Windows?,3 pages (the faulting page + one before + one after).
+What is the cluster size for other types of page faults in Windows?,7 pages.
+"What is a key component of virtual memory management in Windows, related to page allocation for processes?",Working-set management.
+What limits are assigned to a process upon creation in Windows regarding its memory usage?,A `working-set minimum` (50 pages) and a `working-set maximum` (345 pages).
+Define `working-set minimum` in Windows.,Minimum number of frames guaranteed to a process in memory.
+Define `working-set maximum` in Windows.,Maximum number of frames allowed to a process if sufficient memory is available.
+Define `hard working-set limit` in Windows.,"Maximum amount of physical memory a process is allowed to use. If configured, working-set minimum and maximum values may be ignored."
+Can a process in Windows grow beyond its `working-set maximum`?,"Yes, if memory is available."
+Can memory allocated to a process in Windows shrink below its `working-set minimum`?,"Yes, during high memory demand."
+What page replacement algorithm does Windows use?,LRU-approximation clock algorithm (second-chance) with local and global policies.
+What does the Virtual Memory Manager in Windows maintain to manage page frames?,A free page frames list with a threshold.
+What happens in Windows if a page fault occurs for a process that is currently below its `working-set maximum`?,A page is allocated from the free list.
+"What happens in Windows if a process is at its `working-set maximum`, experiences a page fault, and there's sufficient free memory?","A free page is allocated, and the process grows beyond its `working-set maximum`."
+What happens in Windows if there is insufficient free memory when a page fault occurs?,The kernel selects a page from the process's working set for replacement (using a local LRU policy).
+What global replacement tactic does Windows employ if free memory falls below its threshold?,`Automatic working-set trimming`.
+Define `automatic working-set trimming` in Windows.,Decreasing working-set frames for processes if the minimum free memory threshold is reached.
+How does `automatic working-set trimming` work in Windows?,"It evaluates pages allocated to processes and, if a process has more pages than its `working-set minimum`, removes pages until sufficient memory is available or the process reaches its minimum."
+Which processes are targeted first during `automatic working-set trimming` in Windows?,"Larger, idle processes are targeted before smaller, active processes."
+How long does `automatic working-set trimming` continue in Windows?,"Until sufficient free memory is achieved, even if processes are trimmed below their `working-set minimum`."
+What types of processes does Windows perform trimming on?,User-mode and system processes.
+How does Solaris handle a page fault incurred by a thread?,The kernel assigns a page from the free list.
+What is a critical imperative for the kernel in Solaris regarding memory?,To keep sufficient free memory.
+What is the `lotsfree` parameter in Solaris?,"A threshold that, when free memory falls below it, causes the system to begin paging."
+What is the typical value for the `lotsfree` parameter in Solaris?,1/64 of physical memory.
+How often does the Solaris kernel check free memory against `lotsfree`?,Four times per second.
+What happens in Solaris if the number of free pages falls below `lotsfree`?,The `pageout` process starts.
+What mechanism does the `pageout` process in Solaris use for page replacement?,It's similar to a second-chance algorithm and uses two hands.
+"Describe the action of the ""front hand"" in the Solaris `pageout` process.",It scans all pages and sets their reference bit to 0.
+"Describe the action of the ""back hand"" in the Solaris `pageout` process.","It examines the reference bit; if it's still 0, the page is appended to the free list and written to secondary storage if modified."
+"How does Solaris manage ""minor page faults""?",A process can reclaim a page from the free list if it was accessed before being reassigned.
+What parameters does the Solaris pageout algorithm use to control its operation?,Parameters to control the `scanrate` (pages per second).
+What is the range of `scanrate` in Solaris?,From `slowscan` to `fastscan`.
+What is the default `slowscan` rate in Solaris?,100 pages/sec.
+What is the `fastscan` rate in Solaris?,"Total physical pages/2, with a maximum of 8,192 pages/sec."
+"What determines the `scanrate` in Solaris, particularly how it progresses from `slowscan` to `fastscan`?",The amount of free memory available.
+What system parameter in Solaris determines the distance between the two hands of the pageout process?,`handspread`.
+What determines the time between clearing a page's reference bit and checking it in Solaris?,The `scanrate` and `handspread` parameters.
+How often does the Solaris `pageout` process check the amount of free memory?,Four times per second.
+What happens in Solaris if free memory falls below `desfree`?,The `pageout` process runs 100 times per second.
+What is the goal of the `desfree` parameter in Solaris?,To keep at least `desfree` amount of memory available.
+What action does the Solaris kernel take if it's unable to maintain `desfree` memory for a 30-second average?,"It swaps processes, freeing all their pages."
+Which processes does the Solaris kernel prioritize for swapping if it cannot maintain `desfree` memory?,Idle processes.
+What happens in Solaris if the system is unable to maintain `minfree` memory?,The `pageout` process is called for every new page request.
+"What types of pages does the Solaris page-scanning algorithm specifically skip, even if they are eligible for reclamation?",Shared library pages.
+What distinction does Solaris make regarding pages in its virtual memory management?,It distinguishes between pages for processes and regular data files.
+"What is the term for Solaris's approach of prioritizing the selection of victim frames based on certain criteria (e.g., avoiding shared library pages)?",`Priority paging`.
+Define `priority paging` in Solaris.,"Prioritizing selection of victim frames based on criteria, such as avoiding shared library pages."

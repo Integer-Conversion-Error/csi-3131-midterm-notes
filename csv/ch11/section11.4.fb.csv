@@ -1,0 +1,32 @@
+Front,Back
+What is the fundamental importance of error detection and correction?,"They are fundamental to memory, networking, and storage."
+Define: Error detection.,"Determining if a problem has occurred (e.g., data corruption)."
+What actions can a system take upon detecting an error?,"Halt operation, report the error, or warn of a failing/failed device."
+How do memory systems typically detect errors?,Using parity bits.
+"What is a parity bit, and what is its association?","A bit associated with each byte, recording the even or odd number of 1s within that byte."
+How does parity detect a single-bit error?,The calculated parity changes and does not match the stored parity.
+How is an error detected if the stored parity bit itself is damaged?,It will not match the newly computed parity.
+What types of errors are guaranteed to be detected by parity?,All single-bit errors.
+What is a limitation of parity regarding multiple-bit errors?,Double-bit errors might go undetected.
+How is a parity bit calculated?,By XORing the bits of the associated data.
+What is the memory overhead required for parity?,An extra bit of memory per byte.
+What general term encompasses parity as a form of error detection?,Checksums.
+Define: Checksum.,A general term for an error detection and correction code.
+How do checksums operate to detect errors?,"They use modular arithmetic to compute, store, and compare values on fixed-length words."
+What is another error-detection method besides parity?,Cyclic redundancy check (CRCs).
+Define: Cyclic redundancy check (CRCs).,An error-detection method using a hash function to detect multiple-bit errors.
+Define: Error-correcting code (ECC).,"A value calculated from data bytes, recalculated later to check for changes, and capable of correcting errors."
+How does ECC perform error correction?,It uses algorithms and extra storage.
+What factors cause ECC codes to vary?,The extra storage needed and the number of errors correctable.
+In what unit is ECC typically applied in disk drives?,Per-sector ECC.
+In what unit is ECC typically applied in flash drives?,Per-page ECC.
+Describe the ECC process during a write operation.,"When a controller writes a sector/page, the ECC is calculated from the data and written along with it."
+Describe the ECC process during a read operation.,"When a sector/page is read, the ECC is recalculated from the data and compared with the stored ECC value."
+What does an ECC mismatch during a read operation indicate?,"The data is corrupted, and the storage media may be bad."
+How is ECC able to identify and correct corrupted bits?,"It contains enough information to identify changed bits and calculate correct values, provided only a few bits are corrupted."
+Define: Soft error.,"A recoverable error, often by retrying the operation."
+When does ECC signal a non-correctable error?,When there are too many changes for ECC to correct.
+Define: Hard error.,"An unrecoverable error, possibly resulting in data loss."
+Who is responsible for performing ECC processing on read/write operations?,The controller automatically.
+How do error detection and correction influence product markets?,They frequently serve as differentiators between consumer and enterprise products.
+What are additional applications of ECC in some systems?,DRAM error correction and data path protection.

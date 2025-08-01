@@ -1,0 +1,4 @@
+Question,Answer,Explanation
+Dynamic _______ inserts a routine into memory only when the routine is called by a program.,loading,Memory can potentially be conserved by loading routines in memory only when a program calls the routine. The routine may be linked either statically during load time or dynamically during program execution.
+_____ occurs when a process spends more time paging than executing.,Thrashing,If a process has a sustained high page fault rate it is spending more time paging - resolving page faults - than executing.
+________ is the time required for the disk arm to move to the desired cylinder on an HDD device.,Seek time,Seek time is the required time for the disk arm to move to the appropriate cylinder - the track at a given arm position of the HDD.

@@ -1,0 +1,29 @@
+Front,Back,Reversible
+What makes error detection and correction fundamental?,"They are fundamental to memory, networking, and storage systems.",y
+Define Error Detection.,"The process of determining if a problem has occurred, such as data corruption (e.g., a bit change in DRAM, a network packet change, or a data block change).",y
+What actions can a system take upon detecting an issue?,"It can halt operation, report the error, or warn of a failing/failed device.",y
+How do memory systems detect errors?,Using parity bits.,y
+What is the function of a parity bit associated with each byte?,It records the even/odd number of 1s in that byte.,y
+How is a single-bit error detected using parity bits?,The calculated parity changes and no longer matches the stored parity.,y
+How is damage to a stored parity bit detected?,The damaged stored parity bit will not match the newly computed parity for the data.,y
+What type of errors are guaranteed to be detected by parity bits?,All single-bit errors.,y
+Can double-bit errors be detected by parity bits?,They might go undetected.,y
+How is parity calculated?,By XORing bits.,y
+What extra memory is required for parity error detection?,An extra bit of memory per byte.,y
+What general term includes parity as a form of error detection?,Checksums.,y
+Define Checksum.,"A general term for an error detection and correction code that uses modular arithmetic to compute, store, and compare values on fixed-length words. Parity is one form of checksum.",y
+What is another error-detection method besides parity?,Cyclic Redundancy Checks (CRCs).,y
+Define Cyclic Redundancy Check (CRC).,An error-detection method that uses a hash function to detect multiple-bit errors.,y
+Define Error-Correction Code (ECC).,"A code that detects and corrects problems. It is a value calculated from data bytes, written with the data, and then recalculated later to check for changes. ECC contains enough information to identify changed bits and calculate correct values if few bits are corrupted.",y
+What does error correction require?,Algorithms and extra storage.,y
+What factors cause ECC codes to vary?,The extra storage needed and the number of errors they can correct.,y
+How do disk drives utilize ECC?,They use per-sector ECC.,y
+How do flash drives utilize ECC?,They use per-page ECC.,y
+When is ECC written during a write operation?,"When the controller writes a sector or page, the ECC value, calculated from the data, is written along with it.",y
+What happens with ECC when a sector or page is read?,The ECC is recalculated from the read data and compared with the stored ECC value.,y
+What does an ECC mismatch indicate?,"That the data is corrupted, and the storage media may be bad.",y
+What is a soft error?,"A recoverable error that ECC can correct, often by retrying the operation.",y
+What is a hard error?,"A non-correctable, unrecoverable error, signaled when ECC cannot correct too many changes, possibly resulting in data loss.",y
+Who is responsible for ECC processing on read/write operations?,The controller automatically performs it.,y
+What frequently differentiates consumer and enterprise products in terms of data integrity?,Error detection and correction capabilities.,y
+"Besides storage, where else is ECC used?","In some systems, for DRAM error correction and data path protection.",y

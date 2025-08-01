@@ -1,0 +1,480 @@
+Front,Back
+What is the primary role of mass storage in computer systems?,To permanently store files and data.
+What types of secondary storage do modern computers primarily use?,Hard disk drives (HDDs) and nonvolatile memory (NVM) devices.
+List common variations among secondary storage devices.,"Transfer (character at a time vs. block), Access (sequentially vs. randomly), Data transfer (synchronously vs. asynchronously), Usage (dedicated vs. shared), Read-only vs. read-write, Speed (slowest major component)."
+What are the key goals of an OS I/O subsystem?,"Provide the simplest interface possible to the rest of the system, and optimize I/O for maximum concurrency (devices are performance bottleneck)."
+What is 'mass storage'?,The nonvolatile storage system of a computer.
+What is the main mass-storage system?,Secondary storage (HDDs and NVM devices).
+What types of tertiary storage exist for some systems?,"Slower, larger storage like magnetic tape, optical disks, and cloud storage."
+What is the general term for all types of non-volatile storage?,"Non-volatile storage (NVS) or ""storage drives""."
+hard disk drive (HDD),"Secondary storage device based on mechanical components (spinning magnetic media platters, moving read-write heads)."
+nonvolatile memory (NVM),Persistent storage based on circuits and electric charges.
+How is information stored and read on an HDD platter?,Information is stored by recording magnetically and read by detecting magnetic patterns.
+platter,HDD component with a magnetic media layer for holding charges; flat circular shape (like a CD).
+disk arm,"HDD component holding read-write heads, which moves all heads as a unit over cylinders of platters."
+track,"On an HDD platter, the medium under the read-write head during platter rotation; logically a circular division of the platter surface."
+sectors,"On an HDD platter, fixed-size sections that subdivide tracks."
+cylinder,"On an HDD, the set of tracks under read-write heads on all platters in the device at a given arm position."
+What is the smallest unit of transfer on an HDD?,A sector.
+"What was the common sector size for HDDs until around 2010, and what is it migrating to?","Commonly 512 bytes until ~2010, then migrating to 4KB."
+What are common rotation speeds (RPM) for HDD motors?,"5,400, 7,200, 10,000, 15,000 RPM."
+transfer rate,The rate at which data flows between the drive and the computer.
+positioning time,"On an HDD, the time for the read-write head to position over the desired track; also known as random-access time."
+What are the two parts of positioning time (random-access time) for an HDD?,Seek time and rotational latency.
+seek time,"On an HDD, the time for the disk arm to move the read-write head to the desired cylinder."
+rotational latency,"On an HDD, the time for the desired sector to rotate to the disk head once the head is over the desired cylinder."
+What are typical performance figures for modern disks in terms of transfer rate and latency?,"Tens to hundreds of MB/sec transfer, several milliseconds seek/rotational latency."
+How do drive controllers improve HDD performance?,By using DRAM buffers.
+head crash,"On an HDD, a mechanical problem where the read-write head touches the platter surface."
+What is the consequence of a head crash on an HDD?,"It's normally irreparable, the entire disk is replaced, and data is lost unless backed up or RAID protected."
+effective transfer rate,"The actual, measured transfer rate of data between two devices, which is typically lower than published rates."
+What are NVM devices composed of?,A controller and flash NAND die semiconductor chips that store data.
+solid-state disk (SSD),A disk-drive-like storage device using flash-memory-based nonvolatile memory.
+USB drive,Nonvolatile memory in the form of a device that plugs into a USB port (also known as thumb drive/flash drive).
+What are the advantages of NVM devices over HDDs?,"They are more reliable (no moving parts), faster (no seek/rotational latency), and consume less power."
+What are the disadvantages of NVM devices compared to larger HDDs?,They are more expensive per MB and have less capacity.
+What are the storage and reliability challenges with NAND semiconductors?,"Data cannot be overwritten directly (NAND cells must be erased first), and they deteriorate with every erase cycle (~100,000 program-erase cycles)."
+"In what increments are NAND flash devices read/written, and in what increments are they erased?","Read/write in ""page"" increments (similar to a sector), and erasure occurs in ""block"" increments (several pages), which is much slower."
+How is NVM lifespan measured?,In Drive Writes Per Day (DWPD).
+flash translation layer (FTL),"For nonvolatile memory, a table maintained by the controller that maps physical pages to currently valid logical blocks."
+What happens when a full SSD has a pending write and no free blocks?,"If no free blocks but individual pages hold invalid data, garbage collection occurs, where good data is copied to other locations, freeing blocks for erase/writes."
+garbage collection,"The recovery of space containing no-longer-valid data, typically by copying valid data to new locations and then erasing the old block."
+over-provisioning,"In non-volatile memory, space (e.g., 20% of total) set aside by the device as always available write area, not counted in device free space."
+wear leveling,"In nonvolatile memory, an effort by the controller to select all NAND cells over time as write targets to avoid premature media failure due to frequently erased blocks."
+How do NVM devices provide data protection?,They include error-correcting codes (ECC) calculated and stored with the data to detect and correct errors.
+RAM drives,"Sections of a system's DRAM presented as secondary storage devices, created by device drivers."
+What is a practical use of RAM drives despite their volatility?,"To allow users/programmers to place data in memory for temporary safekeeping using standard file operations, useful for temporary files or sharing data."
+magnetic tape,"A nonvolatile magnetic media storage device (tape spooled on reels, passing over a read-write head); mostly used for backups, infrequently used info, or transferring info between systems."
+How do magnetic tapes compare to main memory and drives in terms of random access time?,"Random access is very slow: ~1000x slower than HDDs, ~100,000x slower than SSDs."
+"Once positioned correctly, how fast do tape drives read/write?",At speeds comparable to HDDs.
+I/O bus,Physical connection of an I/O device to a computer system.
+List some common bus types for connecting secondary storage.,"Advanced Technology Attachment (ATA), Serial ATA (SATA), eSATA, Serial Attached SCSI (SAS), Universal Serial Bus (USB), Fibre Channel (FC)."
+Which bus type is most common for secondary storage?,SATA.
+NVM express (NVMe),"A high-speed I/O bus specifically for NVM storage, which directly connects the device to the system PCI bus to increase throughput and decrease latency."
+controller,A special processor managing I/O devices.
+host bus adapter (HBA),A device controller installed in a host bus port to allow a device connection to the host.
+host controller,"I/O-managing processors within a computer (e.g., inside an HBA)."
+device controller,An I/O managing processor built into each storage device.
+How does a mass storage I/O operation typically proceed?,"The computer places a command into the host controller (via memory-mapped I/O ports), which then sends the command via messages to the device controller. The device controller operates the drive hardware."
+"Where does data transfer occur at the drive, and then to the host?","At the drive, data transfers between the device controller's built-in cache and the storage media. Data then transfers to the host between the cache and host DRAM via DMA at fast electronic speeds."
+logical blocks,Logical addresses used to access blocks on storage devices; also the smallest unit of transfer.
+How are storage devices logically addressed?,As large one-dimensional arrays of logical blocks.
+What does a logical block map to physically on a device?,A physical sector or a semiconductor page.
+"Why is converting LBA to old-style disk addresses (cylinder, track, sector) difficult in practice?","Because of defective sector substitution with spares, non-constant sectors per track on some drives, and internal management by disk manufacturers that hides the true physical mapping."
+What assumption do algorithms dealing with HDDs make about logical and physical addresses?,That ascending logical addresses correspond to ascending physical addresses.
+constant linear velocity (CLV),A device-recording method where bit density is uniform per track by varying the rotational speed of the medium.
+Why do outer tracks in CLV have more sectors?,Because they are longer and bit density is uniform.
+Where is CLV commonly used?,In CD-ROM and DVD-ROM drives.
+constant angular velocity (CAV),"A device-recording method where the medium spins at a constant velocity, and bit density decreases from inner to outer tracks to maintain a constant data rate."
+Where is CAV commonly used?,In hard disks.
+"What is the OS's responsibility regarding hardware efficiency, especially for HDDs?","For HDDs, the OS is responsible for minimizing access time and maximizing data transfer bandwidth."
+What is access time for HDDs/mechanical storage?,"It is the total time required to read or write data, consisting of seek time and rotational latency."
+"Define ""seek time"" in the context of HDD access time.",The time for the device arm to move heads to the desired cylinder.
+"Define ""rotational latency"" in the context of HDD access time.",The additional time for the platter to rotate the desired sector to the head.
+"Define ""device bandwidth"" for HDDs.",Total bytes transferred divided by total time (from the first request to the last transfer completion).
+How can access time and bandwidth be improved for HDDs?,By managing the order of storage I/O requests.
+How does a process initiate an I/O request?,It issues a system call to the OS.
+What information does an I/O request typically specify?,"Input/output direction, open file handle, memory address, and amount of data."
+What happens if the drive/controller is available when an I/O request is made?,The request is serviced immediately.
+What happens if the drive/controller is busy when a new I/O request is made?,New requests are placed in a queue.
+What is common about device queues in a multiprogramming system?,They often have pending requests.
+What is the benefit of having a queue of I/O requests for device drivers?,"It allows device drivers to improve performance by ordering requests (e.g., avoiding head seeks)."
+How did past HDD interfaces differ from modern drives regarding control over physical locations?,"Past HDD interfaces allowed the host to specify track/head, leading to much effort on disk scheduling; modern drives do not expose these controls and map LBA to physical addresses internally."
+What are the current goals of disk scheduling?,"Fairness, timeliness, and optimizations (e.g., bunching sequential reads/writes)."
+When do drives perform best?,With sequential I/O.
+Is absolute knowledge of head/physical block/cylinder locations possible on modern drives?,Generally not possible.
+What approximation is used for LBA to physical address mapping on modern drives?,"Increasing LBAs generally mean increasing physical addresses, and close LBAs equate to physical proximity."
+"What is the simplest disk scheduling algorithm, and what are its alternative names?","First-Come, First-Served (FCFS) or FIFO."
+Is FCFS disk scheduling fair?,"Yes, it is intrinsically fair."
+Does FCFS provide the fastest service?,"Generally, no."
+"What is a common problem with FCFS disk scheduling, especially illustrated by a ""wild swing"" example?","It can lead to inefficient head movement (e.g., a ""wild swing"" where the head moves far for one request, then far back for another, then far forward again), not optimizing for seek time."
+Define the SCAN algorithm for HDD I/O scheduling.,"The disk arm starts at one end, moves to the other, servicing requests, and when it reaches the other end, its direction is reversed, and servicing continues."
+What is another name for the SCAN algorithm?,Elevator algorithm.
+"In the SCAN algorithm, what happens to a request just in front of the head?",It is serviced almost immediately.
+"In the SCAN algorithm, what happens to a request just behind the head?","It waits until the arm moves to the end, reverses, and comes back."
+"With a uniform distribution of requests, where is the heaviest density of requests in SCAN, and where are there few requests after reversal?",Few requests are immediately in front of the head after reversal (recently serviced); the heaviest density of requests is at the other end of the disk (where requests have waited longest).
+Define Circular SCAN (C-SCAN) scheduling.,"A variant of SCAN where the head moves from one end to the other, servicing requests, but upon reaching the other end, it immediately returns to the beginning of the disk without servicing requests on the return trip."
+What is the primary goal or benefit of C-SCAN scheduling compared to SCAN?,To provide more uniform wait time.
+How does C-SCAN conceptually treat cylinders?,As a circular list.
+Are many disk-scheduling algorithms commonly used?,"No, many exist but are rarely used."
+"Is an optimal order definable for any request list, and is its computation always justified?","Yes, an optimal order can be defined, but its computation may not justify the savings over simpler algorithms like SCAN."
+What heavily influences the performance of a disk-scheduling algorithm?,The number and types of requests.
+How do all disk scheduling algorithms behave if there is only one outstanding request in the queue?,They all behave like FCFS.
+Which disk scheduling algorithms are generally better for heavy disk load and less likely to cause starvation?,SCAN and C-SCAN.
+Which Linux scheduler was created to prevent starvation?,The deadline scheduler.
+What type of queues does the Linux deadline scheduler maintain?,Separate read and write queues.
+Why does the Deadline scheduler give reads priority?,Because processes are more likely to block on read operations.
+How are the queues in the Deadline scheduler sorted?,"In LBA (Logical Block Addressing) order, which implements a C-SCAN like behavior."
+How are I/O requests typically sent in the Deadline scheduler?,"In batches, sorted by LBA order."
+"How many queues does the Deadline scheduler specifically keep, and how are they organized?","Four queues: two read queues and two write queues (one of each sorted by LBA, the other by FCFS)."
+How does the Deadline scheduler check for and prevent starvation of FCFS requests?,"After each batch, it checks if any FCFS requests are older than a configured age (default 500 ms); if so, the LBA queue (read/write) containing the old request is selected for the next batch."
+What was the default I/O scheduler in Linux RedHat 7?,The Deadline I/O scheduler.
+"Besides Deadline, what other I/O schedulers were included in RHEL 7?",NOOP and Completely Fair Queueing scheduler (CFQ).
+What are the characteristics of the NOOP scheduler and when is it preferred?,"It is preferred for CPU-bound systems using fast storage (NVM devices), as it does minimal work, effectively acting as FCFS."
+What type of drives is the Completely Fair Queueing scheduler (CFQ) the default for?,SATA drives.
+"How many queues does CFQ maintain, and how are they sorted?","Three queues (insertion sort, LBA order): real time, best effort (default), and idle."
+"What are the priorities among CFQ's queues, and what is a potential issue?","Real time has the highest priority, then best effort, then idle (real time > best effort > idle); starvation is possible."
+How does CFQ use historical data to optimize?,"It anticipates if a process will issue more I/O requests soon; if so, it idles waiting for new I/O, ignoring other queued requests to minimize seek time, assuming locality of reference per process."
+"Define ""bandwidth"" (from table definition).",Total amount of data transferred divided by total time between first request for service and completion of last transfer.
+"Define ""SCAN algorithm"" (from table definition).","HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then reverses."
+"Define ""Circular SCAN (CSCAN) scheduling"" (from table definition).","HDD I/O scheduling algorithm: disk head moves from one end to other, performing I/O; then returns to beginning without servicing."
+"Define ""Completely Fair Queueing (CFQ)"" (from table definition).","In Linux, default I/O scheduler in kernel 2.6 and later."
+What is the primary goal of disk-scheduling algorithms for Hard Disk Drives (HDDs)?,To minimize disk head movement.
+What distinguishes NVM devices from HDDs in terms of physical components?,NVM devices have no moving disk heads.
+What common scheduling policy do NVM devices typically use?,"Simple FCFS (First-Come, First-Served)."
+Define the Linux NOOP scheduler.,A Linux NVM scheduling algorithm that uses an FCFS policy and merges adjacent requests.
+Describe the characteristic of read service time in NVM devices.,Uniform.
+Describe the characteristic of write service time in NVM devices and why it behaves that way.,"Not uniform, due to flash memory properties."
+How do some SSD schedulers handle write requests?,They merge only adjacent write requests.
+How do some SSD schedulers handle read requests?,They service all read requests in FCFS order.
+What are the two main types of I/O access?,Sequential and random.
+For which types of devices is sequential access I/O optimal?,Mechanical devices such as HDDs and tapes.
+Why is sequential access optimal for mechanical devices?,"Because the data is located near the read/write head, minimizing movement."
+Define Input/Output Operations Per Second (IOPS).,"A measure of random access I/O performance, representing the number of input and output operations per second."
+What effect does random access I/O have on HDDs?,It causes disk head movement.
+Compare random access I/O performance between NVM (SSDs) and HDDs.,"Random access I/O is much faster on NVM (e.g., HDD hundreds of IOPS, SSD hundreds of thousands of IOPS)."
+Do NVM devices offer a significant advantage for raw sequential throughput compared to HDDs?,"Less advantage, because HDD head seeks are minimized during sequential operations."
+What is the performance advantage of NVM over HDD for sequential reads?,Equivalent to a 10x advantage.
+How does writing to NVM compare to reading from NVM in terms of speed?,Writing is slower than reading.
+How does writing impact NVM's performance advantage over HDDs?,It decreases the advantage.
+Describe the consistency of write performance for HDDs throughout their lifespan.,Consistent throughout device life.
+What factors cause NVM write performance to vary?,"Device fullness (due to garbage collection and over-provisioning) and ""wear""."
+How does the performance of a worn NVM device compare to a new one?,Much worse performance.
+How can NVM lifespan and performance be improved through file system interaction?,"The file system informs the NVM device when files are deleted, allowing the device to erase blocks."
+Under what general conditions does garbage collection typically occur in an NVM device?,"When the NVM device is under a random read/write load, is full, but has free space."
+What is the primary purpose of garbage collection in NVM devices?,To reclaim space from invalid data.
+Describe the sequence of operations a single write might trigger due to garbage collection in an NVM device.,"Read of pages, write of good data to overprovisioning space, erase of an all-invalid-data block, and placement of the block into overprovisioning space."
+Summarize the I/O operations triggered by a single write request due to garbage collection.,One page write (for the new data) + one or more page reads (by GC) + one or more page writes (for good data from GC blocks).
+Define write amplification.,"Creation of I/O requests by NVM devices (GC, space management), impacting write performance."
+What is the worst-case scenario for write amplification?,Several extra I/Os are triggered with each write request.
+What is the fundamental importance of error detection and correction?,"They are fundamental to memory, networking, and storage."
+Define: Error detection.,"Determining if a problem has occurred (e.g., data corruption)."
+What actions can a system take upon detecting an error?,"Halt operation, report the error, or warn of a failing/failed device."
+How do memory systems typically detect errors?,Using parity bits.
+"What is a parity bit, and what is its association?","A bit associated with each byte, recording the even or odd number of 1s within that byte."
+How does parity detect a single-bit error?,The calculated parity changes and does not match the stored parity.
+How is an error detected if the stored parity bit itself is damaged?,It will not match the newly computed parity.
+What types of errors are guaranteed to be detected by parity?,All single-bit errors.
+What is a limitation of parity regarding multiple-bit errors?,Double-bit errors might go undetected.
+How is a parity bit calculated?,By XORing the bits of the associated data.
+What is the memory overhead required for parity?,An extra bit of memory per byte.
+What general term encompasses parity as a form of error detection?,Checksums.
+Define: Checksum.,A general term for an error detection and correction code.
+How do checksums operate to detect errors?,"They use modular arithmetic to compute, store, and compare values on fixed-length words."
+What is another error-detection method besides parity?,Cyclic redundancy check (CRCs).
+Define: Cyclic redundancy check (CRCs).,An error-detection method using a hash function to detect multiple-bit errors.
+Define: Error-correcting code (ECC).,"A value calculated from data bytes, recalculated later to check for changes, and capable of correcting errors."
+How does ECC perform error correction?,It uses algorithms and extra storage.
+What factors cause ECC codes to vary?,The extra storage needed and the number of errors correctable.
+In what unit is ECC typically applied in disk drives?,Per-sector ECC.
+In what unit is ECC typically applied in flash drives?,Per-page ECC.
+Describe the ECC process during a write operation.,"When a controller writes a sector/page, the ECC is calculated from the data and written along with it."
+Describe the ECC process during a read operation.,"When a sector/page is read, the ECC is recalculated from the data and compared with the stored ECC value."
+What does an ECC mismatch during a read operation indicate?,"The data is corrupted, and the storage media may be bad."
+How is ECC able to identify and correct corrupted bits?,"It contains enough information to identify changed bits and calculate correct values, provided only a few bits are corrupted."
+Define: Soft error.,"A recoverable error, often by retrying the operation."
+When does ECC signal a non-correctable error?,When there are too many changes for ECC to correct.
+Define: Hard error.,"An unrecoverable error, possibly resulting in data loss."
+Who is responsible for performing ECC processing on read/write operations?,The controller automatically.
+How do error detection and correction influence product markets?,They frequently serve as differentiators between consumer and enterprise products.
+What are additional applications of ECC in some systems?,DRAM error correction and data path protection.
+What are the OS responsibilities related to storage device management?,"Drive initialization, booting from drive, and bad-block recovery."
+What is the initial state of a new storage device?,"A blank slate (e.g., platter of magnetic material, uninitialized semiconductor cells)."
+What must happen to a storage device before data can be stored on it?,It must be divided into sectors that the controller can read/write.
+What must happen to NVM pages before data can be stored?,They must be initialized and an FTL (Flash Translation Layer) created.
+What is the process of dividing a device into sectors or initializing NVM pages?,Low-level formatting or physical formatting.
+What is low-level formatting?,The process that fills a device with a special data structure for each storage location.
+What components typically make up the data structure for a sector or page?,"A header, a data area, and a trailer."
+What information is contained in the header and trailer of a sector/page data structure?,"Controller information, such as sector/page number and error detection/correction code."
+When are most drives low-level formatted?,"At the factory, as part of the manufacturing process."
+What does factory low-level formatting enable the manufacturer to do?,Test the device and initialize the mapping from logical block numbers to defect-free sectors/pages.
+What are the common choices for sector sizes?,512 bytes and 4KB.
+What is the advantage of a larger sector size?,"Fewer sectors per track, fewer headers/trailers, and more space available for user data."
+How do some OSes handle sector sizes?,They may only handle one specific sector size.
+What are the three steps an OS typically takes to record its own data structures on a device?,"1. Partitioning, 2. Volume creation and management, 3. Logical formatting (or creation of a file system)."
+What is partitioning (storage device management)?,Dividing a device into one or more groups of blocks/pages.
+What is the purpose of partitioning?,To allow the OS to treat each partition as a separate device.
+Give examples of how partitions might be used.,"One partition for OS executable code (file system), another for swap space, and another for user files."
+How do some OS/file systems handle partitioning?,They partition automatically when the entire device is managed by the file system.
+Where is partition information typically stored?,In a fixed format at a fixed location on the storage device.
+Which Linux command manages partitions?,`fdisk`.
+What happens after an OS recognizes a device and reads its partition info?,"The OS creates device entries (e.g., `/dev` in Linux)."
+Which configuration file tells the OS to mount partitions in Linux?,`/etc/fstab`.
+What is mounting a file system?,Making it available for use by logically attaching it to the root file system.
+How is a volume implicitly created?,"When a file system is placed directly within a partition, making it ready to be mounted."
+How are volumes explicitly created?,"When multiple partitions/devices are used as a RAID set, allowing one or more file systems to spread across devices."
+Which Linux tool provides volume management features?,`lvm2`.
+Which file system integrates volume management?,ZFS.
+"What can the term ""volume"" also refer to in a broader sense?","Any mountable file system, such as a CD image file."
+What is logical formatting (storage management)?,"The process where the OS stores initial file-system data structures onto the device, or creation of a file system."
+What data structures are created during logical formatting?,Maps of free/allocated space and an initial empty directory.
+What does partition information indicate regarding booting?,If a partition contains a bootable file system (OS).
+What is established by a partition labeled for boot?,The root of the file system.
+What happens once the boot partition is mounted?,Device links for all other devices/partitions are created.
+"What constitutes a computer's ""file system""?",All mounted volumes.
+How are Windows file systems typically named?,"Separately via letters (e.g., C:, D:, E:)."
+How are Linux file systems typically structured?,"The boot file system is mounted at boot, and other file systems are mounted within its tree structure."
+What is the difference in file system interfaces between Windows and Linux regarding device usage?,"In Windows, the file system interface is clear when a device is used. In Linux, a single file access might traverse many devices."
+What larger chunks do file systems group blocks into?,Clusters.
+How does device I/O differ from file system I/O?,"Device I/O occurs via blocks, while file system I/O occurs via clusters."
+What is the benefit of grouping blocks into clusters for I/O?,It assures more sequential-access and fewer random-access characteristics.
+How do file systems optimize for HDD head seeks?,They group file contents near metadata to reduce head seeks.
+What is it called when special programs use a partition as a large sequential array of logical blocks without file-system data structures?,Raw disk.
+What is the I/O type for a raw disk?,Raw I/O.
+What are common use cases for raw disk access?,Swap space and some database systems that need to control exact record location.
+What file-system services does raw I/O bypass?,"Buffer cache, file locking, prefetching, space allocation, file names, and directories."
+What is the purpose of allowing applications to use raw partitions?,To implement their own special-purpose storage services.
+How do most applications interact with storage devices?,They use the provided file system.
+How does Linux provide access similar to raw I/O?,Via the `DIRECT` flag to the `open()` system call.
+What must a computer have when it starts (powered up/rebooted)?,An initial program to run.
+What is the initial bootstrap loader like and where is it stored?,It tends to be simple and is stored in NVM (Non-Volatile Memory) flash memory firmware on the motherboard.
+Where is the bootstrap NVM firmware mapped?,To a known memory location.
+What does the bootstrap NVM firmware initialize?,"CPU registers, device controllers, and main memory contents."
+What does the tiny bootstrap loader do?,It brings in the full bootstrap program from secondary storage.
+Where is the full bootstrap program stored?,"In ""boot blocks"" at a fixed location on the device."
+What is a device with a boot partition called?,A boot disk or system disk.
+What does the bootstrap NVM code instruct the storage controller to do?,"Read boot blocks into memory (without device drivers loaded), then execute the code."
+How does the full bootstrap program differ from the initial bootstrap loader?,It is more sophisticated; it loads the entire OS from a non-fixed location and starts the OS.
+"In Windows, what does the boot partition contain?",The OS and device drivers.
+What is the Windows boot code in the first logical block of a hard disk/NVM device termed?,Master Boot Record (MBR).
+What runs when Windows booting begins?,Code in the system's firmware.
+What does the firmware code do during Windows boot?,Directs the system to read boot code from the MBR (as it understands enough about the controller/device to load the sector).
+What does the MBR contain?,"Boot code, a table listing partitions, and a flag for the boot partition."
+What happens after the system identifies the boot partition during Windows boot?,"It reads the first sector/page, known as the boot sector."
+What does the boot sector do in the Windows boot process?,Directs to the kernel.
+What happens after the kernel is loaded in the Windows boot process?,"The boot process continues, loading subsystems and system services."
+Why are disks prone to failure?,Due to moving parts and small tolerances.
+What happens in case of complete disk failure?,"The disk is replaced, and contents are restored from backup."
+What type of disk failure is more frequent than complete failure?,One or more sectors becoming defective.
+Do new disks come with defects?,Most disks come from the factory with bad blocks.
+"How were bad blocks handled on older disks (e.g., IDE controllers)?",Manually.
+What was the manual strategy for handling bad blocks during formatting?,"Scanning the disk for bad blocks, then flagging discovered bad blocks as unusable so the file system wouldn't allocate them."
+How were blocks that went bad during operation handled manually?,"A special program (e.g., Linux `badblocks`) was run manually to search for and lock away the bad blocks."
+What typically happened to data on bad blocks that were manually locked away?,The data was usually lost.
+How do more sophisticated disks handle bad-block recovery?,They are smarter; the controller maintains a list of bad blocks.
+When is the controller's list of bad blocks initialized and updated?,Initialized at the factory and updated over the life of the disk.
+What does low-level formatting do on sophisticated disks to aid bad-block recovery?,It sets aside spare sectors that are not visible to the OS.
+What does the controller do when it encounters a bad sector on a sophisticated disk?,It logically replaces each bad sector with a spare sector.
+What are the names for the scheme where a controller replaces a bad sector with a spare sector?,Sector sparing or forwarding.
+Describe the steps in a typical bad-sector transaction with sector sparing.,"1. OS tries to read logical block 87. 2. Controller calculates ECC, finds sector bad, reports I/O error to OS. 3. Device controller replaces bad sector with a spare. 4. After that, any system request for logical block 87 is translated to the replacement sector's address by the controller."
+What is a potential issue with bad sector redirection by the controller?,It could invalidate OS disk-scheduling optimization.
+Where are spare sectors typically allocated on most disks?,"A few spare sectors in each cylinder, and a spare cylinder."
+"When a bad block is remapped, where does the controller try to use a spare sector from first?",From the same cylinder if possible.
+What is an alternative to sector sparing?,Sector slipping.
+How does sector slipping work?,"It remaps all sectors from a defective one onwards down one spot (e.g., if logical block 17 is defective, it remaps all sectors from 17 to 202, moving them down one spot, freeing up space of sector 18, and mapping sector 17 to it)."
+What might recoverable soft errors trigger?,"Device activity, such as copying block data or sparing/slipping the block."
+What is the consequence of an unrecoverable hard error?,"Lost data. The file using the block must be repaired (e.g., from backup), which requires manual intervention."
+What can become nonfunctional or go bad in NVM devices?,"Bits, bytes, or pages."
+Why is bad block management simpler for NVM devices compared to HDDs?,There is no seek time performance loss.
+How are bad pages handled in NVM devices?,"Multiple pages are set aside as replacement locations, or space from an over-provisioning area is used."
+What does the NVM controller do regarding bad pages?,It maintains a table of bad pages and never sets them as available to write to.
+low-level formatting,Initialization of a storage medium for computer storage.
+physical formatting,Initialization of a storage medium for computer storage.
+partition,Logical segregation of storage space into multiple areas.
+mounting,Making a file system available for use by logically attaching it to the root file system.
+volume,Container of storage; often a device with a mountable file system.
+logical formatting,Creation of a file system in a volume to ready it for use.
+cluster,"In Windows storage, a power-of-2 number of disk sectors collected for I/O optimization."
+raw disk,Direct access to a secondary storage device as an array of blocks with no file system.
+bootstrap,Steps taken at computer power-on to bring system to full operation.
+boot disk,Disk with a boot partition and kernel to load for booting.
+system disk,"Storage device with a boot partition, can store OS for booting."
+boot partition,Storage device partition containing an executable operating system.
+master boot record (MBR),"Windows boot code, stored in the first sector of a boot partition."
+boot sector,"First sector of a Windows boot device, containing bootstrap code."
+bad block,Unusable sector on an HDD.
+sector sparing,Replacement of unusable HDD sector with another sector elsewhere on device.
+sector slipping,Renaming of sectors to avoid using a bad sector.
+What is swapping?,The process of moving entire processes between secondary storage and main memory.
+When does swapping typically occur?,"When physical memory is critically low, processes are moved to swap space to free memory."
+How do modern operating systems typically implement swapping?,"Modern OS combine swapping with virtual memory, swapping individual pages rather than entire processes."
+"Are the terms ""swapping"" and ""paging"" used interchangeably in modern OS contexts?",Yes.
+Define swap-space management.,A low-level OS task of managing space on secondary storage for swapping and paging.
+How does virtual memory utilize secondary storage?,As an extension of main memory.
+What is the impact of swap space on system performance?,It significantly decreases system performance because drive access is much slower than main memory access.
+What is the main goal for swap space design and implementation?,To provide the best throughput for the virtual memory system.
+How does swap space usage vary between operating systems?,It is used differently by various OS depending on their memory-management algorithms.
+What do traditional swapping systems hold in swap space?,The entire process image (code and data segments).
+What do paging systems store in swap space?,Pages that have been pushed out of main memory.
+What is the typical range for the amount of swap space needed?,It varies from a few megabytes (MB) to gigabytes (GB).
+What factors determine the amount of swap space needed?,"Physical memory, virtual memory backing, and virtual memory usage."
+Is it safer to overestimate or underestimate the amount of swap space required?,It is safer to overestimate.
+What are the consequences of running out of swap space?,The system may abort processes or crash.
+What is the consequence of overestimating swap space?,It wastes secondary storage space but causes no other harm.
+How did Solaris traditionally determine the recommended swap space amount?,Swap space was set equal to the virtual memory exceeding pageable physical memory.
+What was the past Linux recommendation for swap space amount?,Double the physical memory.
+Why has the Linux recommendation for swap space changed today?,Today's Linux uses considerably less swap space due to changes in paging algorithms.
+"Can some operating systems, like Linux, utilize multiple swap spaces?","Yes, they can allow multiple swap spaces, which can be files or dedicated partitions."
+Where are multiple swap spaces typically located when used?,Usually on separate storage devices.
+What is the purpose of having multiple swap spaces on separate storage devices?,To spread the I/O load from paging/swapping over the system's I/O bandwidth.
+What are the two primary locations where swap space can reside?,Carved out of a normal file system (as a large file) or in a separate raw partition.
+How is swap space managed when it resides as a file within a normal file system?,"Normal file-system routines are used to create, name, and allocate its space."
+Define raw partition.,A partition within a storage device not containing a file system.
+What is a key characteristic of swap space located in a raw partition regarding file systems?,It has no file system or directory structure.
+Who manages block allocation and deallocation for swap space in a raw partition?,A separate swap-space storage manager.
+What is the primary optimization goal for the swap-space manager in a raw partition?,"Speed, not storage efficiency."
+How does the frequency of access to swap space compare to file systems?,Swap space is accessed more frequently than file systems.
+"What potential issue may increase with swap space in raw partitions, and why is it considered an acceptable trade-off?","Internal fragmentation may increase, which is acceptable because the data life in swap space is shorter."
+How is fragmentation in raw swap partitions typically managed or resolved?,It is short-lived because the swap space is reinitialized at boot time.
+How is the amount of swap space determined when using the raw-partition approach?,It is a fixed amount determined during disk partitioning.
+How can additional swap space be added when using the raw-partition approach?,By repartitioning the device (which might involve moving or destroying other partitions) or by adding another swap space elsewhere.
+Are all operating systems rigid in their swap space location choices?,"No, some OS (like Linux) are flexible and can swap in both raw partitions and file-system space."
+What is the trade-off involved when choosing between file system-based swap space and raw partitions?,The convenience of file system allocation/management versus the performance of raw partitions.
+How did traditional UNIX kernels manage swapping?,They copied entire processes between contiguous disk regions and memory.
+How did later UNIX systems evolve their swapping mechanisms with the advent of paging hardware?,They evolved to a combination of swapping and paging.
+What significant change did Solaris 1 introduce regarding standard UNIX swap methods?,It changed them for improved efficiency and to adapt to technological developments.
+"In systems like Solaris, what happens to text-segment pages (code) during execution and if selected for pageout?","They are brought from the file system, accessed in memory, and then thrown away if selected for pageout."
+Why is it more efficient to reread a text-segment page from the file system than to write it to swap and then reread it?,It is more efficient to reread the page from the file system than to write it to swap and then reread it.
+For what type of memory is swap space primarily used as a backing store in modern systems like Solaris and Linux?,Pages of anonymous memory.
+Define anonymous memory.,Memory not associated with a file; dirty pages paged out are stored in swap space.
+What was a significant change in later Solaris versions regarding swap space allocation timing?,"It allocates swap space only when a page is forced out of physical memory, not when the virtual memory page is first created."
+Why does the later Solaris swap allocation scheme offer better performance on modern computers?,"Because modern computers have more physical memory, leading to less frequent paging."
+How is Linux's use of swap space similar to Solaris's?,"Linux, like Solaris, uses swap space primarily for anonymous memory."
+What types of swap areas does Linux allow?,"One or more swap areas, which can be a swap file on a regular file system or a dedicated swap partition."
+"What does each swap area in Linux consist of, and what do these components hold?","A series of 4-KB page slots, which hold swapped pages."
+Define page slot (in Linux swap-space management).,"In Linux swap-space management, a part of the data structure tracking swap-space use."
+What data structure is associated with each swap area in Linux?,"A swap map, which is an array of integer counters."
+Define swap map (in Linux swap-space management).,"In Linux swap-space management, a part of the data structure tracking swap-space use."
+"In a Linux swap map, what does each counter correspond to?",A page slot.
+"In a Linux swap map, what does a counter value of 0 indicate?",The corresponding page slot is available.
+"In a Linux swap map, what does a counter value greater than 0 indicate?",The corresponding page slot is occupied by a swapped page.
+What specific information does the value of a counter in a Linux swap map provide?,"It indicates the number of mappings to the swapped page (e.g., 3 means it's mapped to 3 processes if it's shared memory)."
+What are the three main ways computers access secondary storage?,"Host-attached, network-attached, and cloud storage."
+Define host-attached storage.,"Storage accessed through local I/O ports, directly attached to a computer."
+What is the most common local I/O port for host-attached storage?,SATA (Serial Advanced Technology Attachment).
+How can more host-attached storage be accessed beyond a few SATA ports?,"Through an individual storage device, a device in a chassis, or multiple drives in a chassis connected via USB, FireWire, or Thunderbolt."
+What type of I/O architectures do high-end workstations and servers use for extensive host-attached storage?,Sophisticated I/O architectures for more or shared storage.
+Define Fibre Channel (FC).,A high-speed serial architecture (using optical fiber or copper cable) used as a storage I/O bus in data centers to connect computers to storage arrays.
+What are the benefits of Fibre Channel (FC)?,"Large address space, switched communication, and flexibility in I/O communication by allowing multiple hosts and storage devices to attach to the fabric."
+List examples of devices suitable for host-attached storage.,"HDDs, NVM devices, CD/DVD/Blu-ray/tape drives, and Storage-Area Networks (SANs)."
+How are I/O commands for host-attached storage directed?,Reads/writes of logical data blocks are directed to specifically identified storage units (via bus ID or target logical unit).
+Define Network-Attached Storage (NAS).,"Storage that provides access across a network, typically accessed from a computer over a network."
+What can a NAS device be?,A special-purpose storage system or a general computer system providing storage to other hosts.
+How do clients access NAS?,Via a remote-procedure-call (RPC) interface.
+Name common RPC interfaces used for NAS and their typical operating systems.,NFS (UNIX/Linux) and CIFS (Windows).
+How are NAS RPCs typically carried?,"Via TCP/UDP over an IP network, usually the same LAN."
+How is a NAS unit usually implemented?,As a storage array with RPC interface software.
+What important feature do CIFS and NFS provide for file sharing on NAS?,"Locking features, allowing file sharing between hosts accessing the NAS."
+What is a key convenience benefit of NAS for LAN computers?,It provides a convenient way for LAN computers to share a storage pool due to ease of naming and access.
+What is a downside of NAS compared to some direct-attached storage?,It is less efficient and offers lower performance.
+Define iSCSI.,The latest network-attached storage protocol that uses the IP network protocol to carry the SCSI protocol for distant storage access.
+How does iSCSI enable hosts to treat storage?,"Hosts treat storage as directly attached, even if physically distant, by using networks (not SCSI cables) as interconnects between hosts and storage."
+What is the key difference in data transfer between NFS/CIFS and iSCSI?,"NFS/CIFS present a file system and send parts of files, while iSCSI sends logical blocks across the network, allowing the client to use blocks directly or create a file system."
+Define cloud storage.,"Similar to network-attached storage, it is accessed across a network, specifically over the Internet/WAN to a remote, shared data center, often for a fee or free."
+What is a primary difference between cloud storage and NAS in terms of location?,"Unlike NAS, cloud storage is accessed over the Internet/WAN to a remote data center."
+What is a primary difference between cloud storage and NAS in terms of how storage is accessed/presented?,"NAS is accessed as another file system (CIFS/NFS) or raw block device (iSCSI), with the OS integrating these protocols. Cloud storage is API based, requiring programs to use APIs for access."
+Provide examples of cloud storage services.,"Amazon S3, Dropbox, Microsoft OneDrive, Apple iCloud."
+Why do cloud storage services primarily use APIs instead of existing NAS protocols?,Due to WAN latency and the higher likelihood of failure scenarios. NAS protocols are designed for LANs with lower latency and less connectivity loss.
+"How do LAN connection failures (e.g., with NFS/CIFS) typically affect a system?",The system might hang.
+How does cloud storage typically handle failures?,"Failures are more likely, and the application pauses access until connectivity is restored."
+"What is a major drawback of Network-Attached Storage (NAS), especially in large client-server installations?","Storage I/O consumes data network bandwidth and increases network communication latency, leading to server-client communication competing with server-storage communication."
+Define Storage-Area Network (SAN).,"A private local-area storage network that connects servers and storage units using storage protocols (not general networking protocols), allowing multiple computers to connect to storage devices."
+What is a key advantage or 'power' of a SAN?,Flexibility.
+How is storage allocated in a SAN?,Storage is dynamically allocated to hosts that are attached to the SAN.
+What types of drives can storage arrays in a SAN contain?,RAID protected or unprotected drives (Just a Bunch of Disks (JBOD)).
+Define Just a Bunch of Disks (JBOD).,Unprotected drives in a storage array.
+What is the function of a SAN switch?,It allows or prohibits access between hosts and storage.
+How do SANs facilitate sharing among server clusters?,"Clusters of servers can share the same storage, and storage arrays can include multiple direct host connections."
+Compare SANs to storage arrays in terms of ports and cost.,SANs typically have more ports and higher cost than storage arrays.
+What are typical characteristics of SAN connectivity?,"Short distances, typically no routing. NAS can have more connected hosts than SAN."
+Define a storage array.,"A purpose-built device that includes drives to store data and one or more controllers to manage storage and access. It can include SAN or network ports, or both."
+What components and functions do storage array controllers typically have?,"CPUs, memory, and software that implement array features such as network protocols, UIs, RAID, snapshots, replication, compression, deduplication, and encryption."
+How do storage arrays utilize SSDs?,"Some arrays include SSDs for maximum performance (though smaller capacity if only SSDs), or they mix SSDs and HDDs, using SSDs as cache or for selected data while HDDs serve as bulk storage."
+What is the most common interconnect for SANs?,Fibre Channel (FC).
+Which SAN interconnect is increasing in use due to its simplicity?,iSCSI.
+Define InfiniBand (IB).,"A special-purpose bus architecture that provides hardware and software support for high-speed interconnection networks between servers and storage units, also used as a SAN interconnect."
+What is the primary purpose of Redundant Arrays of Independent Disks (RAIDs)?,"RAIDs are disk-organization techniques used to improve data read/write rates through parallel operation and to enhance data storage reliability through redundant information, preventing data loss upon a single drive failure."
+Define Redundant Arrays of Independent Disks (RAID).,"RAID is a disk organization technique where two or more storage devices work together, usually with protection from device failure."
+How has the meaning of the 'I' in RAID changed historically?,"Originally, 'I' stood for 'inexpensive' as RAIDs were a cost-effective alternative to large, expensive disks. Today, it stands for 'independent'."
+What is Mean Time Between Failures (MTBF)?,MTBF is the statistical mean time a device is expected to work correctly before failing.
+Why is redundancy introduced in storage systems like RAID?,"Redundancy is introduced to store extra information not normally needed, which is then used to rebuild lost information if a disk fails, preventing data loss."
+Define Mirroring in the context of RAID.,"Mirroring is a storage RAID protection scheme where two physical devices contain the same content; if one fails, data is read from the other."
+What is a Mirrored Volume?,"A mirrored volume is a logical disk composed of two physical drives, where every write operation is performed on both drives."
+What factors determine the Mean Time to Data Loss for a mirrored volume?,The Mean Time to Data Loss for a mirrored volume depends on the MTBF of individual drives and the mean time to repair (average time to replace a failed drive and restore data).
+Define Mean Time to Repair.,Mean time to repair is the statistical mean of time required to replace a failed drive and restore data.
+Define Mean Time to Data Loss.,Mean time to data loss is the statistical mean of the time until data is irrecoverably lost in a redundant storage system.
+How do RAID systems mitigate inconsistent states caused by power failures during writes?,"Solutions include writing one copy first then the next, or adding a solid-state nonvolatile cache (NVRAM) to the RAID array, which protects write-back cache data from loss (assuming the cache itself has error protection/correction)."
+How does mirroring improve performance in a RAID system?,"Mirroring doubles the read request rate because reads can be sent to either drive. While the transfer rate per individual read remains the same as a single drive, the number of reads per unit time is doubled."
+What is Data Striping?,Data striping is the technique of splitting data across multiple drives to improve the overall transfer rate.
+Define Bit-Level Striping.,"Bit-level striping is the simplest form of data striping where bits of each byte are split and stored on separate drives. For example, in an 8-drive array, bit 'i' of each byte would go to drive 'i'."
+Define Block-Level Striping.,"Block-level striping is a form of data striping where blocks of a file are distributed across multiple drives. With 'n' drives, block 'i' of a file typically goes to drive (i modulo n) + 1."
+What are the two main goals of parallelism via striping in storage systems?,"The goals are to increase the throughput of multiple small accesses (e.g., page accesses) by load balancing, and to reduce the response time of large accesses by reading from all disks in parallel."
+What are RAID Levels?,"RAID levels are classifications for various disk-organization schemes that offer different cost-performance trade-offs by combining striping with various methods of redundancy (e.g., parity bits or mirroring)."
+Describe RAID Level 0.,RAID Level 0 consists of drive arrays with block-level striping but no redundancy. It offers high performance but no data protection against drive failure.
+Describe RAID Level 1.,RAID Level 1 is drive mirroring. It provides high reliability by duplicating data but is expensive due to doubling the required storage.
+Describe the core concept of RAID Level 4.,"RAID Level 4 uses a memory-style Error-Correcting-Code (ECC) organization. Data blocks are striped across N drives, and an ECC calculation result (parity block) is stored on a dedicated N+1 drive. It allows recovery from a single drive failure."
+What is a Read-Modify-Write Cycle in the context of RAID?,"A read-modify-write cycle occurs when a write operation is smaller than a full block. The entire block must be read, modified with the new data, and then written back along with an updated parity block."
+"What are the advantages of RAID Level 4 over RAID Level 1, given equal data protection?",RAID 4 offers reduced storage overhead (one parity drive for several data drives vs. a mirror for every drive) and faster transfer rates for reads/writes of block series due to N-way striping.
+"What is the main performance problem with RAID Level 4 and other parity-based RAIDs, and how is it mitigated?","The main performance problem is the expense of computing and writing XOR parity, which can slow down small writes (requiring a read-modify-write cycle). This is mitigated by fast modern CPUs, dedicated parity hardware in controllers, and NVRAM caches that buffer writes and avoid most read-modify-write cycles."
+Describe RAID Level 5.,"RAID Level 5 is characterized by block-interleaved distributed parity. Instead of a single dedicated parity drive (like RAID 4), data and parity blocks are spread among all N+1 drives, avoiding the performance bottleneck of a single parity drive."
+What is the P + Q redundancy scheme in RAID?,"The P + Q redundancy scheme, used in RAID Level 6, involves storing extra redundant information beyond simple XOR parity. It typically uses advanced error-correcting codes, like Galois field math, to calculate two distinct parity blocks (P and Q) for a set of data blocks, enabling tolerance of up to two drive failures."
+What is Galois field math used for in RAID?,"Galois field math is used in RAID Level 6 (P + Q redundancy) to calculate the second independent parity block (Q), allowing the system to tolerate two drive failures by using advanced error-correcting codes."
+What is Multidimensional RAID Level 6?,"Multidimensional RAID Level 6 amplifies the protection of standard RAID 6 by logically arranging hundreds of drives into rows and columns and implementing RAID 6 both horizontally (across rows) and vertically (down columns), allowing recovery from multiple failures in any location."
+What are RAID Levels 0+1 and 1+0?,RAID 0+1 (often called RAID 10) and RAID 1+0 (often called RAID 01) are combined RAID levels that merge the performance benefits of RAID 0 (striping) with the reliability benefits of RAID 1 (mirroring). They are expensive as they double the number of drives needed.
+What is the key difference in resilience between RAID 0+1 and RAID 1+0 after a single drive failure?,"In RAID 0+1, a single drive failure makes the entire striped set (sub-array) inaccessible, leaving only the mirrored copy available. In RAID 1+0, a single drive failure makes only that specific drive unavailable, with its mirror taking over, and the rest of the striped drives remain available, offering better resilience."
+List common implementations of RAID.,"RAID can be implemented via: Volume-management software (kernel/system layer), Host Bus Adapter (HBA) hardware, Storage array hardware, or at the Storage Area Network (SAN) interconnect layer via drive virtualization devices."
+Define Snapshot in file systems.,"A snapshot in file systems is a read-only view of a file system at a particular point in time, showing its state before the last update."
+Define Replication in file systems.,"Replication in file systems is the automatic duplication and synchronization of data over a network to another system, primarily for redundancy and disaster recovery."
+What is the difference between synchronous and asynchronous replication?,"Synchronous replication requires a block to be written both locally and remotely before the write is considered complete, ensuring no data loss. Asynchronous replication groups writes and sends them periodically, which is faster and has no distance limitations, but may incur data loss if the primary site fails before writes are replicated."
+What is a Hot Spare drive?,A hot spare is an unused storage device that is configured as an automatic replacement for a failed drive in a RAID set. It is not used for data storage but is ready to be used to recover data and reestablish the RAID level without human intervention.
+Why is rebuild performance an important consideration when selecting a RAID level?,"Rebuild performance, the time it takes to rebuild data if a drive fails, is crucial for systems requiring continuous data supply (e.g., high-performance databases). It also influences the overall Mean Time Between Failures (MTBF) of the system."
+Which RAID level is easiest for rebuilding after a drive failure?,"RAID Level 1 (mirroring) is the easiest for rebuilding, as data can simply be copied from the healthy mirrored drive."
+For what type of applications is RAID Level 0 typically used?,"RAID Level 0 is used in high-performance applications where data loss is not critical, such as scientific computing, due to its lack of redundancy."
+For what type of applications is RAID Level 1 typically used?,"RAID Level 1 is popular for applications requiring high reliability with fast recovery, such as small databases."
+What is the primary disadvantage of RAID Level 1?,"The primary disadvantage of RAID Level 1 is its high space overhead, as it requires double the storage capacity due to mirroring."
+Which RAID level is often preferred for moderate data volumes?,"RAID Level 5 is often preferred for moderate data volumes, balancing performance, protection, and storage efficiency."
+Which RAID levels are most common in storage arrays and why?,RAID Level 6 and Multidimensional RAID 6 are most common in storage arrays because they offer good performance and protection (tolerating multiple drive failures) without incurring the large space overhead of mirroring.
+What is unique about how the InServ storage array (HP 3Par) handles RAID?,"The InServ storage array does not require drives to be configured at a specific RAID level. Instead, each drive is broken into 256-MB 'chunklets,' and RAID is applied at the chunklet level. A single drive can participate in multiple, various RAID levels across different volumes."
+"Define Utility Storage, as featured in the InServ array.","Utility storage is an InServ feature that allows an administrator to configure a host with a large logical storage space, but initially allocate only a small amount of physical storage. As the host uses more storage, unused drives (or 'chunklets' in InServ's case) are dynamically allocated up to the original logical level, without the file system noticing changes."
+List types of problems that RAID does NOT protect against.,"RAID does not protect against logical errors such as wrong file pointers, wrong pointers within file structures, incomplete writes ('torn writes'), accidental overwrites of file system structures, or total data loss due to hardware RAID controller failure or software RAID bugs."
+What is Solaris ZFS?,"Solaris ZFS is an advanced file system, first included as part of Solaris, known for its innovative approach to data integrity using checksums and its integrated file system and volume management capabilities."
+How does Solaris ZFS enhance data consistency and error correction?,"ZFS maintains internal checksums for all blocks (data and metadata), storing these checksums with the pointers to the blocks (e.g., in the inode for data blocks). If a block's checksum is incorrect, ZFS detects the problem and, if mirrored, automatically updates the bad block with the good one, providing higher consistency, error detection, and error correction than standard RAID or file systems."
+Define Inode in file systems.,"An inode (index node) is a per-file data structure in many file systems that holds most of the metadata of the file, such as permissions, ownership, timestamps, and pointers to the file's data blocks."
+What is a Pool in Solaris ZFS?,"In ZFS, a pool is a logical grouping of drives, partitions, or RAID sets that can contain one or more ZFS file systems. The entire pool's free space is available to all file systems within that pool, providing flexible storage allocation."
+How does ZFS address the flexibility limitations of traditional RAID and volume management?,"ZFS combines file system management and volume management, allowing drives or partitions to be gathered into flexible 'pools' of storage. File systems within a pool can dynamically use the pool's free space without artificial limits, relocation, or resizing, avoiding the need to pre-allocate fixed-size volumes."
+What is Object Storage?,"Object storage is an alternative data storage approach, typically computer-oriented and designed for programs, where data is placed as self-describing 'objects' into a flat storage pool. Objects are accessed, created, or deleted via unique object IDs rather than through a traditional navigable file system hierarchy."
+How does Object Storage differ from traditional file systems?,"Unlike file systems, object storage provides no way to navigate the storage pool or find objects directly; instead, objects are accessed via unique object IDs. It is designed for programs rather than direct user interaction and often runs on commodity hardware without traditional RAID arrays, relying on software for data protection."
+Define Hadoop File System (HDFS).,"HDFS is an example of object storage management software, commonly used in Hadoop clusters, which determines where to store objects and manages their protection, often by storing copies of objects on different computers."
+Define Ceph.,"Ceph is a brand of object storage management software known for its distributed, scalable object, block, and file storage capabilities."
+"What is the primary advantage of Object Storage, especially in large-scale deployments?","The primary advantage of object storage is horizontal scalability, meaning capacity can be increased simply by adding more computers with internal or external disks to the storage pool, allowing for petabytes of storage."
+Define Horizontal Scalability.,"Horizontal scalability is the ability to increase capacity (e.g., storage capacity or processing power) by adding more items (such as individual computers or storage nodes) to a system, rather than expanding the capabilities of a single, existing item."
+"What is another term for Object Storage, and why is it called that?","Another term for object storage is Content-Addressable Storage, because objects can be retrieved based on their contents or properties rather than a fixed path or name."
+Define Unstructured Data in the context of object storage.,"Unstructured data refers to data that does not have a fixed format but is rather free-form, a characteristic often found in objects stored in object storage systems."
+List common real-world examples of data stored in object stores.,"Common examples include Google search contents, Dropbox files, Spotify songs, Facebook photos, and data objects for customer applications in cloud computing services like Amazon S3."
+What are the major secondary storage I/O units?,Hard disk drives (HDDs) and nonvolatile memory (NVM) devices.
+How is modern secondary storage structured?,As large one-dimensional arrays of logical blocks.
+List the ways drives can be attached to a computer.,"1. Through local I/O ports on host.
+2. Directly connected to motherboards.
+3. Through communications network or storage network connection."
+What generates requests for secondary storage I/O?,File system and virtual memory system.
+What does each secondary storage I/O request specify?,Device address as a logical block number.
+What is the purpose of disk-scheduling algorithms for HDDs?,"To improve HDD effective bandwidth, average response time, and variance in response time."
+How do SCAN and C-SCAN algorithms improve HDD performance?,Via disk-queue ordering strategies.
+How does HDD performance vary with scheduling algorithms?,It varies greatly.
+What is a key physical characteristic of Solid-state disks (SSDs)?,They have no moving parts.
+How does SSD performance vary among scheduling algorithms?,Performance varies little among algorithms.
+What is the typical scheduling strategy used by SSDs?,"Simple FCFS (First-Come, First-Served)."
+What is a common outcome of complex data storage and transmission?,Errors frequently result.
+Define Error detection.,"Attempts to spot problems, alert the system for corrective action, and avoid error propagation."
+Define Error correction.,"Detects and repairs problems, depending on correction data and the amount of corruption."
+How are storage devices typically partitioned?,Into one or more chunks of space.
+What can each partition on a storage device hold?,A volume or be part of a multidevice volume.
+Where are file systems created?,In volumes.
+Who manages a storage device's blocks?,The OS (Operating System).
+What is the typical state of new storage devices when they arrive?,Typically pre-formatted.
+What steps are taken after a device is pre-formatted for use?,"The device is partitioned, and file systems are created."
+"What are boot blocks allocated for, if a device contains an OS?",To store the system's bootstrap program.
+What action must the system take if a block or page becomes corrupted?,The system must lock out or logically replace it with a spare.
+What is key to good performance in some systems regarding memory management?,Efficient swap space.
+How do some systems implement swap space?,They dedicate a raw partition to swap space.
+How do other systems implement swap space?,They use a file within the file system.
+What options do some systems provide for swap space implementation?,"They provide both dedicating a raw partition or using a file within the file system, leaving the decision to the user or administrator."
+Why are secondary storage devices in large systems frequently made redundant?,Via RAID algorithms.
+What benefits do RAID algorithms provide?,"They allow more than one drive for operation, and enable continued operation/automatic recovery from drive failure."
+How are RAID algorithms organized?,Into different levels.
+What does each RAID level provide?,A specific combination of reliability and high transfer rates.
+What is Object storage used for?,"Big data problems, such as Internet indexing and cloud photo storage."
+How are objects in object storage characterized and addressed?,"They are self-defining collections of data, addressed by an object ID (not a file name)."
+What is typically used for data protection in object storage?,Replication.
+Where do computes based on data happen in object storage systems?,On systems where a copy of the data exists.
+What is a key scalability characteristic of object storage?,It is horizontally scalable for vast capacity and easy expansion.

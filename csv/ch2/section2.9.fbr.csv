@@ -1,0 +1,52 @@
+Front,Back,Reversible
+How are operating systems commonly designed to run?,"On a class of machines with various peripheral configurations, rather than a single specific machine.",y
+What are the typical steps involved when generating (or building) an operating system from scratch?,"1. Write or obtain the OS source code.
+2. Configure the OS for the target system.
+3. Compile the OS.
+4. Install the OS.
+5. Boot the computer with the new OS.",y
+What does OS configuration involve?,"Specifying features, usually stored in a configuration file.",y
+"Define ""system build"" (OS generation context).",Creation of an operating-system build and configuration for a specific computer site.,y
+"Describe the ""System build"" approach to OS generation.",Modifying source code and recompiling the entire OS for a tailored version.,y
+"Describe the ""Precompiled modules"" approach to OS generation.","Selecting and linking precompiled object modules from a library. It is faster, but less tailored.",y
+"Describe the ""Completely modular"" approach to OS generation.",Selection occurs at execution time by setting parameters.,y
+"Which OS generation approach do most modern OSes for desktops, laptops, and mobile devices use?","The ""Precompiled modules"" approach, combining specific hardware generation with modular support (e.g., loadable kernel modules) for dynamic changes.",y
+What are the typical steps involved in building a Linux system from scratch?,"1. Downloading Linux source code (e.g., from http://www.kernel.org).
+2. Configuring the kernel using make menuconfig to generate a .config file.
+3. Compiling the main kernel using make, producing the vmlinuz kernel image.
+4. Compiling kernel modules using make modules.
+5. Installing kernel modules into vmlinuz using make modules_install.
+6. Installing the new kernel using make install.",y
+What are two ways Linux can be installed as a virtual machine (VM)?,"1. Building from scratch (similar to building Linux, but without OS compilation).
+2. VM appliance (downloading a pre-built and configured OS appliance and installing it with virtualization software).",y
+Provide an example process for installing a VM using a pre-built OS appliance.,"Download Ubuntu ISO, use VM software to boot from ISO, answer installation questions, install and boot.",y
+"Define ""booting"".",The procedure of starting a computer by loading the kernel.,y
+What are the main steps of the system boot process after the bootstrap program initiates?,"1. A small piece of code (bootstrap program or boot loader) locates the kernel.
+2. The kernel is loaded into memory and started.
+3. The kernel initializes hardware.
+4. The root file system is mounted.",y
+Describe a multistage boot process.,An initial boot loader in nonvolatile firmware (BIOS) loads a second boot loader from a boot block on disk.,y
+"Define ""BIOS"".",Code stored in firmware and run at boot time to start system operation.,y
+"Define ""boot block"".",A block of code stored in a specific location on disk with the instructions to boot the kernel stored on that disk.,y
+"Define ""unified extensible firmware interface (UEFI)"".",The modern replacement for BIOS containing a complete boot manager.,y
+What are the advantages of UEFI over BIOS?,It offers better 64-bit/large disk support and faster single-stage booting.,y
+"Define ""bootstrap program"".",The program that allows the computer to start running by initializing hardware and loading the kernel.,y
+What are the functions of a bootstrap program?,"It performs diagnostics, initializes system aspects (CPU registers, device controllers, memory), starts the OS, and mounts the root file system.",y
+"Define ""running"" (OS state).",The state of the operating system after boot when all kernel initialization has completed and system services have started.,y
+"When is a system considered ""running""?",When all kernel initialization has completed and system services have started.,y
+What is GRUB?,An open-source bootstrap program for Linux/UNIX.,y
+"Define ""GRUB"".",A common open-source bootstrap loader that allows selection of boot partitions and options to be passed to the selected kernel.,y
+Where are boot parameters set in GRUB?,In a GRUB configuration file.,y
+What runtime changes does GRUB allow?,Setting kernel parameters and selecting different kernels.,y
+What is the state of the Linux kernel image when loaded by GRUB?,It is compressed and extracted after loading.,y
+What does GRUB create for necessary drivers/modules?,A temporary RAM file system (initramfs).,y
+When does GRUB switch to the real root file system?,After drivers are installed from the temporary RAM file system (initramfs).,y
+"What is the initial process created by GRUB, and what does it do?","It creates the systemd process, which then starts other services.",y
+Are booting mechanisms universal or boot loader-dependent?,"Boot loader-dependent (e.g., specific GRUB versions for BIOS/UEFI).",y
+"How does mobile system boot (e.g., Android) differ from PCs?","Vendors provide boot loaders (e.g., LK for Android), unlike PCs.",y
+"What does mobile system boot (e.g., Android) use for its kernel and initial setup?",A compressed kernel image and an initial RAM file system.,y
+How does Android's use of initramfs differ from typical Linux desktop/server systems?,"Android maintains initramfs as the root file system, whereas typical Linux systems discard it after drivers are loaded.",y
+"What is the initial process started by Android's boot loader, and when does the home screen display?",It starts the init process and creates services before displaying the home screen.,y
+"What do most OS boot loaders (Windows, Linux, macOS, iOS, Android) provide for diagnostics and repairs?",Recovery mode or single-user mode.,y
+"Define ""recovery mode"".",A system boot state providing limited services and designed to enable the system admin to repair system problems and debug system startup.,y
+"Define ""single-user mode"".",A system boot state providing limited services and designed to enable the system admin to repair system problems and debug system startup.,y

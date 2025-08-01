@@ -1,0 +1,5 @@
+# Dumps from webdriver-manager
+/drivers/
+
+# Virtual environment
+/venv/

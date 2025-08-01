@@ -1,0 +1,75 @@
+Front,Back,Reversible
+What is the primary benefit of demand paging in terms of I/O?,Demand paging saves I/O by loading only used pages.,y
+How can the degree of multiprogramming be increased using memory management techniques?,By over-allocating memory.,y
+Explain the concept of 'over-allocating' memory.,Providing access to more resources than physically available; allocating more virtual memory than physical memory.,y
+What problem can arise from over-allocating memory?,"Processes may suddenly need all pages (e.g., 60 frames needed, only 40 available).",y
+How does over-allocation manifest in a system?,As a page fault with no free frames.,y
+"What additional system component uses memory, increasing strain on memory-placement?",I/O buffers.,y
+What action is taken if there are no free frames during a page fault?,A frame not in use is found and freed.,y
+Describe the process of freeing a frame.,Write its contents to swap space and change the page table to indicate the page is no longer in memory.,y
+What is the purpose of 'page replacement'?,Selection of a physical memory frame to be replaced when a new page is allocated.,y
+"In the modified page-fault service routine, what is the first step?",Find the desired page on secondary storage.,y
+"In the modified page-fault service routine, if no free frame is available, what is selected?","A victim frame, using a page-replacement algorithm.",y
+What is a 'victim frame'?,The frame selected by the page-replacement algorithm to be replaced.,y
+What happens to a victim frame if it has been modified?,Its contents are written to secondary storage before replacement; page/frame tables are updated.,y
+How does page-fault service time change if no free frames are available?,"It doubles due to two page transfers (page-out for victim, page-in for desired page).",y
+What is used to reduce overhead in page replacement when a page is unchanged?,A modify bit (or dirty bit).,y
+What is a 'modify bit' (or 'dirty bit')?,An MMU bit indicating a frame has been modified (must be saved before replacement).,y
+When is the modify bit set?,Hardware sets the modify bit if the page has been written to.,y
+What is the advantage of a modify bit being unset when a page is replaced?,"No need to write the page to storage (because it's unchanged), significantly reducing page-fault service time.",y
+How does page replacement relate to logical and physical memory?,"It separates logical and physical memory, allowing enormous virtual memory on smaller physical memory.",y
+What are the two major problems for demand paging?,1. Frame-allocation algorithm (how many frames to allocate to each process). 2. Page-replacement algorithm (which frames to replace).,y
+What is a 'frame-allocation algorithm'?,An OS algorithm for allocating frames among all demands.,y
+What is a 'page-replacement algorithm'?,An algorithm choosing which victim frame will be replaced by a new data frame.,y
+What is the primary goal of a page replacement algorithm?,To achieve the lowest page-fault rate.,y
+How are page replacement algorithms evaluated?,Using a reference string (a trace of memory accesses).,y
+What is a 'reference string'?,A trace of accesses to a resource; a list of pages accessed over time.,y
+What simplification is typically made when creating a reference string?,"Only the page number is recorded, and immediate repeated references are ignored.",y
+What is the general relationship between the number of allocated frames and the page-fault rate?,More frames generally lead to fewer page faults.,y
+"Describe the First-in, First-out (FIFO) page replacement algorithm.","It replaces the oldest page, meaning the first one brought into memory.",y
+How can the FIFO page replacement algorithm be implemented?,"Using a FIFO queue: replace the page at the head, and insert the new page at the tail.",y
+What are the advantages of the FIFO page replacement algorithm?,It is easy to understand and program.,y
+What is a common performance issue with the FIFO page replacement algorithm?,"It may replace actively used pages, leading to increased page-fault rates and slowed execution.",y
+What is 'Belady's anomaly'?,A phenomenon where the page-fault rate may increase as the number of allocated frames increases for some algorithms.,y
+Which page replacement algorithm suffers from Belady's anomaly?,FIFO page replacement.,y
+What is the 'optimal page-replacement algorithm' (OPT or MIN)?,"The algorithm with the lowest page-fault rate, which never suffers from Belady's anomaly.",y
+What is the rule for the Optimal (OPT) page replacement algorithm?,Replace the page that will not be used for the longest period of time.,y
+What is the primary difficulty in implementing the Optimal page replacement algorithm?,"It requires future knowledge of the reference string, which is impossible in practice.",y
+What is the main use of the Optimal page replacement algorithm?,Mainly for comparison studies to evaluate other algorithms.,y
+What algorithm does the Least Recently Used (LRU) algorithm approximate?,The optimal page-replacement algorithm.,y
+Describe the rule for the 'Least Recently Used (LRU)' algorithm.,It replaces the page that has not been used for the longest period of time.,y
+How is LRU page replacement related to the optimal algorithm?,It is like the optimal algorithm looking backward in time.,y
+Does LRU page replacement suffer from Belady's anomaly?,"No, because it is a stack algorithm.",y
+What is a 'stack algorithm'?,A class of page-replacement algorithms that do not suffer from Belady's anomaly.,y
+What is required for the true implementation of the LRU algorithm?,Substantial hardware assistance.,y
+How can LRU be implemented using counters?,Associate a time-of-use field with each page-table entry; the CPU logical clock increments; copy the clock to the field on reference. Replace the page with the smallest time value.,y
+How can LRU be implemented using a stack?,"Keep a stack of page numbers; on reference, remove the page and put it on top. The most recently used page is at the top, and the least recently used is at the bottom. Best with a doubly linked list.",y
+Why is true LRU implementation expensive?,Due to the need for per-memory-reference updates.,y
+Why do many systems use LRU-approximation algorithms?,Because they lack the hardware for true LRU implementation.,y
+What is a 'reference bit'?,An MMU bit indicating a page has been referenced.,y
+How is the reference bit used in LRU approximation?,Hardware sets the bit when a page is referenced; the OS periodically clears the bits to determine which pages have been used (but not their exact order).,y
+Describe the 'Additional-reference-bits algorithm'.,"It keeps an 8-bit byte for each page. On a timer interrupt (e.g., every 100ms), the OS shifts the reference bit into the high-order bit of the byte and shifts others right. The 8-bit shift registers show the history, and the page with the lowest number is considered LRU.",y
+What is another name for the 'Second-chance page-replacement algorithm'?,The clock algorithm.,y
+Describe the 'second-chance page-replacement algorithm'.,"It's a basic FIFO algorithm. If a selected page's reference bit is 0, it's replaced. If the reference bit is 1, it's given a second chance: the bit is cleared, its arrival time is reset, and it's not replaced until others are replaced or given second chances.",y
+How is the second-chance algorithm typically implemented?,"As a circular queue with a pointer that advances, clearing reference bits, until a page with a 0-bit is found.",y
+When does the second-chance algorithm degenerate to FIFO?,If all reference bits are set.,y
+What is the 'clock' in the context of the second-chance algorithm?,A circular queue in the second-chance algorithm containing possible victim frames.,y
+What two bits does the 'Enhanced second-chance algorithm' consider?,"The reference bit and the modify bit, as an ordered pair (reference bit, modify bit).",y
+"List the four classes of pages in the Enhanced second-chance algorithm, from best to worst for replacement.","1. (0, 0): neither recently used nor modified (best to replace). 2. (0, 1): not recently used but modified (needs write-out). 3. (1, 0): recently used but clean (likely used again soon). 4. (1, 1): recently used and modified (likely used again soon, needs write-out).",y
+What is the replacement preference in the Enhanced second-chance algorithm?,"It replaces the first page found in the lowest nonempty class, preferring clean pages to reduce I/Os.",y
+How do counting-based page replacement algorithms generally work?,They keep a counter of references for each page.,y
+Describe the 'Least Frequently Used (LFU)' page replacement algorithm.,It selects the page with the smallest access count for replacement.,y
+What is a problem with the LFU algorithm?,A page that was heavily used initially but is now unused might retain a high count and not be replaced readily.,y
+How can the problem of high counts in LFU be mitigated?,By shifting counts right periodically (creating an exponentially decaying average).,y
+Describe the 'Most Frequently Used (MFU)' page replacement algorithm.,"It selects the page with the smallest access count for replacement, assuming that pages with the smallest count were just brought in and are therefore likely to be used in the future.",y
+Are LFU and MFU common in practice?,Neither LFU nor MFU are common because they are expensive to implement and do not approximate the optimal algorithm well.,y
+What is the purpose of 'Page-buffering algorithms'?,They are used in addition to page replacement algorithms to improve performance.,y
+How does a 'pool of free frames' page-buffering algorithm work?,"On a page fault, the desired page is read into a free frame from the pool before the victim is written out, allowing the process to restart faster. The victim frame is added to the pool after its write-out.",y
+How does a 'list of modified pages' page-buffering algorithm work?,"When the paging device is idle, modified pages are written to secondary storage and their modify bits are reset, increasing the probability of a clean page for replacement (no write-out needed during fault).",y
+What is the benefit of a 'pool of free frames remembering old page' algorithm?,"If an old page is needed before its frame is reused, it can be reused directly from the pool without I/O. The free-frame pool is checked first on a page fault.",y
+Which operating system uses page buffering with the second-chance algorithm?,UNIX.,y
+Why might some applications perform worse with OS virtual memory buffering?,"Applications often understand their memory/storage use better than general-purpose OS algorithms, and double buffering can occur if both the OS and application buffer I/O.",y
+Provide an example of an application scenario where general-purpose OS algorithms might be inefficient.,"Data warehouses performing sequential reads then computations/writes. LRU might remove older pages that will be read again, making MFU potentially more efficient.",y
+What is 'raw disk'?,"Direct access to secondary storage as a large sequential array of logical blocks, bypassing file-system services.",y
+What file-system services does 'raw I/O' bypass?,"Demand paging, locking, prefetching, allocation, names, and directories.",y
+When are raw partitions generally efficient?,"They are efficient for specific applications that can manage their own storage, but most applications are better served by regular file-system services.",y

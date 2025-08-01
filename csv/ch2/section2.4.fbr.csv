@@ -1,0 +1,23 @@
+Front,Back,Reversible
+What are system services (or system utilities)?,They provide a convenient environment for program development and execution.,y
+What are the main categories of system services?,"File management, Status information, File modification, Programming-language support, Program loading and execution, Communications, Background services.",y
+What operations are included in 'File management' system services?,"Create, delete, copy, rename, print, list, manipulate files/directories.",y
+What information can 'Status information' system services query?,"Date, time, memory/disk, user count; performance, logging, debugging.",y
+What is the 'Registry' used for by 'Status information' services?,Storing and retrieving configuration information.,y
+What tools are provided by 'File modification' system services?,Text editors for content; search/transform commands.,y
+What tools are included in 'Programming-language support' system services?,"Compilers, assemblers, debuggers, interpreters.",y
+What programming languages are often supported by OS-provided programming-language support services?,"C, C++, Java, Python.",y
+What tools are part of 'Program loading and execution' system services?,"Loaders (absolute, relocatable, linkage editors, overlay); debugging for high-level/machine languages.",y
+What is the primary function of 'Communications' system services?,"Providing virtual connections among processes, users, and systems.",y
+Give examples of operations supported by 'Communications' system services.,"Messages, web browsing, e-mail, remote login, file transfer.",y
+When are 'Background services' typically launched?,At boot.,y
+What are common terms for constantly running background services?,"Services, subsystems, daemons.",y
+Give examples of functions performed by 'Background services'.,"Network, schedulers, error monitoring, print servers.",y
+How do 'Application programs' influence a user's view of the OS?,"They shape the user's OS view (not system calls), enabling diverse interfaces (GUI, CLI) or dual-booting.",y
+"Define ""system service"".",A collection of applications included with or added to an operating system to provide services beyond those provided by the kernel.,y
+"Define ""system utility"".",A collection of applications included with or added to an operating system to provide services beyond what are provided by the kernel.,y
+"Define ""registry"".","A file, set of files, or service used to store and retrieve configuration information. In Windows, the manager of hives of data.",y
+"Define ""service"" (as a software entity).",A software entity running on one or more machines and providing a particular type of function to calling clients.,y
+"Define ""service"" in the context of Android.",An application component with no user interface; it runs in the background while executing long-running operations or performing work for remote processes.,y
+"Define ""subsystem"".","A subset of an operating system responsible for a specific function (e.g., memory management).",y
+"Define ""application program"".","A Program designed for end-user execution, such as a word processor, spreadsheet, compiler, or Web browser.",y

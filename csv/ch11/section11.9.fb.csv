@@ -1,0 +1,38 @@
+Front,Back
+What are the major secondary storage I/O units?,Hard disk drives (HDDs) and nonvolatile memory (NVM) devices.
+How is modern secondary storage structured?,As large one-dimensional arrays of logical blocks.
+List the ways drives can be attached to a computer.,"1. Through local I/O ports on host.
+2. Directly connected to motherboards.
+3. Through communications network or storage network connection."
+What generates requests for secondary storage I/O?,File system and virtual memory system.
+What does each secondary storage I/O request specify?,Device address as a logical block number.
+What is the purpose of disk-scheduling algorithms for HDDs?,"To improve HDD effective bandwidth, average response time, and variance in response time."
+How do SCAN and C-SCAN algorithms improve HDD performance?,Via disk-queue ordering strategies.
+How does HDD performance vary with scheduling algorithms?,It varies greatly.
+What is a key physical characteristic of Solid-state disks (SSDs)?,They have no moving parts.
+How does SSD performance vary among scheduling algorithms?,Performance varies little among algorithms.
+What is the typical scheduling strategy used by SSDs?,"Simple FCFS (First-Come, First-Served)."
+What is a common outcome of complex data storage and transmission?,Errors frequently result.
+Define Error detection.,"Attempts to spot problems, alert the system for corrective action, and avoid error propagation."
+Define Error correction.,"Detects and repairs problems, depending on correction data and the amount of corruption."
+How are storage devices typically partitioned?,Into one or more chunks of space.
+What can each partition on a storage device hold?,A volume or be part of a multidevice volume.
+Where are file systems created?,In volumes.
+Who manages a storage device's blocks?,The OS (Operating System).
+What is the typical state of new storage devices when they arrive?,Typically pre-formatted.
+What steps are taken after a device is pre-formatted for use?,"The device is partitioned, and file systems are created."
+"What are boot blocks allocated for, if a device contains an OS?",To store the system's bootstrap program.
+What action must the system take if a block or page becomes corrupted?,The system must lock out or logically replace it with a spare.
+What is key to good performance in some systems regarding memory management?,Efficient swap space.
+How do some systems implement swap space?,They dedicate a raw partition to swap space.
+How do other systems implement swap space?,They use a file within the file system.
+What options do some systems provide for swap space implementation?,"They provide both dedicating a raw partition or using a file within the file system, leaving the decision to the user or administrator."
+Why are secondary storage devices in large systems frequently made redundant?,Via RAID algorithms.
+What benefits do RAID algorithms provide?,"They allow more than one drive for operation, and enable continued operation/automatic recovery from drive failure."
+How are RAID algorithms organized?,Into different levels.
+What does each RAID level provide?,A specific combination of reliability and high transfer rates.
+What is Object storage used for?,"Big data problems, such as Internet indexing and cloud photo storage."
+How are objects in object storage characterized and addressed?,"They are self-defining collections of data, addressed by an object ID (not a file name)."
+What is typically used for data protection in object storage?,Replication.
+Where do computes based on data happen in object storage systems?,On systems where a copy of the data exists.
+What is a key scalability characteristic of object storage?,It is horizontally scalable for vast capacity and easy expansion.

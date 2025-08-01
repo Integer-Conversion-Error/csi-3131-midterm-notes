@@ -1,0 +1,99 @@
+Front,Back,Reversible
+What does it mean that attaching many drives to a computer is economically feasible?,It creates opportunities for improving data read/write rate through parallel operation and improving data storage reliability through redundant information on multiple drives.,y
+What is the benefit of redundant information on multiple drives?,Failure of one drive does not lead to data loss.,y
+Define Redundant Arrays of Independent Disks (RAID).,"RAID is a disk organization technique where two or more storage devices work together, usually with protection from device failure.",y
+What was the primary use of RAIDs in the past?,"RAIDs were used as a cost-effective alternative to large, expensive disks by utilizing arrays of small, cheap disks.",y
+What are the primary uses of RAIDs today?,RAIDs are used for higher reliability and data-transfer rates.,y
+"What does the 'I' in RAID stand for today, and what did it stand for in the past?","Today, 'I' stands for 'independent'. In the past, it stood for 'inexpensive'.",y
+How does the chance of disk failure in a multi-disk RAID array compare to a single disk?,The chance of some disk failing in an array of N disks is greater than the chance of a single disk failing.,y
+Define Mean Time Between Failures (MTBF).,MTBF is the statistical mean time a device is expected to work correctly before failing.,y
+Why is storing only one copy of data on a disk array unacceptable?,Each disk failure would lead to significant data loss.,y
+What is the solution to prevent data loss when a disk fails in a multi-disk system?,"Introduce redundancy by storing extra information not normally needed, which is used to rebuild lost information if a disk fails.",y
+Are RAIDs applicable to NVM devices?,"Yes, RAIDs are applicable to NVM (Non-Volatile Memory) devices, which are less likely to fail than HDDs because they have no moving parts.",y
+What is the simplest and most expensive redundancy technique?,Mirroring.,y
+Define mirroring.,"Mirroring is a storage RAID protection technique where two physical devices contain the same content; if one fails, data is read from the other.",y
+What is a mirrored volume?,A mirrored volume is a volume in which two devices are mirrored.,y
+When does data loss occur in a mirrored volume?,Data is lost only if the second drive fails before the first failed drive is replaced and its data restored.,y
+What factors determine the Mean Time Between Failures (MTBF) of a mirrored volume (where failure means data loss)?,The MTBF of individual drives and the mean time to repair (average time to replace a failed drive and restore data).,y
+Define Mean Time To Repair.,Mean time to repair is the statistical mean of time to repair a device.,y
+Define Mean Time To Data Loss.,Mean time to data loss is the statistical mean of time until data is lost.,y
+What are some reasons why drive failures might not be independent in a RAID system?,"Power failures, natural disasters, and manufacturing defects can cause correlated failures. Additionally, as drives age, their probability of failure grows, increasing the chance of a second failure during repair.",y
+What is a particular concern regarding power failures in RAID systems with writes in progress?,"If writes are in progress to the same block on both drives and power fails before both are written, it can lead to an inconsistent state.",y
+How can the issue of inconsistent state during power failures in RAID systems be resolved?,"One solution is to write one copy first, then the next. Another is to add a solid-state nonvolatile cache to the RAID array, assuming the cache has its own error protection/correction (ECC, mirroring).",y
+How does parallel access to multiple drives improve performance in RAID?,"It improves the overall performance, for example, by doubling the read request rate in mirroring (reads can be sent to either drive).",y
+How does mirroring affect the transfer rate per read versus the reads per unit time?,"The transfer rate per read remains the same as a single drive, but the number of reads per unit time is doubled because requests can be sent to either drive.",y
+How do multiple drives improve transfer rate beyond mirroring?,They improve transfer rate by striping data.,y
+Define data striping.,Data striping is the splitting of data across multiple devices.,y
+What is the simplest form of data striping?,Bit-level striping.,y
+Define bit-level striping.,"Bit-level striping is the splitting of data at the bit level, where each bit is stored on a separate device.",y
+How does an 8-drive array with bit-level striping function as a single logical drive?,It is treated as a single drive with 8 times the normal sector size and 8 times the access rate.,y
+Define block-level striping.,"Block-level striping is the splitting of data at the block level, where each block is stored on a separate device.",y
+What is the most commonly available form of data striping?,Block-level striping.,y
+What are the two main goals of parallelism in a storage system via striping?,"1. Increase the throughput of multiple small accesses (e.g., page accesses) by load balancing. 2. Reduce the response time of large accesses.",y
+What are RAID levels?,RAID levels are various types of RAID protection.,y
+Describe RAID level 0.,RAID level 0 consists of drive arrays with block-level striping but no redundancy. It offers high performance but no protection against data loss.,y
+Describe RAID level 1.,"RAID level 1 is drive mirroring. It duplicates data across two drives, providing high reliability at a high cost (double the storage space).",y
+What is the core idea behind RAID level 4 (and RAID 5 and 6) regarding error correction?,"It uses memory-style error-correcting-code (ECC) organization, where blocks are striped across drives, and the ECC calculation result (parity) is stored on an extra drive.",y
+How does RAID 4 handle a single drive failure or damaged sector?,"If one drive fails, ECC recalculation detects the error and prevents data from being passed. If a single sector is damaged, its data can be disregarded and recalculated using parity by computing the parity of corresponding bits from other drives.",y
+How do block reads and large reads/writes perform in RAID 4?,"Block reads access only one drive, allowing others to process requests. Large reads and writes achieve high transfer rates as all disks read/write in parallel.",y
+What is a disadvantage of small independent writes in RAID 4?,"Small independent writes are not parallel, requiring a read-modify-write cycle.",y
+Define read-modify-write cycle.,"A read-modify-write cycle is a write of data smaller than a block that requires the entire block to be read, modified, and then written back.",y
+How many drive accesses are typically required for a single small write in RAID 4 due to the read-modify-write cycle?,Four drive accesses: two to read (old data and old parity) and two to write (new data and new parity).,y
+What is an advantage of RAID 4 used by WAFL (Write Anywhere File Layout) file system?,"It allows seamless drive addition, as new drives can be added with zeros, which does not change the parity calculation for existing data.",y
+"What are two key advantages of RAID 4 over RAID 1, considering they offer equal data protection?",1. Reduced storage overhead: one parity drive serves several regular drives (vs. one mirror for every drive). 2. Faster transfer rate: reads/writes of a series of blocks spread over multiple drives (N-way striping) are N times faster than RAID 1.,y
+What is a performance problem associated with RAID 4 and other parity-based RAIDs?,"The expense of computing and writing XOR parity, which can slow down write operations.",y
+How are the performance issues of parity-based RAIDs mitigated today?,"Modern CPUs are fast enough that the performance hit is minimal. Many RAID storage arrays/HBAs include dedicated parity hardware and NVRAM caches that buffer writes and gather data into full stripes to write concurrently, avoiding most read-modify-write cycles.",y
+Describe RAID level 5.,"RAID level 5 is block-interleaved distributed parity. It spreads both data and parity among all N+1 drives, rather than dedicating a single drive for parity.",y
+How is parity distributed in RAID 5?,"For each set of N blocks of data, one drive stores the parity block for that set, while the others store data blocks. The parity block cannot be stored on the same drive as any of the data blocks it protects within that stripe.",y
+What is the primary benefit of distributing parity across all drives in RAID 5 compared to RAID 4?,"It avoids the overuse and potential bottleneck of a single parity drive, which is a problem in RAID 4, improving write performance.",y
+Which RAID level is the most common parity RAID?,RAID level 5.,y
+Describe RAID level 6.,"RAID level 6 is a P + Q redundancy scheme. Like RAID 5, it distributes data and parity, but stores an extra set of redundant information for multiple drive failures, using Galois field math to calculate the second (Q) parity.",y
+What mathematical concept is used in RAID 6 to calculate the second parity block (Q)?,Galois field math.,y
+What is the primary advantage of RAID 6 in terms of failure tolerance?,A RAID 6 system can tolerate the failure of two drives without data loss.,y
+What is Multidimensional RAID level 6?,"It is an amplification of RAID level 6, typically used in arrays with hundreds of drives. It logically arranges drives into rows and columns and implements RAID 6 horizontally (across rows) and vertically (down columns) to recover from multiple failures.",y
+Describe RAID levels 0+1 and 1+0.,"They are combined RAID levels designed to offer both performance (from RAID 0) and reliability (from RAID 1). RAID 0+1 stripes a set of drives then mirrors the entire stripe. RAID 1+0 mirrors drives in pairs, then stripes across those mirrored pairs.",y
+Which combined RAID level offers theoretical advantages for single drive failures?,"RAID 1+0. If a single drive fails in RAID 0+1, the entire stripe becomes inaccessible, leaving only the mirrored copy. In RAID 1+0, only the single failed drive is unavailable, but its mirror is still functional, and the rest of the drives remain available.",y
+List the four main ways RAID can be implemented.,1. Volume-management software (in kernel/system software). 2. HBA (Host Bus Adapter) hardware. 3. Storage array hardware. 4. SAN (Storage Area Network) interconnect layer via drive virtualization devices.,y
+Define snapshot in the context of file systems.,A snapshot is a read-only view of a file system at a particular point in time.,y
+Define replication in file systems.,Replication is the automatic duplication and synchronization of data over a network to another system.,y
+What are the two types of replication and how do they differ?,"1. Synchronous replication: A block is considered written only after it's been written locally AND remotely. 2. Asynchronous replication: Writes are grouped and written periodically, allowing for faster local writes but potential data loss if the primary site fails before writes are replicated.",y
+How does replication compare to RAID as a protection method?,"Replication protects against data loss and can increase read performance by allowing reads from replicas. However, it typically uses more storage than most RAID configurations.",y
+Define hot spare.,"A hot spare is an unused storage device ready to be used to recover data (e.g., in a RAID set) automatically without human intervention.",y
+What is the importance of rebuild performance when selecting a RAID level?,"Rebuild performance, which is the time to rebuild data if a drive fails, is critical for systems requiring a continuous data supply (e.g., high-performance databases). It also influences the overall Mean Time Between Failures (MTBF) of the RAID system.",y
+"Which RAID level has the easiest rebuild performance, and why?",RAID 1 (mirroring) has the easiest rebuild performance because data can simply be copied from the healthy mirrored drive.,y
+"Which RAID levels require accessing all other drives for rebuild, and how long can this process take?","RAID levels 4, 5, and 6 require accessing all other drives to rebuild. Rebuild times for large RAID 5 sets can take hours.",y
+When is RAID level 0 typically used?,"RAID level 0 is used in high-performance applications where data loss is not critical, such as scientific computing.",y
+When is RAID level 1 commonly preferred?,"RAID level 1 is popular for applications requiring high reliability with fast recovery, such as small databases, despite its high space overhead.",y
+When are RAID levels 0+1 and 1+0 used?,"They are used where both performance and reliability are important, such as with small databases, but at a higher cost due to the doubled drive requirement.",y
+When is RAID level 5 often preferred?,RAID level 5 is often preferred for moderate data volumes.,y
+Which RAID levels are most common in storage arrays today?,"RAID 6 and Multidimensional RAID 6 are most common in storage arrays due to their good performance, robust protection, and efficient space utilization compared to mirroring.",y
+What is a characteristic innovation of the InServ storage array (HP 3Par)?,"It does not require drives to be configured at a specific RAID level. Instead, each drive is broken into 256-MB 'chunklets,' and RAID is applied at the chunklet level.",y
+How does the chunklet approach in InServ arrays enhance flexibility?,"A single drive can participate in multiple and various RAID levels simultaneously, as its chunklets can be used for different volumes and RAID configurations.",y
+What kind of snapshots does InServ provide?,"InServ provides both read-write and read-only snapshots, allowing multiple hosts to mount copies of a file system without own copies (changes handled by copy-on-write).",y
+Define utility storage.,"Utility storage is an InServ feature where storage space can be increased as needed. An administrator configures a host with a large logical storage, but initially, only a small amount of physical storage is allocated, with more added on demand.",y
+What are the benefits of utility storage?,"It reduces the drives needed by hosts initially, delays drive purchases, and allows drives to be added/removed without the file system noticing.",y
+"Beyond traditional disk arrays, to what other storage devices have RAID concepts been generalized?",RAID concepts have been generalized to arrays of tapes and broadcast data over wireless networks (where blocks are split and broadcast with parity units).,y
+What kind of problems does RAID NOT protect against?,"RAID does not protect against logical errors such as wrong file pointers, wrong pointers within file structure, incomplete writes ('torn writes'), or accidental overwrites of file system structures.",y
+What is a significant risk with hardware RAID controller failures or software RAID bugs?,"Such failures or bugs can lead to total data loss, as RAID primarily protects against physical media errors, not other hardware or software errors.",y
+What is Solaris ZFS?,"Solaris ZFS is an advanced file system, first included as part of Solaris, known for its innovative approach using checksums for data integrity.",y
+How does ZFS use checksums for data integrity?,"ZFS maintains internal checksums of all blocks (data and metadata). These checksums are not kept with the checksummed block itself, but are stored with the pointer to the block (e.g., in an inode).",y
+Define inode.,"In many file systems, an inode is a per-file data structure holding most of the metadata of the file.",y
+How does ZFS detect and correct data corruption using checksums and mirroring?,"If ZFS reads a data block and its checksum is incorrect, the file system knows there's a problem. If the data is mirrored and one copy has an incorrect checksum while the other is correct, ZFS automatically updates the bad block with the good one.",y
+What are the benefits of ZFS's comprehensive checksumming throughout its structures?,"It provides higher consistency, more robust error detection, and automatic error correction capabilities compared to traditional RAID implementations or standard file systems.",y
+What other Linux file system has a similar checksum feature to ZFS?,The Linux BTRFS file system.,y
+What is a common issue with most traditional RAID implementations regarding flexibility?,"They often lack flexibility in managing storage space, for example, making it difficult to change volume sizes or adapt to changing file system requirements over time.",y
+How does ZFS address the lack of flexibility in traditional RAID and volume management?,"ZFS combines file-system management and volume management. Drives or partitions are gathered into 'pools' of storage, and the entire pool's free space is available to all ZFS file systems within that pool, eliminating artificial limits and the need to relocate/resize.",y
+Define pool in ZFS.,"In ZFS, a pool refers to drives, partitions, or RAID sets that can contain one or more file systems.",y
+What additional storage management features does ZFS provide for file systems within a pool?,"ZFS provides quotas to limit the size of a file system and reservations to assure its growth, both of which can be changed by the file-system owner at any time.",y
+What is object storage?,"Object storage is an approach where data is placed into a storage pool as self-contained 'objects,' designed for programs and accessed via an object ID, rather than navigated through a traditional file system hierarchy.",y
+How does object storage differ from traditional file systems?,"In object storage, there is no way for a user or program to navigate the pool directly to find objects; objects are typically accessed via a unique object ID.",y
+What are two examples of object storage management software?,Hadoop file system (HDFS) and Ceph.,y
+What kind of hardware is typically used for object storage systems?,"Object storage systems typically run on commodity hardware, not traditional RAID arrays.",y
+What is a key advantage of object storage in terms of capacity?,"Horizontal scalability, meaning capacity can be scaled by adding more computers with internal or external disks to the storage pool, allowing for petabyte-scale pools.",y
+Define horizontal scalability.,Horizontal scalability is the ability to scale capacity by adding more items (computers) rather than expanding one existing item.,y
+What is a key feature of each object in object storage systems?,"Each object is self-describing, meaning it includes a description of its content.",y
+What is another term for object storage based on its retrieval method?,Content-addressable storage.,y
+Define content-addressable storage.,Content-addressable storage is another term for object storage; objects are retrieved based on their contents.,y
+"What type of data is typically stored in object storage, and why?","Unstructured data, because there is no set format for the contents of objects.",y
+Define unstructured data.,Unstructured data is data not in a fixed format but rather free-form.,y
+Give examples of where huge amounts of data are stored in object stores.,"Google search contents, Dropbox files, Spotify songs, Facebook photos, and Amazon AWS S3 (for customer applications).",y

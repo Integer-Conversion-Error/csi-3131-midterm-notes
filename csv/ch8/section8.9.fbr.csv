@@ -1,0 +1,12 @@
+Front,Back,Reversible
+What is a deadlock?,A set of processes where each process is waiting for an event caused by another process in the set.,y
+List the four necessary conditions for a deadlock to occur.,"Mutual exclusion, Hold and wait, No preemption, Circular wait.",y
+When is a deadlock possible?,"Only if all four necessary conditions (mutual exclusion, hold and wait, no preemption, and circular wait) are present simultaneously.",y
+How are deadlocks modeled?,With resource-allocation graphs.,y
+What indicates a deadlock in a resource-allocation graph?,A cycle in the graph.,y
+What is the goal of deadlock prevention?,To ensure that one of the four necessary conditions for deadlock cannot occur.,y
+What is a practical method for deadlock prevention?,Eliminating circular wait.,y
+What is deadlock avoidance?,A method that uses algorithms to avoid granting resources if doing so would lead to an unsafe state.,y
+Which algorithm is commonly used for deadlock avoidance?,Banker's algorithm.,y
+What is deadlock detection?,An algorithm that evaluates processes and resources on a running system to find a deadlocked state.,y
+What are the two main methods for deadlock recovery?,"Aborting one process in a circular wait, or preempting resources assigned to a deadlocked process.",y

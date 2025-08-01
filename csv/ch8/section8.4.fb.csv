@@ -1,0 +1,16 @@
+Front,Back
+What are the three main ways to deal with deadlock?,"Ignore problem, Prevent/Avoid, and Detect/Recover."
+"Describe the ""Ignore problem"" approach to deadlock handling.","Pretend deadlocks never occur (most OS, e.g., Linux, Windows)."
+"Describe the ""Prevent/Avoid"" approach to deadlock handling.",Use a protocol to ensure the system *never* enters a deadlocked state.
+"Describe the ""Detect/Recover"" approach to deadlock handling.","Allow the system to enter a deadlocked state, then detect and recover (some systems, e.g., databases)."
+"Why is the ""ignoring problem"" solution for deadlocks common in operating systems?",Due to the infrequency of deadlocks and the cost of other methods.
+Can different deadlock handling approaches be combined?,"Yes, basic approaches can be combined for an optimal solution per resource class."
+"Define ""deadlock prevention.""",Methods to ensure at least one necessary condition for deadlock cannot hold.
+How does Deadlock Prevention prevent deadlocks?,By constraining resource request methods.
+What information must the OS be given in advance for Deadlock Avoidance?,Information on resources a thread will request/use.
+What factors does the OS consider when deciding to satisfy or delay a resource request using Deadlock Avoidance?,"Currently available resources, resources allocated to each thread, and future requests/releases of each thread."
+When is the Deadlock Detection and Recovery approach applied?,"If no prevention or avoidance mechanisms are in place, allowing deadlock to arise."
+What two main functions do system algorithms provide in Deadlock Detection and Recovery?,"Examine system state to determine if deadlock occurred, and recover from deadlock."
+What are the consequences of an undetected deadlock?,"System performance deteriorates, resources remain held, more threads deadlock, eventually requiring a manual restart."
+"Can manual recovery methods used for other liveness failures (e.g., livelock) be applied to deadlock recovery?",Yes.
+"Define ""deadlock avoidance.""",OS method where processes inform OS of resource use; system approves/denies requests to avoid deadlock.

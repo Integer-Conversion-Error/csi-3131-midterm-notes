@@ -1,0 +1,26 @@
+Front,Back,Reversible
+What is a multiprogramming environment?,An environment where multiple threads compete for finite resources.,y
+What happens when a thread requests a resource that is unavailable?,The thread enters a waiting state.,y
+Define deadlock.,A situation where a waiting thread can never change state because its requested resources are held by other waiting threads.,y
+Provide the formal definition of deadlock.,Every process in a set is waiting for an event that can only be caused by another process in the set.,y
+How is a system composed in the context of resource management?,A finite number of resources are distributed among competing threads.,y
+How are resources typically partitioned in a system model?,"Resources are partitioned into types (classes), each with identical instances.",y
+What is true about instances within a resource type?,"All instances within a resource type are identical, and any instance of a resource type should satisfy a request.",y
+Give examples of resource types.,"CPU cycles, files, I/O devices.",y
+"If a system has 4 CPUs, how is the resource type 'CPU' characterized?",The resource type 'CPU' has 4 instances.,y
+What synchronization tools are common sources of deadlock?,Mutex locks and semaphores.,y
+How are individual lock instances typically treated as resources?,"Each lock instance is typically its own resource class (e.g., one lock for a queue, another for a linked list).",y
+What are the three steps in the resource utilization sequence for a thread?,"1. Request, 2. Use, 3. Release.",y
+"Describe the ""Request"" step in the resource utilization sequence.",A thread requests a resource and waits if it is not immediately available.,y
+"Describe the ""Use"" step in the resource utilization sequence.",A thread operates on the resource.,y
+"Describe the ""Release"" step in the resource utilization sequence.",A thread releases the resource.,y
+How can resource requests and releases be made in a system?,"Via system calls (e.g., \texttt{request()}, \texttt{release()}, \texttt{open()}, \texttt{close()}, \texttt{allocate()}, \texttt{free()}) or via semaphore operations (\texttt{wait()}, \texttt{signal()}) and mutex locks (\texttt{acquire()}, \texttt{release()}).",y
+What is the role of the OS regarding resource allocation?,The OS checks for resource allocation via a system table.,y
+What information does the OS's system table track regarding resources?,It tracks free/allocated resources and the owning thread.,y
+How are waiting threads managed by the OS in relation to resources?,Waiting threads are queued for requested resources.,y
+Define a deadlocked state in terms of threads.,Every thread in a set is waiting for an event that can only be caused by another thread in the set.,y
+What are the main events that threads wait for in a deadlocked state?,Resource acquisition and release.,y
+Give an example of a problem that illustrates a deadlocked state.,"The Dining-philosophers problem, where each philosopher holds one chopstick and waits for another, creating a circular wait.",y
+What is the developer's responsibility regarding deadlock?,Developers must be aware of deadlock possibilities.,y
+What is an important consideration when using locking tools to prevent race conditions?,Locking tools require careful management of lock acquisition/release to avoid deadlocks.,y
+"From the section glossary, define deadlock.",The state in which two processes or threads are stuck waiting for an event that can only be caused by one of the processes or threads.,y

@@ -1,0 +1,38 @@
+Front,Back,Reversible
+What is a process?,A program loaded into memory and executing.,y
+What resources does a process require?,"CPU time, memory, files, I/O devices.",y
+What is the role of a process in most systems?,It is the unit of work.,y
+How are most systems composed in terms of processes?,"They comprise OS processes (system code) and user processes (user code), executing concurrently.",y
+How do modern operating systems support control within processes?,They support multiple threads of control within processes; threads can run in parallel on multicore systems.,y
+What does the OS do with threads in relation to processing cores?,It schedules threads onto available processing cores.,y
+What is a program (in contrast to a process)?,"A passive entity (e.g., an executable file on disk).",y
+How is a process characterized as an active entity?,It has a program counter and associated resources.,y
+When does a program become a process?,When it is loaded into memory.,y
+Can multiple processes be associated with the same program? Explain the memory implications.,"Yes (e.g., multiple web browser instances). Their text sections are identical, but their data, heap, and stack sections differ.",y
+What are the main sections of a process's memory layout?,"Text section, Data section, Heap section, and Stack section.",y
+Define 'Text section' in process memory.,The executable code of a program or process.,y
+Define 'Data section' in process memory.,The data part of a program or process; it contains global variables.,y
+Define 'Heap section' in process memory.,The section of process memory that is dynamically allocated during process run time; it stores temporary variables.,y
+Define 'Stack section' in process memory.,The section of process memory that contains the stack; it contains activation records and other temporary data.,y
+"How do the stack and heap sections grow in process memory, and what prevents their overlap?",They grow towards each other; the OS prevents overlap.,y
+Define 'Activation record'.,"A record created when a function or subroutine is called; added to the stack by the call and removed when the call returns. Contains function parameters, local variables, and the return address.",y
+What happens to a process's state during execution?,A process changes state during execution.,y
+Describe the 'New' process state.,The process is being created.,y
+Describe the 'Running' process state.,Instructions are being executed (only one process per processor core at any instant).,y
+Describe the 'Waiting' process state.,"The process is waiting for an event (e.g., I/O completion, signal reception).",y
+Describe the 'Ready' process state.,The process is waiting to be assigned to a processor.,y
+Describe the 'Terminated' process state.,The process has finished execution.,y
+What is a Process Control Block (PCB) or Task Control Block (TCB)?,A per-process kernel data structure containing many pieces of information associated with the process.,y
+What kind of information is contained within a Process Control Block (PCB)?,"Process state, program counter, CPU registers, CPU-scheduling information (priority, queue pointers), memory-management information (base/limit registers, page/segment tables), accounting information (CPU/real time used, limits), and I/O status information (allocated devices, open files).",y
+What is the primary purpose of a Process Control Block (PCB)?,It serves as a repository for data needed to start/restart a process.,y
+Define 'Thread'.,"A process control structure that is an execution location. A process with a single thread executes only one task at a time, while a multithreaded process can execute a task per thread.",y
+What does it mean for a process to have a single thread of execution?,The process performs one task at a time.,y
+What is a multithreaded process?,"A process with multiple threads of execution, allowing it to perform multiple tasks concurrently.",y
+"What is a key benefit of multithreaded processes, especially on multicore systems?",It is especially beneficial on multicore systems for parallel execution.,y
+How is the PCB affected by the presence of threads in a modern OS?,The PCB is expanded to include per-thread information.,y
+Define 'job'.,A set of commands or processes executed by a batch system.,y
+Define 'user programs'.,"User-level programs, as opposed to system programs.",y
+Define 'task'.,"A process, a thread activity, or, generally, a unit of computation on a computer.",y
+Define 'program counter'.,A CPU register indicating the main memory location of the next instruction to load and execute.,y
+Define 'executable file'.,A file containing a program that is ready to be loaded into memory and executed.,y
+What is meant by the 'state' of a process?,"The condition of a process, including its current activity as well as its associated memory and disk contents.",y

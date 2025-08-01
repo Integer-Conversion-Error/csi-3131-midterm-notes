@@ -1,0 +1,50 @@
+Front,Back
+What is the fundamental requirement for using information stored in files?,Information stored in files must be accessed and read into memory.
+How many access methods do systems typically provide for file information?,"Some systems provide only one access method, while others provide many."
+What is a major design problem related to file access methods?,Choosing the right access method.
+Define: sequential access,"File-access method: contents read in order, beginning to end."
+What is the simplest file access method?,Sequential access.
+Describe how information is processed using sequential access.,"Information is processed in order, one record after another."
+What are common applications that use sequential access?,Editors and compilers.
+What is the function of the `read_next()` operation in sequential access?,It reads the next portion of the file and automatically advances the file pointer.
+What is the function of the `write_next()` operation in sequential access?,It appends new material to the end of the file and advances the file pointer to the end of the newly written material.
+Can a file using sequential access be reset?,"Yes, a file using sequential access can be reset to the beginning."
+Do all sequential access systems allow skipping records?,Some systems allow skipping forward or backward `n` records.
+What model of file is sequential access based on?,The tape model of a file.
+On what types of devices does sequential access work?,It works on both sequential-access devices and random-access ones.
+Define: direct access,File-access method: contents read in random order.
+Define: relative access,File-access method: contents read in random order.
+What is another name for direct access?,Relative access.
+Define: logical records,File contents logically designated as fixed-length structured data.
+How are files structured in direct access?,Files are structured as fixed-length logical records.
+How do programs read/write records using direct access?,Programs can read or write records rapidly in no particular order.
+What model of file is direct access based on?,The disk model of a file (as disks allow random access).
+How is a file viewed in direct access?,As a numbered sequence of blocks or records.
+Are there restrictions on read/write order in direct access?,"No, there are no restrictions on read/write order."
+What is a significant use case for direct access?,"Immediate access to large amounts of information, such as in databases (e.g., an airline reservation system)."
+How do direct-access file operations typically specify the target location?,"They include a block number as a parameter (e.g., `read(n)`, `write(n)`)."
+What is an alternative way to implement direct access operations while retaining sequential-like operations?,Retain `read_next()` and `write_next()` and add a `position_file(n)` operation.
+Define: relative block number,Index relative to beginning of file (first is block 0).
+What is the starting index for relative block numbers in many systems?,"0 (the first block is 0, the next is 1, etc.). Some systems start at 1."
+Define: allocation problem,OS determination of where to store file blocks.
+What is a benefit of the OS handling the allocation problem for direct access?,It prevents the user from accidentally accessing non-file portions of the file system.
+How does the OS satisfy a request for a record `N` in a direct-access file?,It turns it into an I/O request for `N` bytes starting at `N * (logical record length)`.
+"What makes it easy to read, write, or delete a record in direct access?",Logical records are of fixed size.
+Do all operating systems support both sequential and direct access?,"No, not all operating systems support both."
+When might a file's access method be defined?,Some systems require a file to be defined as sequential or direct at its creation.
+How can sequential access be simulated on a direct-access file?,By keeping a `cp` variable for the current position.
+What is the efficiency of simulating direct access on a sequential-access file?,It is extremely inefficient and clumsy.
+What are other file access methods typically built upon?,Direct-access method.
+Define: index (in the context of file access),"An access method built on direct access, where a file contains an index with pointers to its contents."
+What is a core component of file access methods built on direct access?,An index constructed for the file.
+What does an index contain in the context of file access?,"Pointers to various blocks of the file, similar to a book index."
+How is a record found using an index-based access method?,"Search the index, then use the pointer to access the file directly."
+Give an example of how an index might be structured for a sorted file.,"For a retail-price file sorted by UPC, the index might contain the first UPC in each block."
+What is the process for finding a block using a simple index kept in memory?,"Perform a binary search on the index to find the relevant block, then access that block."
+What challenge arises when index files become too large?,The index file itself might be too large to fit in memory.
+How is the challenge of large index files addressed?,"By creating an index for the index file (e.g., a primary index pointing to secondary indexes, which then point to the data)."
+What is an example of an indexed sequential-access method?,IBM ISAM (Indexed Sequential-Access Method).
+Describe the structure of IBM ISAM indexes.,"A small main index points to disk blocks of a secondary index, and the secondary index blocks then point to the actual file blocks."
+What is a requirement for the file data in IBM ISAM?,The file must be sorted on a key.
+Outline the steps to find an item using IBM ISAM.,1. Perform a binary search on the main index. 2. Get the appropriate secondary index block. 3. Perform a binary search on the secondary index. 4. Find the block containing the record. 5. Perform a sequential search within that block.
+What is the maximum number of direct-access reads typically required to locate any record using an indexed sequential-access method like ISAM?,At most two direct-access reads.

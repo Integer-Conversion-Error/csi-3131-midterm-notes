@@ -1,0 +1,148 @@
+Front,Back,Reversible
+Why do computer systems need mass storage?,For permanently storing files and data.,y
+What types of secondary storage do modern computers use?,Hard disks (HDDs) and nonvolatile memory (NVM) devices.,y
+How do secondary storage devices vary in terms of data transfer granularity?,Character at a time vs. block of characters.,y
+How do secondary storage devices vary in terms of access method?,Sequentially vs. randomly.,y
+How do secondary storage devices vary in terms of data transfer timing?,Synchronously vs. asynchronously.,y
+How do secondary storage devices vary in terms of usage?,Dedicated vs. shared.,y
+How do secondary storage devices vary in terms of write capability?,Read-only vs. read-write.,y
+What is the speed characteristic of secondary storage compared to other computer components?,It is the slowest major component of the computer.,y
+What is a requirement for the OS regarding device control?,It needs to provide a wide range of functionality for device control.,y
+What are the key goals of an OS I/O subsystem concerning interfaces?,To provide the simplest interface possible to the rest of the system.,y
+What are the key goals of an OS I/O subsystem concerning performance?,"To optimize I/O for maximum concurrency, as devices are a performance bottleneck.",y
+Define Mass storage.,The nonvolatile storage system of a computer.,y
+What are the main components of a mass-storage system?,"Secondary storage, specifically HDDs and NVM devices.",y
+"What is tertiary storage, and what are some examples?","Slower, larger storage systems such as magnetic tape, optical disks, and cloud storage.",y
+What is the general term for all types of non-volatile storage?,"Non-volatile storage (NVS) or ""storage drives"".",y
+Define hard disk drive (HDD).,"Secondary storage device based on mechanical components (spinning magnetic media platters, moving read-write heads).",y
+Define nonvolatile memory (NVM).,Persistent storage based on circuits and electric charges.,y
+What is the shape of an HDD platter?,Flat circular (like a CD).,y
+What are common platter diameters for HDDs?,1.8 to 3.5 inches.,y
+What are the surfaces of an HDD platter covered with?,Magnetic material.,y
+How is information stored and read on an HDD?,"Stored by recording magnetically, read by detecting magnetic patterns.",y
+Where are read-write heads located on an HDD?,"They ""fly"" just above each surface of every platter.",y
+Define disk arm (HDD).,"HDD component holding read-write head, moves over cylinders of platters.",y
+How is an HDD platter surface logically divided?,Into circular tracks.,y
+How are HDD tracks further subdivided?,Into sectors.,y
+Define cylinder (HDD).,"On HDD, set of tracks under read-write heads on all platters in device.",y
+"Approximately how many cylinders are on an HDD, and how many sectors per track?",Thousands of concentric cylinders; hundreds of sectors per track.,y
+"What is the characteristic size of an HDD sector, and what is its role in data transfer?","Fixed size, and it is the smallest unit of transfer.",y
+"What were common HDD sector sizes, and what is the current trend?","Commonly 512 bytes until ~2010, then migrating to 4KB.",y
+What are typical storage capacities for HDDs?,Gigabytes and terabytes.,y
+"What mechanism spins HDD platters, and at what speed?","A disk drive motor, spinning at high speeds (60 to 250 times per second, measured in RPM).",y
+What are common rotational speeds (RPM) for HDDs?,"5,400, 7,200, 10,000, 15,000 RPM.",y
+Describe a power-saving feature found in some HDDs.,Some drives power down when not in use and spin up on an I/O request.,y
+How does HDD rotation speed relate to data transfer?,"Rotation speed is related to the transfer rate, which is the rate data flows between the drive and the computer.",y
+Define transfer rate.,Rate at which data flows.,y
+What are other important performance aspects of HDDs besides transfer rate?,Positioning time or random-access time.,y
+Define positioning time (HDD).,"On HDD, time for read-write head to position over desired track.",y
+What are the two components of HDD positioning time?,Seek time and rotational latency.,y
+Define seek time (HDD).,"On HDD, time for read-write head to position over desired cylinder.",y
+Define rotational latency (HDD).,"On HDD, time for read-write head (once over desired cylinder) to access desired track.",y
+What are typical performance figures for HDDs in terms of transfer rate and latency?,"Tens to hundreds of MB/sec transfer rate, and several milliseconds for seek and rotational latency.",y
+How is HDD performance increased?,By using DRAM buffers in the drive controller.,y
+How does an HDD read-write head operate without touching the platter?,It flies on a thin cushion (microns) of air/gas.,y
+Define head crash (HDD).,"On HDD, mechanical problem: read-write head touching platter.",y
+What are the consequences of an HDD head crash?,"It's normally irreparable, requiring the entire disk to be replaced, and data is lost unless backed up or RAID protected.",y
+Describe the typical physical enclosure of an HDD.,They are typically sealed units.,y
+"What is a ""removable"" HDD?",An HDD that can be removed from some chassis without shutting down the system.,y
+What are examples of other removable media besides HDDs?,"CDs, DVDs, and Blu-ray discs.",y
+Are published disk performance numbers always accurate for real-world usage?,"No, they are not always the same as real-world performance.",y
+How do stated disk transfer rates compare to effective transfer rates?,Stated transfer rates are always higher than effective transfer rates.,y
+Define effective transfer rate.,"Actual, measured transfer rate of data between two devices.",y
+What is the distinction between published transfer rate and effective transfer rate?,"Published transfer rate refers to bits read directly from the magnetic media, while effective transfer rate refers to the rate at which blocks are delivered to the OS.",y
+What is a key characteristic distinguishing NVM devices from HDDs?,NVM devices are electrical rather than mechanical.,y
+What are NVM devices typically composed of?,A controller and flash NAND die semiconductor chips that store data.,y
+Define Solid-State Disk (SSD).,Disk-drive-like storage device using flash-memory-based nonvolatile memory.,y
+Define USB drive.,Nonvolatile memory in form of device plugging into USB port.,y
+"Where else can NVM devices be found, particularly in mobile devices?","Surface-mounted on motherboards, as seen in smartphones.",y
+What are the advantages of NVM devices over HDDs?,"More reliable (no moving parts), faster (no seek/rotational latency), and consume less power.",y
+What are the disadvantages of NVM devices compared to HDDs?,More expensive per MB and generally less capacity than larger HDDs.,y
+What is the current trend regarding NVM capacity and price?,"NVM capacity has increased faster, and its price has dropped quicker, leading to increasing use.",y
+"Where are SSDs commonly used, and why?","In laptops for smaller, faster, and energy-efficient systems.",y
+What can limit the throughput of NVM devices despite their inherent speed?,Standard bus interfaces can limit their throughput.,y
+How do some NVM devices overcome bus interface limitations?,"By connecting directly to the system bus (e.g., PCIe).",y
+How is NVM technology influencing computer design?,"It's changing computer design, allowing for direct disk replacement and new cache tiers.",y
+What are some challenges associated with NAND semiconductors used in NVM?,Storage and reliability challenges.,y
+How do NVM devices read and write data?,"In ""page"" increments, similar to how HDDs use sectors.",y
+What is a critical characteristic of NAND cells regarding data modification?,Data cannot be overwritten directly; NAND cells must be erased first.,y
+"How is data erased on NVM devices, and how does its speed compare to read/write operations?","Erasure occurs in ""block"" increments (several pages) and is much slower than read/write operations.",y
+How do NVM flash devices achieve parallel operations?,"They consist of many dies and many datapaths, enabling parallel operations.",y
+What is a major limitation of NAND semiconductors in terms of lifespan?,"They deteriorate with every erase cycle, typically lasting about 100,000 program-erase cycles.",y
+How is NVM lifespan measured?,In Drive Writes Per Day (DWPD).,y
+Define Drive Writes Per Day (DWPD).,"How many times the drive capacity can be written per day before failure, typically within its warranty period.",y
+Provide an example calculation for DWPD.,A 1 TB NAND drive with a 5 DWPD rating means 5 TB/day can be written for the warranty period.,y
+How are the limitations of NAND semiconductors (like erase cycles) managed?,"By ameliorating algorithms, usually implemented in the NVM device controller, which are transparent to the OS.",y
+How does the OS interact with NVM devices regarding block management?,"The OS reads and writes logical blocks, and the device controller manages the physical mapping and operations.",y
+What causes performance variations in NVM devices?,The operating algorithms within the device controller.,y
+Define flash translation layer (FTL).,"For nonvolatile memory, a table tracking currently valid blocks, maintained by the controller, mapping physical pages to currently valid logical blocks.",y
+What information does the FTL track regarding physical blocks?,"It tracks which physical blocks contain only invalid pages, indicating they can be erased.",y
+"What happens when an SSD is full and a write operation is pending, if a block contains no valid data?","The write waits for an erase operation, then occurs.",y
+"What happens when an SSD is full and a write operation is pending, if no free blocks exist but individual pages hold invalid data?","Garbage collection occurs, where good data is copied to other locations, freeing blocks for erase/writes.",y
+Define garbage collection (NVM).,Recovery of space containing no-longer-valid data on NVM devices.,y
+What technique is used to solve NVM write performance issues and improve it?,Over-provisioning.,y
+Define over-provisioning (NVM).,"In non-volatile memory, space set aside for data writes not counted in device free space.",y
+What happens to blocks that become totally invalid through garbage collection or write operations?,They are erased and placed in the over-provisioning space or returned to the free pool.,y
+How does over-provisioning space benefit NVM device lifespan?,It helps with wear leveling.,y
+Define wear leveling (NVM).,"In nonvolatile memory, effort to select all NAND cells over time as write targets to avoid premature media failure.",y
+How does the NVM controller implement wear leveling?,It uses algorithms to place data on less-erased blocks to distribute wear evenly.,y
+How do NVM devices protect data integrity?,"They provide error-correcting codes (ECC), which are calculated and stored with data to detect and correct errors.",y
+What happens if an NVM page frequently exhibits correctable errors?,It is marked as bad and not used in subsequent writes.,y
+What is a risk associated with a single NVM device regarding data?,"Catastrophic failure is possible, which can corrupt or prevent reading/writing of data.",y
+How can data on NVM devices be made recoverable from catastrophic failure?,By using RAID protection.,y
+What type of memory is sometimes used as a mass-storage device despite its volatility?,DRAM.,y
+Define RAM drives (RAM disks).,Sections of system's DRAM presented as secondary storage devices.,y
+How can RAM drives be utilized by the OS?,As raw block devices or with file systems.,y
+"What is the primary purpose of RAM drives, despite their volatility?",To allow users or programmers to place data in memory for temporary safekeeping using standard file operations.,y
+For what common tasks are RAM drives particularly useful?,For temporary files and sharing data.,y
+Provide examples of how RAM drives are implemented in major operating systems.,"Linux uses /dev/ram; macOS uses diskutil; Windows uses third-party tools; Solaris and Linux often use /tmp as a ""tmpfs"" RAM drive at boot.",y
+Define magnetic tape.,"Magnetic media storage device (tape spooled on reels, passing over read-write head); mostly for backups.",y
+What was magnetic tape's historical role in secondary storage?,It was an early secondary-storage medium.,y
+What are two key characteristics of magnetic tape regarding data persistence and capacity?,It is nonvolatile and holds large quantities of data.,y
+How does magnetic tape access time compare to main memory and drives?,It is slow compared to main memory and drives.,y
+Provide a comparison of magnetic tape random access speed to HDDs and SSDs.,"Random access is approximately 1,000 times slower than HDDs and 100,000 times slower than SSDs.",y
+What are the main uses of magnetic tapes today?,"Backup, storing infrequently used information, and transferring information between systems.",y
+Describe the physical mechanism of magnetic tape operation.,"Tape is kept in a spool, wound and rewound past a read-write head.",y
+What is a significant time drawback of magnetic tape access?,Moving to the correct spot on the tape can take minutes.,y
+How do tape drive read/write speeds compare to HDDs once positioned?,"Once positioned, tape drives can read and write at speeds comparable to HDDs.",y
+What are typical capacities for magnetic tapes?,They can exceed several terabytes.,y
+What feature in some magnetic tapes can increase their effective storage capacity?,"Built-in compression, which can double the effective storage.",y
+How are magnetic tapes categorized?,"By width (e.g., 4, 8, 19mm; 1/4, 1/2 inch) or by technology (e.g., LTO-6, SDLT).",y
+How are secondary storage devices attached to a computer?,By a system bus or an I/O bus.,y
+Define I/O bus.,Physical connection of I/O device to computer system.,y
+List common types of I/O buses used for secondary storage.,"Advanced Technology Attachment (ATA), Serial ATA (SATA), eSATA, Serial Attached SCSI (SAS), Universal Serial Bus (USB), and Fibre Channel (FC).",y
+Define Advanced Technology Attachment (ATA).,Older-generation I/O bus.,y
+Define eSATA.,Type of I/O bus.,y
+Define Serial-Attached SCSI (SAS).,Common type of I/O bus.,y
+Define Universal Serial Bus (USB).,Type of I/O bus.,y
+Define Fibre Channel (FC).,Type of storage I/O bus used in data centers to connect computers to storage arrays.,y
+What is currently the most common I/O bus for secondary storage?,SATA.,y
+What special fast interface is used for NVM devices due to their higher speed?,NVM Express (NVMe).,y
+Define NVM Express (NVMe).,High-speed I/O bus for NVM storage.,y
+How does NVMe improve NVM device performance?,"It directly connects the device to the system PCI bus, which increases throughput and decreases latency.",y
+What manages data transfers on the I/O bus for storage devices?,Special electronic processors called controllers or host-bus adapters (HBA).,y
+Define controller (I/O).,Special processor managing I/O devices.,y
+Define host bus adapter (HBA).,Device controller installed in host bus port to allow device connection to host.,y
+Define host controller.,"I/O-managing processors within a computer (e.g., inside HBA).",y
+Define device controller.,I/O managing processor within a device.,y
+How does a computer initiate a mass storage I/O operation?,"The computer places a command into the host controller, typically via memory-mapped I/O ports.",y
+"After receiving a command, what does the host controller do?",It sends the command via messages to the device controller.,y
+What is the role of the device controller in an I/O operation?,It operates the drive hardware to fulfill the command.,y
+What component do device controllers typically have to improve performance?,A built-in cache.,y
+Where does data transfer occur within the drive itself?,Between the device controller's built-in cache and the storage media.,y
+How is data transferred from the device controller's cache to the host computer?,"At fast electronic speeds, via Direct Memory Access (DMA) between the cache and the host's DRAM.",y
+How are storage devices logically addressed by the operating system?,As large one-dimensional arrays of logical blocks.,y
+Define logical blocks.,Logical addresses used to access blocks on storage devices.,y
+What does each logical block map to physically on a storage device?,A physical sector (on HDDs) or a semiconductor page (on NVM devices).,y
+"Describe the typical logical-to-physical mapping for HDDs (e.g., Sector 0).","Sector 0 is typically the first sector of the first track on the outermost cylinder. Mapping proceeds sequentially through the track, then the rest of the tracks on that cylinder, then the rest of the cylinders (from outermost to innermost).",y
+How is NVM physical addressing mapped to logical blocks?,"A tuple (chip, block, page) is mapped to an array of logical blocks.",y
+"What is Logical Block Address (LBA), and why is it preferred?","A logical address used to access blocks on storage devices, which is easier for algorithms than physical addresses like sector/cylinder/head tuples or chip/block/page tuples.",y
+"Is converting LBA to old-style disk addresses (cylinder, track, sector) straightforward?","No, it is difficult in practice.",y
+Why is converting LBA to physical cylinder/track/sector addresses difficult in practice?,"Because defective sectors are hidden by substituting spare sectors (making LBA sequential but physical non-sequential), the number of sectors per track is not constant on some drives, and disk manufacturers internally manage the LBA to physical address mapping, creating little direct relationship.",y
+What assumption do algorithms dealing with HDDs typically make about logical and physical addresses?,"They assume logical addresses are relatively related to physical addresses, meaning ascending logical addresses imply ascending physical addresses.",y
+Define Constant Linear Velocity (CLV).,Device-recording method: constant bit density per track by varying rotational speed.,y
+In what types of drives is CLV typically used?,CD-ROM and DVD-ROM drives.,y
+Define Constant Angular Velocity (CAV).,"Device-recording method: medium spins at constant velocity, bit density decreases inner to outer tracks.",y
+In what types of drives is CAV typically used?,Hard disks.,y
+What is the trend for sectors per track and cylinders per disk with advancing technology?,They are increasing.,y
+How many cylinders can large disks have?,Tens of thousands.,y

@@ -1,0 +1,17 @@
+Front,Back,Reversible
+What are the four necessary conditions that must hold simultaneously for a deadlock situation to arise?,"Mutual exclusion, Hold and wait, No preemption, and Circular wait.",y
+"Define ""Mutual exclusion"" as a necessary condition for deadlock.",At least one resource must be held in a nonsharable mode.,y
+"Define ""Hold and wait"" as a necessary condition for deadlock.",A thread must be holding at least one resource and waiting to acquire additional resources held by other threads.,y
+"Define ""No preemption"" as a necessary condition for deadlock.",A resource can be released only voluntarily by the thread holding it.,y
+"Define ""Circular wait"" as a necessary condition for deadlock.","A set of waiting threads {T0, T1, ..., Tn} must exist such that T0 is waiting for a resource held by T1, T1 is waiting for a resource held by T2, ..., Tn-1 is waiting for a resource held by Tn, and Tn is waiting for a resource held by T0.",y
+Is it true that all four necessary conditions for deadlock must hold for it to occur?,"Yes, all four conditions (Mutual exclusion, Hold and wait, No preemption, and Circular wait) must hold simultaneously.",y
+"Which of the necessary deadlock conditions implies the ""Hold and wait"" condition?",The circular-wait condition.,y
+What is a system resource-allocation graph?,A directed graph used for the precise description of deadlocks.,y
+What are the two main components of a system resource-allocation graph?,A set of vertices V and a set of edges E.,y
+How are the vertices (V) in a system resource-allocation graph partitioned?,Into two types: T (the set of all active threads) and R (the set of all resource types).,y
+"Define a ""request edge"" in a system resource-allocation graph.","A directed edge from a thread Ti to a resource type Rj (Ti -> Rj), signifying that Ti has requested an instance of Rj.",y
+"Define an ""assignment edge"" in a system resource-allocation graph.","A directed edge from a resource type Rj to a thread Ti (Rj -> Ti), signifying that an instance of Rj has been allocated to Ti.",y
+What does it imply if a system resource-allocation graph contains no cycles?,No thread is deadlocked.,y
+What does it imply if a system resource-allocation graph contains a cycle?,A deadlock may exist.,y
+"In a system resource-allocation graph, if each resource type has exactly one instance and a cycle exists, what does this imply?",A deadlock has occurred.,y
+"In a system resource-allocation graph, if each resource type has several instances and a cycle exists, what does this imply?",A cycle is a necessary but not a sufficient condition for deadlock.,y

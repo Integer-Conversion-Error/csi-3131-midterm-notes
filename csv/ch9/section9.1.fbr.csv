@@ -1,0 +1,72 @@
+Front,Back,Reversible
+What is the main purpose of a computer system?,To execute programs.,y
+Where must programs and data reside during execution?,Partially in main memory.,y
+What is a characteristic of modern computer systems regarding processes and memory?,They maintain several processes in memory concurrently.,y
+How does the effectiveness of memory-management schemes vary?,It depends on the specific situation.,y
+What do most memory-management algorithms require?,Hardware support.,y
+How is the CPU shared among processes?,Through CPU scheduling.,y
+What are the benefits of CPU scheduling?,It improves CPU utilization and response speed.,y
+What is required to effectively implement CPU scheduling?,Keeping many processes in memory (sharing memory).,y
+What is the role of memory in a modern computer system?,It is central to the system's operation.,y
+Describe memory from the CPU's perspective.,"A large array of bytes, each with its own address.",y
+How does the CPU execute a program involving memory?,The CPU fetches instructions from memory as indicated by the program counter. Instructions may cause loading or storing to specific memory addresses.,y
+List the stages of an instruction-execution cycle.,"Fetch instruction, decode, fetch operands, execute, store results.",y
+What does the memory unit see during operation?,"A stream of addresses, without knowing their generation or purpose.",y
+What are the only general-purpose storage components the CPU can access directly?,Main memory and registers.,y
+Where must instructions and data be for the CPU to operate on them?,In direct-access storage (main memory or registers).,y
+How quickly are registers accessible by the CPU?,Within one CPU clock cycle.,y
+"How is main memory accessed, and what is its access time relative to registers?","Via the memory bus, which may take many CPU cycles.",y
+What is a 'stall' in the context of CPU operation?,"CPU state when the CPU is waiting for data from main memory, which delays execution.",y
+What is a 'cache'?,A temporary copy of data in a reserved memory area to improve performance.,y
+How is cache management typically handled?,"By hardware automatically to speed up memory access, without OS control.",y
+How can a multithreaded core mitigate memory stalls?,By switching threads during the memory stall.,y
+What are the primary concerns regarding memory operation and protection?,"Correct operation, protection of the OS from user processes, and protection of user processes from each other.",y
+How is memory protection achieved?,"By hardware, which determines the legal address range for a process and ensures access only to legal addresses. The OS doesn't intervene for performance during typical access.",y
+What is needed for process protection and concurrent execution in memory?,Each process needs a separate memory space.,y
+What is a 'base register'?,A CPU register with the starting address of an address space. It defines the logical address space along with the limit register.,y
+What is a 'limit register'?,A CPU register defining the size of a range. It defines the logical address space along with the base register.,y
+How does CPU hardware enforce memory protection in user mode?,It compares every address generated in user mode with the base and limit registers.,y
+What happens if a user process attempts to access OS or another user's memory?,"It results in a trap to the OS, which is a fatal error.",y
+What does the use of base and limit registers prevent?,Accidental or deliberate modification of the OS or other user code/data.,y
+Who can load the base and limit registers?,"Only the OS, using privileged instructions in kernel mode.",y
+What kind of memory access does the OS have?,Unrestricted access to both OS and user memory.,y
+What tasks does the OS perform with its unrestricted memory access?,"Loading programs, dumping memory on errors, accessing system call parameters, performing I/O, and facilitating context switches.",y
+What are the initial steps for a program to run from disk?,"It's brought into memory as a binary executable, placed in a process context, and then becomes eligible for execution.",y
+What happens to a process's memory when it terminates?,The memory is reclaimed.,y
+Where can a user process reside in physical memory in most systems?,Anywhere in physical memory.,y
+What is 'bind' in the context of addresses?,"To tie together. It refers to the mapping from one address space to another, such as a compiler binding symbolic addresses to relocatable addresses.",y
+How are addresses represented in a source program?,"Symbolically (e.g., 'count').",y
+What does a compiler bind symbolic addresses to?,"Relocatable addresses (e.g., '14 bytes from module start').",y
+What do the linker/loader bind relocatable addresses to?,"Absolute addresses (e.g., 74014).",y
+Describe compile-time address binding.,"If the process's physical memory location is known in advance, the compiler generates 'absolute code' with absolute memory addresses.",y
+What is 'absolute code'?,Code with bindings to absolute memory addresses.,y
+Describe load-time address binding.,"If the process's physical memory location is unknown at compile time, the compiler generates 'relocatable code', and binding occurs when the program is loaded into memory.",y
+What is 'relocatable code'?,Code with bindings to memory addresses changed at loading time to reflect location in main memory.,y
+Describe execution-time address binding.,"If a process can be moved during its execution, binding is delayed until run time.",y
+What is a 'logical address'?,An address generated by the CPU; it is translated to a physical address before use. Also called a virtual address.,y
+What is a 'physical address'?,The actual location in physical memory of code or data.,y
+What is a 'virtual address'?,An address generated by the CPU; it is translated to a physical address before use. Also called a logical address.,y
+What is a 'logical address space'?,The set of all logical addresses generated by a program.,y
+What is a 'physical address space'?,The set of all physical addresses corresponding to the logical addresses generated by a program.,y
+When are logical and physical addresses identical?,With compile-time and load-time binding.,y
+When do logical and physical addresses differ?,With execution-time binding.,y
+What is a 'memory-management unit (MMU)'?,A hardware component of the CPU or motherboard allowing memory access by mapping logical addresses to physical addresses at run-time.,y
+How does a simple MMU scheme work?,It uses a relocation register (a base register generalization). The value in the relocation register is added to every logical address generated by a user process to create the physical address.,y
+What kind of addresses does a user program deal with?,Logical addresses; it never accesses real physical addresses directly.,y
+When is the final physical location of a referenced memory address determined in an execution-time binding system?,At the time of the memory reference.,y
+What concept is central to proper memory management?,The concept of a logical address space bound to a separate physical address space.,y
+What was a limitation of traditional program loading?,"The entire program and its data had to be in physical memory for execution, limiting process size by physical memory size.",y
+What is 'dynamic loading'?,"The loading of a process routine when called, not at process start. This improves memory-space utilization.",y
+How does dynamic loading work?,"All routines are kept on disk in relocatable load format. The main program is loaded and executed. When a routine calls another, it checks if it's loaded. If not, a relocatable linking loader loads the routine, updates address tables, and passes control.",y
+What is the main advantage of dynamic loading?,"Routines are loaded only when needed. This is useful for large programs with infrequent code paths (e.g., error routines), as the total program size can be large but the portion used (loaded) much smaller.",y
+Does dynamic loading require special OS support?,"No, it is primarily the user's responsibility, though the OS may provide library routines to help.",y
+What are 'dynamically linked libraries (DLLs)'?,System libraries linked to user programs at run time; linking is postponed until execution time.,y
+What is 'static linking'?,"Linking where system libraries are treated like object modules, combined by the loader into the binary program image.",y
+What are the disadvantages of static linking?,"Each program includes a copy of the language library in its executable image, which increases executable size and wastes main memory.",y
+What is another significant advantage of dynamically linked libraries (DLLs)?,"They can be shared among multiple processes, with only one instance loaded into memory.",y
+What are 'shared libraries'?,"Libraries loaded once, used by many processes; used in systems supporting dynamic linking. DLLs are an example of shared libraries.",y
+How does a program reference a dynamic library routine?,"The loader locates the DLL, loads it if needed, and adjusts the addresses in the program that reference the DLL functions to the DLL's memory location.",y
+How do DLLs simplify library updates?,"If a library is replaced by a new version, all programs referencing it automatically use the new version without needing to be relinked.",y
+How do DLLs handle compatibility issues with updates?,"Programs and libraries include version information to prevent incompatible versions. Multiple library versions can be loaded, and a program uses its specific version info. Minor changes keep the same version number; major changes increment it.",y
+Who is affected by incompatible changes in a dynamic library?,Only programs compiled with the new library version. Programs linked before the new library continue using the older version.,y
+Does dynamic linking and shared libraries generally require OS help?,"Yes, especially if processes are protected. The OS needs to check if a routine is in another process's memory and allow multiple processes to access the same addresses.",y

@@ -1,0 +1,23 @@
+Front,Back
+How can `fork()` initially interact with demand paging?,It can bypass demand paging.
+What technique is similar to page sharing for rapid process creation?,Copy-on-write.
+What does Copy-on-write minimize for the child process?,New pages allocated to the child process.
+Describe traditional `fork()` behavior regarding address space.,"Traditionally, `fork()` copied the parent's entire address space for the child."
+When is traditional address space copying by `fork()` potentially unnecessary?,If the child immediately calls `exec()`.
+What is the core principle of Copy-on-write for process creation?,Parent and child processes initially share the same pages.
+How are shared pages managed in Copy-on-write?,They are marked as copy-on-write.
+What happens when a process writes to a shared page marked Copy-on-write?,A copy of the shared page is created.
+Illustrate a Copy-on-write scenario when a child modifies a stack page.,"The OS gets a free frame, copies the page, and maps it to the child's address space."
+"After a Copy-on-write operation, which page does the child modify?","Its newly copied page, not the parent's original."
+What types of pages are copied and what types can remain shared under Copy-on-write?,"Only modified pages are copied; unmodified pages (e.g., executable code) can be shared."
+Name operating systems that commonly use Copy-on-write.,"Windows, Linux, macOS."
+What is `vfork()`?,"A variation of `fork()` in UNIX-based systems (Linux, macOS, BSD UNIX)."
+Describe the parent and child process states after `vfork()`.,"The parent process is suspended, and the child uses the parent's address space."
+Does `vfork()` use Copy-on-write?,"No, `vfork()` does not use copy-on-write."
+What happens to parent's address space changes made by a child using `vfork()`?,Child process changes to the parent's address space are visible to the parent upon resumption.
+What is a critical caution when using `vfork()`?,The child must not modify the parent's address space without careful management.
+What is the primary intended use case for `vfork()`?,When the child process calls `exec()` immediately after creation.
+What is the efficiency characteristic of `vfork()` for process creation?,"Extremely efficient, involving no page copying."
+Where is `vfork()` sometimes used in practice?,To implement UNIX command-line shell interfaces.
+"Define ""copy-on-write"" (from glossary).","Write causes data to be copied then modified; on shared page write, page copied, write to copy."
+"Define ""virtual memory fork"" (`vfork()`) (from glossary).","`vfork()` system call; child shares parent's address space for read/write, parent suspended."

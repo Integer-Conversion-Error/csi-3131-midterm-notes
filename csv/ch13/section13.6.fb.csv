@@ -1,0 +1,21 @@
+Front,Back
+What is a file?,"An abstract data type representing a sequence of logical records (e.g., byte, line, complex data)."
+What is the operating system's role regarding file record types?,The OS may support specific record types or leave the management of record types to the application.
+What is a primary task of the operating system concerning files?,"To map the logical file concept to physical storage (e.g., hard disk, NVM)."
+How does the OS handle logical records in relation to physical storage?,The OS may order logical records into physical records for storage.
+What is the purpose of directories?,To organize files.
+What is a single-level directory?,A directory structure where all files reside in a single directory.
+What is a problem with single-level directories in multiuser systems?,"Naming problems, as unique file names are required across all users."
+What is a two-level directory?,A directory structure where each user has a separate directory.
+What problem do two-level directories solve?,Naming problems in multiuser systems.
+What information might a two-level directory list for files?,"File name, location, length, type, owner, and times."
+What is a tree-structured directory?,"A generalization of the two-level directory, allowing subdirectories for further organization."
+What is an acyclic-graph directory?,A directory structure that allows sharing of subdirectories and files.
+What are the complications of an acyclic-graph directory?,It complicates searching and deletion processes.
+What is a general graph directory structure?,A directory structure offering complete flexibility in sharing.
+What is a potential requirement for a general graph directory structure?,It may require garbage collection for unused space.
+What are the main challenges associated with remote file systems?,"Reliability, performance, and security."
+What do distributed information systems manage in the context of remote file systems?,"User, host, and access information for shared state."
+Why is file protection needed?,It is needed on multiuser systems.
+What are common types of access control for file protection?,"Read, write, execute, append, delete, and list directory."
+What techniques can be used for file protection?,"Access lists, passwords, and other techniques."

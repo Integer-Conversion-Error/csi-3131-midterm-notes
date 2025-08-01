@@ -1,0 +1,93 @@
+Front,Back,Reversible
+What are some common types of devices computers operate?,"Storage (disks, tapes), transmission (network, Bluetooth), and human-interface (screen, keyboard, mouse, audio).",y
+How do devices communicate with a computer?,Via signals transmitted over cable or air.,y
+What is a **port** in I/O hardware?,"A connection point for devices to attach to computers (e.g., serial port).",y
+What is a **bus** in computer systems?,"A communication system connecting computer components (CPU, I/O devices) for data and command transfer.",y
+What defines a bus beyond just being a set of wires?,"A rigidly defined protocol for messages, including electrical voltages and timings.",y
+What is a **daisy chain** in device communication?,"A connection method where devices are connected in a string (A to B, B to C), usually operating as a bus.",y
+What characteristics can buses vary in?,"Signaling, speed, throughput, and connection.",y
+What is the primary function of a **PCIe bus** in a typical PC structure?,It connects the processor-memory subsystem to fast devices.,y
+What is the primary function of an **expansion bus** in a typical PC structure?,"It connects slow devices such as keyboards, serial ports, and USB ports.",y
+What is **Serial-attached SCSI (SAS)**?,A common type of I/O bus used to connect disks to a SAS controller.,y
+How does PCIe transfer data?,Over 'lanes'.,y
+What constitutes a 'lane' in PCIe?,"Two signaling pairs (one for receive, one for transmit), forming a full-duplex byte stream.",y
+"What format do PCIe data packets use, and in what direction can data be transferred?","Eight-bit byte format, simultaneously in both directions.",y
+What are the possible physical link configurations for PCIe in terms of lanes?,"1, 2, 4, 8, 12, 16, or 32 lanes (e.g., x8).",y
+"What do 'generations' refer to in PCIe, and what is an example of its impact?","Different versions of the PCIe standard, impacting throughput (e.g., PCIe gen3 x8 provides 8 GB/s throughput).",y
+What is a **controller** in the context of I/O hardware?,"Electronics operating a port, bus, or device. (Alternatively: A special processor managing I/O devices.)",y
+Describe a serial-port controller.,It is simple and typically implemented as a single chip.,y
+"What is **Fibre Channel (FC)**, and how is its controller often implemented?",FC is a storage I/O bus used in data centers to connect computers to storage arrays. Its controller is complex and often a separate circuit board called a Host Bus Adapter (HBA).,y
+What components are typically found in a **Host Bus Adapter (HBA)**?,"A processor, microcode, and private memory for managing the Fibre Channel (FC) protocol.",y
+Can devices have built-in controllers? Provide an example.,"Yes, some devices like a disk drive board have built-in controllers.",y
+What functions does a disk controller implement and manage?,"It implements disk-side protocols (like SAS, SATA), contains microcode and a processor for tasks such as bad-sector mapping, prefetching, buffering, and caching.",y
+How does a processor communicate with a controller?,Via registers (data and control registers).,y
+What is one method for a CPU to communicate with I/O devices using special instructions?,Special I/O instructions that transfer a byte or word to an I/O port address.,y
+What is **memory-mapped I/O**?,A device I/O method where device-control registers are mapped into the processor's address space.,y
+How does the CPU interact with device-control registers in memory-mapped I/O?,It uses standard data-transfer instructions (like load/store) to read from or write to the registers at their mapped memory locations.,y
+How did past PCs typically handle I/O communication methods?,They often mixed special I/O instructions and memory-mapped I/O.,y
+Why is writing to graphics memory via memory-mapped I/O often preferred over I/O instructions?,Writing millions of bytes to graphics memory using standard data-transfer instructions (memory-mapped) is much faster than executing millions of special I/O instructions.,y
+"What is the trend in I/O communication methods for modern systems, and why?",Systems have largely moved to memory-mapped I/O for increased efficiency.,y
+How is most I/O conducted in modern systems?,Most I/O is conducted via device controllers using memory-mapped I/O.,y
+What are the typically four main registers found in an I/O device controller?,"Status, control, data-in, and data-out registers.",y
+What is a **data-in register**?,A device I/O register read by the host to receive input.,y
+What is a **data-out register**?,A device I/O register written by the host to send output.,y
+"What is a **status register**, and what kind of information do its bits indicate?","A device I/O register indicating status. Its bits indicate states such as command complete, byte available, or an error.",y
+"What is a **control register**, and what are some examples of device modes that can be changed via it?","A device I/O register for the host to place commands or change device mode. Examples include full/half-duplex communication, parity settings, word length, and communication speed.",y
+What is the typical size of data registers in I/O controllers?,1 to 4 bytes.,y
+"What are FIFO (First-In, First-Out) chips used for in some controllers?","They hold several bytes, expanding capacity and buffering data bursts.",y
+What term describes the interaction between a host and a controller?,Handshaking.,y
+Describe the host's actions in the first three steps of a typical polling handshaking sequence for sending data to a device.,1. The host repeatedly reads the `busy` bit until it is clear. 2. The host sets the `write` bit in the command register and writes the byte to the `data-out` register. 3. The host sets the `command-ready` bit.,y
+Describe the controller's actions in a typical polling handshaking sequence after the host has prepared data.,"1. The controller notices `command-ready` is set and sets the `busy` bit. 2. The controller reads the command, reads the `data-out` byte, and performs the I/O operation. 3. The controller clears `command-ready`, clears any `error` bit, and clears the `busy` bit.",y
+What action does the host perform in the first step of a polling handshaking sequence?,"The host is **busy-waiting** or **polling**, repeatedly reading the status register until the device is ready.",y
+What is **busy waiting**?,"A thread or process continuously uses the CPU while waiting, typically by repeatedly reading a status register in an I/O loop.",y
+What is **polling**?,"An I/O loop where an I/O thread continuously reads a status register, waiting for I/O completion.",y
+When is polling considered efficient for I/O operations?,"If the controller and device are fast (e.g., completing in as few as 3 CPU cycles).",y
+When is polling considered inefficient for I/O operations?,"If the wait for the device to be ready is long and there are other CPU tasks pending, or if the device is rarely ready.",y
+What is a risk associated with the host waiting too long during polling?,Risk of data loss due to buffer overflow if the host doesn't process input fast enough.,y
+What is an alternative to polling for a hardware controller to notify the CPU when it's ready?,An **interrupt**.,y
+What is an **interrupt**?,A hardware mechanism for a device to notify the CPU that it needs attention.,y
+How does the CPU detect an interrupt request?,It senses the **interrupt-request line** after each instruction it executes.,y
+What happens immediately after a controller asserts an interrupt signal on the interrupt-request line?,The CPU saves its current state and jumps to an **interrupt-handler routine** at a fixed address.,y
+What are the main actions performed by an interrupt handler routine?,"It determines the cause of the interrupt, processes it, restores the CPU's saved state, and then executes a `return from interrupt` instruction.",y
+"Describe the sequence of actions and roles involved in an interrupt, using the terms 'raises', 'catches', 'dispatches', and 'clears'.","A device controller *raises* an interrupt, the CPU *catches* and *dispatches* it to the appropriate handler, and the handler *clears* the interrupt.",y
+What is the typical frequency of interrupts in modern systems?,Hundreds of interrupts per second.,y
+What are some sophisticated features needed for modern interrupt handling?,"Deferring interrupt handling during critical processing, efficient dispatch to the proper handler, multilevel interrupts to distinguish high/low priority, and instructions (traps) to get OS attention directly for events like page faults or errors.",y
+What hardware components provide sophisticated interrupt handling features?,The CPU and **interrupt-controller hardware**.,y
+What is a **nonmaskable interrupt**?,"An interrupt that cannot be delayed or blocked, typically used for unrecoverable errors (e.g., memory errors).",y
+What does it mean for an interrupt to be **maskable**?,"It describes an interrupt that can be temporarily delayed or blocked by the CPU for critical sequences, commonly used by device controllers.",y
+What is an **interrupt vector**?,"An OS data structure indexed by an interrupt address, pointing to interrupt handlers.",y
+What is the purpose of an interrupt vector?,To reduce the need for a single handler to search all possible interrupt sources.,y
+What is **interrupt chaining**?,"A mechanism where an interrupt vector element points to the head of a list of handlers, and these handlers are called in sequence until one services the request.",y
+What is the benefit of using interrupt chaining?,"It avoids the need for a huge interrupt vector table while still improving dispatch efficiency, especially when there are more devices than vector elements.",y
+What are **interrupt priority levels** used for?,"Prioritizing interrupts for handling order, allowing low-priority interrupts to be deferred and high-priority interrupts to preempt ongoing processing.",y
+How does the OS interact with interrupts during boot time?,It probes buses and installs the appropriate interrupt handlers into the interrupt vector.,y
+What kind of events cause controllers to raise interrupts during I/O operations?,"Output completion, input availability, or device failures.",y
+What is an **exception** in the context of interrupts?,"A software-generated interrupt caused by an error (e.g., division by zero, protected memory access) or a user program's request for an OS service.",y
+What are the main responsibilities of a **First-Level Interrupt Handler (FLIH)**?,"Performing context switching, saving CPU state, and queuing the interrupt for further processing.",y
+What is the main responsibility of a **Second-Level Interrupt Handler (SLIH)**?,"It performs the actual, more complex handling of the interrupt.",y
+"What is a **software interrupt**, also known as a **trap**?","A software-generated interrupt used, for example, by system calls.",y
+What actions does a trap (software interrupt) typically perform?,"It saves the user process's state, switches the CPU to kernel mode, and dispatches control to the appropriate kernel routine.",y
+What is the typical priority of traps compared to device interrupts?,"Traps usually have a lower priority compared to device interrupts, as they are generally less urgent.",y
+How are interrupt handlers implemented in a threaded kernel architecture like Solaris?,"They are implemented as kernel threads with high scheduling priorities, allowing preemption and concurrent execution on multiprocessor systems.",y
+What is **programmed I/O (PIO)**?,"A data transfer method where the CPU transfers data one byte or word at a time, often by watching status bits and feeding data to the device.",y
+"Why is Programmed I/O (PIO) considered wasteful for large data transfers, such as disk operations?","Because the CPU wastes time watching status bits and feeding data byte-by-byte, which is inefficient for large volumes of data.",y
+What is **direct memory access (DMA)**?,An operation allowing device controllers to transfer large amounts of data directly to or from main memory without involving the main CPU in the transfer.,y
+How does the host initiate a DMA transfer?,"The host writes a DMA command block to memory, specifying details like the source address, destination address, and byte count.",y
+What is **scatter-gather** in DMA?,An I/O method where a DMA command block specifies a list of non-contiguous sources and/or destinations for a single transfer operation.,y
+"After initiating a DMA transfer, what does the CPU do?",The CPU writes the address of the DMA command block to the DMA controller and then continues with other work.,y
+How does the DMA controller perform data transfers?,"It operates the memory bus directly, performing transfers to or from main memory without involving the main CPU.",y
+Is a DMA controller a common component in modern computers?,"Yes, it is a standard component.",y
+What is a potential risk when a DMA transfer targets user space memory?,"There is a risk that the user space memory region could be modified by the user program during the DMA transfer, leading to data corruption.",y
+"What is **double buffering** in the context of I/O, and why can it be inefficient?","Copying data twice (e.g., from a device into kernel memory, then from kernel memory to user process memory). It is inefficient due to the overhead of the second copy operation.",y
+What is the trend for OS handling of direct I/O between devices and user address space?,"The OS has moved towards using memory-mapping to allow direct I/O transfers between devices and user address space, avoiding double buffering.",y
+What wires are typically used for handshaking between a DMA controller and a device controller?,DMA-request and DMA-acknowledge wires.,y
+What happens during a DMA handshaking sequence when a device has data ready?,"The device places a signal on the DMA-request wire. The DMA controller seizes the memory bus, places the memory address, and signals DMA-acknowledge. The device then transfers the word of data and removes the DMA-request signal.",y
+How does the DMA controller signal the CPU that a transfer is complete?,The DMA controller interrupts the CPU.,y
+What is **cycle stealing**?,"The temporary prevention of CPU access to main memory when a device (e.g., DMA controller) seizes the bus for data transfer.",y
+"Does cycle stealing slow down the CPU, and what is the overall impact of DMA on system performance?","Yes, cycle stealing does slow down the CPU momentarily, but DMA generally improves total system performance by freeing the CPU for other tasks.",y
+What two types of addresses can DMA use for transfers?,Physical addresses or **direct virtual memory access (DVMA)**.,y
+"What is **direct virtual memory access (DVMA)**, and what is a unique capability it provides?",DMA that uses virtual addresses (which are translated to physical addresses) as transfer sources/destinations. It can also enable transfers directly between memory-mapped devices without involving the CPU or main memory as an intermediary.,y
+What are the key concepts of I/O hardware?,"Bus, Controller, I/O port and its registers, Handshaking (between host and device controller), Handshaking execution (polling or interrupts), and Offloading large transfers to a DMA controller.",y
+What is a significant challenge for OS implementers regarding I/O hardware?,"The wide variety of devices, each with unique capabilities, control-bit definitions, and communication protocols.",y
+What two critical questions arise for OS implementers concerning I/O device integration?,"How to attach new devices without requiring an OS rewrite, and how to provide a uniform I/O interface to applications.",y
+What is **PHY**?,"A physical hardware component connecting to a network, corresponding to OSI layer 1.",y

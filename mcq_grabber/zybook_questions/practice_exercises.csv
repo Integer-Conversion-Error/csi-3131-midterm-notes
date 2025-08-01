@@ -1,0 +1,140 @@
+Question,Answer
+List three examples of deadlocks that are not related to a computer-system environment.,
+Suppose that a system is in an unsafe state. Show that it is possible for the threads to complete their execution without entering a deadlocked state.,
+What is the content of the matrix Need?,
+Is the system in a safe state?,
+"If a request from thread
+T
+1
+arrives for (0,4,2,0), can the request be granted immediately?",
+"A possible method for preventing deadlocks is to have a single, higher-order resource that must be requested before any other resource. For example, if multiple threads attempt to access the synchronization objects
+A
+⋯
+E
+, deadlock is possible. (Such synchronization objects may include mutexes, semaphores, condition variables, and the like.) We can prevent deadlock by adding a sixth object
+F
+. Whenever a thread wants to acquire the synchronization lock for any object
+A
+⋯
+E
+, it must first acquire the lock for object
+F
+. This solution is known as containment: the locks for objects
+A
+⋯
+E
+are contained within the lock for object
+F
+. Compare this scheme with the circular-wait scheme of Section Circular wait.",
+"Prove that the safety algorithm presented in Section Banker's algorithm requires an order of
+m
+×
+n
+2
+operations.",
+"Consider a computer system that runs 5,000 jobs per month and has no deadlock-prevention or deadlock-avoidance scheme. Deadlocks occur about twice per month, and the operator must terminate and rerun about ten jobs per deadlock. Each job is worth about two dollars (in CPU time), and the jobs terminated tend to be about half done when they are aborted.
+
+A systems programmer has estimated that a deadlock-avoidance algorithm (like the banker's algorithm) could be installed in the system with an increase of about 10 percent in the average execution time per job. Since the machine currently has 30 percent idle time, all 5,000 jobs per month could still be run, although turnaround time would increase by about 20 percent on average.
+
+What are the arguments for installing the deadlock-avoidance algorithm?
+What are the arguments against installing the deadlock-avoidance algorithm?",
+"Can a system detect that some of its threads are starving? If you answer ""yes,"" explain how it can. If you answer ""no,"" explain how the system can deal with the starvation problem.",
+"Can deadlock occur? If you answer ""yes,"" give an example. If you answer ""no,"" specify which necessary condition cannot occur.",
+Can indefinite blocking occur? Explain your answer.,
+"Available = (0,3,0,1)",
+"Available = (1,0,0,2)",
+"Suppose that you have coded the deadlock-avoidance safety algorithm that determines if a system is in a safe state or not, and now have been asked to implement the deadlock-detection algorithm. Can you do so by simply using the safety algorithm code and redefining Maxi = Waitingi + Allocationi, where Waitingi is a vector specifying the resources for which thread
+i
+is waiting and Allocationi is as defined in Section 8.6? Explain your answer.",
+Is it possible to have a deadlock involving only one single-threaded process? Explain your answer.,
+Name two differences between logical and physical addresses.,
+Why are page sizes always powers of 2?,
+"Consider a system in which a program can be separated into two parts: code and data. The CPU knows whether it wants an instruction (instruction fetch) or data (data fetch or store). Therefore, two base-limit register pairs are provided: one for instructions and one for data. The instruction base-limit register pair is automatically read-only, so programs can be shared among different users. Discuss the advantages and disadvantages of this scheme.",
+How many bits are there in the logical address?,
+How many bits are there in the physical address?,
+What is the effect of allowing two entries in a page table to point to the same page frame in memory? Explain how this effect could be used to decrease the amount of time needed to copy a large amount of memory from one place to another. What effect would updating some byte on one page have on the other page?,
+"Given six memory partitions of 300 KB, 600 KB, 350 KB, 200 KB, 750 KB, and 125 KB (in order), how would the first-fit, best-fit, and worst-fit algorithms place processes of size 115 KB, 500 KB, 358 KB, 200 KB, and 375 KB (in order)?",
+3085,
+42095,
+215201,
+650000,
+2000001,
+"The BTV operating system has a 21-bit virtual address, yet on certain embedded devices, it has only a 16-bit physical address. It also has a 2-KB page size. How many entries are there in each of the following?
+
+A conventional, single-level page table
+An inverted page table
+
+What is the maximum amount of physical memory in the BTV operating system?",
+How many bits are required in the logical address?,
+How many bits are required in the physical address?,
+"A conventional, single-level page table",
+An inverted page table,
+Under what circumstances do page faults occur? Describe the actions taken by the operating system when a page fault occurs.,
+What is a lower bound on the number of page faults?,
+What is an upper bound on the number of page faults?,
+"Consider the following page-replacement algorithms. Rank these algorithms on a five-point scale from ""bad"" to ""perfect"" according to their page-fault rate. Separate those algorithms that suffer from Belady's anomaly from those that do not.
+
+LRU replacement
+FIFO replacement
+Optimal replacement
+Second-chance replacement",
+"An operating system supports a paged virtual memory. The central processor has a cycle time of 1 microsecond. It costs an additional 1 microsecond to access a page other than the current one. Pages have 1,000 words, and the paging device is a drum that rotates at 3,000 revolutions per minute and transfers 1 million words per second. The following statistical measurements were obtained from the system:
+
+One percent of all instructions executed accessed a page other than the current page.
+Of the instructions that accessed another page, 80 percent accessed a page already in memory.
+When a new page was required, the replaced page was modified 50 percent of the time.
+
+Calculate the effective instruction time on this system, assuming that the system is running one process only and that the processor is idle during drum transfers.",
+"Consider the page table for a system with 12-bit virtual and physical addresses and 256-byte pages.
+
+
+The list of free page frames is
+D
+,
+E
+,
+F
+(that is,
+D
+is at the head of the list,
+E
+is second, and
+F
+is last). A dash for a page frame indicates that the page is not in memory.
+
+Convert the following virtual addresses to their equivalent physical addresses in hexadecimal. All numbers are given in hexadecimal.
+
+9EF
+111
+700
+0FF",
+Discuss the hardware functions required to support demand paging.,
+"for (int j = 0; j < 100; j++)
+   for (int i = 0; i < 100; i++)
+      A[i][j] = 0;",
+"for (int i = 0; i < 100; i++)
+   for (int j = 0; j < 100; j++)
+      A[i][j] = 0;",
+"Consider the following page reference string:
+
+1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6.
+  How many page faults would occur for the following replacement algorithms, assuming one, two, three, four, five, six, and seven frames? Remember that all frames are initially empty, so your first unique pages will cost one fault each.
+
+LRU replacement
+FIFO replacement
+Optimal replacement",
+"Consider the following page reference string:
+
+7, 2, 3, 1, 2, 5, 3, 4, 6, 7, 7, 1, 0, 5, 4, 6, 2, 3, 0, 1.
+  Assuming demand paging with three frames, how many page faults would occur for the following replacement algorithms?
+
+LRU replacement
+FIFO replacement
+Optimal replacement",
+"Suppose that you want to use a paging algorithm that requires a reference bit (such as second-chance replacement or working-set model), but the hardware does not provide one. Sketch how you could simulate a reference bit even if one were not provided by the hardware, or explain why it is not possible to do so. If it is possible, calculate what the cost would be.",
+"You have devised a new page-replacement algorithm that you think may be optimal. In some contorted test cases, Belady's anomaly occurs. Is the new algorithm optimal? Explain your answer.",
+"Segmentation is similar to paging but uses variable-sized ""pages."" Define two segment-replacement algorithms, one based on the FIFO page-replacement scheme and the other on the LRU page-replacement scheme. Remember that since segments are not the same size, the segment that is chosen for replacement may be too small to leave enough consecutive locations for the needed segment. Consider strategies for systems where segments cannot be relocated and strategies for systems where they can.",
+CPU utilization 13 percent; disk utilization 97 percent,
+CPU utilization 87 percent; disk utilization 3 percent,
+CPU utilization 13 percent; disk utilization 3 percent,
+"We have an operating system for a machine that uses base and limit registers, but we have modified the machine to provide a page table. Can the page table be set up to simulate base and limit registers? How can it be, or why can it not be?",

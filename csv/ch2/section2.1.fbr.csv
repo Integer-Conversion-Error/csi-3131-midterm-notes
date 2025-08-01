@@ -1,0 +1,20 @@
+Front,Back,Reversible
+What is the fundamental role of an Operating System (OS)?,To provide the environment for program execution.,y
+What critical step must precede the design of an Operating System?,Defining system goals.,y
+What are the three primary perspectives from which an Operating System (OS) can be viewed?,"Its services, user/programmer interface, or internal components.",y
+"Beyond providing an execution environment, how do OS services benefit programmers?",They simplify programming tasks.,y
+What is the purpose of the User Interface (UI) service in an OS?,"Provides interaction via GUI, touch-screen, or CLI.",y
+"Describe the ""Program execution"" service provided by an OS.","Loads, runs, and terminates programs.",y
+"What is the role of the ""I/O operations"" service in an OS?",Manages program access to files and I/O devices for efficiency and protection.,y
+"What capabilities does the ""File-system manipulation"" service provide?","Handles file/directory operations (read, write, create, delete, search, list) and permissions.",y
+"What is the purpose of the ""Communications"" service in an OS?","Enables inter-process communication (IPC) via shared memory or message passing, locally or across networks.",y
+"What does the ""Error detection"" service in an OS involve?","Constantly detects and corrects errors in hardware, I/O devices, and user programs, taking appropriate action (e.g., halting, terminating process, returning error code).",y
+"How does the ""Resource allocation"" service contribute to efficient OS operation?","Manages allocation of CPU cycles, memory, file storage, and I/O devices to multiple running processes, using scheduling routines.",y
+"What is the function of the ""Logging"" service in an OS?",Tracks resource usage for accounting or accumulating statistics to improve computing services.,y
+"Explain the ""Protection and security"" service in an OS.","Controls access to system resources and defends against external/internal attacks (e.g., viruses, DoS). Requires user authentication and safeguards for I/O devices.",y
+"Define ""user interface (UI)"".",A method by which a user interacts with a computer.,y
+"Define ""graphical user interface (GUI)"".","A computer interface comprising a window system with a pointing device to direct I/O, choose from menus, and make selections and, usually, a keyboard to enter text.",y
+"Define ""touch-screen interface"".",A user interface in which touching a screen allows the user to interact with the computer.,y
+"Define ""command-line interface (CLI)"".",A method of giving commands to a computer based on a text input device (such as a keyboard).,y
+"Define ""shared memory"" in the context of interprocess communication.","In interprocess communication, a section of memory shared by multiple processes and used for message passing.",y
+"Define ""message passing"" in the context of interprocess communication.","In interprocess communication, a method of sharing data in which messages are sent and received by processes. Packets of information in predefined formats are moved between processes or between computers.",y

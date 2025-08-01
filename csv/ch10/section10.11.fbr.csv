@@ -1,0 +1,29 @@
+Front,Back,Reversible
+What is virtual memory?,Abstracts physical memory into an extremely large uniform array of storage.,y
+Name one benefit of virtual memory related to program size.,Program can be larger than physical memory.,y
+Name one benefit of virtual memory related to program loading.,Program does not need to be entirely in memory.,y
+Name one benefit of virtual memory related to process interaction.,Processes can share memory.,y
+Name one benefit of virtual memory related to process creation.,Processes can be created more efficiently.,y
+Define Demand paging.,Pages are loaded only when demanded during program execution.,y
+"In demand paging, what happens to pages that are never demanded?",Pages never demanded are never loaded.,y
+What is a page fault?,Occurs when a page not in memory is accessed.,y
+What action must be taken when a page fault occurs?,The page must be brought from the backing store into an available page frame.,y
+Define Copy-on-write.,A mechanism where a child process shares the same address space as its parent.,y
+Under what condition is a copy of a page made in a copy-on-write system?,If the child or parent modifies the shared page.,y
+When are page-replacement algorithms used?,"When available memory is low, a page-replacement algorithm selects an existing page to replace.",y
+Name common page-replacement algorithms.,"FIFO, optimal, LRU.",y
+Why is pure LRU impractical to implement?,Most systems use LRU-approximation algorithms instead.,y
+Define Global page-replacement algorithms.,Algorithms that select a page from any process for replacement.,y
+Define Local page-replacement algorithms.,Algorithms that select a page only from the faulting process for replacement.,y
+What is Thrashing?,A state where the system spends more time paging than executing.,y
+Define Locality (in the context of memory management).,A set of pages actively used together.,y
+How does process execution typically behave with regard to locality?,Process execution moves from locality to locality.,y
+What is a Working set?,"Based on locality, it's the set of pages currently in use by a process.",y
+What is Memory compression?,A technique that compresses a number of pages into a single page.,y
+When is memory compression used as an alternative to paging?,On mobile systems without paging support.,y
+How is Kernel memory allocation different from user-mode process memory allocation?,"Kernel memory is allocated differently, in contiguous chunks of varying sizes.",y
+Name two common techniques for kernel memory allocation.,Buddy system and Slab allocation.,y
+What is TLB reach?,The amount of memory accessible from the Translation Lookaside Buffer (TLB).,y
+How is TLB reach calculated?,Number of entries in TLB × page size.,y
+What is a technique to increase TLB reach?,Increase the page size.,y
+"How do Linux, Windows, and Solaris manage virtual memory?","They manage it similarly, using demand paging, copy-on-write, and variations of LRU approximation (e.g., clock algorithm).",y

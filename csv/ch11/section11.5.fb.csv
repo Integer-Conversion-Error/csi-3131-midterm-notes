@@ -1,0 +1,108 @@
+Front,Back
+What are the OS responsibilities related to storage device management?,"Drive initialization, booting from drive, and bad-block recovery."
+What is the initial state of a new storage device?,"A blank slate (e.g., platter of magnetic material, uninitialized semiconductor cells)."
+What must happen to a storage device before data can be stored on it?,It must be divided into sectors that the controller can read/write.
+What must happen to NVM pages before data can be stored?,They must be initialized and an FTL (Flash Translation Layer) created.
+What is the process of dividing a device into sectors or initializing NVM pages?,Low-level formatting or physical formatting.
+What is low-level formatting?,The process that fills a device with a special data structure for each storage location.
+What components typically make up the data structure for a sector or page?,"A header, a data area, and a trailer."
+What information is contained in the header and trailer of a sector/page data structure?,"Controller information, such as sector/page number and error detection/correction code."
+When are most drives low-level formatted?,"At the factory, as part of the manufacturing process."
+What does factory low-level formatting enable the manufacturer to do?,Test the device and initialize the mapping from logical block numbers to defect-free sectors/pages.
+What are the common choices for sector sizes?,512 bytes and 4KB.
+What is the advantage of a larger sector size?,"Fewer sectors per track, fewer headers/trailers, and more space available for user data."
+How do some OSes handle sector sizes?,They may only handle one specific sector size.
+What are the three steps an OS typically takes to record its own data structures on a device?,"1. Partitioning, 2. Volume creation and management, 3. Logical formatting (or creation of a file system)."
+What is partitioning (storage device management)?,Dividing a device into one or more groups of blocks/pages.
+What is the purpose of partitioning?,To allow the OS to treat each partition as a separate device.
+Give examples of how partitions might be used.,"One partition for OS executable code (file system), another for swap space, and another for user files."
+How do some OS/file systems handle partitioning?,They partition automatically when the entire device is managed by the file system.
+Where is partition information typically stored?,In a fixed format at a fixed location on the storage device.
+Which Linux command manages partitions?,`fdisk`.
+What happens after an OS recognizes a device and reads its partition info?,"The OS creates device entries (e.g., `/dev` in Linux)."
+Which configuration file tells the OS to mount partitions in Linux?,`/etc/fstab`.
+What is mounting a file system?,Making it available for use by logically attaching it to the root file system.
+How is a volume implicitly created?,"When a file system is placed directly within a partition, making it ready to be mounted."
+How are volumes explicitly created?,"When multiple partitions/devices are used as a RAID set, allowing one or more file systems to spread across devices."
+Which Linux tool provides volume management features?,`lvm2`.
+Which file system integrates volume management?,ZFS.
+"What can the term ""volume"" also refer to in a broader sense?","Any mountable file system, such as a CD image file."
+What is logical formatting (storage management)?,"The process where the OS stores initial file-system data structures onto the device, or creation of a file system."
+What data structures are created during logical formatting?,Maps of free/allocated space and an initial empty directory.
+What does partition information indicate regarding booting?,If a partition contains a bootable file system (OS).
+What is established by a partition labeled for boot?,The root of the file system.
+What happens once the boot partition is mounted?,Device links for all other devices/partitions are created.
+"What constitutes a computer's ""file system""?",All mounted volumes.
+How are Windows file systems typically named?,"Separately via letters (e.g., C:, D:, E:)."
+How are Linux file systems typically structured?,"The boot file system is mounted at boot, and other file systems are mounted within its tree structure."
+What is the difference in file system interfaces between Windows and Linux regarding device usage?,"In Windows, the file system interface is clear when a device is used. In Linux, a single file access might traverse many devices."
+What larger chunks do file systems group blocks into?,Clusters.
+How does device I/O differ from file system I/O?,"Device I/O occurs via blocks, while file system I/O occurs via clusters."
+What is the benefit of grouping blocks into clusters for I/O?,It assures more sequential-access and fewer random-access characteristics.
+How do file systems optimize for HDD head seeks?,They group file contents near metadata to reduce head seeks.
+What is it called when special programs use a partition as a large sequential array of logical blocks without file-system data structures?,Raw disk.
+What is the I/O type for a raw disk?,Raw I/O.
+What are common use cases for raw disk access?,Swap space and some database systems that need to control exact record location.
+What file-system services does raw I/O bypass?,"Buffer cache, file locking, prefetching, space allocation, file names, and directories."
+What is the purpose of allowing applications to use raw partitions?,To implement their own special-purpose storage services.
+How do most applications interact with storage devices?,They use the provided file system.
+How does Linux provide access similar to raw I/O?,Via the `DIRECT` flag to the `open()` system call.
+What must a computer have when it starts (powered up/rebooted)?,An initial program to run.
+What is the initial bootstrap loader like and where is it stored?,It tends to be simple and is stored in NVM (Non-Volatile Memory) flash memory firmware on the motherboard.
+Where is the bootstrap NVM firmware mapped?,To a known memory location.
+What does the bootstrap NVM firmware initialize?,"CPU registers, device controllers, and main memory contents."
+What does the tiny bootstrap loader do?,It brings in the full bootstrap program from secondary storage.
+Where is the full bootstrap program stored?,"In ""boot blocks"" at a fixed location on the device."
+What is a device with a boot partition called?,A boot disk or system disk.
+What does the bootstrap NVM code instruct the storage controller to do?,"Read boot blocks into memory (without device drivers loaded), then execute the code."
+How does the full bootstrap program differ from the initial bootstrap loader?,It is more sophisticated; it loads the entire OS from a non-fixed location and starts the OS.
+"In Windows, what does the boot partition contain?",The OS and device drivers.
+What is the Windows boot code in the first logical block of a hard disk/NVM device termed?,Master Boot Record (MBR).
+What runs when Windows booting begins?,Code in the system's firmware.
+What does the firmware code do during Windows boot?,Directs the system to read boot code from the MBR (as it understands enough about the controller/device to load the sector).
+What does the MBR contain?,"Boot code, a table listing partitions, and a flag for the boot partition."
+What happens after the system identifies the boot partition during Windows boot?,"It reads the first sector/page, known as the boot sector."
+What does the boot sector do in the Windows boot process?,Directs to the kernel.
+What happens after the kernel is loaded in the Windows boot process?,"The boot process continues, loading subsystems and system services."
+Why are disks prone to failure?,Due to moving parts and small tolerances.
+What happens in case of complete disk failure?,"The disk is replaced, and contents are restored from backup."
+What type of disk failure is more frequent than complete failure?,One or more sectors becoming defective.
+Do new disks come with defects?,Most disks come from the factory with bad blocks.
+"How were bad blocks handled on older disks (e.g., IDE controllers)?",Manually.
+What was the manual strategy for handling bad blocks during formatting?,"Scanning the disk for bad blocks, then flagging discovered bad blocks as unusable so the file system wouldn't allocate them."
+How were blocks that went bad during operation handled manually?,"A special program (e.g., Linux `badblocks`) was run manually to search for and lock away the bad blocks."
+What typically happened to data on bad blocks that were manually locked away?,The data was usually lost.
+How do more sophisticated disks handle bad-block recovery?,They are smarter; the controller maintains a list of bad blocks.
+When is the controller's list of bad blocks initialized and updated?,Initialized at the factory and updated over the life of the disk.
+What does low-level formatting do on sophisticated disks to aid bad-block recovery?,It sets aside spare sectors that are not visible to the OS.
+What does the controller do when it encounters a bad sector on a sophisticated disk?,It logically replaces each bad sector with a spare sector.
+What are the names for the scheme where a controller replaces a bad sector with a spare sector?,Sector sparing or forwarding.
+Describe the steps in a typical bad-sector transaction with sector sparing.,"1. OS tries to read logical block 87. 2. Controller calculates ECC, finds sector bad, reports I/O error to OS. 3. Device controller replaces bad sector with a spare. 4. After that, any system request for logical block 87 is translated to the replacement sector's address by the controller."
+What is a potential issue with bad sector redirection by the controller?,It could invalidate OS disk-scheduling optimization.
+Where are spare sectors typically allocated on most disks?,"A few spare sectors in each cylinder, and a spare cylinder."
+"When a bad block is remapped, where does the controller try to use a spare sector from first?",From the same cylinder if possible.
+What is an alternative to sector sparing?,Sector slipping.
+How does sector slipping work?,"It remaps all sectors from a defective one onwards down one spot (e.g., if logical block 17 is defective, it remaps all sectors from 17 to 202, moving them down one spot, freeing up space of sector 18, and mapping sector 17 to it)."
+What might recoverable soft errors trigger?,"Device activity, such as copying block data or sparing/slipping the block."
+What is the consequence of an unrecoverable hard error?,"Lost data. The file using the block must be repaired (e.g., from backup), which requires manual intervention."
+What can become nonfunctional or go bad in NVM devices?,"Bits, bytes, or pages."
+Why is bad block management simpler for NVM devices compared to HDDs?,There is no seek time performance loss.
+How are bad pages handled in NVM devices?,"Multiple pages are set aside as replacement locations, or space from an over-provisioning area is used."
+What does the NVM controller do regarding bad pages?,It maintains a table of bad pages and never sets them as available to write to.
+low-level formatting,Initialization of a storage medium for computer storage.
+physical formatting,Initialization of a storage medium for computer storage.
+partition,Logical segregation of storage space into multiple areas.
+mounting,Making a file system available for use by logically attaching it to the root file system.
+volume,Container of storage; often a device with a mountable file system.
+logical formatting,Creation of a file system in a volume to ready it for use.
+cluster,"In Windows storage, a power-of-2 number of disk sectors collected for I/O optimization."
+raw disk,Direct access to a secondary storage device as an array of blocks with no file system.
+bootstrap,Steps taken at computer power-on to bring system to full operation.
+boot disk,Disk with a boot partition and kernel to load for booting.
+system disk,"Storage device with a boot partition, can store OS for booting."
+boot partition,Storage device partition containing an executable operating system.
+master boot record (MBR),"Windows boot code, stored in the first sector of a boot partition."
+boot sector,"First sector of a Windows boot device, containing bootstrap code."
+bad block,Unusable sector on an HDD.
+sector sparing,Replacement of unusable HDD sector with another sector elsewhere on device.
+sector slipping,Renaming of sectors to avoid using a bad sector.

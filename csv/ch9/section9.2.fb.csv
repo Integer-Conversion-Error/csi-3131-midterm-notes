@@ -1,0 +1,48 @@
+Front,Back
+What does main memory accommodate?,The Operating System (OS) and user processes.
+How is memory usually divided for the OS and user processes?,"Into two partitions: one for the OS, and one for user processes."
+Where can the OS reside in memory?,"In low or high memory. Many OS, including Linux/Windows, use high memory."
+How many user processes typically reside in memory concurrently?,Several.
+Define Contiguous Memory Allocation.,A memory allocation method where each process is in a single contiguous memory section.
+What is the primary goal of memory protection?,To prevent a process from accessing memory it does not own.
+Which two registers are combined to implement memory protection?,The relocation register and the limit register.
+What is the purpose of the relocation register in memory protection?,It holds the smallest physical address (base address) that a process can access.
+What is the purpose of the limit register in memory protection?,It specifies the range of logical addresses that a process can access.
+How is a logical address validated in a relocation-register scheme?,Each logical address must fall within the range specified by the limit register.
+How does the MMU (Memory Management Unit) map a logical address dynamically using the relocation-register scheme?,By adding the relocation register's value to the logical address.
+What is the CPU scheduler's role regarding relocation and limit registers during a context switch?,It loads the relocation and limit registers.
+When are CPU-generated addresses checked against the relocation and limit registers?,Every CPU-generated address is checked.
+What does the relocation-register scheme allow regarding OS size?,Dynamic changes to the OS size.
+Why is the relocation-register scheme desirable for device drivers?,It allows them to be loaded only when needed and removed when no longer needed.
+What is the simplest method for memory allocation?,Assigning processes to variably sized partitions.
+Define Variable-Partition scheme.,A memory-allocation scheme where each memory partition contains exactly one process.
+What does the OS keep track of regarding memory parts in variable-partition allocation?,A table of available and occupied memory parts.
+What is the initial state of memory for user processes in a variable-partition scheme?,"All memory is available for user processes as one large block, known as a 'hole'."
+What does memory contain after some processes have been loaded and removed?,A set of 'holes' of various sizes scattered throughout memory.
+What does the OS consider when a process arrives and requires memory?,Its memory requirements and the available space (holes).
+What happens if a process terminates and releases its memory block?,"The OS provides the released memory to another process, and the block is returned to the set of available 'holes'."
+What action is taken if a new hole is adjacent to existing holes upon process termination?,The new hole is merged with the adjacent ones to form a larger hole.
+Define Dynamic Storage-Allocation Problem.,The problem of satisfying a memory request of size 'n' from a list of free 'holes'.
+Name the three common strategies for selecting a free 'hole' in memory allocation.,"First-fit, Best-fit, and Worst-fit."
+Define First-Fit in memory allocation.,"In memory allocation, selecting the first hole large enough for a request, searching from the beginning or the last search end. The search stops when a large enough hole is found."
+Define Best-Fit in memory allocation.,"In memory allocation, selecting the smallest hole large enough for a request."
+Define Worst-Fit in memory allocation.,"In memory allocation, selecting the largest hole available."
+What is typically required when using the Best-Fit strategy?,The entire list of holes must be searched (unless ordered by size).
+What kind of leftover hole does Best-fit allocation produce?,The smallest leftover hole.
+What kind of leftover hole does Worst-fit allocation produce?,The largest leftover hole.
+How do First-fit and Best-fit compare to Worst-fit in simulations?,"First-fit and Best-fit are generally better than Worst-fit, both in terms of decreasing time and improving storage utilization."
+"Which memory allocation strategy, First-fit or Best-fit, is generally faster?",First-fit.
+Define External Fragmentation.,"A type of fragmentation where available memory has holes that together are enough to satisfy a request, but no single hole is large enough. The storage is fragmented and non-contiguous."
+How does external fragmentation occur?,"When processes are loaded and removed from memory, free memory is broken into many small, noncontiguous pieces."
+What is the 50-percent rule in memory fragmentation?,"A statistical finding that for N allocated blocks, 0.5 N blocks are lost to fragmentation, meaning one-third of memory may become unusable."
+What are the two types of memory fragmentation?,Internal fragmentation and external fragmentation.
+Define Internal Fragmentation.,Unused memory that is internal to a partition.
+When does internal fragmentation occur?,"When allocated memory is slightly larger than the requested memory (e.g., in fixed-sized blocks)."
+What is a common solution to external fragmentation?,Compaction.
+Define Compaction in memory management.,Shuffling storage contents to consolidate all used space and create one or more large contiguous blocks of free memory (holes).
+Under what condition is compaction possible?,Only if relocation is dynamic (execution time). It is not possible if relocation is static (assembly/load time).
+What actions are required during compaction if dynamic relocation is enabled?,Move the program/data and change the base register.
+Is compaction generally expensive or inexpensive?,"It can be expensive (e.g., moving all processes to one end)."
+What is another solution to external fragmentation besides compaction?,Permitting a noncontiguous logical address space.
+Which common memory-management technique permits noncontiguous logical address space to solve external fragmentation?,Paging.
+What is the most common memory-management technique?,Paging.

@@ -1,0 +1,71 @@
+Front,Back,Reversible
+What are the OS responsibilities in storage device management?,"Drive initialization, booting from drive, and bad-block recovery.",y
+What is the initial state of a new storage device before data can be stored?,"A blank slate (e.g., platter of magnetic material, uninitialized semiconductor cells).",y
+What must happen to a storage device before data can be stored on it?,"It must be divided into sectors so the controller can read/write. For NVM, pages must be initialized and an FTL created.",y
+Define: low-level formatting,Initialization of a storage medium for computer storage. It fills the device with special data structures for each storage location.,y
+Define: physical formatting,Initialization of a storage medium for computer storage. It fills the device with special data structures for each storage location.,y
+What components make up the special data structure for each storage location (sector/page) created during low-level formatting?,"Header, data area, and trailer.",y
+What information do the header and trailer contain in a storage data structure?,"Controller information (sector/page number, error detection/correction code).",y
+When is low-level formatting typically performed on most drives?,At the factory during the manufacturing process.,y
+What does factory low-level formatting enable the manufacturer to do?,Test the device and initialize mapping from logical block numbers to defect-free sectors/pages.,y
+What are common sector sizes for storage devices?,512 bytes and 4KB.,y
+What is the advantage of using a larger sector size?,"Fewer sectors per track, fewer headers/trailers, and more space available for user data.",y
+What are the three steps an OS needs to perform to record its own data structures on a storage device?,"1. Partitioning, 2. Volume creation and management, 3. Logical formatting (or creation of a file system).",y
+Define: partition,"Logical segregation of storage space into multiple areas, treated by the OS as separate devices.",y
+Provide examples of how partitions can be used.,"One partition for OS executable code (file system), another for swap space, and another for user files.",y
+Where is partition information stored on a storage device?,In a fixed format at a fixed location on the device.,y
+What Linux command is used to manage partitions?,`fdisk`.,y
+What does the OS do after recognizing a device and reading its partition information?,"It creates device entries (e.g., `/dev` in Linux).",y
+What configuration file tells Linux to mount partitions?,`/etc/fstab`.,y
+Define: mounting,Making a file system available for use by logically attaching it to the root file system.,y
+Define: volume,"A container of storage; often a device with a mountable file system. Can be implicit (file system directly in a partition) or explicit (e.g., multiple partitions/devices in a RAID set).",y
+What Linux tool provides volume management features?,`lvm2`.,y
+What file system integrates volume management?,ZFS.,y
+Define: logical formatting,"Creation of a file system in a volume to ready it for use, where the OS stores initial file-system data structures onto the device.",y
+What initial data structures does the OS store during logical formatting?,Maps of free/allocated space and an initial empty directory.,y
+How does partition information indicate if a partition contains a bootable file system?,It indicates if the partition contains the OS.,y
+What happens once a partition labeled for boot is mounted?,"It is used to establish the root of the file system, and device links for all other devices/partitions are created.",y
+What constitutes a computer's 'file system'?,All mounted volumes.,y
+How does Windows name its volumes?,"Separately via letters (e.g., C:, D:, E:).",y
+How are file systems typically mounted in Linux?,"The boot file system is mounted at boot, and other file systems are mounted within the tree structure.",y
+Define: cluster,"In Windows storage, a power-of-2 number of disk sectors collected for I/O optimization. More broadly, file systems group blocks into larger chunks called clusters.",y
+How does device I/O differ from file system I/O?,Device I/O is via blocks; file system I/O is via clusters.,y
+What is the benefit of grouping blocks into clusters for file system I/O?,Assures more sequential-access and fewer random-access characteristics.,y
+What strategy do file systems use to reduce HDD head seeks?,They group file contents near metadata.,y
+Define: raw disk,Direct access to a secondary storage device as an array of blocks with no file system. This allows special programs to use a partition as a large sequential array of logical blocks.,y
+Define: raw I/O,"Input/output operations performed directly on a raw disk, bypassing file-system services.",y
+What are common use cases for raw disk and raw I/O?,Swap space and some database systems (to control exact record location).,y
+What file-system services are bypassed by raw I/O?,"Buffer cache, file locking, prefetching, space allocation, file names, and directories.",y
+What is the purpose of allowing applications to use raw I/O?,It allows them to implement their own special-purpose storage services on a raw partition.,y
+How does Linux provide similar access to raw I/O?,Via the `DIRECT` flag to the `open()` system call.,y
+Define: bootstrap,"The steps taken at computer power-on to bring the system to full operation, starting with an initial program called the bootstrap loader.",y
+Where is the initial bootstrap loader typically stored?,"In NVM flash memory firmware on the motherboard, mapped to a known memory location.",y
+What does the bootstrap firmware typically initialize?,"CPU registers, device controllers, and main memory contents.",y
+What is the role of the tiny bootstrap loader?,It brings in the full bootstrap program from secondary storage.,y
+Where is the full bootstrap program stored?,In 'boot blocks' at a fixed location on the device.,y
+Define: boot disk,A disk with a boot partition and kernel to load for booting.,y
+Define: system disk,"A storage device with a boot partition, which can store the OS for booting.",y
+What does the bootstrap NVM code do to load the OS?,"It instructs the storage controller to read the boot blocks into memory (without device drivers loaded), then executes that code.",y
+What is the role of the full bootstrap program?,"It is more sophisticated and loads the entire OS from a non-fixed location, then starts the OS.",y
+Define: boot partition,A storage device partition containing an executable operating system and its device drivers.,y
+Define: master boot record (MBR),"Windows boot code, stored in the first logical block (or first page for NVM) of a boot partition. It contains boot code, a partition table, and a flag for the boot partition.",y
+Define: boot sector,"The first sector of a Windows boot device, containing bootstrap code that directs to the kernel.",y
+What does the system's firmware do at the beginning of the Windows boot process?,It directs the system to read boot code from the MBR.,y
+"What is a common type of storage device failure, more frequent than complete disk failure?",One or more sectors becoming defective.,y
+When do disks typically come with bad blocks?,Most disks come from the factory with bad blocks.,y
+"How were bad blocks handled on older disks (e.g., IDE controllers)?","Manually, by scanning the disk for bad blocks during formatting and flagging them as unusable.",y
+What Linux program is used to search for and lock away bad blocks that develop during operation?,`badblocks`.,y
+What typically happens to data on bad blocks when handled manually?,It is usually lost.,y
+How do more sophisticated disks handle bad-block recovery?,"The controller maintains a list of bad blocks (initialized at factory, updated over life) and replaces bad sectors logically with spare sectors.",y
+Define: bad block,"An unusable sector on an HDD (or non-functional bits, bytes, pages on NVM devices).",y
+Define: sector sparing,"Replacement of an unusable HDD sector with another sector elsewhere on the device, typically a spare sector set aside during low-level formatting.",y
+What is another term for 'sector sparing'?,Forwarding.,y
+How does a device controller replace a bad sector with a spare sector?,"After detecting a bad sector (e.g., via ECC error), the controller logically replaces it. Subsequent requests for the original logical block are then translated to the replacement sector's address.",y
+What is a potential consequence of the controller redirecting bad blocks?,It could invalidate OS disk-scheduling optimization.,y
+Where are spare sectors typically located on disks?,"A few spare sectors in each cylinder, and a spare cylinder.",y
+"When a bad block is remapped, where does the controller try to use a spare sector from?",The same cylinder if possible.,y
+Define: sector slipping,"Renaming of sectors to avoid using a bad sector, by remapping all subsequent sectors down one spot to free up space, and then mapping the bad sector to the newly freed space.",y
+What happens in the case of an unrecoverable hard error on a storage device?,"Data on that block is lost, and the file using the block must be repaired (e.g., from backup), requiring manual intervention.",y
+How does bad block management differ for NVM devices compared to HDDs?,"It is simpler, as there is no seek time performance loss due to remapping.",y
+How are replacement locations handled for bad pages on NVM devices?,"Multiple pages are set aside as replacement locations, or space from the over-provisioning area is used.",y
+What does the controller for NVM devices do with bad pages?,It maintains a table of bad pages and never sets them as available to write to.,y

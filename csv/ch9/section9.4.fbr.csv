@@ -1,0 +1,52 @@
+Front,Back,Reversible
+What are common techniques for structuring the page table?,"Hierarchical paging, hashed page tables, and inverted page tables.",y
+What is the typical range for logical address spaces in modern computer systems?,$2^{32}$ to $2^{64}$,y
+What problem arises with page tables when logical address spaces are very large?,The page table itself becomes excessively large.,y
+Consider a 32-bit logical address space with a 4 KB page size. How many entries would a standard page table have?,Over 1 million entries ($2^{20}$).,y
+"In a 32-bit logical address space with a 4 KB page size, if each page table entry is 4 bytes, how much physical address space would a page table alone consume for each process?",Up to 4 MB.,y
+What is the general solution to the problem of excessively large page tables?,Divide the page table into smaller pieces.,y
+What is a two-level paging algorithm?,A scheme where the page table itself is paged.,y
+How is a 32-bit logical address space divided into page number and offset in a two-level paging scheme with a 4 KB page size?,Page number: 20 bits; Page offset: 12 bits.,y
+"In a two-level paging scheme for a 32-bit logical address space and 4 KB page size, how is the 20-bit page number further divided?",$p_1$: 10-bit outer page number (index into outer page table); $p_2$: 10-bit inner page offset (displacement within inner page table).,y
+How does address translation occur in a two-level paging scheme?,From the outer page table inward.,y
+What is another common name for a two-level paging scheme?,Forward-mapped page table.,y
+Define 'forward-mapped' in the context of hierarchical page tables.,A scheme for hierarchical page tables where address translation starts at the outer page table and moves inward.,y
+Why is a two-level paging scheme generally inappropriate for a 64-bit logical address space?,"For a 4 KB page size, it would have up to $2^{52}$ entries, and even the outer page table would still be $2^{44}$ bytes (16 GB), making it too large.",y
+What is a three-level paging scheme?,"A hierarchical paging scheme where the outer page table itself is paged, typically into standard-size pages ($2^{10}$ entries, or $2^{12}$ bytes).",y
+"How many levels of paging would a 64-bit UltraSPARC system potentially require with a hierarchical scheme, and why is this problematic?","It would require seven levels of paging, which leads to a prohibitive number of memory accesses.",y
+For what address space size are hierarchical page tables generally inappropriate?,64-bit architectures.,y
+"What is the primary approach for handling address spaces larger than 32 bits, besides hierarchical paging?",Hashed page tables.,y
+What value is used as the hash value in a hashed page table?,The virtual page number.,y
+How do hashed page tables resolve collisions?,Each entry in the hash table contains a linked list of elements.,y
+What three fields make up each element in a hashed page table's linked list?,1. Virtual page number. 2. Value of mapped page frame. 3. Pointer to next element in linked list.,y
+Describe the algorithm for address translation using a hashed page table.,"The virtual page number is hashed into the hash table. The virtual page number is compared with the first field of the first element in the linked list. If a match is found, the corresponding page frame (field 2) is used. If no match, subsequent entries in the linked list are searched.",y
+Define 'hashed page table'.,A page table that is hashed for faster access; the hash value is the virtual page number.,y
+What is a clustered page table?,"A variation of hashed page tables for 64-bit address spaces, where each entry refers to several pages (e.g., 16) instead of a single page.",y
+What is the benefit of a clustered page table compared to a standard hashed page table?,A single page-table entry stores mappings for multiple physical-page frames.,y
+For what type of address spaces are clustered page tables particularly useful?,Sparse address spaces (memory references are noncontiguous or scattered).,y
+Define 'sparse' in memory management.,"Describes a page table with noncontiguous, scattered entries; an address space with many holes.",y
+What is the typical structure of standard page tables regarding processes?,"Each process has an associated page table, with one entry for each page the process is using (or each virtual address).",y
+What is a major drawback of standard page tables?,"Each page table can consist of millions of entries, consuming large amounts of physical memory.",y
+Define 'inverted page table'.,"A page-table scheme with one entry for each real physical page frame in memory, mapping to a logical page (virtual address) value.",y
+What information does each entry in an inverted page table contain?,"The virtual address of the page stored in that real memory location, plus process information (e.g., address-space identifier).",y
+How many page tables are typically present in a system that uses inverted page tables?,"Only one page table for the entire system, with one entry per physical memory page.",y
+Why is an address-space identifier (process-id) often included in an inverted page table entry?,It ensures that a logical page for a particular process maps to its corresponding physical page frame.,y
+Name two operating systems/CPUs that use inverted page tables.,64-bit UltraSPARC and PowerPC.,y
+"In the IBM RT simplified version of inverted page tables, what is the structure of a virtual address?","<process-id, page-number, offset>",y
+"In the IBM RT simplified version of inverted page tables, what is the structure of an inverted page-table entry?","<process-id, page-number>",y
+Describe the memory reference process in the IBM RT simplified version of inverted page tables.,"The <process-id, page-number> from the virtual address is presented to the memory subsystem. The inverted page table is searched for a match. If a match is found at entry 'i', the physical address <i, offset> is generated. If no match, it's an illegal address access.",y
+What is a primary drawback of inverted page tables regarding search time?,"It increases the time to search the table because the table is sorted by physical address, but lookups are performed by virtual address.",y
+How is the search time drawback of inverted page tables typically alleviated?,By using a hash table to limit the search.,y
+What is the cost in terms of memory references when using a hash table with inverted page tables?,"Each access to the hash table adds a memory reference, requiring at least two real memory reads for one virtual memory reference (one for the hash-table entry and one for the page table entry).",y
+What mechanism is typically searched first to improve performance with inverted page tables?,The Translation Lookaside Buffer (TLB).,y
+"What issue do inverted page tables have with shared memory, compared to standard paging?","Standard paging allows multiple virtual addresses to map to the same physical address. Inverted page tables, having only one entry per physical page, mean a physical page cannot have multiple shared virtual addresses. A reference by another process sharing memory would cause a page fault, replacing the existing mapping.",y
+How does Oracle SPARC Solaris efficiently solve the virtual memory problem for its 64-bit OS?,It uses hashed page tables.,y
+"How many hash tables does Solaris use for virtual to physical memory mapping, and what are their purposes?",Two hash tables: one for the kernel and one for all user processes.,y
+What specific area of memory does each hash-table entry in Solaris map?,A contiguous area of mapped virtual memory (more efficient than per-page entry).,y
+What information does an entry in Solaris's hash table typically include?,A base address and a span (number of pages represented).,y
+What is the TLB (Translation Lookaside Buffer) in the context of Solaris?,It holds translation table entries (TTEs) for fast hardware lookups.,y
+What is the Translation Storage Buffer (TSB) in Solaris?,"A cache of Translation Table Entries (TTEs), including an entry for each recently accessed page.",y
+Define 'TLB walk'.,The steps involved in traversing page-table structures to locate a needed translation and copying the result into the TLB.,y
+Describe the full process of a virtual address reference in Oracle SPARC Solaris.,"1. Hardware searches TLB for translation. 2. If not found, hardware performs a 'TLB walk' by searching the in-memory TSB for the TTE. 3. If a match is found in the TSB, the CPU copies the TSB entry into the TLB, and memory translation completes. 4. If no match in the TSB, the kernel is interrupted to search the hash table. 5. The kernel creates a TTE from the hash table and stores it in the TSB for automatic loading into the TLB by the MMU. 6. The interrupt handler returns control to the MMU, which completes address translation and retrieves data.",y
+Define 'Solaris'.,"A UNIX derivative, main operating system of Sun Microsystems (now Oracle); active open source version called Illumos.",y
+Define 'SPARC'.,A proprietary RISC CPU created by Sun Microsystems (now Oracle); active open source version called OpenSPARC.,y

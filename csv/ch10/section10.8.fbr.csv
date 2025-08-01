@@ -1,0 +1,50 @@
+Front,Back,Reversible
+How are pages allocated for user-mode processes?,Pages are allocated from the kernel's free page frame list.,y
+How is the kernel's free page frame list populated?,"By page-replacement algorithms (e.g., Section 10.4).",y
+Describe the physical memory distribution of free pages for user-mode processes.,Free pages are scattered throughout physical memory.,y
+What causes internal fragmentation when a user-mode process requests memory?,"A single byte request results in an entire page frame being granted, leading to internal fragmentation.",y
+Why is kernel memory often allocated from a different free-memory pool than user-mode memory?,"1. Kernel requests vary in data structure sizes, some less than a page, requiring conservative memory use to minimize fragmentation.
+2. Many OS do not subject kernel code/data to paging.
+3. Hardware devices interact directly with physical memory (no virtual memory interface) and may require physically contiguous pages.",y
+What are the main strategies for managing kernel free memory?,"""Buddy system"" and ""slab allocation"".",y
+From where does the buddy system allocate memory?,From a fixed-size segment of physically contiguous pages.,y
+"What is a ""power-of-2 allocator""?",An allocator in the buddy system that satisfies memory requests in units sized as a power of 2.,y
+How does the buddy system handle a memory request that is not appropriately sized (power of 2)?,It is rounded up to the next highest power of 2.,y
+"If a buddy system receives an 11 KB request, what size segment is granted?",A 16-KB segment (rounded up from 11 KB).,y
+Describe the steps for a 21 KB kernel request from an initial 256 KB segment using the buddy system.,"1. Initial 256 KB segment divided into two 128 KB ""buddies"" ($A_L$ and $A_R$).
+2. One buddy ($A_L$) divided into two 64 KB buddies ($B_L$ and $B_R$).
+3. Next-highest power of 2 for 21 KB is 32 KB.
+4. One 64 KB buddy ($B_L$) divided into two 32 KB buddies ($C_L$ and $C_R$).
+5. One 32 KB buddy ($C_L$) is used for the 21 KB request.",y
+"What are ""buddies"" in the context of memory allocation?",Pairs of equal size in buddy memory allocation.,y
+What is a key advantage of the buddy system?,It can quickly combine adjacent buddies to form larger segments using coalescing.,y
+"What is ""coalescing"" in the buddy system?",Combining freed memory in adjacent buddies into larger segments.,y
+Give an example of coalescing in the buddy system after a 21 KB request is released.,"When the $C_L$ unit (32 KB) is released, it can coalesce with $C_R$ to form a 64 KB segment ($B_L$). This $B_L$ can then coalesce with $B_R$ to form a 128 KB segment ($A_L$), and eventually the original 256 KB segment.",y
+What is the main drawback of the buddy system?,Rounding up requests to the next highest power of 2 causes internal fragmentation.,y
+Give an example of internal fragmentation in the buddy system.,"A 33 KB request leads to a 64 KB segment allocation, potentially wasting nearly 50% of the allocated unit.",y
+"What is ""slab allocation""?","A memory allocation method where a slab is split into object-sized chunks, eliminating fragmentation.",y
+"What is a ""slab"" in slab allocation?",A section of memory consisting of one or more physically contiguous pages.,y
+"What is a ""cache"" in the context of the slab allocator?","One or more slabs used to store temporary data copies for performance; in the slab allocator, it consists of one or more slabs.",y
+How many caches does the slab allocator typically use for kernel data structures?,"A single cache is used for each unique kernel data structure (e.g., process descriptors, file objects, semaphores).",y
+"What is an ""object"" in the context of slab allocation?",An instantiation of a kernel data structure.,y
+How are caches populated in the slab allocator?,"Each cache is populated with ""objects"" (instantiations of the kernel data structure it manages).",y
+Describe the process of allocating an object using the slab allocator.,"1. When a cache is created, objects are allocated to it, initially marked as `free`.
+2. The number of objects depends on the slab size (e.g., a 12 KB slab could hold six 2 KB objects).
+3. When a new object is needed, the allocator assigns any `free` object from the cache, marking it `used`.",y
+"How does the slab allocator fulfill a kernel request for a process descriptor (e.g., `struct task_struct`, ~1.7 KB)?","The cache associated with `struct task_struct` fulfills the request with a pre-allocated, free `struct task_struct` object.",y
+What are the three states a slab can be in within Linux?,"1. `Full`: All objects in the slab are `used`.
+2. `Empty`: All objects in the slab are `free`.
+3. `Partial`: The slab has both `used` and `free` objects.",y
+In what order does the slab allocator try to satisfy a request for a free object?,"1. First, it looks for a free object in a partial slab.
+2. If none, it looks for a free object from an empty slab.
+3. If no empty slabs, a new slab is allocated from contiguous physical pages, assigned to the cache, and object memory is allocated from this new slab.",y
+What is the first main benefit of the slab allocator?,"No memory is wasted due to fragmentation. Each kernel data structure has an associated cache, which is made of slabs divided into object-sized chunks, ensuring the exact amount of memory requested by the kernel is returned.",y
+What is the second main benefit of the slab allocator?,"Memory requests are satisfied quickly, which is effective for frequent object allocation/deallocation common in the kernel. Objects are created in advance, quickly allocated from the cache, and released objects are marked free and immediately available.",y
+"Where did the slab allocator first appear, and where is it used today?",It first appeared in the Solaris 2.4 kernel. It is now used for some user-mode requests in Solaris. Linux adopted it (Version 2.2+) and referred to it as SLAB.,y
+What are the recent Linux kernel memory allocators mentioned?,SLOB and SLUB.,y
+What is the purpose of the SLOB allocator?,"It is designed for systems with limited memory, such as embedded systems.",y
+How does the SLOB allocator work?,"It maintains three lists (`small` <256 bytes, `medium` <1,024 bytes, `large` other objects < page size) and allocates from the appropriate list using a first-fit policy.",y
+What is the status of the SLUB allocator in Linux?,It is the default allocator for the Linux kernel (Version 2.6.24+) and replaced SLAB.,y
+How did the SLUB allocator reduce SLAB overhead related to metadata?,"It stores metadata in the `page` structure, not with each slab.",y
+How did the SLUB allocator improve memory saving on multi-processor systems compared to SLAB?,"It removed per-CPU queues for objects, leading to significant memory savings.",y
+How does the SLUB allocator perform with more processors?,It offers better performance with more processors.,y

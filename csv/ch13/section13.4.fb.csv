@@ -1,0 +1,38 @@
+Front,Back
+What aspect of information safety addresses physical damage?,"Reliability (e.g., duplicate copies, backups)."
+What aspect of information safety addresses improper access?,Protection.
+List common protection mechanisms.,"User name/password authentication, encrypting secondary storage, firewalling network access, and advanced mechanisms for valid data access in multiuser systems."
+What is the 'Read' operation in file access control?,Reading from a file.
+What is the 'Write' operation in file access control?,Writing or rewriting a file.
+What is the 'Execute' operation in file access control?,Loading and executing a file.
+What is the 'Append' operation in file access control?,Writing new information at the end of a file.
+What is the 'Delete' operation in file access control?,Deleting a file and freeing its space.
+What is the 'List' operation in file access control?,Listing a file's name and attributes.
+What is the 'Attribute change' operation in file access control?,Changing a file's attributes.
+"Where is protection typically implemented for higher-level functions (like rename, copy, edit) that use lower-level calls?",At the lower-level calls.
+"What is the most general scheme for access control, where access depends on user identity?",Access-control list (ACL).
+Define 'Access-control list (ACL)'.,A list that specifies user names and the allowed access types for a file. The OS checks this list to determine access.
+What are the advantages of using an Access-control list (ACL)?,It allows for complex access methodologies.
+What are the disadvantages of using an Access-control list (ACL)?,"Lengthy lists (tedious to construct, especially if users are unknown) and variable-size directory entries (complicating space management)."
+"In condensed Access-control lists (ACLs), what are the three user classifications?","Owner, Group, and Other."
+Who is classified as the 'Owner' in condensed ACLs?,The user who created the file.
+Who is classified as the 'Group' in condensed ACLs?,A set of users sharing a file and needing similar access.
+Who is classified as 'Other' in condensed ACLs?,All other users not classified as Owner or Group.
+What is a common approach to access control combining ACLs and user classifications?,"Combining ACLs with owner, group, and universe schemes (e.g., as seen in Solaris)."
+"How many fields do UNIX permissions typically use, and what are they?","Three fields: owner, group, and universe (or others)."
+How are UNIX permissions represented for each field?,"Three bits, typically 'rwx'."
+What does 'r' stand for in UNIX 'rwx' permissions?,Read.
+What does 'w' stand for in UNIX 'rwx' permissions?,Write.
+What does 'x' stand for in UNIX 'rwx' permissions?,Execution.
+"In a UNIX file listing, what does 'd' as the first character indicate?",It indicates a subdirectory.
+How does Solaris show that optional ACLs are present on a file?,"A '+' is appended to the regular permissions string (e.g., '-rw-r--r--+')."
+What commands are used to manage ACLs in systems like Solaris?,setfacl and getfacl.
+How does Windows manage ACLs?,Through a Graphical User Interface (GUI).
+"When both ACLs and group permissions are present, which typically takes precedence?",ACLs typically take precedence over group permissions due to specificity priority.
+What is an alternative protection approach involving passwords and files?,Associating a password with each file.
+When is associating a password with each file effective?,If passwords are random and changed often.
+What are the disadvantages of associating a password with each file?,"Users have too many passwords to remember, or using a single password for all files results in all-or-none protection."
+What is a more common approach than associating passwords with individual files for large-scale protection?,"Encryption of partitions or files, managed with a key password."
+What aspects does directory protection in multilevel structures control?,Control over creation/deletion of files in the directory and control over a user's ability to determine file existence (listing directory contents).
+"If a path name refers to a file, what access is needed for the user to access that file?",The user needs access to both the directory (or directories in the path) and the file itself.
+"In acyclic/general graphs (referring to directory structures), how do access rights vary?",Access rights can be different depending on the path name used to refer to a file.

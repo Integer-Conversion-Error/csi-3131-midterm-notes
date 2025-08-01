@@ -1,0 +1,381 @@
+Front,Back
+What are a computer's two main jobs?,I/O and computing.
+"In many cases, which of a computer's main jobs is considered primary?","I/O is often primary, with computing being incidental (e.g., browsing, editing)."
+What is the operating system's role concerning I/O?,To manage and control I/O operations and devices.
+What aspect of I/O hardware is studied regarding OS internal facilities?,"I/O hardware basics, specifically constraints on OS internal facilities."
+What two main areas concerning OS and applications are covered regarding I/O?,OS I/O services and application I/O interface.
+"What ""gap"" is a key topic in I/O study?",Bridging the gap between hardware and application interfaces.
+What is the UNIX System V STREAMS mechanism?,A mechanism for dynamic driver code pipelines.
+What OS design principles are covered regarding I/O performance?,I/O performance and OS design principles for improvement.
+What is a major concern in operating system design related to hardware?,Device control.
+Why do I/O devices require varied control methods?,"Due to wide variations in their function and speed (e.g., mouse, hard disk, flash drive, tape robot)."
+What OS component is formed by the varied I/O control methods?,The kernel's I/O subsystem.
+What is a key benefit of the kernel's I/O subsystem?,It separates the kernel from device management complexities.
+What is a trend in I/O device technology regarding software and hardware interfaces?,Increasing standardization of software/hardware interfaces.
+What is the benefit of increasing standardization of I/O software/hardware interfaces?,It helps incorporate new device generations.
+What is another trend in I/O device technology related to the diversity of devices?,An increasingly broad variety of I/O devices.
+What challenge does the increasing variety of I/O devices pose?,"Incorporating new, unlike devices."
+How do basic I/O hardware elements accommodate diverse devices?,"Elements like ports, buses, and device controllers are designed to accommodate diverse devices."
+How is the kernel structured to manage diverse device details?,With device-driver modules that encapsulate device details.
+What do device drivers provide to the I/O subsystem?,A uniform device-access interface.
+What is the uniform device-access interface provided by device drivers analogous to?,System calls for applications.
+Define: Device driver,An OS component providing uniform access and managing I/O to various devices.
+What are the main types of device categories computers operate?,"Storage (disks, tapes), transmission (network, Bluetooth), and human-interface (screen, keyboard, mouse, audio)."
+How do devices communicate with a computer?,Via signals over cable or air.
+What is a 'port' in I/O hardware?,A connection point for devices to attach to computers.
+What is a 'bus' in computer systems?,"A communication system connecting computer components (CPU, I/O devices) for data/command transfer; a set of wires with a rigidly defined protocol for messages (electrical voltages, timings)."
+What is a 'daisy chain'?,"Devices connected in a string (A to B, B to C), usually operating as a bus."
+How do buses vary?,"In signaling, speed, throughput, and connection."
+What is the 'PCIe bus' and its purpose?,A common computer I/O bus connecting the processor-memory subsystem to fast devices.
+What is an 'expansion bus' and its purpose?,"A computer bus for connecting slow devices (e.g., keyboards)."
+What is 'Serial-attached SCSI (SAS)'?,"A common type of I/O bus, used to connect disks to a SAS controller."
+What is 'SAS'?,Common type of I/O bus.
+Describe a 'PCIe lane'.,Two signaling pairs (receive/transmit) forming a full-duplex byte stream.
+What is the data packet format for PCIe?,"Eight-bit byte format, with simultaneous transmission in both directions."
+What are the common physical link configurations for PCIe?,"1, 2, 4, 8, 12, 16, or 32 lanes (e.g., x8)."
+Give an example of PCIe throughput based on generation and lanes.,PCIe gen3 x8 offers 8 GB/s throughput.
+What is a 'controller' in I/O hardware?,"Electronics operating a port, bus, or device; a special processor managing I/O devices."
+What is 'Fibre Channel (FC)'?,A storage I/O bus used in data centers to connect computers to storage arrays.
+What is a 'host bus adapter (HBA)'?,A device controller installed in a host bus port for device connection.
+What components does an HBA typically contain?,"A processor, microcode, and private memory for its specific protocol (e.g., FC protocol)."
+Do all devices require external controllers?,"No, some devices, like disk drives, have built-in controllers."
+What functions does a disk controller typically perform?,"It implements disk-side protocols (like SAS, SATA), contains microcode, and has a processor for tasks such as bad-sector mapping, prefetching, buffering, and caching."
+How does a processor communicate with a controller?,"Via registers (data, control)."
+What are the two primary methods for processor-controller communication?,Special I/O instructions and Memory-mapped I/O.
+What is 'memory-mapped I/O'?,A device I/O method where device-control registers are mapped into the processor address space.
+How does the CPU interact with device-control registers in memory-mapped I/O?,It uses standard data-transfer instructions to read or write to the registers at their mapped memory locations.
+Why is memory-mapped I/O generally more efficient than special I/O instructions for large data transfers?,"Writing millions of bytes to memory-mapped regions (e.g., graphics memory) is faster than executing millions of individual I/O instructions."
+What is the modern trend regarding I/O communication methods?,"Systems have moved towards memory-mapped I/O for efficiency, with most I/O today occurring via device controllers using this method."
+What are the four typical I/O device control registers?,"Status, control, data-in, and data-out registers."
+What is a 'data-in register'?,A device I/O register read by the host to get input data.
+What is a 'data-out register'?,A device I/O register written by the host to send output data.
+What is a 'status register'?,"A device I/O register whose bits are read by the host to indicate states such as command complete, byte available, or error."
+What is a 'control register'?,"A device I/O register written by the host to start a command or change a device's mode (e.g., full/half-duplex, parity, word length, speed)."
+What is the typical size of data registers?,1-4 bytes.
+What are FIFO chips used for in controllers?,"They hold several bytes, expanding capacity and buffering data bursts."
+What is 'handshaking' in host-controller interaction?,A coordinated exchange of signals or register bits between the host and controller to manage communication.
+Describe the polling process for a host sending a byte to a device.,"1. Host reads `busy` bit until clear. 2. Host sets `write` bit in `command` register, writes byte to `data-out` register. 3. Host sets `command-ready` bit. 4. Controller notices `command-ready` set, sets `busy` bit. 5. Controller reads command, reads `data-out` byte, performs I/O. 6. Controller clears `command-ready`, clears `error` bit, clears `busy` bit."
+What is 'busy waiting' or 'polling'?,"A thread or process continuously uses the CPU while waiting for an event; in I/O, it's an I/O loop where the I/O thread continuously reads the status waiting for I/O completion."
+When is polling an efficient method for I/O?,"If the controller and device are very fast, or for basic operations (e.g., 3 CPU cycles)."
+When is polling inefficient for I/O?,"If the wait is long and other CPU tasks are pending, or if the device is rarely ready, leading to wasted CPU cycles."
+What is a risk associated with polling if the host waits too long?,Data loss due to buffer overflow.
+What is the alternative to polling for a hardware controller to notify the CPU?,An interrupt.
+What is an 'interrupt' in computer systems?,A hardware mechanism for a device to notify the CPU that it needs attention.
+What is an 'interrupt-request line'?,A hardware connection to the CPU for signaling interrupts.
+What is an 'interrupt-handler routine'?,An OS routine called when an interrupt signal is received.
+Describe the basic mechanism of an interrupt.,"The CPU senses the interrupt-request line after each instruction. If a controller asserts the signal, the CPU saves its current state, jumps to an interrupt-handler routine at a fixed address. The handler determines the cause, processes it, restores the CPU state, and executes a 'return from interrupt' instruction."
+What verbs describe the interrupt process from device to handler?,"A device controller *raises* an interrupt, the CPU *catches* and *dispatches* it, and the handler *clears* it."
+What is 'interrupt-controller hardware'?,Computer hardware components for interrupt management.
+What are the two types of interrupt request lines on a CPU?,Nonmaskable interrupt and Maskable interrupt.
+What is a 'nonmaskable interrupt'?,"An interrupt that cannot be delayed or blocked (e.g., unrecoverable memory error)."
+What does 'maskable' mean in the context of interrupts?,Describes an interrupt that can be delayed or blocked.
+What is an 'interrupt vector'?,"An OS data structure indexed by interrupt address, pointing to handlers. Its purpose is to reduce the need for a single handler to search all sources."
+What is 'interrupt chaining'?,A mechanism where an interrupt vector element points to a list of handlers; handlers are called until one services the request. This avoids a huge table and improves dispatch efficiency.
+What is an 'interrupt priority level'?,"Prioritization of interrupts for handling order, allowing deferral of low-priority and urgent response to high-priority interrupts."
+What is an 'exception'?,"A software-generated interrupt by error (e.g., division by zero, protected memory access) or a user program's request for an OS service."
+What is a 'first-level interrupt handler (FLIH)'?,"An interrupt handler responsible for reception and queuing of interrupts, including context switch and state storage."
+What is a 'second-level interrupt handler (SLIH)'?,An interrupt handler that performs the actual handling and processing of the interrupt.
+What is a 'software interrupt'?,A software-generated interrupt; also called a trap.
+What is a 'trap'?,"A software interrupt. It saves user state, switches to kernel mode, and dispatches to a kernel routine."
+How are traps prioritized compared to device interrupts?,"Traps typically have low priority compared to device interrupts, as they are generally less urgent."
+How are interrupts used in virtual memory paging?,"A page fault raises an interrupt, suspending the current process. The handler fetches the required page, and then schedules another process to run."
+How do system calls typically initiate kernel routines?,Library routines build a data structure and then execute a software interrupt (trap) to switch to kernel mode and dispatch to the appropriate kernel routine.
+What is 'programmed I/O (PIO)'?,A data transfer method where the CPU transfers data one byte at a time.
+Why is PIO wasteful for large data transfers?,"It monopolizes the CPU for data movement, which is inefficient for large transfers like those to/from a disk."
+What is 'direct memory access (DMA)'?,An operation allowing device controllers to transfer large data directly to/from main memory without involving the main CPU.
+How is a DMA transfer initiated by the host CPU?,"The host writes a DMA command block (containing source, destination, and byte count) to memory, then provides the command block's address to the DMA controller and continues with other work."
+What is 'scatter-gather' I/O?,An I/O method specifying multiple sources/destinations in one command block for a single transfer operation.
+How does a DMA controller perform data transfers without the main CPU?,"It operates the memory bus directly, seizing it to perform transfers."
+What is a challenge when DMA targets user space memory?,"Risk of modification during transfer, often leading to inefficient 'double buffering'."
+What is 'double buffering'?,"Copying data twice (e.g., device to kernel, then kernel to process), or using two buffers."
+What is the trend for direct I/O between devices and user address space?,Operating systems have moved to using memory-mapping to enable direct I/O transfers.
+What are the handshaking signals between a DMA controller and a device controller?,DMA-request and DMA-acknowledge wires.
+Describe the handshaking process during a DMA transfer.,"1. Device places a signal on the DMA-request line when a word is available. 2. DMA controller seizes the memory bus, places the address, and signals DMA-acknowledge. 3. Device receives DMA-acknowledge, transfers the word, and removes DMA-request. This repeats until done, then DMA controller interrupts the CPU."
+What is 'cycle stealing'?,"A device (e.g., DMA controller) using the bus, temporarily preventing the CPU from accessing main memory."
+What is the overall impact of cycle stealing on system performance?,"While it momentarily slows the CPU, DMA generally improves total system performance by offloading large data transfers."
+What is 'direct virtual memory access (DVMA)'?,"DMA using virtual addresses as transfer sources/destinations, which are translated to physical addresses. It can also transfer between memory-mapped devices without CPU/main memory."
+What are the key concepts of I/O hardware?,"Bus, Controller, I/O port and its registers, Handshaking (host and device controller), Handshaking execution (polling or interrupts), and Offloading large transfers to DMA controller."
+What are the main challenges for OS implementers regarding I/O hardware?,"Managing the wide variety of devices with unique capabilities, control-bit definitions, and protocols; attaching new devices without OS rewrites; and providing a uniform I/O interface to applications."
+What is a 'PHY'?,Physical hardware component connecting to a network (OSI layer 1).
+What is the primary goal when designing the Application I/O interface?,To treat I/O devices uniformly.
+What are the key approaches used to achieve uniform treatment of I/O devices?,"Abstraction, encapsulation, and software layering."
+How are device differences abstracted away in the I/O system?,"By identifying general kinds of devices, each accessed via standardized functions."
+What is an 'interface' in the context of I/O device access?,Standardized functions through which each kind of device is accessed.
+What encapsulates device differences in the kernel?,Device drivers.
+What are 'device drivers'?,Kernel modules custom-tailored to specific devices that export standard interfaces.
+What is the purpose of the device-driver layer?,To hide differences among device controllers from the kernel I/O subsystem.
+How do I/O system calls relate to hardware differences?,"They encapsulate device behavior in generic classes, hiding hardware differences from applications."
+"What are the benefits of the I/O structuring techniques (abstraction, encapsulation, layering)?",Simplifies OS development and allows hardware manufacturers to design compatible devices or write drivers for popular OS.
+List the dimensions along which I/O devices vary.,"Character-stream or block; sequential or random access; synchronous or asynchronous; sharable or dedicated; speed of operation; read-write, read only, or write once."
+Define 'Character-stream' device.,A device that transfers bytes one by one.
+Define 'Block' device.,A device that transfers a block of bytes as a unit.
+Define 'Sequential access' for devices.,Data access in a fixed order determined by the device.
+Define 'Random-access' for devices.,User can seek to any storage location directly.
+Define 'Synchronous' I/O operation.,"Predictable response times, coordinated with the caller."
+Define 'Asynchronous' I/O operation.,"Irregular/unpredictable response times, not coordinated with the caller."
+Define 'Sharable' device.,A device that can be used concurrently by several processes/threads.
+Define 'Dedicated' device.,A device that cannot be used concurrently by multiple processes/threads.
+What are the different data transfer directions for I/O devices?,"Read-write (both input/output), Read only (only one data transfer direction), Write once (written once, then read-only)."
+How does the OS simplify device access for applications?,"It hides many differences and groups devices into conventional types, providing major access conventions."
+What are the major application access conventions for I/O?,"Block I/O, Character-stream I/O, Memory-mapped file access, Network sockets."
+What is an 'escape' or 'back door' in the context of device interfaces?,A method of transparently passing arbitrary commands to a device driver when the interface lacks a standard method for specific functionality.
+What UNIX system call serves as an 'escape' or 'back door'?,`ioctl()`.
+What are the three arguments of the UNIX `ioctl()` system call?,"Device identifier (major/minor numbers), command integer, and a pointer to a data structure."
+"What does the 'major number' signify in a device identifier (e.g., for `ioctl()`)?","The device type, which routes I/O requests to the appropriate driver."
+"What does the 'minor number' signify in a device identifier (e.g., for `ioctl()`)?",The device instance (which specific device of that type).
+What is a 'block-device interface'?,An interface for I/O to disk drives and other block-oriented devices.
+What are common commands for a block-device interface?,"`read()`, `write()`, and `seek()` (for random-access devices)."
+How do applications usually access block devices?,Via the file-system interface.
+What is 'raw I/O'?,"Direct access to secondary storage as a linear array of blocks, bypassing the file system."
+When might raw I/O be preferred?,By the OS or special applications like Database Management Systems (DBMS) to avoid extra buffering and redundant locking.
+What is 'direct I/O'?,"A compromise mode on a file (e.g., in UNIX) that allows block I/O bypassing OS block features like buffering and locking."
+How does memory-mapped file access work?,"It layers on block-device drivers, allowing access to disk storage via a byte array in main memory. A system call maps a file to memory and returns a virtual address."
+What is a key efficiency of memory-mapped file access?,Data transfers only occur when needed (demand-paged virtual memory access).
+What are the benefits of memory-mapped file access for programmers?,"It is convenient, allowing simple read/write operations to memory instead of using explicit I/O calls."
+How is memory-mapped file access used by the kernel?,For kernel services such as executing programs and accessing swap space.
+What is a 'character-stream interface'?,"An interface for I/O to character devices such as keyboards, mice, modems, printers, and audio boards."
+What are the basic system calls for a character-stream interface?,`get()` and `put()` (one character at a time).
+How is network I/O different from disk I/O?,It typically uses a different interface than `read()`-`write()`-`seek()`.
+What is a 'network socket'?,"A common interface for network I/O, serving as an endpoint for communication (used in UNIX, Windows)."
+List common system calls associated with the socket interface.,"Create socket, connect local socket to remote address, listen for remote application connection, send/receive packets, and `select()`."
+What is the purpose of the `select()` system call in network I/O?,"It manages a set of sockets, returning information on which sockets are ready (e.g., packet waiting, room to send), eliminating polling/busy waiting."
+What are the benefits of the socket interface?,It facilitates distributed applications using any network hardware/protocol.
+"Besides sockets, what are other approaches for Inter-Process Communication (IPC) and network communication?","Half-duplex pipes, full-duplex FIFOs, full-duplex STREAMS, and message queues."
+What functionalities do hardware clocks and timers provide?,"Current time, elapsed time, and the ability to set a timer for operation X at time T."
+What is a 'programmable interval timer'?,"Hardware (often provided by CPUs) used to measure elapsed time and trigger operations, typically by generating an interrupt (once or periodically)."
+How is a programmable interval timer used by the OS?,"By the scheduler to preempt processes, by disk I/O to flush dirty caches, and by the network to cancel slow operations."
+How does the OS manage more timer requests than available hardware channels?,It simulates virtual clocks by maintaining a sorted list of wanted interrupts and setting the hardware timer for the earliest pending request.
+What is a 'high-performance event timer (HPET)'?,"A modern hardware timer (provided by some CPUs on PCs) often operating in the 10-megahertz range, with comparators that trigger interrupts when a value matches the HPET."
+What limits precision in timer operations?,Timer resolution and virtual clock overhead.
+What is 'network time protocol (NTP)'?,A network protocol used for synchronizing system clocks.
+Define a 'blocking' system call.,"An I/O request that suspends the calling thread, moving it to a wait queue, until the I/O operation completes."
+What is the nature of physical I/O actions in terms of timing?,"They are generally asynchronous, with varying and unpredictable completion times."
+Why does the OS typically provide blocking I/O calls for applications?,Because they are easier for application developers to write and manage.
+When is nonblocking I/O needed by user processes?,"For applications that cannot afford to halt, such as user interfaces or video applications, to overlap execution with I/O."
+How can multithreaded applications overlap execution with I/O?,Some threads can block on I/O while others continue to execute.
+What is a 'nonblocking' I/O system call?,"An I/O request that returns quickly, indicating the bytes transferred (full, fewer, or none), and does not halt the calling thread."
+What is an 'asynchronous' system call?,"An I/O request that returns immediately without waiting for the I/O to complete, allowing the calling thread to continue execution."
+How is I/O completion communicated for asynchronous system calls?,"Via variable setting, a signal/software interrupt, or a callback mechanism."
+What is the key difference between a nonblocking `read()` and an asynchronous `read()`?,"A nonblocking `read()` returns immediately with any available data (full, fewer, or none), while an asynchronous `read()` requests the full transfer to complete later, returning immediately without data."
+How does OS buffering optimize I/O performance?,"The OS buffers I/O and returns control to the application, completing the request later, which can hide I/O latency."
+How is data consistency ensured when the OS buffers I/O?,"The kernel reads from its buffers before performing I/O, ensuring that the correct data is returned to the reader."
+What mechanism can be used with `select()` for nonblocking behavior in network sockets?,"Specifying a maximum waiting time, with '0' indicating polling behavior (returning immediately if no I/O is possible)."
+What is the overhead associated with using `select()`?,`select()` only checks if I/O is possible; subsequent `read()`/`write()` calls are still needed to perform the actual data transfer.
+What is 'Vectored I/O'?,One system call that performs multiple I/O operations involving multiple memory locations.
+What UNIX system call implements Vectored I/O?,"`readv` (and `writev`), which accepts a vector of multiple buffers to read to or write from."
+What is another name for Vectored I/O?,Scatter-gather.
+What are the benefits of Vectored I/O?,"Avoids context-switching and system-call overhead, eliminates the need to transfer data to a larger contiguous buffer first, and can provide atomicity (all I/O done without interruption, avoiding data corruption)."
+What are some key I/O-related services provided by the kernel's I/O subsystem?,"Scheduling, buffering, caching, spooling, device reservation, and error handling."
+On what infrastructure does the kernel's I/O subsystem build?,Hardware and device-driver infrastructure.
+What is a key responsibility of the I/O subsystem regarding processes and users?,Protecting itself from errant processes and malicious users.
+What is the primary purpose of I/O scheduling?,To determine a good execution order for I/O requests.
+"Why is I/O scheduling necessary, considering the order of application system calls?",The order of application system calls is rarely the best for overall system performance.
+What are the benefits of I/O scheduling?,"Improve overall system performance, fair device access, and reduce average waiting time."
+How is I/O scheduling typically implemented?,By maintaining a wait queue for each I/O device.
+What happens when a blocking I/O system call is made?,The request is placed on the device's wait queue.
+How does the I/O scheduler optimize the device queue?,It rearranges the queue for efficiency and to reduce average response time.
+Can the OS prioritize certain I/O requests? Provide an example.,"Yes, the OS may prioritize delay-sensitive requests, such as those from the virtual memory subsystem over applications."
+What is a 'device-status table'?,A kernel data structure that tracks the status and queues of operations for I/O devices.
+What information is typically stored in an entry of a device-status table?,"Device type, address, and state (e.g., not functioning, idle, busy)."
+What additional information is stored in a device-status table entry if the device is busy?,The request type and parameters of the current operation.
+"Besides improving efficiency, what else does scheduling I/O operations enable the OS to use?","Storage space in main memory/storage hierarchy via buffering, caching, and spooling."
+Define 'buffer'.,A memory area storing data transferred between devices or between a device and an application.
+What is the primary reason for using buffering?,To cope with speed mismatches between a producer and a consumer of data.
+Provide an example of speed mismatch buffering.,A network (slow producer) sending data to an SSD (fast consumer); a buffer accumulates network bytes before writing them to the SSD in a single operation.
+Define 'double buffering'.,"The use of two buffers to decouple a producer and a consumer, allowing for relaxed timing requirements; while one buffer is being filled, the other is being processed/written."
+What other reason is there for buffering beyond speed mismatch?,"To provide adaptations for different data-transfer sizes (e.g., network fragmentation/reassembly)."
+What are 'copy semantics' in the context of application I/O?,"The guarantee that data written to disk is the version present at the time the system call was made, independent of any subsequent changes to the application's buffer."
+How does the OS typically guarantee copy semantics for a `write()` system call?,"The `write()` system call copies application data to a kernel buffer before returning to the application, and the disk write occurs from this kernel buffer."
+"Why is copying data between kernel and application space common, despite its overhead?",Due to the clean semantics it provides.
+What more efficient techniques can be used instead of direct data copying for copy semantics?,Virtual memory mapping and copy-on-write page protection.
+Define 'cache'.,A region of fast memory that holds copies of data.
+What is the primary benefit of accessing cached data?,Access to a cached copy is more efficient than accessing the original data.
+Provide an example of caching in a computer system.,"Process instructions stored on disk are cached in physical memory, and further copied into CPU caches for faster access."
+What is the key difference between a buffer and a cache?,"A buffer may hold the *only* copy of data being transferred, while a cache holds a *copy* of an item that also resides elsewhere (the original source)."
+Can a memory region serve as both a buffer and a cache?,"Yes, caching and buffering are distinct concepts, but a single memory region can serve both purposes."
+How do OS main memory buffers for disk data relate to caching?,"These buffers, used for copy semantics and efficient scheduling, also act as a cache to improve I/O efficiency for shared files or rapid write/reread operations."
+"What action does the kernel take when a file I/O request is made, in relation to the buffer cache?","The kernel checks the buffer cache first; if the requested data is available, it avoids or defers physical disk I/O."
+How do disk writes utilize the buffer cache?,"Disk writes are accumulated in the buffer cache for several seconds, allowing for more efficient write schedules."
+Define 'spool' in the context of I/O.,"A buffer holding output for a device, such as a printer, that cannot accept interleaved data streams."
+Why is spooling necessary for devices like printers?,"Printers can only serve one job at a time, but multiple applications may attempt to print concurrently. Spooling coordinates this concurrent output."
+How does the OS implement spooling for printer output?,The OS intercepts each application's printer output and spools it to a separate file on secondary storage.
+What happens after an application finishes its printing task in a spooling system?,The spooling system queues the spooled file for output to the printer.
+How are spooled files then sent to the printer?,The spooling system copies the queued files to the printer one at a time.
+Who manages the spooling system?,It is typically managed by a system daemon process or an in-kernel thread.
+What control interfaces does the OS provide for spooling?,"It allows users to display the queue, remove jobs, or suspend printing."
+"What type of devices cannot multiplex I/O requests, making spooling or exclusive access necessary?",Devices like tape drives and printers.
+How do operating systems provide explicit coordination facilities for devices that cannot multiplex I/O requests?,They support exclusive device access.
+Give examples of how OSes implement exclusive device access.,VMS allows a process to allocate an idle device and deallocate it when done; other OSes limit only one open file handle to such a device; Windows provides functions like `wait` for device objects or `OpenFile()` parameters for specific access types.
+What is the responsibility of applications when coordinating exclusive device access?,Applications are responsible for avoiding deadlock.
+What is a key role of a protected memory OS regarding errors?,"To guard against hardware and application errors, preventing system failure from minor malfunctions."
+What are the two main types of I/O failure?,"Transient failures (e.g., network overloaded) and permanent failures (e.g., defective controller)."
+How does the OS typically compensate for transient I/O failures?,"By retrying operations, such as a disk `read()` retry or a network `send()` resend."
+What is the OS's capability to recover from a permanent failure of an important component?,The OS is unlikely to recover from such failures.
+What does an I/O system call typically return to indicate its outcome?,A success/failure bit.
+How does UNIX provide detailed error information from system calls?,"Through an integer variable called `errno`, which returns an error code (hundreds of possible values)."
+What is the 'sense key' in SCSI protocol error reporting?,"A value in the status register indicating the general nature of a failure (e.g., hardware error, illegal request)."
+What does the 'additional sense code' convey in SCSI protocol error reporting?,"The category of the failure (e.g., bad command parameter, self-test failure)."
+What does the 'additional sense-code qualifier' provide in SCSI protocol error reporting?,"More specific details about the failure (e.g., which parameter was bad, which subsystem failed)."
+What potential disruption can a user process cause related to I/O?,It may disrupt the system by attempting illegal I/O instructions.
+How does the OS prevent user processes from issuing illegal I/O instructions?,"All I/O instructions are privileged, meaning users cannot issue them directly."
+How do user programs perform I/O operations?,They must use the OS by executing a system call.
+What is the OS's role when a user program makes an I/O system call?,"The OS, operating in monitor mode, checks the request's validity, performs the I/O, and then returns control to the user."
+How are memory-mapped and I/O port memory locations protected from user access?,By the memory-protection system.
+Are there exceptions where the kernel might allow user access to I/O memory? Provide an example.,"Yes, the kernel cannot deny all user access; for example, graphics games need direct access to memory-mapped graphics memory."
+How might the kernel manage direct user access to I/O memory for specific components?,"It might provide a locking mechanism to allocate a section of memory (e.g., graphics memory) to one process at a time."
+How does the kernel keep state information on I/O components?,Via in-kernel data structures.
+Give an example of an in-kernel data structure used for I/O.,An open-file table structure.
+What types of I/O activities do kernel data structures track?,"Network connections, character-device communications, and other I/O activities."
+"How does UNIX handle differing `read()` semantics for various entities (user files, raw devices, process address spaces)?",It encapsulates these differences using an object-oriented technique.
+What does an open-file record contain in UNIX to handle different file types?,A dispatch table with pointers to appropriate routines based on the file type.
+"How do some operating systems, like Windows, handle I/O requests at a high level?",They use message-passing.
+Describe the flow of an I/O request using message-passing in the kernel.,"An I/O request is converted into a message, sent through the kernel to the I/O manager, and then to the device driver."
+What are the benefits of using message-passing for I/O in terms of system design?,"It simplifies the I/O system structure and design, and adds flexibility."
+Why is power management important in data centers?,"Due to power costs, greenhouse gas emissions, and significant heat generation (cooling can use twice as much electricity as powering equipment)."
+What is the OS's role in power usage in cloud computing environments?,"Adjusting processing loads, evacuating user processes, and idling/powering off systems."
+How does the OS manage power for individual hardware components?,"It analyzes load and can power off hardware-enabled components (e.g., CPUs, external I/O devices) if their usage is low."
+How does the OS manage power for CPU cores specifically?,"CPU cores can be suspended and resumed based on load, with their state saved and restored."
+Why is power management a high priority in mobile computing?,To maximize battery life.
+What is 'power collapse' in Android power management?,"A deep sleep state that uses marginally more power than being off, but responds to external stimuli and allows for quick wake-up."
+How is Android's power collapse achieved?,"By powering off individual components (like screen, speakers, I/O subsystem) and placing the CPU in its lowest sleep state."
+Describe Android's component-level power management.,"An infrastructure that understands component relationships and usage, where each component's device driver tracks its usage, allowing unused components to be powered off. If all components on a bus are unused, the bus is turned off; if all components in the device tree are unused, the system enters power collapse."
+What is a 'device tree' in Android's power management?,A representation of the physical-device topology of the system.
+Define 'wakelocks' in Android power management.,A mechanism allowing applications to temporarily prevent the system from entering a power collapse state.
+How do wakelocks work?,"Applications acquire and release wakelocks, and the kernel prevents power collapse while a wakelock is held."
+What role does firmware play in power management during boot time?,"Firmware analyzes hardware and creates a device tree in RAM, which the kernel then uses to load drivers and manage devices."
+What is ACPI?,"Advanced Configuration and Power Interface (ACPI) is an industry-standard firmware used in modern computers that provides callable routines for the kernel to manage device state, errors, and power."
+Give an example of how ACPI is utilized by the kernel for device management.,"The kernel calls a device driver, which in turn calls ACPI routines, which then communicate with the device."
+What is the primary role of the I/O subsystem?,To coordinate extensive services for applications and the kernel.
+List some key areas supervised by the kernel I/O subsystem.,"Management of name space for files/devices, access control, operation control (e.g., a modem cannot `seek()`), file-system space allocation, device allocation, buffering, caching, spooling, I/O scheduling, device-status monitoring, error handling, failure recovery, device-driver configuration and initialization, and power management of I/O devices."
+How do the upper levels of the I/O subsystem access devices?,Via a uniform interface provided by device drivers.
+"How does an OS connect an application's request (e.g., reading a file) to hardware operations (e.g., disk sector access)?",The OS maps the application's file name reference through the file system's directory structure to specific space allocation on disk.
+What is the initial step for an application referring to data?,It refers to data by file name.
+What is the role of the file system in connecting application requests to hardware?,"The file system maps the file name, through directories, to space allocation on the disk."
+How does MS-DOS (FAT) map a file name to disk blocks?,"The file name maps to a number, which indicates an entry in the file-access table, telling which disk blocks are allocated."
+How does UNIX map a file name to disk blocks?,"The file name maps to an inode number, and the inode contains the space-allocation information."
+How does MS-DOS identify hardware devices within a file name?,"The first part of the file name (before the colon), e.g., `C:`, identifies the hardware device."
+"In MS-DOS, how is a device name like `C:` mapped to hardware?",It is mapped to a specific port address via a device table.
+What is a key characteristic of the device name space in MS-DOS compared to its file-system name space?,"It is separate from the file-system name space, indicated by the colon separator (e.g., `C:`)."
+What is an advantage of MS-DOS's separate device name space?,"It makes it easy to associate extra functionality, such as spooling for printer files."
+How is the device name space handled in UNIX?,"It is incorporated into the regular file-system name space, with no clear separation of the device portion in the path name."
+What is the purpose of the mount table in UNIX?,It associates path name prefixes with specific device names.
+How does UNIX resolve a path name involving a device?,It looks up the path name in the mount table for the longest matching prefix.
+What does a mount table entry provide after a successful lookup in UNIX?,A device name (which is also in the file-system name space).
+What is found when a device name is looked up in UNIX?,"A `<major, minor>` device number, not an inode."
+What does the major device number indicate?,It identifies the specific device driver responsible for handling I/O for that device.
+What is the purpose of the minor device number?,It is passed to the device driver to index into its internal device table.
+What information does a device-table entry provide?,The port address or memory-mapped address of the device controller.
+How do modern operating systems enhance flexibility in device lookup?,They use multiple stages of lookup tables.
+What is a benefit of the general mechanisms for passing requests between applications and drivers in modern OS?,New devices and drivers can be introduced without requiring kernel recompilation.
+How do some operating systems manage loading device drivers?,They load device drivers on demand.
+Describe driver loading during boot time.,"The system probes buses and loads necessary drivers, either immediately or upon the first request for the device."
+How are drivers loaded for devices added after system boot?,"The device is detected, often by an error, the kernel inspects it, and then loads the driver dynamically."
+What are some challenges associated with dynamic loading/unloading of drivers?,"It requires more complex kernel algorithms, careful device-structure locking, and robust error handling."
+What is the first step in the life cycle of a blocking `read()` system call?,A process issues a blocking `read()` system call to a file descriptor of an opened file.
+What is the kernel's first action after receiving a `read()` system call?,"The kernel system-call code checks parameters. If the data is already in the buffer cache, the data is returned and I/O completed."
+What happens if the requested data is not in the buffer cache during a `read()` system call?,"Physical I/O is performed. The process is removed from the run queue and placed on a wait queue for the device, and the I/O request is scheduled."
+What happens after an I/O request is scheduled by the kernel?,The I/O subsystem sends the request to the device driver (via subroutine call or in-kernel message).
+What is the device driver's role in a blocking `read()` request after receiving the request?,"The device driver allocates kernel buffer space, schedules the I/O, and sends commands to the device controller by writing to device-control registers."
+What is the device controller's responsibility during a `read()` request?,It operates the device hardware to perform the data transfer.
+How can a driver handle data transfer completion from the device controller?,"The driver may poll for status/data, or set up a DMA transfer to kernel memory, where the DMA controller generates an interrupt upon transfer completion."
+What happens immediately after a DMA transfer completes and an interrupt is generated?,"The correct interrupt handler receives the interrupt via the interrupt-vector table, stores the data, signals the device driver, and then returns."
+What does the device driver do upon receiving a signal from the interrupt handler?,"It determines the completed I/O request and its status, then signals the kernel I/O subsystem."
+What is the kernel's final action regarding data transfer and process state after being signaled by the device driver?,The kernel transfers the data and return codes to the requesting process's address space and moves the process from the wait queue to the ready queue.
+What happens to the process after it is moved to the ready queue following a `read()` system call?,"Moving the process to the ready queue unblocks it. The scheduler then assigns the CPU, allowing the process to resume at the system call completion."
+"Define ""mount table"".","An in-memory data structure containing information about each mounted volume, used to track file systems and access."
+Which UNIX systems typically include the STREAMS mechanism?,UNIX System V and subsequent releases.
+Define STREAMS.,A UNIX I/O feature allowing dynamic assembly of driver code pipelines.
+"Define ""Stream"" in the context of STREAMS.",A full-duplex connection between a device driver and a user-level process.
+What are the main components of a STREAMS mechanism?,"Stream head, driver end, and zero or more stream modules."
+Define stream head.,The interface between STREAMS and user processes.
+Define driver end.,The interface between STREAMS and the controlled device.
+Define stream modules.,Modules of functionality loadable into a STREAM.
+Where are stream modules positioned within a STREAMS connection?,Between the stream head and the driver end.
+What type of queues does each component of a STREAMS mechanism contain?,A pair of queues: a read queue and a write queue.
+How is data transferred between components in a STREAMS mechanism?,Via message passing between queues.
+What is the function of modules in STREAMS?,They provide STREAMS processing functionality.
+How are modules added (pushed) onto a stream?,Using the `ioctl()` system call.
+Provide an example of using a module in STREAMS.,Opening a USB device (like a keyboard) via a stream and pushing a module for input editing.
+Define flow control in STREAMS.,"A method to pause a sender of I/O, which limits the data flow rate."
+How does a STREAMS queue behave when *without* flow control?,It accepts all messages and immediately sends them to the adjacent queue without buffering.
+How does a STREAMS queue behave when *with* flow control?,It buffers messages and does not accept new messages without sufficient buffer space.
+What is involved in flow control between adjacent STREAMS module queues?,Control message exchanges.
+What system calls can a user process use to write data to a device via STREAMS?,`write()` or `putmsg()`.
+What type of data does the `write()` system call handle in STREAMS?,Raw data (unstructured byte stream).
+What additional capability does the `putmsg()` system call provide compared to `write()` in STREAMS?,It allows the user to specify a message.
+What happens after a user process writes data to a stream head?,The stream head copies the data into a message and delivers it to the next module's queue.
+What is the path of data after it leaves the stream head when writing to a device?,"Copying continues from module to module until it reaches the driver end, and then the device."
+What system calls can a user process use to read data from a stream head?,`read()` or `getmsg()`.
+How does the `read()` system call process data received from a stream head?,The stream head gets the message and returns ordinary data (an unstructured byte stream).
+What type of data does the `getmsg()` system call return to the process?,The entire message.
+What is the general nature of STREAMS I/O?,"Asynchronous (or nonblocking), except when communicating directly with the stream head."
+When does a user process block when writing to a stream?,If the next queue in the stream uses flow control and there is no room to copy the message.
+When does a user process block when reading from a stream?,Until data becomes available.
+What is a key responsibility of the driver end regarding device interaction?,"It must respond to interrupts (e.g., when a frame is ready from a network device)."
+How does the driver end's handling of incoming data differ from the stream head's?,"Unlike the stream head, which may block, the driver end *must* handle all incoming data."
+Must drivers support flow control within the STREAMS mechanism?,"Yes, drivers must support flow control."
+What often happens if a device's buffer becomes full when interacting via STREAMS?,"The device typically drops incoming messages (e.g., a network card dropping frames)."
+What is a major benefit of the STREAMS mechanism?,It provides a framework for modular and incremental development of device drivers and network protocols.
+What is an advantage regarding the reusability of STREAMS modules?,"Modules are reusable by different streams or devices (e.g., a networking module for Ethernet and 802.11 wireless)."
+"What type of data and information can STREAMS support transfer between modules, beyond just unstructured byte streams?",Message boundaries and control information.
+How widely adopted is STREAMS in UNIX variants and for what purpose?,Most UNIX variants support STREAMS; it is preferred for implementing protocols and device drivers.
+Provide an example of a system where the socket mechanism is implemented using STREAMS.,System V UNIX and Solaris.
+What is a major factor in system performance?,I/O
+How do heavy I/O demands affect the CPU?,They place heavy demands on the CPU by requiring execution of device-driver code and scheduling processes (blocking/unblocking).
+What is the impact of context switches during I/O on system components?,They stress the CPU and hardware caches.
+What can be exposed by heavy I/O demands in the kernel?,Inefficiencies in the kernel's interrupt-handling mechanisms.
+How does I/O activity load the memory bus?,Through data copies between controllers/physical memory and kernel buffers/application space.
+What is a major concern for computer architects regarding I/O?,Graceful coping with I/O demands.
+Why is interrupt handling considered relatively expensive?,"It involves a state change, execution of the handler, and restoration of the state."
+Under what condition can Programmed I/O (PIO) be more efficient than interrupt-driven I/O?,If busy waiting is minimized.
+What overhead results from I/O completion unblocking a process?,Full context switch overhead.
+What is a characteristic of network traffic in terms of system overhead?,High context-switch rate.
+"In a remote login, what is the sequence of events on the local machine when a character is typed?",Character typed → keyboard interrupt → interrupt handler → device driver → kernel → user process.
+"In a remote login, describe the network I/O system call process initiated by the user on the local machine.",User process issues network I/O system call → local kernel → network layers (packet construction) → network device driver.
+"In a remote login, what happens after the network device driver processes the packet on the local machine?","Network device driver transfers packet to controller → sends character, generates interrupt."
+How does the network I/O system call complete on the local machine in a remote login scenario?,Interrupt back up through kernel → network I/O system call completes.
+"In a remote login, what is the initial event on the remote system when a packet is received?",Network hardware receives packet → interrupt generated.
+"In a remote login, what happens on the remote system after an interrupt is generated for a received packet?",Character is unpacked from protocols → passed to the appropriate network daemon.
+"In a remote login, how does the network daemon process the character on the remote system?",Network daemon identifies session → passes packet to subdaemon.
+What type of overhead is consistently observed throughout the remote login character example?,Context switches and state switches.
+What is the impact of the receiver echoing a character in a remote login scenario?,It doubles the work.
+What is one way some systems reduce the main CPU's interrupt burden for terminal I/O?,By using separate front-end processors.
+What is the primary job of an I/O channel?,To offload I/O work from the main CPU and keep data flowing smoothly.
+How do I/O channels process programs?,They process more general/sophisticated programs tuned for specific workloads.
+List a principle to improve I/O efficiency related to context switches.,Reduce the number of context switches.
+List a principle to improve I/O efficiency related to data copies in memory.,Reduce data copies in memory (between device/application).
+List a principle to improve I/O efficiency related to interrupt frequency.,"Reduce interrupt frequency by using large transfers, smart controllers, or polling (if busy waiting is minimal)."
+List a principle to improve I/O efficiency related to increasing concurrency.,Increase concurrency by using DMA-knowledgeable controllers/channels to offload data copying from the CPU.
+List a principle to improve I/O efficiency related to hardware processing.,Move processing primitives into hardware to enable concurrent operation with the CPU/bus.
+List a principle to improve I/O efficiency related to system component balance.,"Balance CPU, memory subsystem, bus, and I/O performance, as overload in one area causes idleness in others."
+How does the complexity of I/O devices vary?,"It varies significantly, from simple (e.g., mouse) to very complex (e.g., Windows disk driver)."
+"What are some functions of a complex I/O device driver, such as a Windows disk driver?","Manages individual disks, implements RAID arrays, converts requests to disk I/O, performs error handling, data recovery, and optimizes performance."
+What are the three main locations where I/O functionality can be implemented?,"Device hardware, device driver (kernel), or application software."
+Where were experimental I/O algorithms initially implemented?,At the application level.
+What are the advantages of implementing experimental I/O algorithms at the application level?,"Flexible, bugs are unlikely to crash the system, and no reboot/reload of drivers is needed after code changes."
+What are the disadvantages of implementing experimental I/O algorithms at the application level?,"Innefficient due to context switch overhead, and lacks access to internal kernel data/functionality (e.g., messaging, threading, locking)."
+What is an example of a system interface that allows user-mode file systems?,FUSE (Filesystem in Userspace).
+Where are I/O algorithms typically reimplemented once they are proven?,In the kernel.
+What is the main advantage of reimplementing I/O functionality in the kernel?,Improves performance.
+What are the challenges of reimplementing I/O functionality in the kernel?,"More challenging development (due to large, complex kernel), and must be thoroughly debugged to avoid data corruption or system crashes."
+Where is the highest I/O performance achieved?,Through specialized implementation in hardware (device or controller).
+What are the disadvantages of implementing I/O functionality in hardware?,"Difficulty/expense of improvements/bug fixes, increased development time (months vs. days), and decreased flexibility (e.g., hardware RAID controller may not allow the kernel to influence I/O order/location)."
+What is the current trend observed in I/O device speed?,"I/O devices are increasing in speed, with NVM devices nearing DRAM speed."
+What is the impact of increasing I/O device speeds on system design and OS algorithms?,It increases pressure on I/O subsystems and OS algorithms to leverage the faster read/write speeds.
+List the major components that affect the I/O performance of storage and network latency.,"CPU, caches, DRAM, NVM, PCIe, SSD, SAA, HDD."
+"Define ""front-end processors.""",Small computers performing tasks in an overall system; they manage I/O and offload the main CPU.
+"Define ""terminal concentrator.""",A type of front-end processor that multiplexes traffic from hundreds of remote terminals into one port.
+"Define ""I/O channel.""","A dedicated, special-purpose CPU found in large systems (mainframes/high-end systems) used for I/O or offloading the main CPU."
+What are the basic I/O hardware elements?,"Buses, device controllers, and devices."
+How is data movement handled in an I/O system?,By the CPU (using programmed I/O) or by a DMA controller.
+What is a device driver?,A kernel module responsible for controlling a specific hardware device.
+What basic hardware categories does the system-call interface handle?,"Block devices, character-stream devices, memory-mapped files, network sockets, and programmed interval timers."
+What is the typical behavior of system calls regarding processes?,System calls usually block processes.
+When are nonblocking or asynchronous system calls used?,"By the kernel or applications that must not sleep (i.e., cannot afford to block)."
+What services does the kernel's I/O subsystem provide?,"I/O scheduling, buffering, caching, spooling, device reservation, and error handling."
+What is the purpose of name translation in I/O?,It connects hardware devices to symbolic file names.
+What are the multiple mapping levels involved in I/O name translation?,"Character-string names map to device drivers/addresses, which then map to physical addresses (I/O ports/bus controllers)."
+Where can I/O device mapping occur?,"Within the file-system name space (e.g., UNIX) or in a separate device name space (e.g., MS-DOS)."
+What are STREAMS in UNIX?,A UNIX mechanism for the dynamic assembly of driver code pipelines.
+How do drivers behave in a STREAMS pipeline?,"Drivers can be stacked, and data passes sequentially and bidirectionally through them."
+Why are I/O system calls considered costly?,"Due to context switching (crossing the kernel protection boundary), signal/interrupt handling, and CPU/memory load for data copying between kernel buffers and application space."

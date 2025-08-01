@@ -1,0 +1,45 @@
+Front,Back,Reversible
+What is a major factor in system performance?,I/O (Input/Output).,y
+What are the heavy demands I/O places on the CPU?,Executing device-driver code and scheduling processes (blocking/unblocking).,y
+How do context switches impact CPU and hardware caches?,They stress the CPU and hardware caches.,y
+What inefficiencies does I/O expose in the kernel?,Inefficiencies in the kernel's interrupt-handling mechanisms.,y
+How does I/O affect the memory bus?,It loads the memory bus with data copies between controllers/physical memory and kernel buffers/application space.,y
+What is a major concern for computer architects regarding I/O?,Graceful coping with I/O demands.,y
+Why is interrupt handling considered relatively expensive?,"It involves a state change, executing the handler, and restoring state.",y
+When can Programmed I/O (PIO) be more efficient than interrupt-driven I/O?,If busy waiting is minimized.,y
+What overhead results from an I/O completion unblocking a process?,Full context switch overhead.,y
+What is characteristic of network traffic in terms of system performance?,High context-switch rate.,y
+Describe the initial steps of a remote login character being typed on the local machine.,Character typed → keyboard interrupt → interrupt handler → device driver → kernel → user process.,y
+Describe the local machine's process after a user process issues a network I/O system call for a remote login character.,User process issues network I/O system call → local kernel → network layers (packet construction) → network device driver.,y
+What happens after a network device driver transfers a packet for a remote login character on the local machine?,"The network device driver transfers the packet to the controller, which sends the character and generates an interrupt, and the interrupt processes back up through the kernel to complete the network I/O system call.",y
+Describe the initial steps when a remote system receives a network packet for a remote login character.,Network hardware receives packet → interrupt generated.,y
+What happens on the remote system after an interrupt is generated for a received remote login character?,The character is unpacked from protocols → appropriate network daemon identifies the session → passes packet to subdaemon.,y
+What types of overhead occur throughout the remote login character handling process?,Context switches and state switches.,y
+How does the receiver echoing a character impact work in a remote login scenario?,It doubles the work.,y
+Define front-end processors.,"Small computers that perform tasks in an overall system, typically managing I/O and offloading the main CPU.",y
+What are 'front-end processors' used for in some systems?,To manage terminal I/O and reduce the main CPU's interrupt burden.,y
+Define terminal concentrator.,"A type of front-end processor specifically designed for terminals, which multiplexes traffic from hundreds of remote terminals into one port.",y
+Define I/O channel.,"A dedicated, special-purpose CPU found in mainframes and high-end systems used for I/O or offloading the main CPU.",y
+What is the primary job of an I/O channel?,To offload I/O work from the main CPU and keep data flowing smoothly.,y
+How do I/O channels differ from main CPUs in terms of program processing?,"Channels process more general and sophisticated programs, which are tuned for specific I/O workloads.",y
+List principles for improving I/O efficiency.,"Reduce number of context switches; reduce data copies in memory; reduce interrupt frequency; increase concurrency; move processing primitives into hardware; balance CPU, memory, bus, and I/O performance.",y
+How can the number of context switches be reduced to improve I/O efficiency?,By reducing their overall occurrence.,y
+How can data copies in memory be reduced to improve I/O efficiency?,By minimizing copies between the device and application space.,y
+How can interrupt frequency be reduced to improve I/O efficiency?,"By using large transfers, smart controllers, or polling (if busy waiting is minimal).",y
+How can concurrency be increased to improve I/O efficiency?,By using DMA-knowledgeable controllers or channels to offload data copying from the CPU.,y
+How does moving processing primitives into hardware improve I/O efficiency?,It enables concurrent operation with the CPU and bus.,y
+"Why is balancing CPU, memory subsystem, bus, and I/O performance important for efficiency?","Overload in one area causes idleness in others, hindering overall performance.",y
+How does I/O device complexity vary?,From simple (like a mouse) to very complex (like a Windows disk driver).,y
+What functionalities does a Windows disk driver manage?,"Individual disks, RAID arrays, converting requests to disk I/O, error handling, data recovery, and optimizing performance.",y
+What are the three main locations where I/O functionality can be implemented?,"Device hardware, device driver (kernel), or application software (user level).",y
+What are the advantages of implementing experimental I/O algorithms at the application level?,"Flexibility, bugs are unlikely to crash the system, and no reboot/reload drivers are needed after code changes.",y
+What are the disadvantages of implementing experimental I/O algorithms at the application level?,"Inefficiency due to context switch overhead and lack of internal kernel data/functionality (messaging, threading, locking).",y
+What is an example of a system that allows user-mode file systems for I/O functionality?,FUSE system interface.,y
+What happens to I/O algorithms after they are proven at the application level?,They are often reimplemented in the kernel.,y
+What is the primary advantage of implementing I/O functionality in the kernel?,Improved performance.,y
+What are the challenges of implementing I/O functionality in the kernel?,"More challenging development (due to large, complex kernel) and the need for thorough debugging to avoid data corruption or system crashes.",y
+Where is the highest I/O performance achieved?,With specialized implementation in hardware (device or controller).,y
+What are the disadvantages of implementing I/O functionality in hardware?,"Difficulty/expense of improvements/bug fixes, increased development time, and decreased flexibility.",y
+Provide an example of decreased flexibility when I/O functionality is implemented in hardware.,A hardware RAID controller may not allow the kernel to influence I/O order or location.,y
+"How are I/O device speeds changing, and what is the impact?","I/O devices are increasing in speed (e.g., NVM devices nearing DRAM speed), which increases pressure on I/O subsystems and OS algorithms to leverage read/write speeds.",y
+What components are crucial for I/O performance related to storage and network latency?,"CPU, caches, DRAM, NVM, PCIe, SSD, SAA, HDD.",y

@@ -1,0 +1,38 @@
+Front,Back,Reversible
+What two algorithms are needed for deadlock management if a system does not use deadlock-prevention or deadlock-avoidance?,"An algorithm to determine if a deadlock occurred, and an algorithm to recover from the deadlock.",y
+What constitutes the overhead of deadlock detection and recovery?,Run-time costs and potential losses from recovery.,y
+What graphical tool is used for deadlock detection when there is a single instance of each resource type?,A wait-for graph.,y
+How is a wait-for graph derived from a resource-allocation graph?,By removing resource nodes and collapsing edges.,y
+What does an edge Tᵢ → Tⱼ signify in a wait-for graph?,It implies that thread Tᵢ is waiting for thread Tⱼ to release a resource R_q that Tᵢ needs.,y
+How is a deadlock identified using a wait-for graph?,A deadlock exists if the wait-for graph contains a cycle.,y
+What is the general approach to deadlock detection using a wait-for graph?,Maintain the wait-for graph and periodically invoke an algorithm to search for cycles.,y
+What is the computational complexity of cycle detection in a graph?,"O(n²) operations, where n is the number of vertices.",y
+What is the `deadlock_detector` tool from the BCC toolkit used for?,Detecting deadlocks for Pthreads mutex locks on Linux.,y
+How does the `deadlock_detector` tool work?,"It inserts probes to trace `pthread_mutex_lock()` and `pthread_mutex_unlock()` calls, constructs a wait-for graph, and reports deadlock if a cycle is detected.",y
+Why is the wait-for graph scheme not applicable for deadlock detection when there are several instances of a resource type?,The wait-for graph scheme is only suitable for single instances of each resource type.,y
+What three data structures are used in the deadlock detection algorithm for several instances of a resource type?,"`Available` (vector), `Allocation` (matrix), and `Request` (matrix).",y
+Define the `Available` vector in the context of the deadlock detection algorithm for multiple resource instances.,A vector of length m (number of resource types) indicating the number of available instances of each resource type.,y
+Define the `Allocation` matrix in the context of the deadlock detection algorithm for multiple resource instances.,An n × m matrix where `Allocation[i][j]` is the number of resources of type Rⱼ currently allocated to thread Tᵢ.,y
+Define the `Request` matrix in the context of the deadlock detection algorithm for multiple resource instances.,An n × m matrix where `Request[i][j] = k` means thread Tᵢ is requesting k more instances of resource type Rⱼ.,y
+Describe the initialization step (Step 1) of the deadlock detection algorithm for several instances of a resource type.,"Initialize `Work` = `Available`. For each thread `i`, if `Allocation[i]` is not zero, set `Finish[i]` = `false`; otherwise, set `Finish[i]` = `true`.",y
+Describe the iterative search step (Step 2) of the deadlock detection algorithm for several instances of a resource type.,"Find an index `i` such that `Finish[i]` is `false` and `Request[i]` ≤ `Work`. If no such `i` exists, proceed to Step 4.",y
+Describe the resource update step (Step 3) of the deadlock detection algorithm for several instances of a resource type.,"Update `Work` = `Work` + `Allocation[i]`, set `Finish[i]` = `true`, and then go back to Step 2.",y
+Describe the deadlock determination step (Step 4) of the deadlock detection algorithm for several instances of a resource type.,"If `Finish[i]` == `false` for any thread `i` (0 ≤ i < n), then thread Tᵢ is deadlocked.",y
+What is the computational complexity of the deadlock detection algorithm for several instances of a resource type?,"O(m × n²) operations, where m is the number of resource types and n is the number of threads.",y
+"What is the ""optimistic attitude"" principle applied in the deadlock detection algorithm for multiple resource instances?","If a thread's `Request` is less than or equal to `Work`, it is optimistically assumed that the thread will complete its execution and return its resources.",y
+"In the example given for multiple resource instance deadlock detection, what sequence of threads demonstrates that the initial state is not deadlocked?","<T₀, T₂, T₃, T₁, T₄>.",y
+"In the example given for multiple resource instance deadlock detection, if thread T₂ requests an additional instance of resource C, which threads become involved in a deadlock?","Threads T₁, T₂, T₃, T₄.",y
+What two factors determine when to invoke a deadlock detection algorithm?,"How often a deadlock is likely to occur, and how many threads will be affected by a deadlock when it happens.",y
+What are the consequences if deadlocks are frequent but not detected promptly?,"Resources allocated to deadlocked threads become idle, and the number of threads in the deadlock cycle may grow.",y
+"What is an extreme approach to invoking a deadlock detection algorithm, and what are its pros and cons?",Invoking it every time a resource request cannot be granted immediately. Pros: Identifies deadlocked threads and the specific 'causing' thread. Cons: High computational overhead.,y
+"What is a less expensive approach to invoking a deadlock detection algorithm, and what is its potential drawback?","Invoking it at defined intervals (e.g., hourly, or when CPU utilization drops below 40%). Drawback: May not identify the specific 'causing' thread.",y
+How do database systems typically manage deadlocks?,Using deadlock detection and recovery.,y
+"In database systems, what are updates referred to as, and what mechanism is used for data integrity?","Updates are referred to as transactions, and locks are used for data integrity.",y
+How does a database server detect deadlocks?,It periodically searches for cycles in the wait-for graph.,y
+What is the first step a database system takes when a deadlock is detected?,A victim transaction is selected.,y
+"After a victim transaction is selected in a database deadlock, what happens to it?","The victim transaction is aborted and rolled back, which releases its locks.",y
+What is the outcome for the remaining transactions after a victim is aborted in a database deadlock?,The remaining transactions are freed from the deadlock.,y
+What happens to an aborted transaction after it's rolled back in a database deadlock scenario?,The aborted transaction is reissued.,y
+How does MySQL typically choose a victim transaction during deadlock resolution?,"It minimizes the number of rows inserted, updated, or deleted by the victim transaction.",y
+"Define ""wait-for graph"".","In deadlock detection, a variant of the resource-allocation graph with resource nodes removed; indicates a deadlock if the graph contains a cycle.",y
+"Define ""thread dump"".","In Java, a snapshot of the state of all threads in an application; a useful debugging tool for deadlocks.",y

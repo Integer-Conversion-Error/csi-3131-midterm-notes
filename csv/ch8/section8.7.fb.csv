@@ -1,0 +1,35 @@
+Front,Back
+When is deadlock detection used in a system?,It is used if the system does not employ deadlock-prevention or deadlock-avoidance schemes.
+What two algorithms are needed if a system uses deadlock detection?,"An algorithm to determine if a deadlock has occurred, and an algorithm to recover from the deadlock."
+What constitutes the overhead of deadlock detection and recovery?,Run-time costs of the detection algorithm and potential losses resulting from the recovery process.
+What is the primary tool for deadlock detection when there is a single instance of each resource type?,A wait-for graph.
+How is a wait-for graph derived from a resource-allocation graph?,It is obtained by removing resource nodes and collapsing the corresponding edges.
+"In a wait-for graph, what does an edge $T_i \to T_j$ imply?",It implies that thread $T_i$ is waiting for thread $T_j$ to release a resource $R_q$ that $T_i$ needs.
+How is a deadlock detected using a wait-for graph?,A deadlock exists if the wait-for graph contains a cycle.
+What is the computational complexity of cycle detection in a wait-for graph?,"$O(n^2)$ operations, where $n$ is the number of vertices (threads)."
+What is the purpose of the `deadlock_detector` tool in the BCC toolkit?,It is used for detecting deadlocks in Pthreads mutex locks on Linux.
+How does the `deadlock_detector` tool work?,"It inserts probes to trace `pthread_mutex_lock()` and `pthread_mutex_unlock()` calls, constructs a wait-for graph, and reports a deadlock if a cycle is detected."
+Is the wait-for graph scheme applicable for deadlock detection when there are several instances of a resource type?,"No, the wait-for graph scheme is not applicable in this scenario."
+What is the detection algorithm for several instances of a resource type similar to?,It is similar to the banker's algorithm.
+Define 'Available' vector in the context of deadlock detection for multiple resource instances.,A vector of length $m$ (number of resource types) indicating the number of available instances of each resource type.
+Define 'Allocation' matrix in the context of deadlock detection for multiple resource instances.,"An $n \times m$ matrix (n threads, m resource types) indicating the number of resources of each type currently allocated to each thread."
+Define 'Request' matrix in the context of deadlock detection for multiple resource instances.,"An $n \times m$ matrix (n threads, m resource types) indicating the current request of each thread; `Request[i][j] = k` means thread $T_i$ requests $k$ more instances of resource type $R_j$."
+Briefly describe the detection algorithm steps for several instances of a resource type.,"1. Initialize 'Work' = 'Available' and 'Finish' flags (false if Allocation_i \u2260 0, else true). 2. Find an index $i$ where Finish[$i$] == false and Request$_i$ \u2264 Work. If none, go to step 4. 3. Work = Work + Allocation$_i$; Finish[$i$] = true. Go to step 2. 4. If Finish[$i$] == false for any $i$, then thread $T_i$ is deadlocked."
+What is the computational complexity of the detection algorithm for several instances of a resource type?,"$O(m \times n^2)$ operations, where $m$ is the number of resource types and $n$ is the number of threads."
+What is the 'optimistic attitude' adopted by the detection algorithm for multiple resource instances?,"It assumes that if a thread's request can be satisfied by the currently available resources (Work), that thread will complete its execution and return its allocated resources."
+"In the example provided, was the initial system state (before $T_2$ requested 1 C) deadlocked?","No, the initial system state was not deadlocked. A safe sequence such as $<T_0, T_2, T_3, T_1, T_4>$ could be found."
+"In the example provided, if thread $T_2$ requests 1 additional instance of resource C, does a deadlock occur?","Yes, a deadlock occurs. The system becomes deadlocked, involving threads $T_1, T_2, T_3, T_4$."
+What factors influence when to invoke a deadlock detection algorithm?,The likelihood of a deadlock occurring and the number of threads that would be affected if a deadlock happens.
+What happens to resources allocated to deadlocked threads?,"They become idle, leading to resource waste."
+What is the most extreme frequency for invoking a deadlock detection algorithm?,Invoking it every time a resource request cannot be granted immediately.
+What is a benefit of invoking a deadlock detection algorithm every time a resource request cannot be granted?,It identifies the deadlocked threads and the specific thread that 'caused' the deadlock.
+What is a drawback of invoking a deadlock detection algorithm every time a resource request cannot be granted?,It incurs high computational overhead.
+What is a less expensive strategy for invoking a deadlock detection algorithm?,"Invoking it at defined intervals (e.g., hourly, or when CPU utilization drops below a certain threshold like 40%)."
+What is a drawback of invoking a deadlock detection algorithm at defined intervals?,It may not identify the exact thread that 'caused' the deadlock.
+How do database systems typically manage deadlocks?,They use deadlock detection and recovery mechanisms.
+"In database systems, what are updates referred to as, and what are locks used for?","Updates are referred to as 'transactions', and locks are used to ensure data integrity during multiple concurrent transactions."
+How does a database server detect deadlocks?,It periodically searches for cycles in the wait-for graph of transactions.
+What steps are taken when a deadlock is detected in a database system?,"A victim transaction is selected, aborted, and rolled back (releasing its locks). The remaining transactions are freed from the deadlock, and the aborted transaction is reissued."
+How might a victim transaction be chosen in a database deadlock scenario?,"The choice often minimizes the cost of recovery, for example, by selecting the transaction that has performed the fewest inserts, updates, or deletes (e.g., as in MySQL)."
+Definition: wait-for graph,"In deadlock detection, a variant of the resource-allocation graph with resource nodes removed; it indicates a deadlock if the graph contains a cycle."
+Definition: thread dump,"In Java, a snapshot of the state of all threads in an application; a useful debugging tool for deadlocks."

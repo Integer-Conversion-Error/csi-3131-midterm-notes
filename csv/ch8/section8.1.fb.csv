@@ -1,0 +1,25 @@
+Front,Back
+What is a Multiprogramming Environment?,A system where multiple threads compete for finite resources.
+What happens when a thread requests a resource that is unavailable?,The thread enters a waiting state.
+Define Deadlock (conceptual).,A situation where a waiting thread can never change state because its requested resources are held by other waiting threads.
+Provide the formal definition of Deadlock.,Every process in a set is waiting for an event that can only be caused by another process in the set. (This definition also applies to threads.)
+What constitutes the System Composition in the context of resource management?,A finite number of resources distributed among competing threads.
+How are Resource Types organized in a system model?,"Resources are partitioned into types (classes), each with identical instances."
+Give examples of Resource Types.,"CPU cycles, files, I/O devices."
+Explain the concept of identical instances for a resource type.,"Any instance of a resource type should satisfy a request (e.g., if a system has 4 CPUs, any one CPU can satisfy a request for a CPU)."
+Which Synchronization Tools are common sources of deadlock?,Mutex locks and semaphores.
+How are individual lock instances typically classified as resources?,"Each lock instance is typically its own resource class (e.g., one lock for a queue, another for a linked list)."
+What are the three steps in the Resource Utilization Sequence for a thread?,"1. Request
+2. Use
+3. Release"
+"Describe the ""Request"" step in resource utilization.",A thread requests a resource and waits if it is not immediately available.
+"Describe the ""Use"" step in resource utilization.",A thread operates on the requested resource.
+"Describe the ""Release"" step in resource utilization.",A thread releases the resource after use.
+How do threads typically perform resource requests and releases at the system level?,"Via system calls (e.g., `request()`, `release()`, `open()`, `close()`, `allocate()`, `free()`) or via semaphore operations (`wait()`, `signal()`) and mutex locks (`acquire()`, `release()`)."
+How does the Operating System (OS) manage resource allocation?,The OS checks for resource allocation via a system table.
+What information does the OS's system table track for resource management?,Free/allocated resources and the owning thread for allocated resources.
+What happens to threads waiting for requested resources?,They are queued for those resources.
+What are the main events that threads in a deadlocked state wait for?,Resource acquisition and release.
+Provide an example illustrating a Deadlocked State.,"The Dining-philosophers problem, where each philosopher holds one chopstick and waits for another, creating a circular wait."
+What is the developer's responsibility regarding deadlock?,Developers must be aware of deadlock possibilities.
+How do locking tools relate to race conditions and deadlocks?,Locking tools prevent race conditions but require careful management of lock acquisition/release to avoid deadlocks.

@@ -1,0 +1,14 @@
+Front,Back
+What are the basic I/O hardware elements?,"Buses, device controllers, and devices."
+How is data movement handled in an I/O system?,By the CPU (using programmed I/O) or by a DMA controller.
+What is a device driver?,A kernel module responsible for controlling a specific hardware device.
+What basic hardware categories does the system-call interface handle?,"Block devices, character-stream devices, memory-mapped files, network sockets, and programmed interval timers."
+What is the typical behavior of system calls regarding processes?,System calls usually block processes.
+When are nonblocking or asynchronous system calls used?,"By the kernel or applications that must not sleep (i.e., cannot afford to block)."
+What services does the kernel's I/O subsystem provide?,"I/O scheduling, buffering, caching, spooling, device reservation, and error handling."
+What is the purpose of name translation in I/O?,It connects hardware devices to symbolic file names.
+What are the multiple mapping levels involved in I/O name translation?,"Character-string names map to device drivers/addresses, which then map to physical addresses (I/O ports/bus controllers)."
+Where can I/O device mapping occur?,"Within the file-system name space (e.g., UNIX) or in a separate device name space (e.g., MS-DOS)."
+What are STREAMS in UNIX?,A UNIX mechanism for the dynamic assembly of driver code pipelines.
+How do drivers behave in a STREAMS pipeline?,"Drivers can be stacked, and data passes sequentially and bidirectionally through them."
+Why are I/O system calls considered costly?,"Due to context switching (crossing the kernel protection boundary), signal/interrupt handling, and CPU/memory load for data copying between kernel buffers and application space."

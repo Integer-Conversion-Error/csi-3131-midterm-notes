@@ -1,0 +1,533 @@
+Front,Back,Reversible
+What is virtual memory?,A technique allowing execution of a process not completely in memory; it separates logical memory from physical memory.,y
+What is the major advantage of virtual memory?,It allows programs to be larger than physical memory.,y
+How does virtual memory abstract main memory?,"Into a large, uniform storage array.",y
+What two types of memory does virtual memory separate?,Logical memory (programmer's view) from physical memory.,y
+What benefit does virtual memory provide to programmers regarding memory constraints?,"It frees programmers from memory-storage limitations, allowing them not to worry about physical memory limits.",y
+"Beyond basic execution, what capabilities does virtual memory allow processes to do?","Share files, libraries, and implement shared memory.",y
+What is the impact of virtual memory on process creation?,It provides an efficient mechanism for process creation.,y
+What is a potential downside of virtual memory implementation?,It can be complex and decrease performance if used carelessly.,y
+What was the primary limitation of traditional memory management?,"The entire process had to be in physical memory for execution, limiting program size to physical memory.",y
+Why do real programs often not need their entire code loaded into memory?,"Because parts like error handling code are seldom executed, arrays/lists are often allocated more memory than needed, and rare program options/features are rarely used.",y
+"List the benefits of executing only parts of a program in memory (i.e., using virtual memory).","1. Programs are not constrained by physical memory size, allowing for a large virtual address space. 2. Less physical memory is required per program, leading to more programs running concurrently, which increases CPU utilization and throughput (without increasing response/turnaround time). 3. Less I/O is needed for loading/swapping, resulting in faster program execution.",y
+Define 'virtual address space'.,A logical view of how a process is stored in memory. It typically presents the process as starting at logical address 0 with contiguous memory.,y
+How is physical memory organized when using virtual memory?,"In page frames, which are not necessarily contiguous.",y
+What is the function of the Memory-Management Unit (MMU)?,It maps logical pages to physical page frames.,y
+How do the heap and stack typically grow within a process's virtual address space?,"The heap grows upward, and the stack grows downward.",y
+What is the significance of the large blank space often found between the heap and stack in a virtual address space?,It is part of the virtual address space but only requires physical pages if the heap or stack grows into it.,y
+What does it mean for an address space to be 'sparse'?,"It describes an address space with many 'holes' or a page table with noncontiguous, scattered entries.",y
+What are the benefits of sparse address spaces?,1. Holes can be filled as the stack or heap grows. 2. They facilitate dynamic linking of libraries or shared objects during execution.,y
+"How does virtual memory allow system libraries (e.g., standard C library) to be shared by multiple processes?","By mapping them into the virtual address space of processes. These libraries are typically mapped read-only, allowing their physical pages to be shared among processes.",y
+How does virtual memory enable inter-process communication?,Processes can share memory regions for communication.,y
+"How does virtual memory speed up process creation, particularly with `fork()`?",By allowing pages to be shared between the parent and child process initially.,y
+How does Linux manage virtual memory?,Using demand paging.,y
+How does Linux allocate pages?,From a list of free frames.,y
+What is Linux's page-replacement policy?,A global policy similar to the LRU-approximation clock algorithm (second-chance).,y
+What are the two page lists maintained by Linux for virtual memory management?,`active_list` and `inactive_list`.,y
+What is the purpose of the `active_list` in Linux's virtual memory management?,It contains pages considered in use.,y
+What is the purpose of the `inactive_list` in Linux's virtual memory management?,"It contains pages not recently referenced, which are eligible for reclamation.",y
+"What specific bit is associated with each page in Linux's virtual memory system, and what is its function?","An `accessed` bit, which is set when the page is referenced.",y
+"In Linux, what happens when a page is first allocated regarding its `accessed` bit and list placement?","Its `accessed` bit is set, and it's added to the rear of the `active_list`.",y
+"If a page in the `active_list` is referenced in Linux, what actions are taken?","Its `accessed` bit is set, and it moves to the rear of the `active_list`.",y
+What periodic action does Linux perform on the `accessed` bits of pages in the `active_list`?,The `accessed` bits for pages in the `active_list` are periodically reset.,y
+"In Linux, what happens to the least recently used page at the front of the `active_list`?",It may migrate to the rear of the `inactive_list`.,y
+What happens in Linux if a page in the `inactive_list` is referenced?,It moves back to the rear of the `active_list`.,y
+How does Linux maintain a balance between the `active_list` and `inactive_list`?,"The lists are kept in relative balance. If the `active_list` grows larger than the `inactive_list`, pages from the front of the `active_list` move to the `inactive_list` (making them eligible for reclamation).",y
+What is the name of the page-out daemon process in the Linux kernel?,`kswapd`.,y
+What is the function of the `kswapd` process in Linux?,"It periodically awakens, checks free memory, and if free memory falls below a threshold, it scans the `inactive_list` and reclaims pages for the free list.",y
+Which system architectures does Windows 10 support for virtual memory management?,"32-bit and 64-bit systems (Intel, ARM).",y
+What are the default virtual address space and physical memory limits for 32-bit Windows systems?,A default 2 GB virtual address space (extendable to 3 GB) and 4 GB physical memory.,y
+What are the virtual address space and physical memory limits for 64-bit Windows systems?,"128-TB virtual address space, and up to 24 TB physical memory (Windows Server up to 128 TB).",y
+What virtual memory management features are implemented in Windows?,"Shared libraries, demand paging, copy-on-write, paging, and memory compression.",y
+What is the primary mechanism for virtual memory in Windows?,Demand paging with clustering.,y
+Define 'clustering' in the context of Windows virtual memory.,Paging in a group of contiguous pages when a single page is requested via a page fault.,y
+What is the typical cluster size for a data page fault in Windows?,3 pages (the faulting page + one immediately preceding + one immediately following).,y
+What is the typical cluster size for other types of page faults in Windows?,7 pages.,y
+What is a key component of Windows' virtual memory management?,Working-set management.,y
+What are the default working-set minimum and maximum pages assigned to a process upon creation in Windows?,Working-set minimum (50 pages) and working-set maximum (345 pages).,y
+Define 'working-set minimum' in Windows.,The minimum number of frames guaranteed to a process in memory.,y
+Define 'working-set maximum' in Windows.,The maximum number of frames allowed to a process if sufficient memory is available.,y
+Define 'hard working-set limits' in Windows.,"The maximum amount of physical memory a process is allowed to use. (Note: if configured, these values may be ignored.)",y
+Can a process in Windows grow beyond its working-set maximum?,"Yes, if sufficient memory is available.",y
+Can memory allocated to a process in Windows shrink below its working-set minimum?,"Yes, this can occur during periods of high memory demand.",y
+"What page replacement algorithm does Windows use, and what policies does it incorporate?",An LRU-approximation clock algorithm (second-chance) with both local and global policies.,y
+What does the Virtual Memory Manager in Windows maintain to assist with page allocation?,A free page frames list with a threshold.,y
+"In Windows, what happens if a process experiences a page fault while operating below its working-set maximum?",A page is allocated from the free list.,y
+"In Windows, if a process is at its working-set maximum, but sufficient memory is available, what happens upon a page fault?","A free page is allocated, allowing the process to grow beyond its working-set maximum.",y
+What action does the Windows kernel take if there is insufficient free memory during a page fault?,The kernel selects a page from the faulting process's working set for replacement (using a local LRU policy).,y
+What global replacement tactic does Windows employ if free memory falls below a threshold?,`automatic working-set trimming`.,y
+Define 'automatic working-set trimming' in Windows.,The process of decreasing working-set frames for processes if a minimum free memory threshold is reached.,y
+How does automatic working-set trimming operate in Windows when a process holds more pages than its working-set minimum?,It removes pages until sufficient memory is available or the process reaches its working-set minimum.,y
+Which types of processes are prioritized for trimming during automatic working-set trimming in Windows?,"Larger, idle processes are targeted before smaller, active processes.",y
+To what extent does automatic working-set trimming persist in Windows?,"It continues until sufficient free memory is achieved, even if processes shrink below their working-set minimum.",y
+Which categories of processes does Windows perform trimming on?,Both user-mode and system processes.,y
+What happens in Solaris when a thread incurs a page fault?,The kernel assigns a page from the free list.,y
+What is the `lotsfree` parameter in Solaris?,A threshold (typically 1/64 of physical memory) at which the kernel begins paging.,y
+How often does the Solaris kernel check free memory against the `lotsfree` parameter?,Four times per second.,y
+When does the `pageout` process initiate in Solaris?,If the number of free pages falls below the `lotsfree` threshold.,y
+What algorithm does the `pageout` process in Solaris employ?,"An algorithm similar to the second-chance algorithm, utilizing two 'hands'.",y
+What is the role of the 'front hand' in the Solaris `pageout` process?,It scans all pages and sets their reference bit to 0.,y
+What is the role of the 'back hand' in the Solaris `pageout` process?,"It examines the reference bit; if it is still 0, the page is appended to the free list and written to secondary storage if modified.",y
+How does Solaris manage minor page faults?,A process can reclaim a page from the free list if it was accessed before being reassigned.,y
+What parameter controls the rate at which pages are scanned by the Solaris `pageout` algorithm?,"The `scanrate` parameter, which specifies pages per second.",y
+What is the range for the `scanrate` in Solaris?,From `slowscan` to `fastscan`.,y
+"What is the default `slowscan` rate in Solaris, and when is it typically applied?","100 pages/sec, applied when free memory falls below `lotsfree`.",y
+What is the maximum `fastscan` rate in Solaris?,"Total physical pages/2, with a maximum of 8,192 pages/sec (depending on free memory levels).",y
+What system parameter determines the distance between the two hands in the Solaris `pageout` algorithm?,The `handspread` system parameter.,y
+How is the time interval between clearing and checking a page's reference bit determined in Solaris?,It depends on the `scanrate` and `handspread` parameters.,y
+How frequently does the Solaris `pageout` process check memory conditions?,Four times per second.,y
+Under what condition does the Solaris `pageout` process run 100 times per second?,If free memory falls below `desfree` (desired free memory).,y
+What is the primary objective of the `desfree` parameter in Solaris?,To ensure that at least `desfree` memory is kept available.,y
+What action does the Solaris kernel take if it cannot maintain `desfree` memory for a 30-second average?,"The kernel swaps processes (freeing all their pages), typically targeting idle processes.",y
+When is the `pageout` process called for every new page request in Solaris?,If the system is unable to maintain `minfree`.,y
+What specific types of pages does the Solaris page-scanning algorithm skip during reclamation?,"Shared library pages, even if they would otherwise be eligible for reclamation.",y
+How does the Solaris page-scanning algorithm distinguish between different types of pages for reclamation?,"It distinguishes between pages for processes and regular data files, a process known as `priority paging`.",y
+Define 'priority paging' in Solaris.,"Prioritizing the selection of victim frames based on specific criteria, such as avoiding shared library pages.",y
+What is virtual memory?,Abstracts physical memory into an extremely large uniform array of storage.,y
+Name one benefit of virtual memory related to program size.,Program can be larger than physical memory.,y
+Name one benefit of virtual memory related to program loading.,Program does not need to be entirely in memory.,y
+Name one benefit of virtual memory related to process interaction.,Processes can share memory.,y
+Name one benefit of virtual memory related to process creation.,Processes can be created more efficiently.,y
+Define Demand paging.,Pages are loaded only when demanded during program execution.,y
+"In demand paging, what happens to pages that are never demanded?",Pages never demanded are never loaded.,y
+What is a page fault?,Occurs when a page not in memory is accessed.,y
+What action must be taken when a page fault occurs?,The page must be brought from the backing store into an available page frame.,y
+Define Copy-on-write.,A mechanism where a child process shares the same address space as its parent.,y
+Under what condition is a copy of a page made in a copy-on-write system?,If the child or parent modifies the shared page.,y
+When are page-replacement algorithms used?,"When available memory is low, a page-replacement algorithm selects an existing page to replace.",y
+Name common page-replacement algorithms.,"FIFO, optimal, LRU.",y
+Why is pure LRU impractical to implement?,Most systems use LRU-approximation algorithms instead.,y
+Define Global page-replacement algorithms.,Algorithms that select a page from any process for replacement.,y
+Define Local page-replacement algorithms.,Algorithms that select a page only from the faulting process for replacement.,y
+What is Thrashing?,A state where the system spends more time paging than executing.,y
+Define Locality (in the context of memory management).,A set of pages actively used together.,y
+How does process execution typically behave with regard to locality?,Process execution moves from locality to locality.,y
+What is a Working set?,"Based on locality, it's the set of pages currently in use by a process.",y
+What is Memory compression?,A technique that compresses a number of pages into a single page.,y
+When is memory compression used as an alternative to paging?,On mobile systems without paging support.,y
+How is Kernel memory allocation different from user-mode process memory allocation?,"Kernel memory is allocated differently, in contiguous chunks of varying sizes.",y
+Name two common techniques for kernel memory allocation.,Buddy system and Slab allocation.,y
+What is TLB reach?,The amount of memory accessible from the Translation Lookaside Buffer (TLB).,y
+How is TLB reach calculated?,Number of entries in TLB × page size.,y
+What is a technique to increase TLB reach?,Increase the page size.,y
+"How do Linux, Windows, and Solaris manage virtual memory?","They manage it similarly, using demand paging, copy-on-write, and variations of LRU approximation (e.g., clock algorithm).",y
+What is one traditional method for program loading?,Loading the entire program into physical memory at execution.,y
+What is a problem with loading an entire program into physical memory at execution?,"The entire program may not be needed initially (e.g., unselected options), leading to inefficient memory use.",y
+What is an alternative to loading an entire program into physical memory at execution?,"Loading pages only as needed, which is called demand paging.",y
+When are pages loaded into physical memory in a demand paging system?,Only when they are 'demanded' during execution.,y
+What happens to unaccessed pages in a demand paging system?,They are never loaded into physical memory.,y
+What is demand paging similar to?,Paging with swapping.,y
+What is a key benefit of demand paging?,More efficient memory use by loading only the needed portions of a program.,y
+What hardware support is needed to distinguish between pages in memory and pages in secondary storage?,A valid-invalid bit scheme for page table entries.,y
+"In a valid-invalid bit scheme, what does a 'valid' bit indicate?",That the associated page is legal and currently in memory.,y
+"In a valid-invalid bit scheme, what does an 'invalid' bit indicate?",That the associated page is either not valid (not in the logical address space) or is valid but currently located in secondary storage.,y
+What happens if a process attempts to access a page marked as 'invalid' in the page table?,A 'page fault' occurs.,y
+What does a page fault cause?,A trap to the operating system (OS).,y
+What is the first step in the page fault handling procedure?,Check an internal table (like the process control block) to determine if the memory access is valid or invalid.,y
+"In page fault handling, what happens if the memory access is determined to be invalid?",The process is terminated.,y
+"In page fault handling, what happens if the memory access is valid but the page is not in memory?",The operating system initiates the process to bring the page into memory.,y
+"After determining a valid but non-resident page, what is the next step in page fault handling?",Find a free frame in physical memory.,y
+What happens after a free frame is found during page fault handling?,A secondary storage operation is scheduled to read the required page into the new free frame.,y
+What happens after the storage read is complete during page fault handling?,The internal table and the page table are modified to indicate that the page is now in memory.,y
+What is the final step in the page fault handling procedure?,"The interrupted instruction is restarted, allowing the process to access the page as if it had always been in memory.",y
+What is 'pure demand paging'?,"A form of demand paging where a process starts with no pages in memory, and pages are brought in only as they are faulted for.",y
+Why does demand paging generally have reasonable performance?,Because programs tend to exhibit 'locality of reference'.,y
+What two main hardware components are crucial for demand paging?,The page table and secondary memory (swap device/swap space).,y
+What is the role of the page table in demand paging hardware support?,It marks entries as invalid using valid-invalid bits or protection bits.,y
+What is the role of secondary memory in demand paging hardware support?,"It holds pages that are not currently in main memory, often referred to as swap space or a swap device.",y
+What is a crucial requirement for an operating system supporting demand paging related to instructions?,The ability to restart any instruction after a page fault occurs.,y
+What process state information must be saved on a page fault to allow instruction restart?,"Registers, condition code, and the instruction counter.",y
+"What is a difficulty encountered with restarting instructions after a page fault, especially for older architectures?","Instructions that modify multiple locations, like the IBM System 360/370 MVC instruction.",y
+What is one solution for restarting instructions that modify multiple locations after a page fault?,"Microcode accessing both ends of blocks before modification, ensuring a fault happens before any modification.",y
+What is another solution for restarting instructions that modify multiple locations after a page fault?,Using temporary registers to store overwritten values and restoring old values on a fault before the trap.,y
+How should paging appear to a running process?,It should be transparent to the process.,y
+What does the operating system maintain to handle page faults and memory allocation?,A free-frame list.,y
+"Besides page faults, for what other purposes are free frames allocated from the free-frame list?",For stack and heap segment expansion.,y
+What is 'zero-fill-on-demand'?,A technique used by most operating systems where frames are 'zeroed-out' (filled with zeros) before being allocated to a process.,y
+What is the purpose of 'zero-fill-on-demand'?,To ensure security by preventing a process from accessing the previous contents of a frame.,y
+What is the state of the free-frame list at system startup?,All available memory is placed on the free-frame list.,y
+What happens to the free-frame list as requests for memory frames are made?,It shrinks and must be repopulated when its size becomes low.,y
+What is the formula for calculating the effective access time for demand-paged memory?,"Effective Access Time = (1 - p) * ma + p * page fault time, where 'p' is the probability of a page fault and 'ma' is the memory access time.",y
+What are the three main components of page fault service time?,"Servicing the page-fault interrupt, reading in the page from secondary storage, and restarting the process.",y
+What is the typical time range for servicing a page-fault interrupt and restarting the process?,1 to 100 microseconds.,y
+What is the approximate HDD page-switch time?,"Around 8 milliseconds (composed of ~3ms latency, ~5ms seek, and ~0.05ms transfer).",y
+How does the effective access time relate to the page-fault rate?,It is directly proportional to the page-fault rate.,y
+"What is the impact on performance if the page-fault rate is 1/1000, given a memory access time of 200 ns and a page-fault service time of 8 ms?","The effective access time would be 8.2 microseconds, representing a 40x slowdown.",y
+What condition is crucial for good demand-paging performance?,A very low page-fault rate.,y
+How does swap space I/O generally compare to file system I/O?,Swap space I/O is generally faster than file system I/O because it typically uses larger blocks and avoids file lookups.,y
+Describe one strategy for swap space usage where the entire file image is copied.,"The entire file image is copied to swap space at startup, and then pages are demand-paged from this swap space. (Disadvantage: initial copy time).",y
+Describe a common swap space usage strategy used by Linux and Windows.,"Pages are initially demand-paged directly from the file system, but if they are modified and later replaced, they are written to swap space.",y
+How do Linux and BSD UNIX handle demand paging for binary executables?,"They demand-page binary executables directly from the file system. If frames holding these pages are replaced, they are simply overwritten (as they are never modified), with the file system acting as the backing store.",y
+"What type of memory still typically uses swap space, regardless of the executable paging strategy?",Anonymous memory (such as stack and heap).,y
+How do mobile operating systems like iOS typically handle memory and swapping?,"They typically do not use swapping. Instead, they demand-page from the file system and reclaim read-only pages if memory becomes constrained.",y
+"How are anonymous memory pages handled in mobile OS like iOS, given they typically don't swap?",They are not reclaimed unless the application is terminated or explicitly releases the memory.,y
+What is an alternative to swapping in mobile systems?,Compressed memory.,y
+Define 'demand paging'.,Bringing in pages from storage as needed rather than entirely at process load time.,y
+Define 'page fault'.,A fault that occurs when a reference is made to a non-memory-resident page.,y
+Define 'pure demand paging'.,A specific type of demand paging where no page is brought into memory until it is referenced.,y
+Define 'locality of reference'.,The tendency of processes to reference memory in predictable patterns rather than randomly.,y
+Define 'swap space'.,The secondary storage backing-store space used for memory pages that have been paged out of physical memory.,y
+Define 'free-frame list'.,A kernel-maintained list of available free physical memory frames.,y
+Define 'zero-fill-on-demand'.,"The process of writing zeros into a page before making it available to a process, typically for security reasons.",y
+Define 'effective access time'.,"The measured or calculated time required to access a resource, such as memory.",y
+Define 'page-fault rate'.,A measure of how often a page fault occurs per memory access attempt.,y
+Define 'anonymous memory'.,"Memory that is not associated with a file; if it becomes dirty and needs to be paged out, it is stored in swap space.",y
+What is a characteristic of `fork()` regarding demand paging?,Process creation using `fork()` can bypass demand paging initially.,y
+What technique is Copy-on-write similar to for rapid process creation?,Page sharing.,y
+What is the primary goal of Copy-on-write in process creation?,To minimize new pages allocated to the child process.,y
+How did traditional `fork()` behave regarding the parent's address space?,"Traditionally, `fork()` copied the parent's entire address space for the child.",y
+When might copying the parent's address space for the child be unnecessary?,If the child immediately calls `exec()`.,y
+Define Copy-on-write (concept).,"Parent and child processes initially share the same pages; if either process writes to a shared page, a copy of that page is created.",y
+How are pages marked when Copy-on-write is in effect?,Shared pages are marked as copy-on-write.,y
+What happens when a process writes to a shared page marked copy-on-write?,"A copy of the shared page is created, and the write operation occurs on the new copy.",y
+Describe the process when a child modifies a copy-on-write stack page.,"The OS gets a free frame, copies the original page to it, and maps the copied page to the child's address space. The child then modifies its new, copied page, not the parent's.",y
+"Which pages are copied when using Copy-on-write, and which can remain shared?","Only modified pages are copied; unmodified pages (e.g., executable code) can continue to be shared.",y
+In which operating systems is Copy-on-write a common technique?,"Windows, Linux, macOS.",y
+What is `vfork()`?,"A variation of `fork()` found in UNIX systems (Linux, macOS, BSD UNIX).",y
+How does `vfork()` differ from `fork()` in terms of address space sharing and Copy-on-write?,"With `vfork()`, the parent process is suspended, and the child directly uses the parent's address space. `vfork()` does not use copy-on-write.",y
+What is a critical consequence of a child process modifying the parent's address space when using `vfork()`?,Changes made by the child process to the parent's address space will be visible to the parent upon its resumption.,y
+What caution should be exercised when using `vfork()`?,The child process must not modify the parent's address space.,y
+What is the intended use case for `vfork()`?,It is intended for use when the child process calls `exec()` immediately after creation.,y
+What is the efficiency characteristic of `vfork()` process creation?,It is extremely efficient because no page copying is involved.,y
+For what specific application is `vfork()` sometimes used?,To implement UNIX command-line shell interfaces.,y
+Define: copy-on-write,"A technique where a write operation causes data to be copied then modified; specifically, on a shared page write, the page is copied, and the write occurs to the copy.",y
+Define: virtual memory fork,"Refers to the `vfork()` system call, where the child process shares the parent's address space for read/write access, and the parent process is suspended during this time.",y
+What is the primary benefit of demand paging in terms of I/O?,Demand paging saves I/O by loading only used pages.,y
+How can the degree of multiprogramming be increased using memory management techniques?,By over-allocating memory.,y
+Explain the concept of 'over-allocating' memory.,Providing access to more resources than physically available; allocating more virtual memory than physical memory.,y
+What problem can arise from over-allocating memory?,"Processes may suddenly need all pages (e.g., 60 frames needed, only 40 available).",y
+How does over-allocation manifest in a system?,As a page fault with no free frames.,y
+"What additional system component uses memory, increasing strain on memory-placement?",I/O buffers.,y
+What action is taken if there are no free frames during a page fault?,A frame not in use is found and freed.,y
+Describe the process of freeing a frame.,Write its contents to swap space and change the page table to indicate the page is no longer in memory.,y
+What is the purpose of 'page replacement'?,Selection of a physical memory frame to be replaced when a new page is allocated.,y
+"In the modified page-fault service routine, what is the first step?",Find the desired page on secondary storage.,y
+"In the modified page-fault service routine, if no free frame is available, what is selected?","A victim frame, using a page-replacement algorithm.",y
+What is a 'victim frame'?,The frame selected by the page-replacement algorithm to be replaced.,y
+What happens to a victim frame if it has been modified?,Its contents are written to secondary storage before replacement; page/frame tables are updated.,y
+How does page-fault service time change if no free frames are available?,"It doubles due to two page transfers (page-out for victim, page-in for desired page).",y
+What is used to reduce overhead in page replacement when a page is unchanged?,A modify bit (or dirty bit).,y
+What is a 'modify bit' (or 'dirty bit')?,An MMU bit indicating a frame has been modified (must be saved before replacement).,y
+When is the modify bit set?,Hardware sets the modify bit if the page has been written to.,y
+What is the advantage of a modify bit being unset when a page is replaced?,"No need to write the page to storage (because it's unchanged), significantly reducing page-fault service time.",y
+How does page replacement relate to logical and physical memory?,"It separates logical and physical memory, allowing enormous virtual memory on smaller physical memory.",y
+What are the two major problems for demand paging?,1. Frame-allocation algorithm (how many frames to allocate to each process). 2. Page-replacement algorithm (which frames to replace).,y
+What is a 'frame-allocation algorithm'?,An OS algorithm for allocating frames among all demands.,y
+What is a 'page-replacement algorithm'?,An algorithm choosing which victim frame will be replaced by a new data frame.,y
+What is the primary goal of a page replacement algorithm?,To achieve the lowest page-fault rate.,y
+How are page replacement algorithms evaluated?,Using a reference string (a trace of memory accesses).,y
+What is a 'reference string'?,A trace of accesses to a resource; a list of pages accessed over time.,y
+What simplification is typically made when creating a reference string?,"Only the page number is recorded, and immediate repeated references are ignored.",y
+What is the general relationship between the number of allocated frames and the page-fault rate?,More frames generally lead to fewer page faults.,y
+"Describe the First-in, First-out (FIFO) page replacement algorithm.","It replaces the oldest page, meaning the first one brought into memory.",y
+How can the FIFO page replacement algorithm be implemented?,"Using a FIFO queue: replace the page at the head, and insert the new page at the tail.",y
+What are the advantages of the FIFO page replacement algorithm?,It is easy to understand and program.,y
+What is a common performance issue with the FIFO page replacement algorithm?,"It may replace actively used pages, leading to increased page-fault rates and slowed execution.",y
+What is 'Belady's anomaly'?,A phenomenon where the page-fault rate may increase as the number of allocated frames increases for some algorithms.,y
+Which page replacement algorithm suffers from Belady's anomaly?,FIFO page replacement.,y
+What is the 'optimal page-replacement algorithm' (OPT or MIN)?,"The algorithm with the lowest page-fault rate, which never suffers from Belady's anomaly.",y
+What is the rule for the Optimal (OPT) page replacement algorithm?,Replace the page that will not be used for the longest period of time.,y
+What is the primary difficulty in implementing the Optimal page replacement algorithm?,"It requires future knowledge of the reference string, which is impossible in practice.",y
+What is the main use of the Optimal page replacement algorithm?,Mainly for comparison studies to evaluate other algorithms.,y
+What algorithm does the Least Recently Used (LRU) algorithm approximate?,The optimal page-replacement algorithm.,y
+Describe the rule for the 'Least Recently Used (LRU)' algorithm.,It replaces the page that has not been used for the longest period of time.,y
+How is LRU page replacement related to the optimal algorithm?,It is like the optimal algorithm looking backward in time.,y
+Does LRU page replacement suffer from Belady's anomaly?,"No, because it is a stack algorithm.",y
+What is a 'stack algorithm'?,A class of page-replacement algorithms that do not suffer from Belady's anomaly.,y
+What is required for the true implementation of the LRU algorithm?,Substantial hardware assistance.,y
+How can LRU be implemented using counters?,Associate a time-of-use field with each page-table entry; the CPU logical clock increments; copy the clock to the field on reference. Replace the page with the smallest time value.,y
+How can LRU be implemented using a stack?,"Keep a stack of page numbers; on reference, remove the page and put it on top. The most recently used page is at the top, and the least recently used is at the bottom. Best with a doubly linked list.",y
+Why is true LRU implementation expensive?,Due to the need for per-memory-reference updates.,y
+Why do many systems use LRU-approximation algorithms?,Because they lack the hardware for true LRU implementation.,y
+What is a 'reference bit'?,An MMU bit indicating a page has been referenced.,y
+How is the reference bit used in LRU approximation?,Hardware sets the bit when a page is referenced; the OS periodically clears the bits to determine which pages have been used (but not their exact order).,y
+Describe the 'Additional-reference-bits algorithm'.,"It keeps an 8-bit byte for each page. On a timer interrupt (e.g., every 100ms), the OS shifts the reference bit into the high-order bit of the byte and shifts others right. The 8-bit shift registers show the history, and the page with the lowest number is considered LRU.",y
+What is another name for the 'Second-chance page-replacement algorithm'?,The clock algorithm.,y
+Describe the 'second-chance page-replacement algorithm'.,"It's a basic FIFO algorithm. If a selected page's reference bit is 0, it's replaced. If the reference bit is 1, it's given a second chance: the bit is cleared, its arrival time is reset, and it's not replaced until others are replaced or given second chances.",y
+How is the second-chance algorithm typically implemented?,"As a circular queue with a pointer that advances, clearing reference bits, until a page with a 0-bit is found.",y
+When does the second-chance algorithm degenerate to FIFO?,If all reference bits are set.,y
+What is the 'clock' in the context of the second-chance algorithm?,A circular queue in the second-chance algorithm containing possible victim frames.,y
+What two bits does the 'Enhanced second-chance algorithm' consider?,"The reference bit and the modify bit, as an ordered pair (reference bit, modify bit).",y
+"List the four classes of pages in the Enhanced second-chance algorithm, from best to worst for replacement.","1. (0, 0): neither recently used nor modified (best to replace). 2. (0, 1): not recently used but modified (needs write-out). 3. (1, 0): recently used but clean (likely used again soon). 4. (1, 1): recently used and modified (likely used again soon, needs write-out).",y
+What is the replacement preference in the Enhanced second-chance algorithm?,"It replaces the first page found in the lowest nonempty class, preferring clean pages to reduce I/Os.",y
+How do counting-based page replacement algorithms generally work?,They keep a counter of references for each page.,y
+Describe the 'Least Frequently Used (LFU)' page replacement algorithm.,It selects the page with the smallest access count for replacement.,y
+What is a problem with the LFU algorithm?,A page that was heavily used initially but is now unused might retain a high count and not be replaced readily.,y
+How can the problem of high counts in LFU be mitigated?,By shifting counts right periodically (creating an exponentially decaying average).,y
+Describe the 'Most Frequently Used (MFU)' page replacement algorithm.,"It selects the page with the smallest access count for replacement, assuming that pages with the smallest count were just brought in and are therefore likely to be used in the future.",y
+Are LFU and MFU common in practice?,Neither LFU nor MFU are common because they are expensive to implement and do not approximate the optimal algorithm well.,y
+What is the purpose of 'Page-buffering algorithms'?,They are used in addition to page replacement algorithms to improve performance.,y
+How does a 'pool of free frames' page-buffering algorithm work?,"On a page fault, the desired page is read into a free frame from the pool before the victim is written out, allowing the process to restart faster. The victim frame is added to the pool after its write-out.",y
+How does a 'list of modified pages' page-buffering algorithm work?,"When the paging device is idle, modified pages are written to secondary storage and their modify bits are reset, increasing the probability of a clean page for replacement (no write-out needed during fault).",y
+What is the benefit of a 'pool of free frames remembering old page' algorithm?,"If an old page is needed before its frame is reused, it can be reused directly from the pool without I/O. The free-frame pool is checked first on a page fault.",y
+Which operating system uses page buffering with the second-chance algorithm?,UNIX.,y
+Why might some applications perform worse with OS virtual memory buffering?,"Applications often understand their memory/storage use better than general-purpose OS algorithms, and double buffering can occur if both the OS and application buffer I/O.",y
+Provide an example of an application scenario where general-purpose OS algorithms might be inefficient.,"Data warehouses performing sequential reads then computations/writes. LRU might remove older pages that will be read again, making MFU potentially more efficient.",y
+What is 'raw disk'?,"Direct access to secondary storage as a large sequential array of logical blocks, bypassing file-system services.",y
+What file-system services does 'raw I/O' bypass?,"Demand paging, locking, prefetching, allocation, names, and directories.",y
+When are raw partitions generally efficient?,"They are efficient for specific applications that can manage their own storage, but most applications are better served by regular file-system services.",y
+What is the primary issue addressed by frame allocation?,How to allocate a fixed amount of free memory among multiple processes.,y
+"In a pure demand paging system, where are frames placed initially after OS memory allocation?",On the free-frame list.,y
+What happens when a page fault occurs and frames are available?,The process gets free frames from the free-frame list.,y
+What happens when the free-frame list is exhausted during a page fault?,A page-replacement algorithm is used to free up a frame.,y
+What happens to a process's frames when it terminates?,They are returned to the free-frame list.,y
+Describe a variation in frame allocation related to OS buffer/table space.,"The OS can allocate buffer/table space from the free-frame list, which can then be used for user paging when not actively in use by the OS.",y
+Describe a variation in frame allocation involving reserved free frames.,"A small number of free frames (e.g., 3) can be reserved: one for a page fault, and others for selecting a replacement page during a swap operation.",y
+What is the basic strategy for user process frame allocation?,A user process is allocated any available free frame.,y
+What are the two main constraints on frame allocation?,1. Cannot exceed the total available frames (unless page sharing is involved). 2. Must allocate at least a minimum number of frames.,y
+How does having fewer frames impact system performance?,It leads to a higher page-fault rate and slower execution.,y
+What is the consequence if a page fault occurs before an instruction can complete?,The instruction must be restarted.,y
+What is required regarding the number of frames for an instruction to complete correctly?,There must be enough frames for all pages an instruction can reference.,y
+What is the minimum number of frames required for a single memory-reference instruction?,Two frames: one for the instruction itself and one for the memory reference.,y
+What is the minimum number of frames required per process for one-level indirect addressing?,At least three frames.,y
+What determines the minimum number of frames required for a process?,The computer architecture.,y
+"For a 'move' instruction straddling two frames with two indirect operands, how many frames might be required?",Six frames.,y
+How do Intel architectures typically limit the minimum number of frames needed?,"They only allow register-to-register or memory operations, which can limit the minimum frames required for an instruction.",y
+What defines the maximum number of frames a process can be allocated?,The total available physical memory.,y
+What is 'equal allocation' in the context of virtual memory frame management?,Assigns equal amounts of a resource (page frames) to all requestors (processes).,y
+What is 'proportional allocation' in the context of virtual memory frame management?,"Assigns a resource (page frames) in proportion to some aspect of the requestor; in virtual memory, typically in proportion to process size.",y
+What is the formula for calculating frames allocated to process 'pi' using proportional allocation?,"a_i ≈ (s_i/S) × m, where s_i is the virtual memory size of p_i, S is the total virtual memory size of all processes, and m is the total available frames.",y
+What constraints apply to the calculated number of frames (a_i) in proportional allocation?,"a_i must be an integer, greater than the minimum frames required, and the sum of all a_i values must be less than or equal to the total available frames (m).",y
+How does an increased multiprogramming level affect frame allocation per process?,"Processes lose frames (i.e., fewer frames are allocated per process).",y
+How does a decreased multiprogramming level affect frame allocation per process?,"Frames are spread among fewer processes (i.e., more frames are allocated per process).",y
+What is a limitation of equal and proportional allocation regarding process priority?,High-priority processes are treated the same as low-priority processes.,y
+How can process priority be factored into frame allocation?,"By using proportional allocation based on process priority, or a combination of size and priority.",y
+What is 'global replacement'?,"A page-replacement strategy where a process selects a replacement frame from all frames in the system, even if they are allocated to another process.",y
+What is 'local replacement'?,A page-replacement strategy where a process selects a replacement frame only from its own allocated frames.,y
+How does local replacement affect a process's frame allocation?,The number of frames allocated to a process does not change.,y
+How does global replacement affect a process's frame allocation?,A process can increase its number of allocated frames by taking them from other processes.,y
+What is a major problem associated with global replacement?,A process's performance depends on the paging behavior of other processes (external circumstances).,y
+What is a key characteristic of local replacement regarding process performance?,A process's performance depends only on its own paging behavior.,y
+Which page-replacement strategy generally leads to greater system throughput and is more common?,Global replacement.,y
+What is a page fault?,An event where a page is referenced but has no valid mapping in memory.,y
+What are the two types of page faults?,Major page faults (also known as hard faults) and minor page faults (also known as soft faults).,y
+What is a 'major fault'?,A page fault that is resolved by performing I/O to bring the required page from secondary storage (backing store) into memory.,y
+What actions are required to resolve a major page fault?,Reading from the backing store and updating the page table.,y
+When do demand paging systems typically experience a high number of major faults?,"Initially, when many pages are first accessed and need to be loaded from disk.",y
+What is a 'minor fault'?,A page fault that is resolved without paging in data from secondary storage.,y
+Provide a reason for a minor page fault involving shared libraries.,"A shared library page may already be in memory, but the process has no logical mapping to it, requiring only an update to the process's page table.",y
+Provide a reason for a minor page fault involving a reclaimed page.,"A page that was previously reclaimed to the free-frame list but not yet zeroed or reallocated can be reassigned to a process, requiring only its removal from the free-frame list.",y
+How does the time consumption of minor faults compare to major faults?,Minor faults are less time-consuming than major faults.,y
+What Linux command can be used to observe major and minor page faults?,"ps -eo min_flt,maj_flt,cmd",y
+"What is a common observation regarding major and minor faults in Linux processes, and why?","Major faults are typically low, while minor faults are high, because Linux processes heavily use shared libraries.",y
+"In a global page-replacement strategy, when are page replacements triggered?","When the free-frame list falls below a certain threshold, not necessarily at zero.",y
+What is the purpose of triggering page replacements before the free-frame list is exhausted?,To ensure there is always sufficient free memory available.,y
+What are 'reapers' in the context of memory management?,Routines that scan memory and free frames to maintain a minimum level of free memory.,y
+When are kernel 'reaper' routines triggered?,When the amount of free memory falls below a minimum threshold.,y
+From which processes do reapers reclaim pages?,"From all processes, excluding kernel processes.",y
+How do reapers select pages for reclamation?,"They use page-replacement algorithms, typically LRU approximation.",y
+When are reapers suspended and resumed?,They are suspended when free memory reaches a maximum threshold and resumed when it falls back below the minimum threshold.,y
+What happens if reapers are unable to maintain free frames using their typical algorithm?,"They reclaim pages more aggressively, potentially using simpler algorithms like pure FIFO.",y
+What is the 'out-of-memory (OOM) killer'?,A Linux routine that terminates processes to free memory when the amount of free memory becomes very low.,y
+How is the OOM score used by the OOM killer?,A higher OOM score indicates a higher likelihood of the process being terminated.,y
+How is a process's OOM score calculated?,By its memory usage percentage.,y
+What is the path to view a process's OOM score in Linux?,/proc/<pid>/oom_score,y
+Who can configure the minimum and maximum thresholds for reaper routines?,The system administrator.,y
+What is the typical assumption about memory access in virtual memory systems?,Uniform memory access (UMA).,y
+What is 'non-uniform memory access (NUMA)'?,"An architecture, common in systems with multiple CPUs, where memory access time varies based on the CPU core accessing it.",y
+How does CPU access time differ in NUMA systems?,"A CPU accesses memory located locally (e.g., on the same system board) faster than memory located remotely.",y
+What is the trade-off with NUMA systems compared to uniform access systems?,"NUMA systems are slower than uniform access for some operations, but they allow for more CPUs, leading to greater throughput and parallelism.",y
+Why is managing page frame location critical for NUMA performance?,"To ensure that frames are allocated as close as possible to the CPU that will access them, minimizing latency.",y
+How does a NUMA-aware system handle frame allocation during a page fault?,It attempts to allocate a frame that is physically close to the CPU experiencing the fault.,y
+How can the scheduler improve performance in NUMA systems?,"By tracking the last CPU a process ran on and scheduling it on the same CPU, then allocating frames close to that CPU, leading to improved cache hits and decreased memory access times.",y
+What issue do threads introduce for NUMA memory allocation?,"If a process has threads running on different system boards, allocating memory optimally for all threads becomes a challenge.",y
+How does Linux address NUMA challenges related to scheduling domains?,"The kernel identifies scheduling domains, and the CFS scheduler tries to prevent thread migration across these domains to avoid memory access penalties.",y
+How does Linux address NUMA challenges related to memory allocation?,"It maintains a separate free-frame list for each NUMA node, ensuring that a thread is allocated memory from the node it is running on.",y
+What are 'lgroups' in Solaris?,"Locality groups in the kernel that gather CPUs and memory, allowing for optimized memory access within a defined latency.",y
+Describe the structure and access within a Solaris lgroup.,"Each lgroup consists of a set of CPUs and memory, where any CPU in the group can access any memory in that group within a defined latency. Lgroups can also form a hierarchy.",y
+How does Solaris utilize lgroups for scheduling and memory allocation?,"Solaris schedules threads and allocates memory within an lgroup; if not possible, it uses nearby lgroups to minimize memory latency and maximize CPU cache hit rates.",y
+"What is ""thrashing"" in an operating system context?","A state where a process does not have enough physical memory frames (minimum needed for its working set), leading to quickly recurring page faults. It is characterized by high paging activity, where the system spends more time paging than executing.",y
+What is a primary performance consequence of thrashing?,"Severe performance problems, including a plunge in system throughput and a tremendous increase in page-fault rate, leading to increased effective memory-access time.",y
+Describe the common scenario that can trigger thrashing.,"The OS monitors low CPU utilization and, in an attempt to improve it, increases the degree of multiprogramming by initiating new processes.",y
+Which type of page-replacement algorithm can contribute to thrashing in a multiprogramming environment?,"A global page-replacement algorithm, which replaces pages without regard to the process that owns them.",y
+"How does a global page-replacement algorithm, combined with low CPU utilization, lead to thrashing?","A process needing more frames starts faulting and takes frames from other processes. This causes other processes to fault, taking frames from others. Faulting processes use the paging device, emptying the ready queue, which decreases CPU utilization. The CPU scheduler then increases multiprogramming further, taking more frames and leading to more page faults and longer paging device queues, causing CPU utilization to drop even more, thus perpetuating the cycle.",y
+"How does CPU utilization generally change as the degree of multiprogramming increases, before thrashing occurs?",CPU utilization increases (though at a slower rate) until it reaches a maximum.,y
+What happens to CPU utilization when the degree of multiprogramming is increased beyond the point where thrashing begins?,CPU utilization drops sharply.,y
+What is the most direct way to stop thrashing once it has begun?,Decrease the degree of multiprogramming.,y
+What types of page-replacement algorithms can limit the effects of thrashing?,Local replacement algorithms or priority replacement algorithms.,y
+"Define a ""local replacement algorithm"".",A page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes; a process selects pages only from its own allocated frames.,y
+"Define a ""priority replacement algorithm"".",A page replacement algorithm that avoids thrashing by not allowing a process to steal frames from other processes.,y
+What is a limitation of using local or priority replacement algorithms to limit thrashing?,"While a thrashing process cannot steal frames from others, it still queues for the paging device, increasing the average service time for page faults and, consequently, the effective access time for all processes.",y
+What is the fundamental way to prevent thrashing?,Provide each process with enough physical memory frames.,y
+"Define the ""locality model"".","A model for page replacement based on the working-set strategy, which states that during execution, a process moves from one 'locality' of memory references to another.",y
+"In the context of the locality model, what is a ""locality""?",A set of pages that are actively used together by a program.,y
+Describe the characteristics of localities in a running program.,"A running program typically consists of several overlapping localities, which are defined by its program structure and data structures.",y
+"What fundamental principle, relevant to memory access patterns, is behind caching?","Accesses are patterned, not random (i.e., exhibiting locality).",y
+"What is the ""working-set model"" based on?",The locality assumption.,y
+What key parameter is used in the working-set model?,"Δ (delta), which defines the working-set window.",y
+"Define ""working-set window"".",A limited set of most recently accessed pages (a 'window' view of the entire set of accessed pages). It specifically refers to the most recent Δ page references.,y
+"Define ""working set"".","The set of pages that are contained within the working-set window (i.e., the pages in the most recent Δ references).",y
+How long does a page remain in a working set?,"If a page is in active use, it remains in the working set. If it's no longer used, it drops from the working set Δ time units after its last reference.",y
+What does a working set approximate?,A program's locality.,y
+What determines the accuracy of the working set in approximating a program's locality?,The selection of the Δ (working-set window) parameter.,y
+What is the consequence if the Δ parameter in the working-set model is too small?,The working set will not encompass the entire locality.,y
+What is the consequence if the Δ parameter in the working-set model is too large?,The working set may overlap several localities.,y
+What does the working set represent if Δ is infinite?,The working set would be all pages touched by the process during its entire execution.,y
+What is the most important property derived from the working-set model?,The working-set size (WSSi) for each process.,y
+"In the working-set model, how is the total demand for frames (D) calculated?","D = sum of WSSi, where WSSi is the working-set size for each process i.",y
+"According to the working-set model, when does thrashing occur?","If the total demand for frames (D) exceeds the total available frames (m), meaning some processes lack sufficient frames for their working sets.",y
+How does an OS use the working-set model to manage processes and memory?,"It monitors the working set of each process, allocates enough frames for its working-set size, initiates new processes if there are enough extra frames, and suspends processes (swapping their pages out) if the sum of working-set sizes exceeds available frames.",y
+What are the main benefits of using the working-set model for memory management?,"It prevents thrashing, helps keep the degree of multiprogramming high, and optimizes CPU utilization.",y
+What is the main difficulty in implementing the working-set model?,Accurately tracking the moving working-set window.,y
+What is a common approximation method used to implement the working-set model?,Using a fixed-interval timer interrupt in conjunction with reference bits.,y
+How does the fixed-interval timer interrupt and reference bit approximation work for working sets?,"At each timer interrupt, the OS copies and clears the reference bits. On a page fault, it examines the current reference bit and a few in-memory history bits. If at least one bit is on within the Δ window (e.g., last 10,000-15,000 references), the page is considered part of the working set.",y
+What is a key limitation of the working-set approximation using timer interrupts and reference bits?,It cannot tell the exact reference time within an interval.,y
+How can the accuracy of the working-set approximation be improved?,By increasing the number of history bits or increasing the interrupt frequency (though this comes at a higher cost).,y
+"Define ""Page-Fault Frequency"" (PFF).",The frequency at which page faults occur.,y
+What is the primary goal of the Page-Fault Frequency (PFF) strategy?,To prevent thrashing by directly controlling the page-fault rate.,y
+How does the PFF strategy compare to the working-set model regarding thrashing control?,The working-set model is successful and useful for prepaging but can be clumsy for thrashing control; the PFF strategy is more direct.,y
+How does the PFF strategy decide whether a process needs more or fewer frames?,"If the page-fault rate is too high, the process needs more frames. If it's too low, the process may have too many frames.",y
+How does the PFF strategy operationalize its control over page-fault rates?,"It establishes upper and lower bounds for the desired page-fault rate. If the actual PFF exceeds the upper limit, another frame is allocated. If it falls below the lower limit, a frame is removed.",y
+What action does the PFF strategy take if a process's page-fault rate increases but no free frames are available?,"The OS selects a process to swap out to backing store, and the freed frames are then distributed to the processes with high page-fault frequencies.",y
+What is the current best practice for memory management to avoid thrashing and swapping?,Include enough physical memory in the system to avoid the occurrence of thrashing and excessive swapping.,y
+What is the primary benefit of the current best practice in memory management (having enough physical memory)?,"It provides the best user experience across various devices, from smartphones to large servers.",y
+What is memory compression an alternative to?,Paging.,y
+How does memory compression reduce memory usage?,"By compressing several frames into a single frame, without swapping pages to disk.",y
+Describe the initial trigger for memory compression based on the example process.,"A free-frame list falling below a set threshold, which triggers page replacement.",y
+"What happens to selected frames (e.g., 15, 3, 35, 26) when page replacement is triggered for memory compression?",They are placed on a modified-frame list.,y
+"In the memory compression process, what is done with the selected frames instead of writing them to swap space?","They are compressed (e.g., three frames) into a single page frame.",y
+"What is the first step involving a free frame (e.g., Frame 7) in the memory compression process described in the example?",Frame 7 is removed from the free-frame list.,y
+"After a free frame (e.g., Frame 7) is removed, what happens to the selected frames (e.g., 15, 3, 35) in the memory compression process?","They are compressed and stored in the allocated free frame (e.g., Frame 7).",y
+"Where is the frame containing compressed data (e.g., Frame 7) stored after compression?",In a list of compressed frames.,y
+"What happens to the original frames (e.g., 15, 3, 35) after their contents have been compressed and stored elsewhere?",They are moved back to the free-frame list.,y
+What occurs if a compressed frame is referenced?,"A page fault is triggered, the frame is decompressed, and the original pages are restored.",y
+Do mobile systems like Android and iOS typically support standard swapping/paging?,"No, they generally do not.",y
+"What role does memory compression play in the memory-management strategy of mobile systems (Android, iOS)?",It is an integral part of their memory-management strategy.,y
+Which major operating systems support memory compression?,Windows 10 and macOS.,y
+"In Windows 10, which applications are candidates for memory compression?",Universal Windows Platform (UWP) apps on mobile devices.,y
+How does macOS (Version 10.9+) utilize memory compression?,"It compresses LRU (Least Recently Used) pages when free memory is short, and then pages if needed.",y
+How does memory compression performance compare to paging to an SSD on macOS?,Memory compression is faster than paging to an SSD on macOS.,y
+What is a requirement for memory compression in terms of frame allocation?,It requires allocating free frames for compressed pages.,y
+What is an example of significant memory saving possible with memory compression?,Compressing 3 frames into 1 frame.,y
+What two factors are in contention regarding memory compression algorithms?,Compression speed and compression ratio (amount of reduction).,y
+What is the trade-off associated with achieving higher compression ratios?,"It typically requires slower, more computationally expensive algorithms.",y
+What is the balancing goal for most memory compression algorithms?,To achieve high ratios with fast algorithms.,y
+How can memory compression performance be improved?,By using parallel compression with multiple cores.,y
+Name two examples of fast memory compression algorithms and their typical compression effectiveness.,"Microsoft's Xpress and Apple's WKdm, which typically compress data to 30-50% of its original size.",y
+Define memory compression.,An alternative to paging; compresses frame contents to decrease memory usage.,y
+Define Universal Windows Platform (UWP).,A Windows 10 architecture providing a common app platform for all devices running Windows 10.,y
+Define compression ratio.,"A measurement of compression effectiveness, specifically the ratio of compressed space to uncompressed space.",y
+How are pages allocated for user-mode processes?,Pages are allocated from the kernel's free page frame list.,y
+How is the kernel's free page frame list populated?,"By page-replacement algorithms (e.g., Section 10.4).",y
+Describe the physical memory distribution of free pages for user-mode processes.,Free pages are scattered throughout physical memory.,y
+What causes internal fragmentation when a user-mode process requests memory?,"A single byte request results in an entire page frame being granted, leading to internal fragmentation.",y
+Why is kernel memory often allocated from a different free-memory pool than user-mode memory?,"1. Kernel requests vary in data structure sizes, some less than a page, requiring conservative memory use to minimize fragmentation.
+2. Many OS do not subject kernel code/data to paging.
+3. Hardware devices interact directly with physical memory (no virtual memory interface) and may require physically contiguous pages.",y
+What are the main strategies for managing kernel free memory?,"""Buddy system"" and ""slab allocation"".",y
+From where does the buddy system allocate memory?,From a fixed-size segment of physically contiguous pages.,y
+"What is a ""power-of-2 allocator""?",An allocator in the buddy system that satisfies memory requests in units sized as a power of 2.,y
+How does the buddy system handle a memory request that is not appropriately sized (power of 2)?,It is rounded up to the next highest power of 2.,y
+"If a buddy system receives an 11 KB request, what size segment is granted?",A 16-KB segment (rounded up from 11 KB).,y
+Describe the steps for a 21 KB kernel request from an initial 256 KB segment using the buddy system.,"1. Initial 256 KB segment divided into two 128 KB ""buddies"" ($A_L$ and $A_R$).
+2. One buddy ($A_L$) divided into two 64 KB buddies ($B_L$ and $B_R$).
+3. Next-highest power of 2 for 21 KB is 32 KB.
+4. One 64 KB buddy ($B_L$) divided into two 32 KB buddies ($C_L$ and $C_R$).
+5. One 32 KB buddy ($C_L$) is used for the 21 KB request.",y
+"What are ""buddies"" in the context of memory allocation?",Pairs of equal size in buddy memory allocation.,y
+What is a key advantage of the buddy system?,It can quickly combine adjacent buddies to form larger segments using coalescing.,y
+"What is ""coalescing"" in the buddy system?",Combining freed memory in adjacent buddies into larger segments.,y
+Give an example of coalescing in the buddy system after a 21 KB request is released.,"When the $C_L$ unit (32 KB) is released, it can coalesce with $C_R$ to form a 64 KB segment ($B_L$). This $B_L$ can then coalesce with $B_R$ to form a 128 KB segment ($A_L$), and eventually the original 256 KB segment.",y
+What is the main drawback of the buddy system?,Rounding up requests to the next highest power of 2 causes internal fragmentation.,y
+Give an example of internal fragmentation in the buddy system.,"A 33 KB request leads to a 64 KB segment allocation, potentially wasting nearly 50% of the allocated unit.",y
+"What is ""slab allocation""?","A memory allocation method where a slab is split into object-sized chunks, eliminating fragmentation.",y
+"What is a ""slab"" in slab allocation?",A section of memory consisting of one or more physically contiguous pages.,y
+"What is a ""cache"" in the context of the slab allocator?","One or more slabs used to store temporary data copies for performance; in the slab allocator, it consists of one or more slabs.",y
+How many caches does the slab allocator typically use for kernel data structures?,"A single cache is used for each unique kernel data structure (e.g., process descriptors, file objects, semaphores).",y
+"What is an ""object"" in the context of slab allocation?",An instantiation of a kernel data structure.,y
+How are caches populated in the slab allocator?,"Each cache is populated with ""objects"" (instantiations of the kernel data structure it manages).",y
+Describe the process of allocating an object using the slab allocator.,"1. When a cache is created, objects are allocated to it, initially marked as `free`.
+2. The number of objects depends on the slab size (e.g., a 12 KB slab could hold six 2 KB objects).
+3. When a new object is needed, the allocator assigns any `free` object from the cache, marking it `used`.",y
+"How does the slab allocator fulfill a kernel request for a process descriptor (e.g., `struct task_struct`, ~1.7 KB)?","The cache associated with `struct task_struct` fulfills the request with a pre-allocated, free `struct task_struct` object.",y
+What are the three states a slab can be in within Linux?,"1. `Full`: All objects in the slab are `used`.
+2. `Empty`: All objects in the slab are `free`.
+3. `Partial`: The slab has both `used` and `free` objects.",y
+In what order does the slab allocator try to satisfy a request for a free object?,"1. First, it looks for a free object in a partial slab.
+2. If none, it looks for a free object from an empty slab.
+3. If no empty slabs, a new slab is allocated from contiguous physical pages, assigned to the cache, and object memory is allocated from this new slab.",y
+What is the first main benefit of the slab allocator?,"No memory is wasted due to fragmentation. Each kernel data structure has an associated cache, which is made of slabs divided into object-sized chunks, ensuring the exact amount of memory requested by the kernel is returned.",y
+What is the second main benefit of the slab allocator?,"Memory requests are satisfied quickly, which is effective for frequent object allocation/deallocation common in the kernel. Objects are created in advance, quickly allocated from the cache, and released objects are marked free and immediately available.",y
+"Where did the slab allocator first appear, and where is it used today?",It first appeared in the Solaris 2.4 kernel. It is now used for some user-mode requests in Solaris. Linux adopted it (Version 2.2+) and referred to it as SLAB.,y
+What are the recent Linux kernel memory allocators mentioned?,SLOB and SLUB.,y
+What is the purpose of the SLOB allocator?,"It is designed for systems with limited memory, such as embedded systems.",y
+How does the SLOB allocator work?,"It maintains three lists (`small` <256 bytes, `medium` <1,024 bytes, `large` other objects < page size) and allocates from the appropriate list using a first-fit policy.",y
+What is the status of the SLUB allocator in Linux?,It is the default allocator for the Linux kernel (Version 2.6.24+) and replaced SLAB.,y
+How did the SLUB allocator reduce SLAB overhead related to metadata?,"It stores metadata in the `page` structure, not with each slab.",y
+How did the SLUB allocator improve memory saving on multi-processor systems compared to SLAB?,"It removed per-CPU queues for objects, leading to significant memory savings.",y
+How does the SLUB allocator perform with more processors?,It offers better performance with more processors.,y
+What is the initial drawback of pure demand paging?,"A large number of page faults when a process starts, due to initial locality.",y
+"Define ""prepaging.""","Bringing pages into memory before they are requested, in an attempt to prevent high initial paging.",y
+What is the strategy behind prepaging?,To bring some or all needed pages into memory at once.,y
+Provide an example of prepaging in practice.,"Using the working-set model to remember a suspended process's working set, then automatically bringing the entire working set back into memory before restarting the process.",y
+What is the main advantage of prepaging?,The potential cost saving of prepaging compared to the cost of servicing multiple individual page faults.,y
+What is the primary risk associated with prepaging?,"Many prepaged pages may not actually be used, leading to wasted effort and memory.",y
+"In prepaging cost analysis, what do 's' and 'α' represent?",'s' represents the number of pages prepaged. 'α' represents the fraction of 's' pages actually used (where 0 ≤ α ≤ 1).,y
+When does prepaging 'lose' or 'win' based on the fraction of used pages (α)?,"If α is approximately 0, prepaging loses (more wasted effort). If α is approximately 1, prepaging wins (more saved page faults).",y
+Is prepaging executable programs generally easy or difficult? Why?,"It is difficult because it's unclear what pages (code, data, stack, heap) will be needed and should be brought in.",y
+Is prepaging files more predictable than prepaging executable programs? Why?,"Yes, because files are often accessed sequentially, making it easier to predict future page needs.",y
+What Linux system call is an example of file prepaging?,"The `readahead()` system call, which prefetches file contents into memory.",y
+When is the decision on the best page size typically made?,During new machine design.,y
+What are common properties of page sizes in computer systems?,"They are invariably powers of 2, typically ranging from 4,096 bytes (2¹²) to 4,194,304 bytes (2²²).",y
+How does decreasing page size affect page table size?,"Decreasing page size increases the number of pages, which in turn increases the page table size.",y
+"From the perspective of page table size, what page size is desirable?","A large page size is desirable because each active process has its own copy of the page table, and a larger page size means fewer entries are needed.",y
+What is internal fragmentation in the context of memory utilization with paging?,"It is the unused portion of a page that is allocated to a process, occurring because a process's memory requirements rarely end exactly on a page boundary.",y
+How does page size relate to memory utilization and internal fragmentation?,"Memory is better utilized with smaller pages, as this minimizes the average waste (half of the final page) due to internal fragmentation.",y
+What are the three main components of time involved in reading or writing a page?,"Seek time, rotational latency, and transfer time.",y
+"How does transfer time relate to page size, and what page size does this argue for?","Transfer time is proportional to page size, which argues for a small page size to minimize transfer time.",y
+"Which components of I/O time typically dominate, and what does this imply for page size?","Latency and seek time typically dwarf transfer time. This implies that doubling the page size has only a minimal increase in total I/O time, thus arguing for a larger page size to reduce the number of I/O operations.",y
+How do smaller page sizes affect locality and resolution?,"Smaller page sizes improve locality and total I/O efficiency because each page matches program locality more accurately, providing better ""resolution"" by isolating only the memory actually needed.",y
+What is the trade-off between small and large page sizes regarding I/O and allocated memory from a locality perspective?,"Smaller page sizes result in less I/O and less total allocated memory by avoiding the allocation/transfer of unneeded data within a page, unlike larger page sizes.",y
+"How does page size impact the number of page faults, and what page size minimizes page faults?","A smaller page size generally leads to more page faults. To minimize page faults, a larger page size is needed, as it reduces the frequency of needing to fetch new pages.",y
+What are some overhead costs associated with each page fault?,"An interrupt, saving registers, replacing a page, queuing for disk I/O, and updating page tables.",y
+What has been the historical trend regarding page sizes?,"A trend toward larger page sizes, even for mobile systems, with modern systems adopting much larger sizes (e.g., Linux huge pages).",y
+"Define ""hit ratio"" in the context of a TLB.","Percentage of times a cache provides a valid lookup (e.g., TLB effectiveness).",y
+What is a downside of increasing the number of TLB entries to increase the hit ratio?,It is expensive and power-hungry due to the use of associative memory.,y
+"Define ""TLB reach.""",Amount of memory addressable by the translation look-aside buffer.,y
+How is TLB reach calculated?,Number of TLB entries × Page size.,y
+"Ideally, what should the TLB reach be able to contain?",The entire working set for a process.,y
+What happens if a process has insufficient TLB reach?,"The process will spend a significant amount of time resolving memory references by traversing the main page table in memory, instead of using the fast TLB.",y
+"Besides increasing the number of TLB entries, what are other approaches to increase TLB reach?",Increase the page size or provide support for multiple page sizes.,y
+"How does increasing the page size affect TLB reach, given the same number of TLB entries?","It directly multiplies the TLB reach (e.g., changing from 4 KB to 16 KB pages quadruples TLB reach).",y
+What is a potential downside of using larger page sizes to increase TLB reach?,Increased internal fragmentation for some applications.,y
+What is a common feature regarding page size support in most modern architectures?,They support multiple page sizes.,y
+What is the default and an example of a larger page size supported by Linux?,"Linux has a default page size of 4 KB and also supports ""huge pages"" (e.g., 2 MB).",y
+"Define ""huge pages.""","A feature designating a region of physical memory for especially large pages, supported by modern systems like Linux.",y
+"Define ""contiguous bit"" in the context of an ARM v8 TLB entry.","In ARM v8 CPUs, a TLB bit indicating mapping to contiguous memory blocks.",y
+"What is the purpose of the ""contiguous bit"" in ARM v8 TLB entries?","To allow a single TLB entry to map a larger, contiguous block of memory, effectively increasing the TLB reach without increasing the number of TLB entries.",y
+"When multiple page sizes are supported, which component may manage the TLB?","The Operating System (OS), rather than hardware alone.",y
+What is the trade-off associated with software-managed TLB?,"It introduces performance cost, but this can be offset by the increased hit ratio and TLB reach it allows.",y
+What is the primary purpose of inverted page tables?,To reduce the amount of physical memory needed for virtual-to-physical address translations.,y
+How do inverted page tables achieve their purpose?,"They use one entry per page of physical memory, indexed by a combination of process ID and page number (<process-id, page-number>).",y
+What is a key benefit of inverted page tables?,"They significantly reduce the physical memory required to store translation information, as there is only one entry per physical frame, not per virtual page for every process.",y
+What is a major downside of inverted page tables concerning process address space information?,"They no longer contain complete information about the logical address space of a process, which is needed for handling page faults.",y
+How do systems using inverted page tables handle the need for logical address space information during page faults?,"They keep an ""external page table"" (one per process) that looks like a traditional page table and contains virtual page location information.",y
+"When are these external page tables typically referenced, and why is this acceptable?","They are referenced only on a page fault, and thus do not need to be quickly available. They can even be paged in/out themselves as necessary.",y
+What special case can occur with inverted page tables during a page fault?,A page fault may cause another page fault if the external page table itself needs to be paged in.,y
+What does the special case of external page table paging require and cause?,It requires careful kernel handling and can cause a delay in page-lookup processing.,y
+How is demand paging typically designed concerning user programs?,It is designed to be transparent to the user program.,y
+"Can system performance with demand paging be improved even if it's transparent? If so, how?","Yes, system performance can be improved if the user or compiler is aware of demand paging and optimizes program structure accordingly.",y
+Illustrate how program structure affects page faults using the 128x128 array initialization example.,"Initializing in row-major order (accessing one word in each page repeatedly) leads to 16,384 page faults if fewer than 128 frames are allocated. Initializing in column-major order (accessing all words on one page before moving to the next) reduces page faults to 128.",y
+What is the general principle for selecting data and programming structures to improve paging performance?,"Careful selection can increase locality, lower the page-fault rate, and result in a smaller working set.",y
+Provide an example of a data structure with good locality.,"A stack, because access is always to the top.",y
+Provide an example of a data structure with bad locality.,"A hash table, because it tends to scatter memory references.",y
+"What does ""locality of reference"" measure regarding data structure efficiency?",It is one measure of how efficiently a data structure will perform in a paged memory system.,y
+"Besides locality of reference, what other factors contribute to data structure efficiency?","Search speed, total memory references, and total pages touched.",y
+How can compilers and loaders positively affect paging performance regarding code and data?,"By separating code and data and creating reentrant code, code pages can be read-only and never modified, thus becoming ""clean pages"" that don't need to be paged out.",y
+How can loaders optimize routine placement for better paging performance?,By avoiding placing routines across page boundaries (keeping a routine within a single page) and by packing frequently calling routines into the same page.,y
+What classic computer science problem is analogous to packing variable-sized load segments into fixed-sized pages to minimize interpage references?,A variant of the bin-packing problem.,y
+"Why do pages sometimes need to be ""locked"" in memory in a demand paging system?",To prevent pages involved in ongoing I/O operations (to/from user virtual memory) from being paged out by the replacement algorithm.,y
+Describe the problem that can occur if I/O buffers are not locked.,"If a process initiates I/O to a memory buffer and then is suspended, other processes can cause page faults that replace the I/O buffer's page. When the I/O operation completes, it writes to a physical frame now holding a different page, corrupting data.",y
+What is one solution to the I/O paging problem that involves copying data?,"Never execute I/O directly to user memory. Instead, copy data between system memory (where I/O occurs) and user memory.",y
+What is the main drawback of copying data between system and user memory for I/O?,It can introduce high overhead due to extra copying operations.,y
+"What is the preferred solution to the I/O paging problem, involving page state?","Allow pages to be ""locked"" into memory using a lock bit associated with every frame. A locked frame cannot be selected for replacement.",y
+Briefly describe the process for using a lock bit during a write to disk.,"The pages containing the block to be written are locked into memory. Once the I/O operation is complete, the pages are unlocked.",y
+"Define ""locked"" in the context of memory pages.",Fixed in place; pages locked in memory to prevent paging out.,y
+"Define ""pinning"" in the context of memory pages.",Locking pages into memory to prevent them from being paged out.,y
+Why do operating system kernels often keep some or all of their pages locked in memory?,"Many OS designs cannot tolerate a kernel page fault, as it would likely crash the system.",y
+"Can user processes also lock pages, and what is this called?","Yes, user processes may need to lock pages, which is commonly referred to as ""pinning.""",y
+Provide an example of a user process that might need to pin pages.,A database process that manages large chunks of memory and frequently moves blocks between secondary storage and memory.,y
+What are the typical requirements and risks associated with applications using pinning?,"Applications often require special privileges for pinning, and if abused, it can stress memory-management algorithms and deplete available free frames.",y
+How can a lock bit be used in a scenario involving a low-priority and a high-priority process during page replacement?,"When a low-priority process faults and a page is read into memory, if a high-priority process then faults and needs a replacement, the newly brought-in page (clean, not referenced/modified) looks like a perfect candidate. A lock bit can prevent its replacement until the faulting process has been dispatched again and used it once.",y
+What is a significant danger if a lock bit mechanism has a bug?,"A lock bit may get turned on but never turned off, rendering the associated physical frame permanently unusable.",y
+"How does Solaris handle page locking requests from applications, specifically concerning ""locking hints""?","Solaris allows applications to provide ""locking hints,"" but the OS can disregard them if the free-frame pool becomes too small or if a process requests an excessive number of locked pages.",y

@@ -1,0 +1,26 @@
+Front,Back
+How does deadlock occur?,Deadlock occurs if all four necessary conditions for deadlock hold simultaneously.
+How can deadlock be prevented?,Prevent deadlock by ensuring at least one of the four necessary conditions cannot hold.
+When is the mutual-exclusion condition necessary for deadlock?,The mutual-exclusion condition must hold for deadlock to occur.
+What types of resources do not require mutual exclusion and thus cannot be involved in deadlock?,"Sharable resources (e.g., read-only files) do not require mutual exclusion."
+Why can't deadlocks generally be prevented by denying mutual-exclusion?,"Some resources are intrinsically nonsharable (e.g., mutex locks), so mutual exclusion cannot always be denied."
+What is Protocol 1 to prevent 'hold and wait'?,A thread requests and allocates all resources it needs before beginning its execution.
+What is a major impracticality of Protocol 1 for preventing 'hold and wait'?,"It is impractical for dynamic resources, as a thread may not know all resources it will need at the outset."
+What is Protocol 2 to prevent 'hold and wait'?,A thread requests resources only when it is holding none. It must release all current resources before requesting more.
+What are the disadvantages of both protocols for preventing 'hold and wait'?,Low resource utilization and possible starvation.
+What is 'low resource utilization' in the context of 'hold and wait' prevention?,"Resources are allocated but remain unused for long periods, leading to inefficient use of resources."
+What is 'starvation' in the context of 'hold and wait' prevention?,"A thread waits indefinitely for popular resources, potentially never acquiring them."
+What is Protocol 1 to prevent 'no preemption'?,"If a thread requests a resource and must wait, all resources it currently holds are preempted (implicitly released). The thread restarts when its old and new requested resources are all available."
+What is Protocol 2 to prevent 'no preemption'?,"If a requested resource is unavailable, check if it's held by a waiting thread. If so, preempt it and allocate to the requesting thread. If not, the requesting thread waits, and its resources may be preempted by other requests. The thread restarts when new resources are allocated and preempted resources are recovered."
+To what types of resources is 'no preemption' prevention often applied?,"Resources whose state can be saved and restored (e.g., CPU registers, database transactions)."
+To what types of resources can 'no preemption' prevention generally not be applied?,"Mutex locks and semaphores, where deadlocks commonly occur."
+What is a practical solution to prevent 'circular wait'?,Impose a total ordering of all resource types.
+How does imposing a total ordering of resource types prevent 'circular wait'?,Require threads to request resources in increasing order of their enumeration (based on the total ordering).
+What is an alternative rule for requesting resources when using a total ordering to prevent 'circular wait'?,"A thread requesting resource R_j must have released any resource R_i such that F(R_i) ≥ F(R_j), where F is the ordering function."
+How are multiple instances of the same resource type handled when using total ordering to prevent 'circular wait'?,A single request for all needed instances of that resource type must be issued.
+Does the protocol of total ordering resource types prevent 'circular wait'?,"Yes, this protocol prevents circular wait (proof by contradiction)."
+What is a challenge in developing a total ordering for resources to prevent 'circular wait'?,Developing an effective ordering can be difficult for systems with many locks.
+What method does Java use for lock acquisition ordering?,`System.identityHashCode(Object)`.
+Does lock ordering guarantee deadlock prevention if locks are acquired dynamically?,"No, lock ordering does not guarantee deadlock prevention if locks are acquired dynamically (e.g., within a `transaction()` function)."
+Define: deadlock prevention,A set of methods intended to ensure that at least one of the necessary conditions for deadlock cannot hold.
+Define: deadlock avoidance,An operating system method in which processes inform the operating system of which resources they will use during their lifetimes so the system can approve or deny requests to avoid deadlock.

@@ -1,0 +1,278 @@
+Front,Back
+What is a file?,A collection of related information defined by its creator; the smallest allotment of logical secondary storage from a user's perspective; a named collection of related information recorded on secondary storage.
+What is the primary role of the OS regarding files and physical storage?,The OS maps files onto physical mass-storage devices.
+Define 'file system'.,Describes how files map to physical devices and how they are accessed/manipulated.
+What are the key design goals for file systems?,"Efficient access (as physical storage can be slow), file sharing support, and remote access."
+Why is the file system considered the most visible OS aspect for users?,It provides a mechanism for online storage and access to OS data/programs and user data.
+What are the two main components of a file system?,1. A collection of files (storing related data). 2. A directory structure (organizes and provides information about files).
+What kind of storage do most file systems reside on?,"Nonvolatile, persistent storage devices."
+How does the OS provide a uniform logical view of stored information?,It abstracts physical properties to define a logical storage unit called the file.
+What types of information do files commonly represent?,Programs (source/object) and data.
+What are common categories of data files?,"Numeric, alphabetic, alphanumeric, and binary."
+How can files be structured in terms of formatting?,They can be free form (like text) or rigidly formatted.
+What is a 'text file'?,A file containing text (alphanumeric characters); a sequence of characters organized into lines.
+What is a 'source file'?,"A file containing program source code; a sequence of functions (declarations, executable statements)."
+What is an 'executable file'?,A file containing a program ready for loading/execution; a series of code sections a loader can bring into memory and execute.
+How are files typically named for human users?,"They are named symbolically, e.g., `example.c`."
+What does it mean for a file to be 'independent'?,"A file is independent of its creator process, user, and system. A copy remains independent if no sharing or synchronization is involved."
+List the typical attributes of a file.,"Name, Identifier, Type, Location, Size, Protection, Timestamps and user identification."
+What is the 'Name' attribute of a file?,"The symbolic, human-readable name of the file."
+What is the 'Identifier' attribute of a file?,"A unique tag (number), non-human-readable, that identifies the file within the file system."
+What is the 'Type' attribute of a file?,An attribute used in systems supporting different file types to categorize the file.
+What is the 'Location' attribute of a file?,A pointer to the device and the file's location on that device.
+What is the 'Size' attribute of a file?,"The current size of the file (in bytes, words, or blocks), possibly including the maximum allowed size."
+What is the 'Protection' attribute of a file?,"Access-control information, specifying permissions like read, write, or execute."
+"What information is included in 'Timestamps and user identification' attributes of a file, and what is its purpose?","Includes creation time, last modification time, and last use time. Useful for protection, security, and monitoring."
+What are 'extended file attributes'?,"Extended metadata supported by newer file systems, such as character encoding and file checksums."
+What is a 'file info window'?,A GUI view of file metadata.
+Where is information about all files stored within the file system structure?,"In the directory structure, typically on the same device as the files themselves."
+What does a directory entry contain?,"The file name and a unique identifier, which in turn locates other attributes of the file."
+How does the OS typically handle file operations?,"It provides system calls for operations like create, write, read, reposition, delete, and truncate files."
+What are the two steps involved in creating a file?,1. Find space in the file system. 2. Make an entry for the new file in the directory.
+What is typically required before performing most file operations (except create/delete)?,The `open()` system call.
+What is a 'write pointer'?,"The location in a file for the next write operation, maintained by the system during sequential writes."
+What is a 'read pointer'?,"The location in a file for the next read operation, maintained by the system during sequential reads."
+What is the 'current-file-position pointer'?,"A per-process pointer that indicates the next read/write location within a file, shared by read and write operations."
+What is the 'seek' operation in the context of files?,"The operation of changing the current-file-position pointer to a given value, without actual I/O involved."
+What are the steps involved in deleting a file?,1. Search the directory for the named file. 2. Release all file space for reuse. 3. Erase or mark the directory entry as free.
+What are 'hard links'?,File-system links where a file has two or more names pointing to the same inode. The actual content is deleted only when the last link is deleted.
+What does it mean to 'truncate' a file?,"To erase the contents of a file but keep its attributes, resetting the file length to zero and releasing its allocated space."
+Why does the `open()` system call exist for files?,To avoid constant directory searching for file location and attributes during repeated operations on the same file.
+What is an 'open-file table'?,"An OS data structure that contains information about all currently open files, allowing files to be specified by an index into the table rather than requiring directory searches."
+What happens when a file is closed?,The OS removes its entry from the open-file table and releases any associated locks.
+What are the two levels of internal tables the OS uses for open files when multiple processes are involved?,A per-process table and a system-wide open-file table.
+What information does the per-process open-file table track?,"Files a specific process has open, its current file pointer, access rights, and accounting information."
+What information does the system-wide open-file table contain?,"Process-independent information about open files, such as disk location, access dates, and size."
+What is an 'open count' in the context of file management?,"A counter in the system-wide open-file table that tracks the number of processes that currently have a file open. When it reaches zero, the entry is removed."
+What is the purpose of file locks?,"They allow one process to lock a file or sections of a file to prevent other processes from accessing them, useful for shared files like system logs."
+What is a 'shared lock'?,"A type of file lock that allows multiple processes to acquire it concurrently, similar to a reader lock."
+What is an 'exclusive lock'?,"A type of file lock that allows only one process to acquire it at a time, similar to a writer lock."
+Differentiate between 'mandatory' and 'advisory' file-locking mechanisms.,"In mandatory locking, the OS prevents other processes from accessing a locked file (e.g., Windows). In advisory locking, the OS does not prevent access; applications must manually acquire and respect the locks (e.g., UNIX)."
+What is a common technique for indicating file types?,"Including the type as part of the file name, often as an extension (e.g., `name.extension`)."
+How do operating systems typically use file extensions?,"The OS uses the extension to indicate the file type and the allowed operations, such as identifying executable files (.com, .exe, .sh)."
+What is a 'shell script'?,"A file containing a set series of commands specific to a shell, often identified by a `.sh` extension."
+How does macOS handle file types and application associations?,"Each file has a type (e.g., `.app`) and a 'creator attribute' (the program that created it). The OS sets and enforces the creator attribute, allowing double-clicking a file to open the associated application."
+What is a 'magic number' in the context of file types?,"A specific number or byte sequence at the beginning of some binary files that indicates their data type, such as an image format. Text files can also have magic numbers to indicate their shell language, for example."
+How does UNIX generally treat file structures?,Each file is a sequence of 8-bit bytes with no OS interpretation. This provides maximum flexibility but requires applications to interpret the file structure themselves.
+What is the universal file structure that all operating systems must support?,"The executable file structure, necessary for loading and running programs."
+What is the unit of disk I/O?,"All disk I/O operates in units of one block (or sector), and all blocks are typically the same size."
+What is 'internal fragmentation' in file systems?,"Wasted disk space that occurs in the last allocated block of a file because the block size is fixed, and the file's data may not perfectly fill the last block."
+How does block size relate to internal fragmentation?,A larger block size generally leads to greater internal fragmentation.
+What is the fundamental requirement for using information stored in files?,Information stored in files must be accessed and read into memory.
+How many access methods do systems typically provide for file information?,"Some systems provide only one access method, while others provide many."
+What is a major design problem related to file access methods?,Choosing the right access method.
+Define: sequential access,"File-access method: contents read in order, beginning to end."
+What is the simplest file access method?,Sequential access.
+Describe how information is processed using sequential access.,"Information is processed in order, one record after another."
+What are common applications that use sequential access?,Editors and compilers.
+What is the function of the `read_next()` operation in sequential access?,It reads the next portion of the file and automatically advances the file pointer.
+What is the function of the `write_next()` operation in sequential access?,It appends new material to the end of the file and advances the file pointer to the end of the newly written material.
+Can a file using sequential access be reset?,"Yes, a file using sequential access can be reset to the beginning."
+Do all sequential access systems allow skipping records?,Some systems allow skipping forward or backward `n` records.
+What model of file is sequential access based on?,The tape model of a file.
+On what types of devices does sequential access work?,It works on both sequential-access devices and random-access ones.
+Define: direct access,File-access method: contents read in random order.
+Define: relative access,File-access method: contents read in random order.
+What is another name for direct access?,Relative access.
+Define: logical records,File contents logically designated as fixed-length structured data.
+How are files structured in direct access?,Files are structured as fixed-length logical records.
+How do programs read/write records using direct access?,Programs can read or write records rapidly in no particular order.
+What model of file is direct access based on?,The disk model of a file (as disks allow random access).
+How is a file viewed in direct access?,As a numbered sequence of blocks or records.
+Are there restrictions on read/write order in direct access?,"No, there are no restrictions on read/write order."
+What is a significant use case for direct access?,"Immediate access to large amounts of information, such as in databases (e.g., an airline reservation system)."
+How do direct-access file operations typically specify the target location?,"They include a block number as a parameter (e.g., `read(n)`, `write(n)`)."
+What is an alternative way to implement direct access operations while retaining sequential-like operations?,Retain `read_next()` and `write_next()` and add a `position_file(n)` operation.
+Define: relative block number,Index relative to beginning of file (first is block 0).
+What is the starting index for relative block numbers in many systems?,"0 (the first block is 0, the next is 1, etc.). Some systems start at 1."
+Define: allocation problem,OS determination of where to store file blocks.
+What is a benefit of the OS handling the allocation problem for direct access?,It prevents the user from accidentally accessing non-file portions of the file system.
+How does the OS satisfy a request for a record `N` in a direct-access file?,It turns it into an I/O request for `N` bytes starting at `N * (logical record length)`.
+"What makes it easy to read, write, or delete a record in direct access?",Logical records are of fixed size.
+Do all operating systems support both sequential and direct access?,"No, not all operating systems support both."
+When might a file's access method be defined?,Some systems require a file to be defined as sequential or direct at its creation.
+How can sequential access be simulated on a direct-access file?,By keeping a `cp` variable for the current position.
+What is the efficiency of simulating direct access on a sequential-access file?,It is extremely inefficient and clumsy.
+What are other file access methods typically built upon?,Direct-access method.
+Define: index (in the context of file access),"An access method built on direct access, where a file contains an index with pointers to its contents."
+What is a core component of file access methods built on direct access?,An index constructed for the file.
+What does an index contain in the context of file access?,"Pointers to various blocks of the file, similar to a book index."
+How is a record found using an index-based access method?,"Search the index, then use the pointer to access the file directly."
+Give an example of how an index might be structured for a sorted file.,"For a retail-price file sorted by UPC, the index might contain the first UPC in each block."
+What is the process for finding a block using a simple index kept in memory?,"Perform a binary search on the index to find the relevant block, then access that block."
+What challenge arises when index files become too large?,The index file itself might be too large to fit in memory.
+How is the challenge of large index files addressed?,"By creating an index for the index file (e.g., a primary index pointing to secondary indexes, which then point to the data)."
+What is an example of an indexed sequential-access method?,IBM ISAM (Indexed Sequential-Access Method).
+Describe the structure of IBM ISAM indexes.,"A small main index points to disk blocks of a secondary index, and the secondary index blocks then point to the actual file blocks."
+What is a requirement for the file data in IBM ISAM?,The file must be sorted on a key.
+Outline the steps to find an item using IBM ISAM.,1. Perform a binary search on the main index. 2. Get the appropriate secondary index block. 3. Perform a binary search on the secondary index. 4. Find the block containing the record. 5. Perform a sequential search within that block.
+What is the maximum number of direct-access reads typically required to locate any record using an indexed sequential-access method like ISAM?,At most two direct-access reads.
+What is a directory in a file system context?,A symbol table translating file names to file control blocks.
+What are the essential organizational capabilities a directory must allow?,"Insert entries, Delete entries, Search for named entry, List all entries."
+List the common operations on a directory.,"Search for a file, Create a file, Delete a file, List a directory, Rename a file, Traverse the file system."
+What is the purpose of the 'Search for a file' operation on a directory?,To find the entry for a particular file or find files matching a pattern.
+What is the purpose of the 'Create a file' operation on a directory?,To add new files to the directory.
+"What is the purpose of the 'Delete a file' operation on a directory, and what can be a consequence?","To remove a file from the directory; it may leave a hole, requiring defragmentation."
+What is the purpose of the 'List a directory' operation?,To list files and their entry contents.
+What is the purpose of the 'Rename a file' operation on a directory?,To change a file name when its contents/use changes; it may also change the file's position.
+What is the purpose of the 'Traverse the file system' operation on a directory?,"To access every directory/file, typically for backup or space release."
+Describe the simplest directory structure.,"Single-level directory, where all files are in the same directory."
+What are the advantages of a single-level directory?,Easy to support and understand.
+What are the limitations of a single-level directory?,Files must have unique names (name collision problem for multiple users) and it's difficult for a single user to remember many file names.
+How is a two-level directory structured?,"It separates directories for each user, with each user having their own User File Directory (UFD)."
+What is a User File Directory (UFD)?,Per-user directory of files in two-level directory implementation.
+What is the Main File Directory (MFD) in a two-level directory system?,"The system's main file directory, indexed by user name/account, which points to each User File Directory (UFD)."
+How does file searching work when a user refers to a file in a two-level directory system?,Only their User File Directory (UFD) is searched.
+What is an advantage of the two-level directory structure regarding file names?,"Different users can have the same file names, as names are unique only within each User File Directory (UFD)."
+Who typically handles the creation and deletion of User File Directories (UFDs)?,"Special system programs, restricted to administrators."
+What are the disadvantages of a two-level directory structure?,"It isolates users, which is a disadvantage for cooperation; to access another user's file, one must specify both the user name and the file name."
+How can a two-level directory be visualized as a tree structure?,"The Main File Directory (MFD) is the root, User File Directories (UFDs) are descendants, and files are the leaves."
+What is a path name in the context of a two-level directory?,"The combination of the user name and the file name used to locate a file (e.g., '/userb/test.txt' or 'C:\userb\test')."
+What problem arises with system files in a two-level directory structure?,Copying system files to each User File Directory (UFD) wastes space.
+What is the solution to the system file problem in two-level directories?,"Create a special user directory for system files (e.g., user 0)."
+Describe the search sequence for files in a two-level directory system with system file optimization.,"The OS first searches the local User File Directory (UFD), then the special system directory."
+What is a search path?,A sequence of directories searched for an executable file when a command is executed.
+Can search paths be customized in a two-level directory system?,"Yes, the search path can be extended, and users can have their own search paths."
+What is the relationship between tree-structured directories and two-level directories?,Tree-structured directories are a generalization of two-level directories to arbitrary height.
+What is the most common directory structure?,Tree-structured directories.
+"In a tree-structured directory, what are the characteristics of files and path names?","There is a root directory, and every file has a unique path name."
+What can a directory (or subdirectory) contain in a tree-structured directory system?,Files or subdirectories.
+"How is a directory often treated in a tree-structured directory system, and how is its type distinguished?",A directory is often treated as a special file; one bit defines whether an entry is a file (0) or a subdirectory (1).
+How are directories created and deleted in a tree-structured system?,Using special system calls.
+What is a 'current directory' in a tree-structured file system?,Each process has a directory that is currently being referenced.
+How is a file referenced in a tree-structured directory system if it's not in the current directory?,One must specify its path name or change the current directory.
+Where does the initial current directory come from?,From an accounting file.
+Define 'absolute path name' in a tree-structured directory.,"A path name that begins at the root (e.g., '/') and follows the path down to the file."
+Define 'relative path name' in a tree-structured directory.,A path name that defines the path from the current directory.
+Provide an example of a relative path name.,"If the current directory is '/spell/mail', then 'prt/first' refers to '/spell/mail/prt/first'."
+How do users typically organize their files in a tree-structured directory system?,By defining subdirectories based on topic or information type.
+How is a directory deleted if it is empty in some tree-structured systems?,The entry is simply deleted.
+How do some systems (like UNIX with 'rm -r') handle the deletion of a non-empty directory in a tree-structured system?,"They delete the directory and all its files/subdirectories recursively, which is convenient but dangerous."
+How do other systems handle the deletion of a non-empty directory in a tree-structured system if they do not support recursive deletion?,"They only delete the directory if it's empty, requiring the user to delete contents recursively first."
+How can users access other users' files in a tree-structured directory system?,By specifying the full path name or by changing their current directory to the relevant path.
+What is the primary feature of acyclic-graph directories?,They allow directories to share subdirectories and files.
+What constraint defines an acyclic-graph directory structure?,There are no cycles (loops) in the graph.
+What happens when a shared file is modified in an acyclic-graph directory system?,"Changes are visible to all directories sharing the file, as only one actual file exists."
+What happens when new files are added to a shared subdirectory in an acyclic-graph directory system?,The new files appear in all shared subdirectories.
+What are two main ways to implement shared files/subdirectories in an acyclic-graph directory system?,Using links (pointers) or by duplicating all information in both sharing directories.
+What is a 'link' in the context of acyclic-graph directories?,"A file that has no contents but points to another file or subdirectory (e.g., using an absolute or relative path name)."
+What does it mean to 'resolve' a link?,To follow the path name in the link to locate the real target file.
+How does the OS typically handle links during directory traversal in acyclic-graph systems?,It ignores links to preserve the acyclic structure.
+What is a disadvantage of implementing sharing by duplicating all information in both sharing directories?,It leads to consistency issues if the original file/subdirectory is modified.
+What are the main problems associated with acyclic-graph directories?,"Multiple absolute path names for the same file (aliasing), issues with traversing the entire file system efficiently, and complexity in determining when space can be deallocated upon deletion."
+What is the 'aliasing' problem in acyclic-graph directories?,The same file can have multiple absolute path names.
+What is a challenge when traversing an entire file system structured as an acyclic graph?,Avoiding traversing shared structures more than once.
+What problem does deleting a file linked in an acyclic-graph directory present?,Deleting the original file may leave dangling pointers if other links to it still exist.
+How do symbolic links behave upon deletion of the original file?,"Deletion of the link itself doesn't affect the original file, but if the original file is deleted, the symbolic links dangle."
+How can the dangling pointer problem be avoided when deleting files in an acyclic-graph directory system?,"By preserving the file until all references to it are deleted, typically by using a reference count."
+How does a 'reference count' work for file deletion?,The count is incremented on a new link/entry creation and decremented on deletion; the file is deleted only when the count reaches 0.
+What type of links in UNIX use a reference count for deletion?,Hard links.
+What are hard links?,File-system links where a file has two or more names pointing to the same inode.
+What is the main characteristic of a general graph directory structure?,It allows cycles (loops) in the directory structure.
+What is the primary advantage of acyclic graph directories over general graph directories?,Simpler traversal and deletion algorithms.
+What are the problems associated with cycles in a general graph directory structure?,Infinite loops during search/traversal and reference counts may not reach 0 even if a file/directory is inaccessible.
+What is required to determine when space can be reallocated in a general graph directory system with cycles?,Garbage collection.
+What is 'garbage collection' in the context of file systems?,The recovery of space containing no-longer-valid data.
+Why is garbage collection problematic for disk-based file systems?,It can be very time-consuming.
+What is a simpler approach to dealing with cycles in general graph directories?,Bypass links during directory traversal.
+Define 'user file directory (UFD)'.,Per-user directory of files in two-level directory implementation.
+Define 'main file directory (MFD)'.,Index pointing to each UFD in two-level directory implementation.
+Define 'path name'.,"File-system name for a file, containing mount-point and directory-entry info to locate it (e.g., 'C:/foo/bar.txt')."
+Define 'search path'.,Sequence of directories searched for an executable file when a command is executed.
+Define 'absolute path name'.,Path name starting at the top of the file system hierarchy.
+Define 'relative path name'.,"Path name starting at a relative location (e.g., current directory)."
+Define 'acyclic graph' in the context of directory structures.,Directory structure implementation that contains no cycles (loops).
+Define 'link' (in the context of acyclic-graph directories).,File that has no contents but points to another file.
+Define 'resolve' (in relation to links).,To follow a link and find the target file.
+Define 'hard links'.,File-system links where a file has two or more names pointing to the same inode.
+Define 'garbage collection' (in context of file systems).,Recovery of space containing no-longer-valid data.
+What aspect of information safety addresses physical damage?,"Reliability (e.g., duplicate copies, backups)."
+What aspect of information safety addresses improper access?,Protection.
+List common protection mechanisms.,"User name/password authentication, encrypting secondary storage, firewalling network access, and advanced mechanisms for valid data access in multiuser systems."
+What is the 'Read' operation in file access control?,Reading from a file.
+What is the 'Write' operation in file access control?,Writing or rewriting a file.
+What is the 'Execute' operation in file access control?,Loading and executing a file.
+What is the 'Append' operation in file access control?,Writing new information at the end of a file.
+What is the 'Delete' operation in file access control?,Deleting a file and freeing its space.
+What is the 'List' operation in file access control?,Listing a file's name and attributes.
+What is the 'Attribute change' operation in file access control?,Changing a file's attributes.
+"Where is protection typically implemented for higher-level functions (like rename, copy, edit) that use lower-level calls?",At the lower-level calls.
+"What is the most general scheme for access control, where access depends on user identity?",Access-control list (ACL).
+Define 'Access-control list (ACL)'.,A list that specifies user names and the allowed access types for a file. The OS checks this list to determine access.
+What are the advantages of using an Access-control list (ACL)?,It allows for complex access methodologies.
+What are the disadvantages of using an Access-control list (ACL)?,"Lengthy lists (tedious to construct, especially if users are unknown) and variable-size directory entries (complicating space management)."
+"In condensed Access-control lists (ACLs), what are the three user classifications?","Owner, Group, and Other."
+Who is classified as the 'Owner' in condensed ACLs?,The user who created the file.
+Who is classified as the 'Group' in condensed ACLs?,A set of users sharing a file and needing similar access.
+Who is classified as 'Other' in condensed ACLs?,All other users not classified as Owner or Group.
+What is a common approach to access control combining ACLs and user classifications?,"Combining ACLs with owner, group, and universe schemes (e.g., as seen in Solaris)."
+"How many fields do UNIX permissions typically use, and what are they?","Three fields: owner, group, and universe (or others)."
+How are UNIX permissions represented for each field?,"Three bits, typically 'rwx'."
+What does 'r' stand for in UNIX 'rwx' permissions?,Read.
+What does 'w' stand for in UNIX 'rwx' permissions?,Write.
+What does 'x' stand for in UNIX 'rwx' permissions?,Execution.
+"In a UNIX file listing, what does 'd' as the first character indicate?",It indicates a subdirectory.
+How does Solaris show that optional ACLs are present on a file?,"A '+' is appended to the regular permissions string (e.g., '-rw-r--r--+')."
+What commands are used to manage ACLs in systems like Solaris?,setfacl and getfacl.
+How does Windows manage ACLs?,Through a Graphical User Interface (GUI).
+"When both ACLs and group permissions are present, which typically takes precedence?",ACLs typically take precedence over group permissions due to specificity priority.
+What is an alternative protection approach involving passwords and files?,Associating a password with each file.
+When is associating a password with each file effective?,If passwords are random and changed often.
+What are the disadvantages of associating a password with each file?,"Users have too many passwords to remember, or using a single password for all files results in all-or-none protection."
+What is a more common approach than associating passwords with individual files for large-scale protection?,"Encryption of partitions or files, managed with a key password."
+What aspects does directory protection in multilevel structures control?,Control over creation/deletion of files in the directory and control over a user's ability to determine file existence (listing directory contents).
+"If a path name refers to a file, what access is needed for the user to access that file?",The user needs access to both the directory (or directories in the path) and the file itself.
+"In acyclic/general graphs (referring to directory structures), how do access rights vary?",Access rights can be different depending on the path name used to refer to a file.
+What is memory mapping in the context of file access?,An alternative file access method where a file's I/O is treated as routine memory accesses using virtual memory techniques.
+What is a key benefit of using memory-mapped files?,It can lead to significant performance increases by simplifying and speeding up file access.
+How does memory mapping conceptually link a file to memory?,It maps a disk block to one or more pages in memory.
+What happens upon initial access to a memory-mapped file?,"It triggers demand paging, resulting in a page fault."
+What is read into physical memory during the initial access of a memory-mapped file?,A page-sized portion of the file is read into a physical page.
+How are subsequent reads/writes to a memory-mapped file handled?,They are handled as routine memory accesses.
+How do memory-mapped files simplify and speed up file access?,By avoiding `read()` and `write()` system call overhead.
+Are writes to a memory-mapped file immediately reflected on secondary storage?,"No, writes to a memory-mapped file are not necessarily immediate to secondary storage."
+When are updates to a memory-mapped file generally written back to secondary storage?,"Generally, updates are written back when the file is closed."
+What can happen to intermediate changes in a memory-mapped file under memory pressure?,"Under memory pressure, intermediate changes may go to swap space."
+"How do some operating systems, like Solaris, handle all file I/O?","Some OS (e.g., Solaris) memory-map all file I/O, even with standard calls, to kernel address space."
+Can multiple processes map the same file concurrently using memory mapping?,"Yes, multiple processes can map the same file concurrently for data sharing."
+"If multiple processes map the same memory-mapped file, are writes by one process visible to others?","Yes, writes by one process are visible to others mapping the same section."
+How is data sharing via memory-mapped files implemented at a low level?,It is implemented by a virtual memory map pointing to the same physical page.
+Does memory mapping support copy-on-write functionality?,"Yes, it supports copy-on-write, allowing processes to share read-only data and get their own copies for modification."
+What mechanism should processes use for shared data coordination when using memory-mapped files?,Processes should use mutual exclusion for shared data coordination.
+How is shared memory often implemented?,Shared memory is often implemented by memory mapping files.
+What are the two main steps to implement shared memory using memory-mapped files in the Windows API?,1. Create a file mapping for the file. 2. Establish a view of the mapped file in the process's virtual address space.
+How does a second process access shared memory established via memory-mapped files in Windows?,The second process opens and creates a view of the same mapped file.
+What does a mapped file act as in the context of Windows API shared memory?,A mapped file acts as a shared-memory object for inter-process communication.
+Provide an example use case for shared memory implemented with memory-mapped files.,"Producer writes, Consumer reads (classic inter-process communication example)."
+What Windows API call is used to open a file when setting up memory-mapped shared memory?,`CreateFile()` (returns `HANDLE`)
+What Windows API call is used to create a file mapping object after opening the file?,`CreateFileMapping()` (uses file `HANDLE`)
+What Windows API call is used to establish a view of the mapped file in the process's virtual address space?,`MapViewOfFile()` (uses mapped object `HANDLE`)
+What does `CreateFileMapping()` create that allows multiple processes to access the shared memory?,"A named shared-memory object (e.g., `SharedObject`)."
+"What does `MapViewOfFile()` return, and how are accesses to it handled?",It returns a pointer to the shared-memory object; accesses to this memory are accesses to the file.
+"Can only the entire file be mapped using memory mapping, or just a portion?",The entire file or a portion can be mapped.
+How are mapped files handled with respect to paging?,A mapped file may be demand-paged.
+What Windows API call is used to remove a view of a memory-mapped file?,`UnmapViewOfFile()`.
+"Define ""memory mapping"" (file access method).",File-access method where a file is mapped into a process's memory space for direct memory access.
+"In Windows, what is ""file mapping""?",The first step in memory-mapping a file.
+"In Windows, define ""view"" in the context of memory-mapped files.",An address range mapped in shared memory; the second step in memory-mapping a file.
+"In the Windows API, what is a ""named shared-memory object""?",A section of a memory-mapped file accessible by name from multiple processes.
+What is a file?,"An abstract data type representing a sequence of logical records (e.g., byte, line, complex data)."
+What is the operating system's role regarding file record types?,The OS may support specific record types or leave the management of record types to the application.
+What is a primary task of the operating system concerning files?,"To map the logical file concept to physical storage (e.g., hard disk, NVM)."
+How does the OS handle logical records in relation to physical storage?,The OS may order logical records into physical records for storage.
+What is the purpose of directories?,To organize files.
+What is a single-level directory?,A directory structure where all files reside in a single directory.
+What is a problem with single-level directories in multiuser systems?,"Naming problems, as unique file names are required across all users."
+What is a two-level directory?,A directory structure where each user has a separate directory.
+What problem do two-level directories solve?,Naming problems in multiuser systems.
+What information might a two-level directory list for files?,"File name, location, length, type, owner, and times."
+What is a tree-structured directory?,"A generalization of the two-level directory, allowing subdirectories for further organization."
+What is an acyclic-graph directory?,A directory structure that allows sharing of subdirectories and files.
+What are the complications of an acyclic-graph directory?,It complicates searching and deletion processes.
+What is a general graph directory structure?,A directory structure offering complete flexibility in sharing.
+What is a potential requirement for a general graph directory structure?,It may require garbage collection for unused space.
+What are the main challenges associated with remote file systems?,"Reliability, performance, and security."
+What do distributed information systems manage in the context of remote file systems?,"User, host, and access information for shared state."
+Why is file protection needed?,It is needed on multiuser systems.
+What are common types of access control for file protection?,"Read, write, execute, append, delete, and list directory."
+What techniques can be used for file protection?,"Access lists, passwords, and other techniques."

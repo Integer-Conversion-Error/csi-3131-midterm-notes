@@ -1,0 +1,27 @@
+Front,Back,Reversible
+What is memory compression an alternative to?,Paging.,y
+How does memory compression reduce memory usage?,"By compressing several frames into a single frame, without swapping pages to disk.",y
+Describe the initial trigger for memory compression based on the example process.,"A free-frame list falling below a set threshold, which triggers page replacement.",y
+"What happens to selected frames (e.g., 15, 3, 35, 26) when page replacement is triggered for memory compression?",They are placed on a modified-frame list.,y
+"In the memory compression process, what is done with the selected frames instead of writing them to swap space?","They are compressed (e.g., three frames) into a single page frame.",y
+"What is the first step involving a free frame (e.g., Frame 7) in the memory compression process described in the example?",Frame 7 is removed from the free-frame list.,y
+"After a free frame (e.g., Frame 7) is removed, what happens to the selected frames (e.g., 15, 3, 35) in the memory compression process?","They are compressed and stored in the allocated free frame (e.g., Frame 7).",y
+"Where is the frame containing compressed data (e.g., Frame 7) stored after compression?",In a list of compressed frames.,y
+"What happens to the original frames (e.g., 15, 3, 35) after their contents have been compressed and stored elsewhere?",They are moved back to the free-frame list.,y
+What occurs if a compressed frame is referenced?,"A page fault is triggered, the frame is decompressed, and the original pages are restored.",y
+Do mobile systems like Android and iOS typically support standard swapping/paging?,"No, they generally do not.",y
+"What role does memory compression play in the memory-management strategy of mobile systems (Android, iOS)?",It is an integral part of their memory-management strategy.,y
+Which major operating systems support memory compression?,Windows 10 and macOS.,y
+"In Windows 10, which applications are candidates for memory compression?",Universal Windows Platform (UWP) apps on mobile devices.,y
+How does macOS (Version 10.9+) utilize memory compression?,"It compresses LRU (Least Recently Used) pages when free memory is short, and then pages if needed.",y
+How does memory compression performance compare to paging to an SSD on macOS?,Memory compression is faster than paging to an SSD on macOS.,y
+What is a requirement for memory compression in terms of frame allocation?,It requires allocating free frames for compressed pages.,y
+What is an example of significant memory saving possible with memory compression?,Compressing 3 frames into 1 frame.,y
+What two factors are in contention regarding memory compression algorithms?,Compression speed and compression ratio (amount of reduction).,y
+What is the trade-off associated with achieving higher compression ratios?,"It typically requires slower, more computationally expensive algorithms.",y
+What is the balancing goal for most memory compression algorithms?,To achieve high ratios with fast algorithms.,y
+How can memory compression performance be improved?,By using parallel compression with multiple cores.,y
+Name two examples of fast memory compression algorithms and their typical compression effectiveness.,"Microsoft's Xpress and Apple's WKdm, which typically compress data to 30-50% of its original size.",y
+Define memory compression.,An alternative to paging; compresses frame contents to decrease memory usage.,y
+Define Universal Windows Platform (UWP).,A Windows 10 architecture providing a common app platform for all devices running Windows 10.,y
+Define compression ratio.,"A measurement of compression effectiveness, specifically the ratio of compressed space to uncompressed space.",y

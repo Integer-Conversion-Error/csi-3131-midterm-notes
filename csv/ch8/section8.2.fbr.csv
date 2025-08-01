@@ -1,0 +1,14 @@
+Front,Back,Reversible
+What does `pthread_mutex_init()` do?,Initializes an unlocked POSIX mutex lock.,y
+What does `pthread_mutex_lock()` do?,Acquires a POSIX mutex lock; blocks the calling thread if the lock is currently held.,y
+What does `pthread_mutex_unlock()` do?,Releases a POSIX mutex lock.,y
+Describe a classic deadlock scenario involving two threads and two mutexes.,"Two mutexes (`first_mutex`, `second_mutex`) and two threads (`thread_one`, `thread_two`). `thread_one` locks `first_mutex` then `second_mutex`. `thread_two` locks `second_mutex` then `first_mutex`. Deadlock is possible if `thread_one` acquires `first_mutex` and `thread_two` acquires `second_mutex`, causing both to block indefinitely waiting for the other's lock.",y
+Why are deadlocks difficult to identify and test for?,Deadlocks have an intermittent nature; their occurrence depends on the CPU scheduler and thread timing. They might not occur consistently even under similar conditions.,y
+Define livelock.,"A liveness failure where a thread continuously attempts an action that fails. It's similar to deadlock, but threads are not blocked; they are active but make no progress.",y
+How is livelock similar to and different from deadlock?,Both are liveness failures. Deadlock involves blocked threads. Livelock involves active threads continuously attempting failing actions without making progress.,y
+Provide an analogy for livelock.,"Two people trying to pass in a hallway, repeatedly moving into each other's way, active but making no progress.",y
+What does `pthread_mutex_trylock()` do?,"Attempts to acquire a POSIX mutex lock without blocking. It returns immediately, indicating success or failure.",y
+Describe a livelock scenario involving `pthread_mutex_trylock()`.,"`thread_one` acquires `first_mutex`, `thread_two` acquires `second_mutex`. Both then call `trylock` on the other mutex, which fails. They release their currently held locks and repeat the cycle indefinitely, never making progress.",y
+How can livelock often be avoided?,By having threads retry failing operations at random times instead of simultaneously.,y
+What real-world example demonstrates a mechanism to avoid issues similar to livelock?,"In Ethernet, hosts involved in a network collision 'backoff' for a random period before retransmitting data.",y
+Is livelock more or less common than deadlock?,"Livelock is generally less common than deadlock, but both are challenges in concurrent application design.",y

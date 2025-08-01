@@ -1,0 +1,31 @@
+Front,Back,Reversible
+What type of devices commonly use ARM processors?,Mobile devices like smartphones and tablets.,y
+How does Intel's business model differ from ARM's regarding chip production?,"Intel designs and manufactures chips, whereas ARM only designs and licenses architectural designs to manufacturers.",y
+What is ARM's primary business model regarding chip production?,"ARM only designs, licensing architectural designs to manufacturers.",y
+Name some examples of devices/companies that use ARM architecture.,"Apple (iPhone, iPad), and most Android devices.",y
+"Besides mobile devices, what other systems commonly use ARM processors?",Real-time embedded systems.,y
+What is the significance of ARM architecture in terms of production quantity?,"Over 100 billion ARM processors have been produced, making it the most widely used architecture by quantity.",y
+What specific ARM architecture is the focus of this material?,The 64-bit ARM v8 architecture.,y
+What are translation granules in ARM v8 CPUs?,Features of ARM v8 CPUs defining page sizes and regions.,y
+"How many translation granules does ARM v8 have, and what are their sizes?","Three: 4 KB, 16 KB, and 64 KB.",y
+What do translation granules provide in ARM v8?,Different page sizes and larger contiguous memory sections called regions.,y
+What are regions in ARM v8 CPUs?,Contiguous memory areas with separate privilege and access rules.,y
+"For a 4 KB translation granule in ARM v8, what are the associated page and region sizes?","Page Size: 4 KB; Region Sizes: 2 MB, 1 GB.",y
+"For a 16 KB translation granule in ARM v8, what are the associated page and region sizes?",Page Size: 16 KB; Region Size: 32 MB.,y
+"For a 64 KB translation granule in ARM v8, what are the associated page and region sizes?",Page Size: 64 KB; Region Size: 512 MB.,y
+How many levels of paging do 4-KB and 16-KB translation granules support in ARM v8?,Up to four levels of paging.,y
+How many levels of paging do 64-KB translation granules support in ARM v8?,Up to three levels of paging.,y
+"Although ARM v8 is a 64-bit architecture, how many bits are currently used?",Only 48 bits are currently used.,y
+What is the TTBR register in ARM v8?,"It is the translation table base register, an ARM v8 CPU register pointing to the level 0 (outer) page table for the current thread.",y
+"When using a 4-KB granule with all four paging levels, which bits represent the offset within the page?",Bits 0-11 represent the offset within the 4-KB page.,y
+What can table entries for paging levels 1 and 2 refer to in ARM v8?,Another table or a region.,y
+"If a Level-1 page table entry refers to a 1-GB region, which bits are used as the offset?",The low-order 30 bits (0-29).,y
+"If a Level-2 page table entry refers to a 2-MB region, which bits are used as the offset?",The low-order 21 bits (0-20).,y
+How many levels of TLBs does ARM architecture support?,Two levels.,y
+Describe the inner level of TLBs in ARM architecture.,"It consists of two micro TLBs (one for data, one for instructions), and they support ASIDs.",y
+What is a micro TLB in ARM CPUs?,"ARM CPU inner-level TLBs, one for instructions and one for data.",y
+Describe the outer level of TLBs in ARM architecture.,It consists of a single main TLB.,y
+What is the main TLB in ARM CPUs?,ARM CPU outer-level TLB; checked after micro TLB lookup and before page table walk.,y
+Where does the address translation process begin in ARM architecture TLBs?,At the micro-TLB level.,y
+What happens if there's a micro-TLB miss during address translation in ARM?,The main TLB is checked.,y
+What happens if both the micro-TLB and main TLB miss during address translation in ARM?,A page table walk is performed in hardware.,y

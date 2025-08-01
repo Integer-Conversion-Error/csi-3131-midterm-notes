@@ -1,0 +1,35 @@
+Front,Back,Reversible
+How does the OS connect an application's I/O request to hardware like network wires or a disk sector?,"The OS connects application requests to hardware through a series of mappings and lookups, transforming high-level file names into physical device addresses and operations.",y
+How does an application refer to data when reading a file from disk?,By file name.,y
+What is the role of the file system in connecting application requests to hardware?,The file system maps the file name through directories to space allocation on the storage device.,y
+Describe the file name to disk block mapping in MS-DOS for FAT.,"File name maps to a number, which indicates an entry in a file-access table, which then tells which disk blocks are allocated.",y
+Describe the file name to disk block mapping in UNIX.,"File name maps to an inode number, and the inode contains the space-allocation information.",y
+"In MS-DOS for FAT, how is the hardware device identified within a file name?","The first part of the file name (before the colon) identifies the hardware device (e.g., 'C:' for primary hard disk).",y
+How is a device name like 'C:' mapped in MS-DOS?,It is mapped to a specific port address via a device table.,y
+How are device name space and file-system name space structured in MS-DOS?,They are separate due to the colon separator in file names.,y
+What is a benefit of the separate device and file-system name spaces in MS-DOS?,"It is easy to associate extra functionality, such as spooling for printer files.",y
+How is the device name space handled in UNIX compared to MS-DOS?,"In UNIX, the device name space is incorporated into the regular file-system name space, with no clear separation of the device portion in the path name.",y
+"What is a 'mount table' in UNIX, and what is its purpose?","A mount table is an in-memory data structure that associates path name prefixes with specific device names, which are also in the file-system name space. It provides information about each mounted volume, tracking file systems and access.",y
+How does UNIX resolve a path name to find the associated device?,It looks up the path name in the mount table for the longest matching prefix.,y
+What does a mount table entry provide during UNIX path name resolution?,"It provides a device name, which is itself part of the file-system name space.",y
+"When a device name is looked up in UNIX, what information is found?","A <major, minor> device number, not an inode.",y
+What does the 'major device number' identify in UNIX?,It identifies the device driver responsible for handling I/O for that device.,y
+What does the 'minor device number' identify in UNIX?,"It is passed to the device driver to index into a device-specific table, often identifying a specific instance of a device or a partition.",y
+What does a device-table entry provide for a device number?,It provides the port address or memory-mapped address of the device controller.,y
+How do modern OS designs achieve flexibility in I/O request handling?,They use multiple stages of lookup tables and employ general mechanisms for passing requests between applications and drivers.,y
+What is a key benefit of general mechanisms for passing requests in modern OS?,New devices and drivers can be introduced without requiring kernel recompilation.,y
+How do some modern operating systems handle the loading of device drivers?,"They load device drivers on demand, either immediately or upon the first request.",y
+How are device drivers loaded during system boot time?,"The system probes the buses and loads necessary drivers, either immediately or on the first request for a device.",y
+How are devices added after boot handled by the kernel?,"They are detected by error, the kernel inspects them, and loads the appropriate driver dynamically.",y
+What are the complexities associated with dynamic loading and unloading of device drivers?,"It requires more complex kernel algorithms, device-structure locking, and robust error handling.",y
+What is the first step in the life cycle of a blocking read request?,The process issues a blocking 'read()' system call to the file descriptor of an opened file.,y
+"What does the kernel do after a 'read()' system call, regarding the buffer cache?","The kernel system-call code checks parameters. If the requested data is already in the buffer cache, the data is returned, and the I/O is completed without physical I/O.",y
+What happens if the requested data for a blocking read is not in the buffer cache?,"Physical I/O is performed. The process is removed from the run queue, placed on a wait queue for the device, and the I/O request is scheduled.",y
+How does the I/O subsystem send a request to the device driver?,It sends the request via a subroutine call or an in-kernel message.,y
+What are the device driver's responsibilities after receiving an I/O request?,"The device driver allocates kernel buffer space, schedules the I/O, and sends commands to the device controller by writing to device-control registers.",y
+What is the role of the device controller in a read request?,"The device controller operates the device hardware to perform the data transfer (e.g., reading from disk).",y
+How does the device driver monitor or manage data transfer during a read operation?,"The driver may poll for status/data, or it may set up a DMA (Direct Memory Access) transfer to kernel memory. If DMA is used, the DMA controller generates an interrupt upon transfer completion.",y
+What happens when an interrupt is generated upon I/O completion?,"The correct interrupt handler receives the interrupt via the interrupt-vector table, stores the data, signals the device driver, and then returns.",y
+What does the device driver do after receiving a signal from the interrupt handler?,"The device driver receives the signal, determines the completed I/O request and its status, and then signals the kernel I/O subsystem.",y
+What are the kernel's final actions in handling a completed read request?,The kernel transfers the data and/or return codes to the requesting process's address space and moves the process from the wait queue to the ready queue.,y
+What happens to the process after it is moved to the ready queue upon I/O completion?,"Moving the process to the ready queue unblocks it. The scheduler then assigns the CPU to the process, and it resumes execution at the point where the system call completed.",y

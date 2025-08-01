@@ -1,0 +1,54 @@
+Front,Back
+What are common techniques for structuring page tables?,"Hierarchical paging, hashed page tables, and inverted page tables."
+What is the typical size of logical address spaces supported by modern computer systems?,$2^{32}$ to $2^{64}$ bits.
+What problem arises with page tables when supporting large logical address spaces?,The page table itself becomes excessively large.
+"For a 32-bit logical address space with a 4 KB page size, how many entries would a traditional page table have?",Over 1 million entries ($2^{20}$).
+"Given a 32-bit logical address space, 4 KB page size, and 4-byte entries, how much physical address space would the page table alone consume per process?",Up to 4 MB.
+What is a common solution to the problem of excessively large page tables?,Divide the page table into smaller pieces.
+What is the 'two-level paging algorithm'?,A method where the page table itself is paged.
+"In a two-level paging algorithm for a 32-bit logical address space with a 4 KB page size, how is the logical address divided?",Into a 20-bit page number and a 12-bit page offset.
+"In a two-level paging algorithm for a 32-bit logical address space, how is the 20-bit page number further divided?","$p_1$ (10-bit outer page number, index into outer page table) and $p_2$ (10-bit inner page offset, displacement within inner page table)."
+How does address translation occur in a two-level paging scheme?,From the outer page table inward.
+What is a forward-mapped page table?,A scheme for hierarchical page tables where address translation starts at the outer page table and moves inward.
+Why is a two-level paging scheme inappropriate for a 64-bit logical address space?,"Even with a 4 KB page size, the page table could have up to $2^{52}$ entries, resulting in an outer page table of $2^{42}$ entries or 16 GB, which is still too large."
+What is a three-level paging scheme?,A hierarchical paging method that further pages the outer page table of a two-level scheme.
+Why are hierarchical page tables generally inappropriate for 64-bit architectures?,"Because they would require too many levels of paging (e.g., seven for 64-bit UltraSPARC), leading to prohibitive memory accesses."
+What is the primary approach that hashed page tables handle?,Handling address spaces larger than 32 bits.
+What is used as the hash value in a hashed page table?,The virtual page number.
+How do hashed page tables handle collisions?,Each entry in the hash table points to a linked list of elements.
+What three fields does each element in a hashed page table's linked list consist of?,"1. Virtual page number.
+2. Value of the mapped page frame.
+3. Pointer to the next element in the linked list."
+Describe the algorithm for a hashed page table lookup.,"The virtual page number in the virtual address is hashed into the hash table. The virtual page number is compared with field 1 in the first element of the linked list. If they match, the corresponding page frame (field 2) is used to form the physical address. If no match, subsequent entries in the linked list are searched."
+What is a clustered page table?,"Similar to a hashed page table, but an entry refers to a cluster of several pages (e.g., 16) instead of a single page."
+"What is a benefit of clustered page tables, and for what type of address spaces are they useful?","A single page-table entry stores mappings for multiple physical-page frames, making them useful for sparse address spaces where memory references are noncontiguous or scattered."
+"In memory management, what does 'sparse' describe?","A page table with noncontiguous, scattered entries; an address space with many holes."
+What is a significant drawback of standard page tables in terms of memory consumption?,"Each page table may consist of millions of entries, consuming large amounts of physical memory."
+What is an inverted page table?,"A page-table scheme with one entry for each real physical page frame in memory, mapping to a logical page (virtual address) value."
+What information does each entry in an inverted page table contain?,"The virtual address of the page stored in that real memory location, plus process information (often an address-space identifier or process-id)."
+How many page tables are typically present in a system utilizing inverted page tables?,"Only one page table, with one entry per physical memory page."
+Which systems are examples of those that use inverted page tables?,64-bit UltraSPARC and PowerPC.
+"In the IBM RT simplified version of an inverted page table, what is the structure of the virtual address and the inverted page-table entry?","Virtual address: <process-id, page-number, offset>. Inverted page-table entry: <process-id, page-number>."
+Describe the memory reference process in the IBM RT simplified version of an inverted page table.,"The <process-id, page-number> from the virtual address is presented to the memory subsystem. The inverted page table is searched for a match. If a match is found at entry 'i', the physical address <i, offset> is generated. If no match, it's an illegal address access."
+What is a main drawback of inverted page tables concerning search time?,"It increases the time to search the table because the table is sorted by physical address, but lookups are by virtual address."
+How can the increased search time in inverted page tables be alleviated?,By using a hash table to limit the search.
+What is the performance implication of using a hash table with inverted page tables for address translation?,"Each access to the hash table adds a memory reference, meaning one virtual memory reference requires at least two real memory reads (one for the hash-table entry, one for the page table entry)."
+What is searched first to improve performance with inverted page tables?,The TLB (Translation Lookaside Buffer).
+"What issue arises with shared memory when using inverted page tables, compared to standard paging?","Standard paging allows multiple virtual addresses to map to the same physical address. Inverted page tables only have one virtual page entry for every physical page, meaning one physical page cannot have two or more shared virtual addresses. If another process sharing memory references it, it might cause a page fault and replace the mapping."
+What is characteristic of the Oracle SPARC Solaris approach to virtual memory?,Modern 64-bit CPU and OS are tightly integrated for low-overhead virtual memory.
+What operating system and CPU are discussed in the Oracle SPARC Solaris section?,Solaris running on SPARC CPU.
+How does Oracle SPARC Solaris efficiently solve the virtual memory problem?,By using hashed page tables.
+"How many hash tables does Oracle SPARC Solaris use for virtual memory, and what do they map?",Two hash tables: one for the kernel and one for all user processes. Both map virtual to physical memory.
+"What do the hash-table entries in Oracle SPARC Solaris represent, and why is this efficient?","Each entry represents a contiguous area of mapped virtual memory (a 'span'), which is more efficient than a per-page entry."
+What two fields does an Oracle SPARC Solaris hash-table entry include?,Base address and span (number of pages represented).
+What is the TLB (Translation Lookaside Buffer)?,A cache that holds translation table entries (TTEs) for fast hardware lookups.
+What is the TSB (Translation Storage Buffer) in Oracle SPARC Solaris?,A cache of TTEs (translation table entries) that includes an entry per recently accessed page.
+Describe the steps of a virtual address reference process in Oracle SPARC Solaris when a translation is not immediately found in the TLB.,"1. Hardware searches TLB for translation.
+2. None found, hardware walks through in-memory TSB (TLB walk).
+3. Match in TSB, CPU copies TSB entry into TLB, memory translation completes.
+4. No match in TSB, kernel interrupted to search hash table.
+5. Kernel creates TTE from hash table, stores in TSB for automatic loading into TLB by MMU.
+6. Interrupt handler returns control to MMU, completes address translation, retrieves data."
+What is a TLB walk?,The steps involved in traversing page-table structures to locate a needed translation and copying the result into the TLB.
+What is Solaris?,"A UNIX derivative, main operating system of Sun Microsystems (now Oracle); active open source version called Illumos."
+What is SPARC?,A proprietary RISC CPU created by Sun Microsystems (now Oracle); active open source version called OpenSPARC.

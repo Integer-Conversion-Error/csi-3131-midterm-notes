@@ -1,0 +1,47 @@
+Front,Back,Reversible
+What are the three fundamental approaches users interface with the OS?,"Command-line interface (CLI) or command interpreter, and two forms of graphical user interface (GUI).",y
+"How do most operating systems (e.g., Linux, UNIX, Windows) treat the command interpreter?",As a special program run at process initiation or user login.,y
+What are systems with multiple command interpreters known as?,Shells.,y
+Provide examples of shells on UNIX/Linux systems.,"C shell, Bourne-Again shell, Korn shell.",y
+What is true about the functionality of different shells?,They provide similar functionality; choice is personal preference.,y
+What is the main function of a command interpreter (or shell)?,"To get and execute user commands, often manipulating files (e.g., create, delete, list, print, copy, execute).",y
+What are two ways commands can be implemented within a command interpreter?,"The interpreter contains the execution code, or commands are separate system programs.",y
+What is a characteristic of commands implemented where the interpreter contains the code?,"The interpreter holds the execution code, which increases its size.",y
+How are most commands implemented (regarding command interpreters)?,As separate system programs.,y
+Provide an example of a command implemented as a separate system program in UNIX.,`rm file.txt` executes the `rm` program.,y
+What is an advantage of implementing commands as separate system programs?,It allows easy addition of new commands without changing the interpreter.,y
+What does GUI stand for?,Graphical User Interface.,y
+How do users interact with a GUI?,With a mouse-based window-and-menu system using a desktop metaphor.,y
+What do icons represent in a GUI?,"Programs, files, and functions.",y
+How are actions invoked using icons or menus in a GUI?,By clicking icons or selecting from menus.,y
+Where did GUIs originate?,"Xerox PARC (1973, Xerox Alto).",y
+Which company helped make GUIs widespread in the 1980s?,Apple Macintosh.,y
+What GUI interface did macOS adopt?,Aqua interface.,y
+How did Microsoft Windows first incorporate a GUI?,Version 1.0 added a GUI to MS-DOS.,y
+Name two GUIs available for traditionally CLI-dominated UNIX systems.,KDE and GNOME.,y
+Under what type of licenses are KDE and GNOME available?,Open-source licenses.,y
+What type of interface do smartphones and tablets typically use?,A touch-screen interface.,y
+Why are CLI/mouse systems impractical for smartphones and tablets?,Because they are designed for touch-screen interaction.,y
+How do users interact with a touch-screen interface?,"Via gestures (e.g., pressing, swiping).",y
+How do most mobile devices handle keyboard input?,They simulate keyboards on the touch screen.,y
+What touch-screen interface do Apple iPhone/iPad use?,Springboard.,y
+What often determines the choice between CLI and GUI?,Personal preference.,y
+Who typically prefers the CLI?,System administrators and power users.,y
+Why do system administrators and power users prefer the CLI?,"For efficiency and faster access, especially for repetitive tasks via shell scripts.",y
+How do some systems handle functionality distribution between GUI and CLI?,"They offer only a subset of functions via GUI, reserving less common tasks for CLI.",y
+What interface do most Windows users prefer?,The GUI.,y
+What interfaces do recent Windows versions offer?,Both standard GUI and touch-screen interfaces.,y
+What interfaces does macOS provide?,Both the Aqua GUI and a command-line interface.,y
+What is the kernel of macOS based on?,UNIX.,y
+"What type of interface do mobile systems (e.g., iOS, Android) predominantly use?",Touch-screen interfaces.,y
+Is the user interface typically part of the core OS structure?,"No, it is typically separate.",y
+Define: command interpreter,OS component interpreting user commands.,y
+Define: shell,A command interpreter on systems with multiple choices.,y
+Define: desktop (GUI),GUI workspace on screen.,y
+Define: icons (GUI),Images representing objects in GUI.,y
+Define: folder,File system component for grouping files.,y
+Define: gestures (touch-screen interface),"Motions causing computer actions (e.g., ""pinching"").",y
+Define: Springboard,The iOS touch-screen interface.,y
+Define: system administrators,"Users who configure, monitor, and manage systems.",y
+Define: power users,Users with deep system knowledge.,y
+Define: shell script,File containing a series of commands for a specific shell.,y

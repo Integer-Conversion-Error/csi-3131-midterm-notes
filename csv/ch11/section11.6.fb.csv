@@ -1,0 +1,55 @@
+Front,Back
+What is swapping?,The process of moving entire processes between secondary storage and main memory.
+When does swapping typically occur?,"When physical memory is critically low, processes are moved to swap space to free memory."
+How do modern operating systems typically implement swapping?,"Modern OS combine swapping with virtual memory, swapping individual pages rather than entire processes."
+"Are the terms ""swapping"" and ""paging"" used interchangeably in modern OS contexts?",Yes.
+Define swap-space management.,A low-level OS task of managing space on secondary storage for swapping and paging.
+How does virtual memory utilize secondary storage?,As an extension of main memory.
+What is the impact of swap space on system performance?,It significantly decreases system performance because drive access is much slower than main memory access.
+What is the main goal for swap space design and implementation?,To provide the best throughput for the virtual memory system.
+How does swap space usage vary between operating systems?,It is used differently by various OS depending on their memory-management algorithms.
+What do traditional swapping systems hold in swap space?,The entire process image (code and data segments).
+What do paging systems store in swap space?,Pages that have been pushed out of main memory.
+What is the typical range for the amount of swap space needed?,It varies from a few megabytes (MB) to gigabytes (GB).
+What factors determine the amount of swap space needed?,"Physical memory, virtual memory backing, and virtual memory usage."
+Is it safer to overestimate or underestimate the amount of swap space required?,It is safer to overestimate.
+What are the consequences of running out of swap space?,The system may abort processes or crash.
+What is the consequence of overestimating swap space?,It wastes secondary storage space but causes no other harm.
+How did Solaris traditionally determine the recommended swap space amount?,Swap space was set equal to the virtual memory exceeding pageable physical memory.
+What was the past Linux recommendation for swap space amount?,Double the physical memory.
+Why has the Linux recommendation for swap space changed today?,Today's Linux uses considerably less swap space due to changes in paging algorithms.
+"Can some operating systems, like Linux, utilize multiple swap spaces?","Yes, they can allow multiple swap spaces, which can be files or dedicated partitions."
+Where are multiple swap spaces typically located when used?,Usually on separate storage devices.
+What is the purpose of having multiple swap spaces on separate storage devices?,To spread the I/O load from paging/swapping over the system's I/O bandwidth.
+What are the two primary locations where swap space can reside?,Carved out of a normal file system (as a large file) or in a separate raw partition.
+How is swap space managed when it resides as a file within a normal file system?,"Normal file-system routines are used to create, name, and allocate its space."
+Define raw partition.,A partition within a storage device not containing a file system.
+What is a key characteristic of swap space located in a raw partition regarding file systems?,It has no file system or directory structure.
+Who manages block allocation and deallocation for swap space in a raw partition?,A separate swap-space storage manager.
+What is the primary optimization goal for the swap-space manager in a raw partition?,"Speed, not storage efficiency."
+How does the frequency of access to swap space compare to file systems?,Swap space is accessed more frequently than file systems.
+"What potential issue may increase with swap space in raw partitions, and why is it considered an acceptable trade-off?","Internal fragmentation may increase, which is acceptable because the data life in swap space is shorter."
+How is fragmentation in raw swap partitions typically managed or resolved?,It is short-lived because the swap space is reinitialized at boot time.
+How is the amount of swap space determined when using the raw-partition approach?,It is a fixed amount determined during disk partitioning.
+How can additional swap space be added when using the raw-partition approach?,By repartitioning the device (which might involve moving or destroying other partitions) or by adding another swap space elsewhere.
+Are all operating systems rigid in their swap space location choices?,"No, some OS (like Linux) are flexible and can swap in both raw partitions and file-system space."
+What is the trade-off involved when choosing between file system-based swap space and raw partitions?,The convenience of file system allocation/management versus the performance of raw partitions.
+How did traditional UNIX kernels manage swapping?,They copied entire processes between contiguous disk regions and memory.
+How did later UNIX systems evolve their swapping mechanisms with the advent of paging hardware?,They evolved to a combination of swapping and paging.
+What significant change did Solaris 1 introduce regarding standard UNIX swap methods?,It changed them for improved efficiency and to adapt to technological developments.
+"In systems like Solaris, what happens to text-segment pages (code) during execution and if selected for pageout?","They are brought from the file system, accessed in memory, and then thrown away if selected for pageout."
+Why is it more efficient to reread a text-segment page from the file system than to write it to swap and then reread it?,It is more efficient to reread the page from the file system than to write it to swap and then reread it.
+For what type of memory is swap space primarily used as a backing store in modern systems like Solaris and Linux?,Pages of anonymous memory.
+Define anonymous memory.,Memory not associated with a file; dirty pages paged out are stored in swap space.
+What was a significant change in later Solaris versions regarding swap space allocation timing?,"It allocates swap space only when a page is forced out of physical memory, not when the virtual memory page is first created."
+Why does the later Solaris swap allocation scheme offer better performance on modern computers?,"Because modern computers have more physical memory, leading to less frequent paging."
+How is Linux's use of swap space similar to Solaris's?,"Linux, like Solaris, uses swap space primarily for anonymous memory."
+What types of swap areas does Linux allow?,"One or more swap areas, which can be a swap file on a regular file system or a dedicated swap partition."
+"What does each swap area in Linux consist of, and what do these components hold?","A series of 4-KB page slots, which hold swapped pages."
+Define page slot (in Linux swap-space management).,"In Linux swap-space management, a part of the data structure tracking swap-space use."
+What data structure is associated with each swap area in Linux?,"A swap map, which is an array of integer counters."
+Define swap map (in Linux swap-space management).,"In Linux swap-space management, a part of the data structure tracking swap-space use."
+"In a Linux swap map, what does each counter correspond to?",A page slot.
+"In a Linux swap map, what does a counter value of 0 indicate?",The corresponding page slot is available.
+"In a Linux swap map, what does a counter value greater than 0 indicate?",The corresponding page slot is occupied by a swapped page.
+What specific information does the value of a counter in a Linux swap map provide?,"It indicates the number of mappings to the swapped page (e.g., 3 means it's mapped to 3 processes if it's shared memory)."

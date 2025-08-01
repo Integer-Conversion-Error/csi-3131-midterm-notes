@@ -1,0 +1,40 @@
+Front,Back,Reversible
+Why do files need to be accessed and read into memory?,Files store information that must be processed.,y
+How many file access methods do systems typically offer?,"Some systems provide only one access method, while others provide many.",y
+What is a major design problem related to file access methods?,Choosing the right access method for a given application.,y
+Define sequential access.,"A file-access method where contents are read in order, from beginning to end.",y
+What is the characteristic processing order of sequential access?,"Information is processed one record after another, in order.",y
+Name common applications that use sequential access.,Editors and compilers.,y
+What is the function of `read_next()` in sequential access?,Reads the next portion of the file and automatically advances the file pointer.,y
+What is the function of `write_next()` in sequential access?,Appends data to the end of the file and advances the file pointer to the end of the newly written material.,y
+Can a sequential file be reset to its beginning?,Yes.,y
+What optional capabilities might some sequential access systems offer for navigation?,The ability to skip forward or backward `n` records.,y
+On what conceptual model of a file is sequential access based?,The tape model of a file.,y
+On what types of storage devices does sequential access work?,It works on both sequential-access devices and random-access devices.,y
+Define direct access (or relative access).,A file-access method where contents are read in random order.,y
+How are files structured for direct access?,As fixed-length logical records.,y
+What is the main advantage of direct access regarding read/write operations?,"Programs can read and write records rapidly in no particular order, with no restrictions on order.",y
+On what conceptual model of a file is direct access based?,"The disk model of a file, which allows random access.",y
+How is a file viewed when using direct access?,As a numbered sequence of blocks or records.,y
+What is a significant application area for direct access?,"Immediate access to large amounts of information, such as in databases (e.g., airline reservation systems).",y
+How do direct-access file operations specify the target block?,"They include a block number as a parameter, like `read(n)` or `write(n)`.",y
+What is an alternative way to implement direct access operations while keeping sequential-like commands?,"Retain `read_next()` and `write_next()`, but add a `position_file(n)` operation.",y
+What is a relative block number?,"An index relative to the beginning of the file (first block is 0), provided by the user.",y
+"What is the ""allocation problem"" in the context of file systems?",The operating system's determination of where to store file blocks.,y
+What security benefit does using relative block numbers provide?,It prevents the user from accessing non-file portions of the file system.,y
+Do all systems use 0 as the starting relative block number?,"No, some systems start relative block numbers at 0, while others start at 1.",y
+How is a request for record N translated into an I/O request in direct access?,It is turned into an I/O request for `N` bytes starting at `N * (logical record length)`.,y
+Why are fixed-size logical records beneficial in direct access?,"They make it easy to read, write, and delete records.",y
+Is it universal for operating systems to support both sequential and direct access?,"No, not all operating systems support both. Some require a file to be defined as sequential or direct at creation.",y
+How can sequential access be simulated on a direct-access file?,By maintaining a `cp` (current position) variable.,y
+What are the implications of trying to simulate direct access on a sequential-access file?,It is extremely inefficient and clumsy.,y
+What access method is built on top of direct access?,Indexed access methods.,y
+Define an index as an access method.,"An access method built on direct access where a file contains an index with pointers to its contents, similar to a book index.",y
+What is the general procedure to find a record using an index?,"Search the index, then use the pointer to access the file directly.",y
+Provide an example scenario for using an index.,"A retail-price file sorted by UPC, where the index contains the first UPC in each block, which can be kept in memory.",y
+How is record access achieved with an index when the index itself fits in memory?,"Binary search the index to find the relevant block, then access that block.",y
+What is the solution when an index file is too large to fit in memory?,"Construct an index for the index file, creating a hierarchical structure (e.g., primary index pointing to secondary index, which points to data).",y
+Name an example of an indexed sequential-access method.,IBM ISAM.,y
+Describe the structure of a hierarchical index system like IBM ISAM.,"A small main index points to disk blocks of a secondary index, and these secondary index blocks then point to the actual file blocks. The file itself is sorted on a key.",y
+Outline the step-by-step process to find an item using a two-level indexed system like ISAM.,1. Binary search the main index. 2. Get the secondary index block. 3. Binary search the secondary index. 4. Find the block containing the record. 5. Perform a sequential search within that block.,y
+What is the maximum number of direct-access reads needed to locate any record using a two-level indexed method (like ISAM's secondary index)?,At most two direct-access reads (after the initial index searches).,y
